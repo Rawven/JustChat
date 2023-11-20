@@ -1,7 +1,7 @@
-package org.example.dao;
+package Raven.example.dao;
 
+import Raven.example.entity.po.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.example.entity.po.User;
 
 public interface UserMapper extends BaseMapper<User> {
 }
