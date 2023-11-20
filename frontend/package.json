@@ -10,8 +10,12 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "axios": "^1.6.2",
+    "element-plus": "^2.4.2",
+    "jquery": "^3.7.1",
     "pinia": "^2.1.7",
     "vue": "^3.3.4",
+    "vue-resource": "^1.5.3",
     "vue-router": "^4.2.5"
   },
   "devDependencies": {
