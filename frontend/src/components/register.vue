@@ -27,7 +27,8 @@ export default {
       user: {
         username: '',
         email: '',
-        password: ''
+        password: '',
+        profile: ''
       }
     };
   },
@@ -37,9 +38,10 @@ export default {
       this.$refs.registerForm.validate((valid) => {
         if (valid) {
           // 发送注册请求
-          axios.post('https://api.example.com/register', this.user)
+          axios.post('localhost:8080/register', this.user)
               .then(response => {
                 console.log('Registration successful:', response.data);
+                  
                 // 注册成功后可以进行相关的处理，例如跳转到登录页面
                 // this.$router.push('/login');
               })

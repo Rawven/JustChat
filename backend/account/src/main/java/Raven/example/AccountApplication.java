@@ -1,5 +1,6 @@
 package Raven.example;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
@@ -9,7 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @date 2023/11/20
  */
 @SpringBootApplication
-
+@MapperScan("Raven.example.dao")
 public class AccountApplication {
     public static void main(String[] args) {
         System.out.println("Hello world!");

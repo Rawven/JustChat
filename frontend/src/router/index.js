@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import loginView from "@/views/LoginView.vue";
-import login from "@/components/login.vue";
 import registerView from "@/views/RegisterView.vue";
 
 const router = createRouter({
