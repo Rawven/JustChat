@@ -11,6 +11,7 @@
     <modules>
         <module>account</module>
         <module>common</module>
+        <module>gateway</module>
     </modules>
 
     <properties>
@@ -49,6 +50,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>
