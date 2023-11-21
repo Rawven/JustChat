@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
  * @author 刘家辉
  * @date 2023/11/20
  */
-@Service
 public interface AccountService {
     /**
      * login
@@ -24,6 +23,7 @@ public interface AccountService {
      * register
      *
      * @param registerModel register model
+     * @return {@link String}
      */
-    void register (RegisterModel registerModel);
+    String register (RegisterModel registerModel);
 }

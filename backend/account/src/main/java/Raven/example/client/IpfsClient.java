@@ -7,7 +7,9 @@ import io.ipfs.api.NamedStreamable;
 import io.ipfs.multihash.Multihash;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
@@ -22,19 +24,13 @@ import java.io.IOException;
  * @date 2023/11/21
  */
 @RefreshScope
-@Configuration
+@Component
 public class IpfsClient {
-    @Value("${ipfs.server-addr")
-    private String serverAddr;
-
-    @Value("${ipfs.gateway")
-    private String gateway;
-
     private static IPFS ipfsClient;
 
     @PostConstruct
     public void init(){
-        ipfsClient = new IPFS(serverAddr);
+        ipfsClient = new IPFS("/ip4/127.0.0.1/tcp/5001");
     }
 
     /**
@@ -64,22 +60,13 @@ public class IpfsClient {
     }
 
     /**
-     * 获取http访问地址
-     * @param cid 文件cid
-     * @return 返回uri
-     */
-    public String getUri(String cid){
-        return gateway + "/ipfs/" + cid;
-    }
-
-    /**
+     * add identification
      * 添加唯一标识
      *
      * @param prefix 文件名缀
      * @param suffix 文件后缀
-     * @param file 原文件
+     * @param file   原文件
      * @return 文件
-     * @throws IOException 文件传输异常
      */
     private File addIdentification(MultipartFile file, String prefix, String suffix){
         File f = null;

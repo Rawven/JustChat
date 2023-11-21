@@ -26,9 +26,9 @@ public class AccountController {
     }
 
     @PostMapping("/register")
-    public CommonResult<Void> register(@RequestBody RegisterModel registerModel) {
-        accountService.register(registerModel);
-        return CommonResult.operateSuccess("注册成功");
+    public CommonResult<String> register(@RequestBody RegisterModel registerModel) {
+
+        return CommonResult.operateSuccess("注册成功",accountService.register(registerModel));
     }
 
 }

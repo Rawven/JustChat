@@ -11,6 +11,8 @@ import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 /**
  * account service impl
@@ -18,31 +20,33 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author 刘家辉
  * @date 2023/11/20
  */
-
+@Service
 public class AccountServiceImpl implements AccountService {
     @Autowired
     private UserMapper userMapper;
     @Autowired
     private IpfsClient ipfsClient;
 
+    @Value("${Raven.key}")
+    private String key;
     @Override
     public String login(LoginModel loginModel) {
         User user = userMapper.selectOne(new QueryWrapper<User>().
                 eq("username", loginModel.getUsername()).
                 eq("password", loginModel.getPassword()));
         Assert.notNull(user, "用户名或密码错误");
-        return JwtUtil.createToken(user.getId());
+        return JwtUtil.createToken(user.getId(),key);
     }
 
     @Override
-    public void register(RegisterModel registerModel) {
+    public String register(RegisterModel registerModel) {
          Assert.isNull( userMapper.selectOne(new QueryWrapper<User>().
                 eq("username", registerModel.getUsername())));
-        Assert.isTrue(userMapper.insert(new User().
+        User user = new User();
+        Assert.isTrue(userMapper.insert(user.
                 setUsername(registerModel.getUsername()).
                 setPassword(registerModel.getPassword())
-                .setEmail(registerModel.getEmail())
-                .setProfile(ipfsClient.upload(registerModel.getProfile())))>0);
-
+                .setEmail(registerModel.getEmail())) >0);
+        return JwtUtil.createToken(user.getId(),key);
     }
 }

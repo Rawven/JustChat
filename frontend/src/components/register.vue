@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2>Register</h2>
-    <el-form ref="registerForm" :model="user" label-width="80px" @submit.native.prevent="register">
+    <el-form :model="user" :rules="rules" ref="registerForm" label-width="80px">
       <el-form-item label="Username" prop="username">
         <el-input v-model="user.username" required></el-input>
       </el-form-item>
@@ -22,28 +22,36 @@
 import axios from 'axios';
 
 export default {
+  name: 'userRegister',
   data() {
     return {
       user: {
         username: '',
         email: '',
         password: '',
-        profile: ''
-      }
+      },
+      rules: {
+        // Add validation rules if needed
+        username: [{ required: true, message: 'Please enter your username', trigger: 'blur' }],
+        email: [
+          { required: true, message: 'Please enter your email', trigger: 'blur' },
+        ],
+        password: [{ required: true, message: 'Please enter your password', trigger: 'blur' }],
+      },
     };
   },
   methods: {
     register() {
-      // 校验表单
+      // 表单校验
       this.$refs.registerForm.validate((valid) => {
         if (valid) {
           // 发送注册请求
-          axios.post('localhost:8080/register', this.user)
+          axios.post('http://localhost:8080/account/register', this.user)
               .then(response => {
                 console.log('Registration successful:', response.data);
-                  
+                localStorage.setItem("token", response.data);
                 // 注册成功后可以进行相关的处理，例如跳转到登录页面
-                // this.$router.push('/login');
+                this.$router.push('/login');
               })
               .catch(error => {
                 console.error('Registration error:', error);
@@ -52,11 +60,11 @@ export default {
           this.$message.error('Please fill in all required fields.');
         }
       });
-    }
+    },
   }
 };
 </script>
 
 <style scoped>
-/* 可以根据需要添加一些样式 */
+/* 根据需要添加样式 */
 </style>
