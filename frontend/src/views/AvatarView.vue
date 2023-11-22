@@ -1,7 +1,7 @@
 <template>
-        <div>
-          <Avatar />
-        </div>
+  <div>
+    <Avatar/>
+  </div>
 
 </template>
 

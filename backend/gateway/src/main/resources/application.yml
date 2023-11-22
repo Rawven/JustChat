@@ -1,9 +1,34 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  redis:
+     address: redis://10.21.32.221:6379
+     password: 123456
+  application:
+    name: JC-Gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true # 开启从注册中心动态创建路由的功能，利用微服务名进行路由
+      routes: # 路由配置
+        - id: account # 路由的id，没有固定规则但要求唯一，建议配合服务名
+          uri: lb://JC-Account # 匹配后提供服务的路由地址
+          predicates: # 断言，路由匹配条件
+            - Path=/account/** # 匹配的路径
+          filters: # 过滤器
+            - StripPrefix=1 # 去掉路径中的第一级
+    nacos:
+      discovery:
+        server-addr: 10.21.32.154:8848
+
   datasource:
     url: jdbc:mysql://10.21.32.154:3306/JustChat?useUnicode=true&characterEncoding=utf-8&useSSL=false
     username: user
     password: 123456
 server:
-  port: 8031
+  port: 7000
 Raven:
   key: 爱你老妈

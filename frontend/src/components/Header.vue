@@ -8,7 +8,7 @@ export default {
 <template>
   <el-header class="navbar">
     <div class="logo">Raven的聊天室项目</div>
-    <el-link type="primary" href="https://github.com/UWEPPPP" target="_blank">访问 GitHub</el-link>
+    <el-link href="https://github.com/UWEPPPP" target="_blank" type="primary">访问 GitHub</el-link>
   </el-header>
 </template>
 
