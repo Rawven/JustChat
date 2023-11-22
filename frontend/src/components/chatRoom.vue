@@ -10,6 +10,8 @@
             <el-card class="message-card">
               <div v-for="msg in messages" :key="msg.id" class="message">
                 <p class="message-time">{{ new Date(msg.id).toLocaleString() }}</p>
+                <p class="message-user">{{ msg.user }}</p>
+                <img :src="'http://127.0.0.1:8083'+msg.profile" alt="User profile" class="message-profile">
                 <p class="message-text">{{ msg.text }}</p>
               </div>
             </el-card>
@@ -40,7 +42,13 @@ export default {
 
     this.socket.onmessage = (event) => {
       console.log('WebSocket message received:', event.data);
-      const msg = JSON.parse(event.data);
+      const data = JSON.parse(event.data);
+      const msg = {
+        id: Date.now(),
+        text: data.message,
+        user: data.userInfo.username,
+        profile: data.userInfo.profile
+      };
       this.messages.push(msg);
     };
 
@@ -52,17 +60,18 @@ export default {
       console.error('WebSocket error observed:', event);
     };
   },
-  beforeUnmount() {
-    if (this.socket) {
-      this.socket.close();
-    }
-  },
+
   methods: {
     sendMessage() {
       if (this.message) {
         const msg = { id: Date.now(), text: this.message };
         this.socket.send(JSON.stringify(msg));
         this.message = '';
+      }
+    },
+    beforeUnmount() {
+      if (this.socket) {
+        this.socket.close();
       }
     },
     
@@ -133,5 +142,11 @@ export default {
   background: #d3dce6;
   padding: 20px;
   border-radius: 4px;
+}
+
+.message-profile {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
 }
 </style>

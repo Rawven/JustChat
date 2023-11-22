@@ -1,16 +1,23 @@
 package www.raven.jc.service.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CopyOnWriteArraySet;
+import cn.hutool.core.lang.Assert;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import www.raven.jc.dto.UserInfoDTO;
+import www.raven.jc.feign.AccountFeign;
+import www.raven.jc.result.CommonResult;
+import www.raven.jc.util.JwtUtil;
 
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
-
-import org.springframework.stereotype.Component;
-
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * web socket service
@@ -22,31 +29,36 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @ServerEndpoint("/websocket/{token}")
 public class WebSocketService {
-
-
+    @Value("${Raven.key}")
+    private String key;
+    @Autowired
+    private AccountFeign accountFeign;
     /**
      * 与某个客户端的连接会话，需要通过它来给客户端发送数据
      **/
     private Session session;
 
-    /**concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
-    *虽然@Component默认是单例模式的，但springboot还是会为每个websocket连接初始化一个bean，所以可以用一个静态set保存起来。
-    */
-    private static CopyOnWriteArraySet<WebSocketService> webSockets =new CopyOnWriteArraySet<>();
+    /**
+     * concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
+     * 虽然@Component默认是单例模式的，但springboot还是会为每个websocket连接初始化一个bean，所以可以用一个静态set保存起来。
+     */
+    private static CopyOnWriteArraySet<WebSocketService> webSockets = new CopyOnWriteArraySet<>();
     /**
      * 用来存在线连接数
      */
-    private static final Map<String,Session> sessionPool = new HashMap<String,Session>();
+    private static final Map<String, Session> sessionPool = new HashMap<String, Session>();
 
     /**
      * 链接成功调用的方法
      */
     @OnOpen
-    public void onOpen(Session session, @PathParam(value="token")String token) {
-            this.session = session;
-            webSockets.add(this);
-            sessionPool.put(token, session);
-            log.info("【websocket消息】有新的连接，总数为:"+webSockets.size());
+    public void onOpen(Session session, @PathParam(value = "token") String token) {
+        log.info("【websocket消息】有新的连接，token为:" + token);
+        session.getUserProperties().put("userId", JwtUtil.verify(token, "爱你老妈"));
+        this.session = session;
+        webSockets.add(this);
+        sessionPool.put(token, session);
+        log.info("【websocket消息】有新的连接，总数为:" + webSockets.size());
     }
 
     /**
@@ -55,8 +67,8 @@ public class WebSocketService {
      */
     @OnClose
     public void onClose() {
-            webSockets.remove(this);
-            log.info("【websocket消息】连接断开，总数为:"+webSockets.size());
+        webSockets.remove(this);
+        log.info("【websocket消息】连接断开，总数为:" + webSockets.size());
     }
 
     /**
@@ -66,9 +78,18 @@ public class WebSocketService {
      * @param message message
      */
     @OnMessage
-    public void onMessage(String message) {
-        log.info("【websocket消息】收到客户端消息:"+message);
-        sendAllMessage(message);
+    public void onMessage(String message) throws JsonProcessingException {
+        log.info("【websocket消息】收到客户端消息:" + message);
+        Integer id= Integer.valueOf(session.getUserProperties().get("userId").toString());
+        log.info("【websocket消息】收到客户端消息:" + id);
+        CommonResult<UserInfoDTO> userInfos = accountFeign.getSingleInfo(id);
+        UserInfoDTO data = userInfos.getData();
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String,Object> map = new HashMap<>(2);
+        map.put("userInfo",data);
+        map.put("message",message);
+        String realMsg = objectMapper.writeValueAsString(map);
+        sendAllMessage(realMsg);
     }
 
     /**
@@ -80,7 +101,7 @@ public class WebSocketService {
     @OnError
     public void onError(Session session, Throwable error) {
 
-        log.error("用户错误,原因:"+error.getMessage());
+        log.error("用户错误,原因:" + error.getMessage());
         error.printStackTrace();
     }
 
@@ -91,25 +112,25 @@ public class WebSocketService {
      * @param message message
      */
     public void sendAllMessage(String message) {
-        log.info("【websocket消息】广播消息:"+message);
-        for(WebSocketService webSocketService : webSockets) {
-                if(webSocketService.session.isOpen()) {
-                    webSocketService.session.getAsyncRemote().sendText(message);
-                }
+        log.info("【websocket消息】广播消息:" + message);
+        for (WebSocketService webSocketService : webSockets) {
+            if (webSocketService.session.isOpen()) {
+                webSocketService.session.getAsyncRemote().sendText(message);
+            }
         }
     }
 
     /**
      * send one message
      *
-     * @param token  user id
+     * @param token   user id
      * @param message message
      */
     public void sendOneMessage(String token, String message) {
         Session session = sessionPool.get(token);
-        if (session != null&&session.isOpen()) {
+        if (session != null && session.isOpen()) {
             try {
-                log.info("【websocket消息】 单点消息:"+message);
+                log.info("【websocket消息】 单点消息:" + message);
                 session.getAsyncRemote().sendText(message);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -121,19 +142,20 @@ public class WebSocketService {
     /**
      * send more message
      *
-     * @param tokens user ids
+     * @param tokens  user ids
      * @param message message
      */
     public void sendMoreMessage(String[] tokens, String message) {
-        for(String userId:tokens) {
+        for (String userId : tokens) {
             Session session = sessionPool.get(userId);
-            if (session != null&&session.isOpen()) {
-                    log.info("【websocket消息】 单点消息:"+message);
-                    session.getAsyncRemote().sendText(message);
+            if (session != null && session.isOpen()) {
+                log.info("【websocket消息】 单点消息:" + message);
+                session.getAsyncRemote().sendText(message);
             }
         }
 
     }
+
     @Override
     public int hashCode() {
         return super.hashCode();
