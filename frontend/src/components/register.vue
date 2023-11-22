@@ -50,7 +50,7 @@ export default {
       this.$refs.registerForm.validate((valid) => {
         if (valid) {
           // 发送注册请求
-          axios.post('http://localhost:7000/account/register', this.user)
+          axios.post('http://10.44.59.225:7000/account/register', this.user)
               .then(response => {
                 console.log('Registration successful:', response.data);
                 localStorage.setItem("token", response.data.data);

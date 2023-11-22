@@ -7,4 +7,6 @@ package www.raven.jc.service;
  * @date 2023/11/22
  */
 public interface ChatService {
+
+    void sendMsg();
 }

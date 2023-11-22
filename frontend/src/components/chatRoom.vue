@@ -31,11 +31,31 @@ export default {
     };
   },
   created() {
-    this.socket = new WebSocket('ws://your-websocket-server.com');
-    this.socket.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      this.messages.push(message);
+    let token = localStorage.getItem("token");
+    this.socket = new WebSocket(`ws://10.44.59.225:8081/websocket/${token}`);
+
+    this.socket.onopen = () => {
+      console.log('WebSocket is open now.');
     };
+
+    this.socket.onmessage = (event) => {
+      console.log('WebSocket message received:', event.data);
+      const msg = JSON.parse(event.data);
+      this.messages.push(msg);
+    };
+
+    this.socket.onclose = () => {
+      console.log('WebSocket is closed now.');
+    };
+
+    this.socket.onerror = (event) => {
+      console.error('WebSocket error observed:', event);
+    };
+  },
+  beforeUnmount() {
+    if (this.socket) {
+      this.socket.close();
+    }
   },
   methods: {
     sendMessage() {
@@ -45,11 +65,7 @@ export default {
         this.message = '';
       }
     },
-    beforeDestroy() {
-      if (this.socket) {
-        this.socket.close();
-      }
-    },
+    
   },
 };
 </script>

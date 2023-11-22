@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Component
 @Slf4j
-@ServerEndpoint("/websocket/{userId}")
+@ServerEndpoint("/websocket/{token}")
 public class WebSocketService {
 
 
@@ -42,10 +42,10 @@ public class WebSocketService {
      * 链接成功调用的方法
      */
     @OnOpen
-    public void onOpen(Session session, @PathParam(value="userId")String userId) {
+    public void onOpen(Session session, @PathParam(value="token")String token) {
             this.session = session;
             webSockets.add(this);
-            sessionPool.put(userId, session);
+            sessionPool.put(token, session);
             log.info("【websocket消息】有新的连接，总数为:"+webSockets.size());
     }
 
@@ -68,6 +68,7 @@ public class WebSocketService {
     @OnMessage
     public void onMessage(String message) {
         log.info("【websocket消息】收到客户端消息:"+message);
+        sendAllMessage(message);
     }
 
     /**
@@ -101,11 +102,11 @@ public class WebSocketService {
     /**
      * send one message
      *
-     * @param userId  user id
+     * @param token  user id
      * @param message message
      */
-    public void sendOneMessage(String userId, String message) {
-        Session session = sessionPool.get(userId);
+    public void sendOneMessage(String token, String message) {
+        Session session = sessionPool.get(token);
         if (session != null&&session.isOpen()) {
             try {
                 log.info("【websocket消息】 单点消息:"+message);
@@ -120,11 +121,11 @@ public class WebSocketService {
     /**
      * send more message
      *
-     * @param userIds user ids
+     * @param tokens user ids
      * @param message message
      */
-    public void sendMoreMessage(String[] userIds, String message) {
-        for(String userId:userIds) {
+    public void sendMoreMessage(String[] tokens, String message) {
+        for(String userId:tokens) {
             Session session = sessionPool.get(userId);
             if (session != null&&session.isOpen()) {
                     log.info("【websocket消息】 单点消息:"+message);

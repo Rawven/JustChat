@@ -36,7 +36,7 @@ export default {
         let formData = new FormData();
         formData.append('file', this.selectedFile);
         let item = localStorage.getItem("token");
-        axios.post('http://localhost:7000/account/profileUpload', formData,
+        axios.post('http://10.44.59.225:7000/account/profileUpload', formData,
             {
               headers: {
                 'token': item

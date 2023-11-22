@@ -52,7 +52,7 @@ export default {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
           // 发送登录请求
-          axios.post('http://localhost:7000/account/login', this.user)
+          axios.post('http://10.44.59.225:7000/account/login', this.user)
               .then(response => {
                 console.log('Registration successful:', response.data);
                 localStorage.setItem("token", response.data.data);
