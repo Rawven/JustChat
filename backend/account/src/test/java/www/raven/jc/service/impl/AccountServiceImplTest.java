@@ -1,9 +1,9 @@
 package www.raven.jc.service.impl;
 
-import www.raven.jc.model.LogModel.model.RegisterModel;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import www.raven.jc.entity.model.RegisterModel;
 
 @SpringBootTest
 @RunWith(org.springframework.test.context.junit4.SpringRunner.class)

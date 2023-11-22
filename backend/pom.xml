@@ -12,6 +12,7 @@
         <module>account</module>
         <module>common</module>
         <module>gateway</module>
+        <module>chat</module>
     </modules>
 
     <properties>

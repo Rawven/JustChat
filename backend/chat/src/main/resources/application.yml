@@ -1,0 +1,18 @@
+spring:
+  redis:
+    address: redis://10.21.32.221:6379
+    password: 123456
+  application:
+    name: JC-Chat
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 10.21.32.154:8848
+  datasource:
+    url: jdbc:mysql://10.21.32.154:3306/JustChat?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    username: user
+    password: 123456
+server:
+  port: 8081
+Raven:
+  key: 爱你老妈

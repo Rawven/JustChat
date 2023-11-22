@@ -29,6 +29,7 @@ import HeaderH from "@/components/Header.vue";
 
 export default {
   name: 'accountName',
+  // eslint-disable-next-line vue/no-unused-components
   components: {HeaderH},
   data() {
     return {
@@ -55,6 +56,7 @@ export default {
               .then(response => {
                 console.log('Registration successful:', response.data);
                 localStorage.setItem("token", response.data.data);
+                this.$router.push('/chatRoom');
               })
               .catch(error => {
                 console.error('Registration error:', error);

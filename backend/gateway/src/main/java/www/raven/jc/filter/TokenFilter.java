@@ -36,26 +36,28 @@ public class TokenFilter implements GlobalFilter, Ordered {
     private String key;
     @Autowired
     private RedissonClient redissonClient;
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
         log(request);
         String path = request.getURI().getPath();
-        if(Arrays.stream(Filter.WHITE_PATH).noneMatch(whitePath -> whitePath.equals(path))){
+        if (Arrays.stream(Filter.WHITE_PATH).noneMatch(whitePath -> whitePath.equals(path))) {
             List<String> tokens = request.getHeaders().get(Filter.TOKEN);
-            if(tokens == null || tokens.isEmpty()){
+            if (tokens == null || tokens.isEmpty()) {
                 return exchange.getResponse().setComplete();
             }
-            String userId = JwtUtil.verify(tokens.get(0),key);
-            Assert.isTrue(Objects.equals(tokens.get(0), redissonClient.getBucket("token:"+userId).get()),"Invalid token");
-            log.info("token:"+tokens.get(0));
+            String userId = JwtUtil.verify(tokens.get(0), key);
+            Assert.isTrue(Objects.equals(tokens.get(0), redissonClient.getBucket("token:" + userId).get()), "Invalid token");
+            log.info("token:" + tokens.get(0));
             ServerHttpRequest realRequest = request.mutate().header("userId", userId).build();
-            log.info("userId:"+realRequest.getHeaders().get("userId").get(0));
+            log.info("userId:" + realRequest.getHeaders().get("userId").get(0));
             return chain.filter(exchange.mutate().request(realRequest).build());
         }
         return chain.filter(exchange);
     }
-    public void log(ServerHttpRequest request){
+
+    public void log(ServerHttpRequest request) {
         log.info("出现一次请求");
         // 打印请求方法和URL
         log.info("Request method: " + request.getMethod());

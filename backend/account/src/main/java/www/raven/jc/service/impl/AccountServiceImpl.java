@@ -69,6 +69,5 @@ public class AccountServiceImpl implements AccountService {
         String upload = ipfsClient.upload(profile);
         String header = request.getHeader("userId");
         Assert.isTrue(userMapper.update(new UpdateWrapper<User>().eq("id",header).set("profile",upload))>0,"插入头像失败");
-
     }
 }
