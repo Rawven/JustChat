@@ -1,5 +1,10 @@
 package www.raven.jc.service;
 
+import www.raven.jc.dto.UserInfoDTO;
+import www.raven.jc.entity.vo.MessageVO;
+
+import java.util.List;
+
 /**
  * chat service
  *
@@ -8,5 +13,20 @@ package www.raven.jc.service;
  */
 public interface ChatService {
 
-    void sendMsg();
+    /**
+     * save msg
+     * save msg
+     *
+     * @param data    data
+     * @param message message
+     * @throws Exception exception
+     */
+    void saveMsg(UserInfoDTO data, String message) throws Exception;
+
+    /**
+     * restore history
+     *
+     * @return {@link List}<{@link MessageVO}>
+     */
+    List<MessageVO> restoreHistory();
 }

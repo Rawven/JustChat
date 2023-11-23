@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * message
@@ -22,5 +23,5 @@ public class Message {
     private Integer messageId;
     private Integer senderId;
     private String content;
-    private LocalDateTime timestamp;
+    private Date timestamp;
 }

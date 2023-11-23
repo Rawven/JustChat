@@ -1,18 +1,22 @@
-package www.raven.jc.dto;
+package www.raven.jc.entity.vo;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.util.Date;
+
 /**
- * user info vo
+ * message vo
  *
  * @author 刘家辉
  * @date 2023/11/23
  */
 @Data
 @Accessors(chain = true)
-public class UserInfoDTO {
-    private Integer userId;
-    private String username;
+public class MessageVO {
+    private Date time;
+    private String text;
+    private String user;
     private String profile;
+
 }

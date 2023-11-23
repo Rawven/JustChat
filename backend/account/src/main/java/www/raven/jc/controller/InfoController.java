@@ -1,12 +1,13 @@
 package www.raven.jc.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.InfoService;
+
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * info controller
@@ -20,8 +21,13 @@ public class InfoController {
     @Autowired
     private InfoService infoService;
 
-    @GetMapping("/getSingleInfo")
-    public CommonResult<UserInfoDTO> getSingleInfo(Integer userId) {
+    @PostMapping("/getSingleInfo")
+    public CommonResult<UserInfoDTO> getSingleInfo(@RequestBody Integer userId) {
         return CommonResult.operateSuccess("查找成功",infoService.querySingleInfo(userId));
+    }
+
+    @PostMapping("/getAllInfo")
+    public CommonResult<List<UserInfoDTO>> getAllInfo() {
+        return CommonResult.operateSuccess("查找成功",infoService.queryAllInfo());
     }
 }

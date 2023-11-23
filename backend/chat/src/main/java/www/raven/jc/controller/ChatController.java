@@ -4,8 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.ChatService;
+
+import java.util.List;
 
 /**
  * chat controller
@@ -19,9 +22,13 @@ public class ChatController {
     @Autowired
     private ChatService chatService;
 
-    @PostMapping("/sendMsg")
-    public CommonResult<Void> sendMsg() {
-        chatService.sendMsg();
-        return CommonResult.operateSuccess("发送信息成功");
-    }
+    @PostMapping("/restoreHistory")
+       public CommonResult<List<MessageVO>> restoreHistory() {
+        List<MessageVO> messageVOS = chatService.restoreHistory();
+        for ( MessageVO messageVO:
+              messageVOS) {
+            System.out.println(messageVO);
+        }
+        return CommonResult.operateSuccess("获取历史记录成功",messageVOS);
+        }
 }

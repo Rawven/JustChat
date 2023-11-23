@@ -44,6 +44,7 @@ export default {
             })
             .then(response => {
               console.log('Avatar upload successful:', response.data);
+              this.$router.push('/chatRoom');
               // Additional logic after successful avatar upload
             })
             .catch(error => {

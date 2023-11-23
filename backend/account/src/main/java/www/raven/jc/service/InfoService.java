@@ -2,6 +2,8 @@ package www.raven.jc.service;
 
 import www.raven.jc.dto.UserInfoDTO;
 
+import java.util.List;
+
 /**
  * info service
  *
@@ -16,4 +18,11 @@ public interface InfoService {
      * @return {@link UserInfoDTO}
      */
     UserInfoDTO querySingleInfo(Integer userId);
+
+    /**
+     * query all info
+     *
+     * @return {@link List}<{@link UserInfoDTO}>
+     */
+    List<UserInfoDTO> queryAllInfo();
 }
