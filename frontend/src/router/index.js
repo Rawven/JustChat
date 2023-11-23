@@ -3,6 +3,8 @@ import loginView from "@/views/LoginView.vue";
 import registerView from "@/views/RegisterView.vue";
 import AvatarView from "@/views/AvatarView.vue";
 import ChatRoomView from "@/views/ChatRoomView.vue";
+import MainPageView from "@/views/MainPageView.vue";
+import OpenANewRoom from "@/views/OpenANewRoomView.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,6 +28,16 @@ const router = createRouter({
             path: '/chatRoom',
             name: "RoomView",
             component : ChatRoomView
+        },
+        {
+            path: '/mainPage',
+            name :"MainPageView",
+            component : MainPageView
+        },
+        {
+            path: '/openRoom',
+            name :"OpenRoomView",
+            component : OpenANewRoom
         }
     ]
 })

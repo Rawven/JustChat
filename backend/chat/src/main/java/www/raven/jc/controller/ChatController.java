@@ -24,11 +24,6 @@ public class ChatController {
 
     @PostMapping("/restoreHistory")
     public CommonResult<List<MessageVO>> restoreHistory() {
-        List<MessageVO> messageVOS = chatService.restoreHistory();
-        for (MessageVO messageVO :
-                messageVOS) {
-            System.out.println(messageVO);
-        }
-        return CommonResult.operateSuccess("获取历史记录成功", messageVOS);
+        return CommonResult.operateSuccess("获取历史记录成功", chatService.restoreHistory());
     }
 }

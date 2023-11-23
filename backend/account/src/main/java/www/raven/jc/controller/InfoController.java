@@ -1,11 +1,13 @@
 package www.raven.jc.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.InfoService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -17,9 +19,19 @@ import java.util.List;
  */
 @RestController
 @ResponseBody
+@Slf4j
 public class InfoController {
     @Autowired
     private InfoService infoService;
+    @Autowired
+    private HttpServletRequest request;
+
+    @PostMapping("/defaultInfo")
+    public CommonResult<UserInfoDTO> defaultInfo() {
+        String userId = request.getHeader("userId");
+        log.info("userId is:{}",userId);
+        return CommonResult.operateSuccess("查找成功",infoService.querySingleInfo(Integer.parseInt(userId)));
+    }
 
     @PostMapping("/getSingleInfo")
     public CommonResult<UserInfoDTO> getSingleInfo(@RequestBody Integer userId) {

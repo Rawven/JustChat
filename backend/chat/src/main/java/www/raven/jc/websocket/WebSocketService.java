@@ -1,4 +1,4 @@
-package www.raven.jc.service;
+package www.raven.jc.websocket;
 
 import cn.hutool.core.lang.Assert;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.feign.AccountFeign;
 import www.raven.jc.result.CommonResult;
+import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JwtUtil;
 
 import javax.websocket.*;

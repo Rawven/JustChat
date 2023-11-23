@@ -22,6 +22,7 @@
 <script>
 import axios from 'axios';
 import HeaderH from "@/components/Header.vue";
+import {Host} from "@/main";
 
 export default {
   name: 'userRegister',
@@ -50,7 +51,7 @@ export default {
       this.$refs.registerForm.validate((valid) => {
         if (valid) {
           // 发送注册请求
-          axios.post('http://10.44.59.225:7000/account/register', this.user)
+          axios.post('http://'+Host+':7000/account/register', this.user)
               .then(response => {
                 console.log('Registration successful:', response.data);
                 localStorage.setItem("token", response.data.data);

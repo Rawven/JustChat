@@ -26,6 +26,7 @@
 <script>
 import axios from 'axios';
 import HeaderH from "@/components/Header.vue";
+import {Host} from "@/main";
 
 export default {
   name: 'accountName',
@@ -52,11 +53,20 @@ export default {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
           // 发送登录请求
-          axios.post('http://10.44.59.225:7000/account/login', this.user)
+          axios.post('http://'+Host+':7000/account/login', this.user)
               .then(response => {
                 console.log('Registration successful:', response.data);
                 localStorage.setItem("token", response.data.data);
-                this.$router.push('/chatRoom');
+                let token = localStorage.getItem("token");
+                axios.post('http://'+Host+':7000/account/defaultInfo', {}, {
+                  headers: {
+                    'token': token
+                  }
+                }).then(response => {
+                  console.log('GetUserInfo successful:', response.data);
+                  localStorage.setItem("userData", response.data.data);
+                })
+                this.$router.push('/mainPage');
               })
               .catch(error => {
                 console.error('Registration error:', error);

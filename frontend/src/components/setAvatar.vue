@@ -20,6 +20,7 @@
 
 <script>
 import axios from 'axios';
+import {Host} from "@/main";
 
 export default {
   name: 'setAvatar',
@@ -36,7 +37,7 @@ export default {
         let formData = new FormData();
         formData.append('file', this.selectedFile);
         let item = localStorage.getItem("token");
-        axios.post('http://10.44.59.225:7000/account/profileUpload', formData,
+        axios.post('http://'+Host+':7000/account/profileUpload', formData,
             {
               headers: {
                 'token': item
@@ -44,7 +45,16 @@ export default {
             })
             .then(response => {
               console.log('Avatar upload successful:', response.data);
-              this.$router.push('/chatRoom');
+              let token = localStorage.getItem("token");
+              axios.post('http://'+Host+':7000/account/defaultInfo', {}, {
+                headers: {
+                  'token': token
+                }
+              }).then(response => {
+                console.log('GetUserInfo successful:', response.data);
+                localStorage.setItem("userData", JSON.stringify(response.data.data));
+              })
+              this.$router.push('/mainPage');
               // Additional logic after successful avatar upload
             })
             .catch(error => {

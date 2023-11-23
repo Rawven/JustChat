@@ -28,6 +28,7 @@
 
 <script>
 import axios from "axios";
+import {Host} from "@/main";
 
 export default {
   name: 'ChatRoom',
@@ -41,10 +42,10 @@ export default {
   created() {
     let token = localStorage.getItem("token");
 
-    this.socket = new WebSocket(`ws://10.44.59.225:8081/websocket/${token}`);
+    this.socket = new WebSocket(`ws://`+Host+`:8081/websocket/${token}`);
     console.log('WebSocket created:', token)
     this.socket.onopen = () => {
-      axios.post("http://10.44.59.225:7000/chat/restoreHistory", {},{
+      axios.post("http://"+Host+":7000/chat/restoreHistory", {},{
         headers: {
           'token': token
         }

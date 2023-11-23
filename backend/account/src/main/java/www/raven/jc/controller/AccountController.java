@@ -21,7 +21,6 @@ public class AccountController {
     @PostMapping("/login")
     public CommonResult<String> login(@RequestBody LoginModel loginModel) {
         return CommonResult.operateSuccess("登录成功", accountService.login(loginModel));
-
     }
 
     @PostMapping("/register")
