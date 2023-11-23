@@ -23,12 +23,12 @@ public class ChatController {
     private ChatService chatService;
 
     @PostMapping("/restoreHistory")
-       public CommonResult<List<MessageVO>> restoreHistory() {
+    public CommonResult<List<MessageVO>> restoreHistory() {
         List<MessageVO> messageVOS = chatService.restoreHistory();
-        for ( MessageVO messageVO:
-              messageVOS) {
+        for (MessageVO messageVO :
+                messageVOS) {
             System.out.println(messageVO);
         }
-        return CommonResult.operateSuccess("获取历史记录成功",messageVOS);
-        }
+        return CommonResult.operateSuccess("获取历史记录成功", messageVOS);
+    }
 }

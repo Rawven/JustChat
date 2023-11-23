@@ -40,27 +40,28 @@ export default {
   },
   created() {
     let token = localStorage.getItem("token");
-    axios.post("http://10.44.59.225:7000/chat/restoreHistory", {
-      headers: {
-        'token': token
-      }
-    })
-        .then(response => {
-          console.log('Restore history successful:', response.data.data);
-          this.messages = response.data.data.map(messageVO => ({
-            time: new Date(messageVO.time).getTime(), // 将Date对象转换为时间戳
-            text: messageVO.text,
-            user: messageVO.user,
-            profile: messageVO.profile
-          })); // 使用map方法将每个MessageVO对象转换为msg对象
-        })
 
-        .catch(error => {
-          console.error('Restore history error:', error);
-        });
     this.socket = new WebSocket(`ws://10.44.59.225:8081/websocket/${token}`);
-
+    console.log('WebSocket created:', token)
     this.socket.onopen = () => {
+      axios.post("http://10.44.59.225:7000/chat/restoreHistory", {},{
+        headers: {
+          'token': token
+        }
+      })
+          .then(response => {
+            console.log('Restore history successful:', response.data.data);
+            this.messages = response.data.data.map(messageVO => ({
+              time: new Date(messageVO.time).getTime(), // 将Date对象转换为时间戳
+              text: messageVO.text,
+              user: messageVO.user,
+              profile: messageVO.profile
+            })); // 使用map方法将每个MessageVO对象转换为msg对象
+          })
+
+          .catch(error => {
+            console.error('Restore history error:', error);
+          });
       console.log('WebSocket is open now.');
     };
 
