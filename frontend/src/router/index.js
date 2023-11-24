@@ -5,6 +5,7 @@ import AvatarView from "@/views/AvatarView.vue";
 import ChatRoomView from "@/views/ChatRoomView.vue";
 import MainPageView from "@/views/MainPageView.vue";
 import OpenANewRoom from "@/views/OpenANewRoomView.vue";
+import UpdateInfoView from "@/views/UpdateInfoView.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,6 +40,11 @@ const router = createRouter({
             path: '/openRoom',
             name: "OpenRoomView",
             component: OpenANewRoom
+        },
+        {
+            path: '/updateInfo',
+            name: 'updateInfoView',
+            component: UpdateInfoView
         }
     ]
 })

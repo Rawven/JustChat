@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import www.raven.jc.dto.UserInfoDTO;
+import www.raven.jc.entity.vo.InfoVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.InfoService;
 
@@ -29,10 +30,9 @@ public class InfoController {
     private HttpServletRequest request;
 
     @PostMapping("/defaultInfo")
-    public CommonResult<UserInfoDTO> defaultInfo() {
+    public CommonResult<InfoVO> defaultInfo() {
         String userId = request.getHeader("userId");
-        log.info("userId is:{}", userId);
-        return CommonResult.operateSuccess("查找成功", infoService.querySingleInfo(Integer.parseInt(userId)));
+        return CommonResult.operateSuccess("查找成功", infoService.defaultInfo(Integer.parseInt(userId)));
     }
 
     @PostMapping("/getSingleInfo")

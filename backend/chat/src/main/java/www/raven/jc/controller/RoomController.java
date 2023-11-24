@@ -28,6 +28,12 @@ public class RoomController {
         RoomRealVO roomRealVO = new RoomRealVO().setRooms(rooms).setTotal(rooms.size());
         return CommonResult.operateSuccess("获取房间列表成功", roomRealVO);
     }
+    @GetMapping("/queryRequireRoomList")
+    public CommonResult<RoomRealVO> queryRequireRoomList(@RequestParam("text") String text) {
+        List<RoomVO> rooms = roomService.queryRequireRoomList(text);
+        RoomRealVO roomRealVO = new RoomRealVO().setRooms(rooms).setTotal(rooms.size());
+        return CommonResult.operateSuccess("获取房间列表成功", roomRealVO);
+    }
 
 
     @PostMapping("/createRoom")

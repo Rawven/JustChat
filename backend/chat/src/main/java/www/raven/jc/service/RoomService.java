@@ -27,4 +27,12 @@ public interface RoomService {
      * @return {@link List}<{@link RoomVO}>
      */
     List<RoomVO> queryRoomPage(Integer page);
+
+    /**
+     * query require room list
+     *
+     * @param text text
+     * @return {@link List}<{@link RoomVO}>
+     */
+    List<RoomVO> queryRequireRoomList(String text);
 }

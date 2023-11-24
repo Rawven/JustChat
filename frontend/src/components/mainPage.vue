@@ -3,11 +3,12 @@
     <el-main class="main">
       <el-row class="row-bg" justify="center" type="flex">
         <el-col v-if="userInfo" :span="8">
-          <img :src="'http://127.0.0.1:8083/ipfs/'+userInfo.profile" alt="User Avatar" class="avatar">
-          <h2 class="username">{{ userInfo.username }}</h2>
-          <h2 class="signature" v-if="userInfo.signature">{{ userInfo.signature }}</h2>
-          <h2 class="signature" v-else>这个用户很懒，没有留下任何东西</h2>
-          <router-link to="/profile">更改个人信息</router-link>
+          <el-card class="box-card">
+            <img :src="'http://127.0.0.1:8083/ipfs/'+userInfo.profile" alt="User Avatar" class="avatar">
+            <h2 class="username">你好!😘 {{ userInfo.username }}</h2>
+            <h2 class="signature">个性签名: {{ userInfo.signature?userInfo.signature:'这个用户很懒 什么也没留下' }}</h2>
+            <router-link to="/updateInfo" class="linkText">更改个人信息</router-link>
+          </el-card>
         </el-col>
         <el-col :span="16">
           <router-link to="/openRoom">
@@ -18,23 +19,39 @@
           <el-input placeholder="请输入搜索内容"></el-input>
 
           <el-main class="cardContainer">
-            <el-card v-for="room in rooms" :key="room.name" class="box-card">
-              <div class="room-header">
-                <el-avatar :src="room.founderAvatar" size="small"></el-avatar> <!-- 使用 el-avatar 组件显示创建者的头像 -->
-                <router-link :to="{path:`/chatRoom/`+Number(room.roomId)}">
-                  <h2 class="room-name">{{ room.roomName }}</h2>
-                </router-link>
-                <p class="room-description">{{ room.roomDescription }}</p>
-                <el-tag size="default" class="room-max-people">最大人数: {{ room.maxPeople }}</el-tag> <!-- 使用 el-tag 组件显示最大人数 -->
-                <el-tag size="default" class="room-founder">创建者: {{ room.founderName }}</el-tag> <!-- 使用 el-tag 组件显示创建者的名字 -->
-              </div>
-            </el-card>
+            <el-table :data="rooms" style="width: 100%">
+              <el-table-column label="房间名" width="180">
+                <template #default="scope">
+                  <h2 class="room-name">{{scope.row.roomName }}</h2>
+                </template>
+              </el-table-column>
+              <el-table-column label="简述" width="180">
+                <template #default="scope">
+                  <p class="room-description">{{scope.row.roomDescription }}</p>
+                </template>
+              </el-table-column>
+              <el-table-column label="最大人数" width="180">
+                <template #default="scope">
+                  <el-tag size="default" class="room-max-people">{{ scope.row.maxPeople }}</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column label="创建者" width="180">
+                <template #default="scope">
+                  <el-tag size="default" class="room-founder">{{ scope.row.founderName }}</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column label="操作" width="180">
+                <template #default="scope">
+                  <el-button type="primary" @click="enterRoom(scope.row.roomId)">进入</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
             <el-pagination class="pagination-container"
                            background
                            layout="prev, pager, next"
                            :total="totalRooms"
                            v-model:current-page="currentPage"
-                           :page-size= "pageSize"
+                           :page-size="pageSize"
                            @current-change="handlePageChange"
             />
           </el-main>
@@ -63,21 +80,21 @@ export default {
         roomName: '',
         roomDescription: '',
         founderName: '',
-        founderAvatar:'',
+        founderAvatar: '',
         maxPeople: 1,
       },
-      userInfo:{
-        username:'',
-        profile:'',
-        signature:'这个用户很懒，没有留下任何东西',
+      userInfo: {
+        username: '',
+        profile: '',
+        signature: '',
       },
       rooms: [],
       currentPage: 1, // 新增属性，用于存储当前的页数
       totalRooms: 0, // 新增属性，用于存储房间总数
-      pageSize:5
+      pageSize: 5
     };
   },
-    created() {
+  created() {
     this.getRooms(this.currentPage);
     let item = localStorage.getItem("userData");
     if (item) {
@@ -85,6 +102,9 @@ export default {
     }
   },
   methods: {
+    enterRoom(roomId) {
+      this.$router.push({path: `/chatRoom/` + Number(roomId)});
+    },
     getRooms(page) {
       this.realAxios.get(`http://` + Host + `:7000/chat/queryRoomList/${page}`, {
         headers: {
@@ -106,6 +126,14 @@ export default {
 </script>
 
 <style scoped>
+.linkText {
+  font-size: 24px;
+  color: #409EFF;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+  animation: fadeIn 2s;
+}
 
 .button {
   display: inline-block;
@@ -176,13 +204,12 @@ export default {
   justify-content: center;
   align-items: center;
 }
+
 .cardContainer {
-  width: 100%; /* 设置容器的宽度 */
+  width: auto; /* 设置容器的宽度 */
   height: 500px; /* 设置容器的高度 */
-  overflow-y: auto; /* 如果内容超出容器的高度，显示滚动条 */
   margin: 20px; /* 添加外边距 */
 }
-
 
 
 .row-bg {
@@ -200,36 +227,60 @@ export default {
 }
 
 .pagination-container {
-  width: 100%;
+  width: auto;
+  left: auto;
   padding: 20px 0;
   text-align: center;
-  position: relative; /* 添加 position 属性 */
-  z-index: 1000; /* 设置 z-index 为一个较大的值 */
-}.box-card {
-   width: 100%;
-   height: 100px;
-   margin-bottom: 20px;
-   display: flex;
-   flex-direction: column;
-   justify-content: space-between;
-   padding: 10px; /* 添加内边距 */
- }
-
-.room-header{
-  display: flex; /* 设置为弹性盒布局，使其子元素在一行中并列显示 */
-  align-items: center; /* 设置在垂直方向上居中对齐 */
-  justify-content: space-between; /* 设置在水平方向上均匀分布 */
-  margin: 5px 0;
+  margin-left: 338px;
 }
 
-.room-name {
+.room-name,.room-description{
+  margin: 10px;
   font-size: 16px;
   font-weight: bold;
+  left: auto;
 }
 
 .room-founder,
-.room-description,
+
 .room-max-people {
+  margin: 10px;
   font-size: 12px;
 }
+
+.box-card {
+  height: 600px;
+  padding: 20px;
+  margin: 20px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 20px;
+}
+
+.username {
+  font-size: 20px;
+  font-weight: bold;
+  color: #409EFF;
+  margin-bottom: 10px;
+}
+
+.signature {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.linkText {
+  font-size: 16px;
+  color: #409EFF;
+  text-decoration: underline;
+}
+
+
 </style>

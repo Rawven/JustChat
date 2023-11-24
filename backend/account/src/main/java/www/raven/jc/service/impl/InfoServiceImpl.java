@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import www.raven.jc.dao.UserMapper;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.User;
+import www.raven.jc.entity.vo.InfoVO;
 import www.raven.jc.service.InfoService;
 
 import java.util.List;
@@ -45,5 +46,15 @@ public class InfoServiceImpl implements InfoService {
                     return userInfoDTO;
                 }
         ).collect(Collectors.toList());
+    }
+
+    @Override
+    public InfoVO defaultInfo(Integer userId) {
+        User user = userMapper.selectById(userId);
+        Assert.notNull(user, "用户不存在");
+        return new InfoVO().setSignature(user.getSignature())
+                .setProfile(user.getProfile())
+                .setUserId(user.getId())
+                .setUsername(user.getUsername());
     }
 }

@@ -58,4 +58,9 @@ public class RoomServiceImpl implements RoomService {
                 .setFounderName(map.get(chatRoom.getFounderId()).getUsername())
                 .setFounderAvatar(map.get(chatRoom.getFounderId()).getProfile())).collect(Collectors.toList());
     }
+
+    @Override
+    public List<RoomVO> queryRequireRoomList(String text) {
+        return null;
+    }
 }

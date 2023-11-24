@@ -37,13 +37,13 @@ public class AccountController {
     }
 
     @PostMapping("/setSignature")
-    public CommonResult<Void> setSignature(@RequestBody String signature) {
+    public CommonResult<Void> setSignature(@RequestParam("signature") String signature) {
         accountService.setSignature(signature);
         return CommonResult.operateSuccess("设置签名成功");
     }
 
     @PostMapping("/setUsername")
-    public CommonResult<Void> setUsername(@RequestBody String username) {
+    public CommonResult<Void> setUsername(@RequestParam("username") String username) {
         accountService.setUsername(username);
         return CommonResult.operateSuccess("重命名成功");
     }
