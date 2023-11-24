@@ -26,13 +26,16 @@ public interface RoomService {
      * @param page page
      * @return {@link List}<{@link RoomVO}>
      */
-    List<RoomVO> queryRoomPage(Integer page);
+    List<RoomVO> queryAllRoomPage(Integer page);
 
     /**
+     * query liked room list
      * query require room list
      *
-     * @param text text
+     * @param text   text
+     * @param column column
      * @return {@link List}<{@link RoomVO}>
      */
-    List<RoomVO> queryRequireRoomList(String text);
+    List<RoomVO> queryLikedRoomList(String column,String text);
+
 }

@@ -24,13 +24,20 @@ public class RoomController {
 
     @GetMapping("/queryRoomList/{page}")
     public CommonResult<RoomRealVO> queryRoomList(@PathVariable("page") int page) {
-        List<RoomVO> rooms = roomService.queryRoomPage(page);
+        List<RoomVO> rooms = roomService.queryAllRoomPage(page);
         RoomRealVO roomRealVO = new RoomRealVO().setRooms(rooms).setTotal(rooms.size());
         return CommonResult.operateSuccess("获取房间列表成功", roomRealVO);
     }
-    @GetMapping("/queryRequireRoomList")
-    public CommonResult<RoomRealVO> queryRequireRoomList(@RequestParam("text") String text) {
-        List<RoomVO> rooms = roomService.queryRequireRoomList(text);
+    @GetMapping("/queryUserNameRelatedRoomList")
+    public CommonResult<RoomRealVO> queryUserNameRelatedRoomList(@RequestParam("text") String text) {
+        List<RoomVO> rooms = roomService.queryLikedRoomList("username",text);
+        RoomRealVO roomRealVO = new RoomRealVO().setRooms(rooms).setTotal(rooms.size());
+        return CommonResult.operateSuccess("获取房间列表成功", roomRealVO);
+    }
+
+    @GetMapping("/queryRoomNameRelatedRoomList")
+    public CommonResult<RoomRealVO> queryRoomNameRelatedRoomList(@RequestParam("text") String text) {
+        List<RoomVO> rooms = roomService.queryLikedRoomList("room_name",text);
         RoomRealVO roomRealVO = new RoomRealVO().setRooms(rooms).setTotal(rooms.size());
         return CommonResult.operateSuccess("获取房间列表成功", roomRealVO);
     }

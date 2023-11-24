@@ -1,6 +1,7 @@
 package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,8 +45,18 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public List<RoomVO> queryRoomPage(Integer page) {
+    public List<RoomVO> queryAllRoomPage(Integer page) {
         Page<ChatRoom> chatRoomPage = roomMapper.selectPage(new Page<>(page, 5), null);
+        return buildRoomVO(chatRoomPage);
+    }
+
+    @Override
+    public List<RoomVO> queryLikedRoomList(String column,String text) {
+        Page<ChatRoom> chatRoomPage = roomMapper.selectPage(new Page<>(1, 5), new QueryWrapper<ChatRoom>().like(column, text));
+        return buildRoomVO(chatRoomPage);
+    }
+
+    private List<RoomVO> buildRoomVO(Page<ChatRoom> chatRoomPage) {
         Assert.isTrue(chatRoomPage.getTotal() > 0);
         CommonResult<List<UserInfoDTO>> allInfo = accountFeign.getAllInfo();
         List<UserInfoDTO> data = allInfo.getData();
@@ -59,8 +70,5 @@ public class RoomServiceImpl implements RoomService {
                 .setFounderAvatar(map.get(chatRoom.getFounderId()).getProfile())).collect(Collectors.toList());
     }
 
-    @Override
-    public List<RoomVO> queryRequireRoomList(String text) {
-        return null;
-    }
+
 }
