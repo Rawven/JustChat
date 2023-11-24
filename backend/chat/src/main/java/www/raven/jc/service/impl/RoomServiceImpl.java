@@ -33,28 +33,29 @@ public class RoomServiceImpl implements RoomService {
     private HttpServletRequest request;
     @Autowired
     private AccountFeign accountFeign;
+
     @Override
     public void createRoom(RoomModel roomModel) {
         ChatRoom room = new ChatRoom().setRoomName(roomModel.getName())
                 .setRoomDescription(roomModel.getDescription())
                 .setMaxPeople(roomModel.getMaxPeople()).
                 setFounderId(Integer.parseInt(request.getHeader("userId")));
-       Assert.isTrue(roomMapper.insert(room)>0);
+        Assert.isTrue(roomMapper.insert(room) > 0);
     }
 
     @Override
     public List<RoomVO> queryRoomPage(Integer page) {
         Page<ChatRoom> chatRoomPage = roomMapper.selectPage(new Page<>(page, 5), null);
-        Assert.isTrue(chatRoomPage.getTotal()>0);
+        Assert.isTrue(chatRoomPage.getTotal() > 0);
         CommonResult<List<UserInfoDTO>> allInfo = accountFeign.getAllInfo();
         List<UserInfoDTO> data = allInfo.getData();
         Map<Integer, UserInfoDTO> map = data.stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
         return chatRoomPage.getRecords().stream().map(chatRoom -> new RoomVO()
                 .setRoomId(chatRoom.getRoomId())
-                    .setRoomName(chatRoom.getRoomName())
-                    .setRoomDescription(chatRoom.getRoomDescription())
-                    .setMaxPeople(chatRoom.getMaxPeople())
-                    .setFounderName(map.get(chatRoom.getFounderId()).getUsername())
+                .setRoomName(chatRoom.getRoomName())
+                .setRoomDescription(chatRoom.getRoomDescription())
+                .setMaxPeople(chatRoom.getMaxPeople())
+                .setFounderName(map.get(chatRoom.getFounderId()).getUsername())
                 .setFounderAvatar(map.get(chatRoom.getFounderId()).getProfile())).collect(Collectors.toList());
     }
 }

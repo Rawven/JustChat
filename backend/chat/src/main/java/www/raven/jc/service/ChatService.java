@@ -16,17 +16,17 @@ public interface ChatService {
 
     /**
      * save msg
-     * save msg
+
      *
      * @param data    data
      * @param message message
-     * @throws Exception exception
+     * @param roomId  room id
      */
-    void saveMsg(UserInfoDTO data, MessageDTO message,String roomId) throws Exception;
+    void saveMsg(UserInfoDTO data, MessageDTO message, String roomId);
 
     /**
-     * restore history
      *
+     * @param roomId room id
      * @return {@link List}<{@link MessageVO}>
      */
     List<MessageVO> restoreHistory(Integer roomId);

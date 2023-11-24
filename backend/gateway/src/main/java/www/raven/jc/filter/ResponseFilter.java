@@ -22,13 +22,15 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.ORIGINAL_RESPONSE_CONTENT_TYPE_ATTR;
 
 /**
- * @author
+ * response filter
+ *
+ * @author 刘家辉
  * @date 2023/2/3 - 10:54
  * @描述 返回参数日志打印
  */
@@ -37,14 +39,13 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.O
 public class ResponseFilter implements GlobalFilter, Ordered {
 
     private static final Logger log = LoggerFactory.getLogger(ResponseFilter.class);
+    private static Joiner joiner = Joiner.on("");
 
     @Override
     public int getOrder() {
         // -1 is response write filter, must be called before that
         return -2;
     }
-
-    private static Joiner joiner = Joiner.on("");
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -66,14 +67,14 @@ public class ResponseFilter implements GlobalFilter, Ordered {
                                     byte[] content = new byte[dataBuffer.readableByteCount()];
                                     dataBuffer.read(content);
                                     DataBufferUtils.release(dataBuffer);
-                                    list.add(new String(content, "utf-8"));
+                                    list.add(new String(content, StandardCharsets.UTF_8));
                                 } catch (Exception e) {
                                     log.info("加载Response字节流异常，失败原因：{}", Throwables.getStackTraceAsString(e));
                                 }
                             });
                             String responseData = joiner.join(list);
-                            log.info("返回参数responseData："+responseData);
-                            byte[] uppedContent = new String(responseData.getBytes(), Charset.forName("UTF-8")).getBytes();
+                            log.info("返回参数responseData：" + responseData);
+                            byte[] uppedContent = new String(responseData.getBytes(), StandardCharsets.UTF_8).getBytes();
                             originalResponse.getHeaders().setContentLength(uppedContent.length);
                             return bufferFactory.wrap(uppedContent);
                         }));

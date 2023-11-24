@@ -3,7 +3,6 @@ package www.raven.jc.entity.vo;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import javax.naming.ldap.PagedResultsControl;
 import java.util.List;
 
 /**

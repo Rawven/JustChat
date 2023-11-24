@@ -18,10 +18,11 @@ public class MybatisProConfig {
     /**
      * mybatis plus interceptor
      * 分页插件
+     *
      * @return {@link MybatisPlusInterceptor}
      */
     @Bean
-    public MybatisPlusInterceptor mybatisPlusInterceptor(){
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
         interceptor.addInnerInterceptor(new PaginationInnerInterceptor());
         return interceptor;

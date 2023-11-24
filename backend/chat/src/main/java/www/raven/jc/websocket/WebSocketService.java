@@ -1,14 +1,12 @@
 package www.raven.jc.websocket;
 
 import cn.hutool.core.lang.Assert;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.feign.AccountFeign;
-import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.JwtUtil;
@@ -30,45 +28,48 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @Slf4j
 @ServerEndpoint("/websocket/{token}/{roomId}")
 public class WebSocketService {
-    private String roomId;
-
+    /**
+     * 用来存在线连接数
+     */
+    private static final Map<String, Session> SESSION_POOL = new HashMap<>();
     private static AccountFeign accountFeign;
     private static ChatService chatService;
-
-    @Autowired
-    public void setAccountFeign(AccountFeign accountFeign){
-        WebSocketService.accountFeign = accountFeign;
-    }
-    @Autowired
-    public void setChatService(ChatService chatService){
-        WebSocketService.chatService = chatService;
-    }
-    /**
-     * 与某个客户端的连接会话，需要通过它来给客户端发送数据
-     **/
-    private Session session;
     /**
      * concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
      * 虽然@Component默认是单例模式的，但springboot还是会为每个websocket连接初始化一个bean，所以可以用一个静态set保存起来。
      */
     private static CopyOnWriteArraySet<WebSocketService> webSockets = new CopyOnWriteArraySet<>();
     /**
-     * 用来存在线连接数
+     * room id
+     * 对应是在哪个聊天室
      */
-    private static final Map<String, Session> sessionPool = new HashMap<String, Session>();
+    private String roomId;
+    /**
+     * 与某个客户端的连接会话，需要通过它来给客户端发送数据
+     **/
+    private Session session;
 
+    @Autowired
+    public void setAccountFeign(AccountFeign accountFeign) {
+        WebSocketService.accountFeign = accountFeign;
+    }
+
+    @Autowired
+    public void setChatService(ChatService chatService) {
+        WebSocketService.chatService = chatService;
+    }
 
     /**
      * 链接成功调用的方法
      */
     @OnOpen
-    public void onOpen(Session session, @PathParam(value = "token") String token,@PathParam(value = "roomId") String roomId) {
+    public void onOpen(Session session, @PathParam(value = "token") String token, @PathParam(value = "roomId") String roomId) {
         log.info("【websocket消息】有新的连接，token为:" + token);
         session.getUserProperties().put("userId", JwtUtil.verify(token, "爱你老妈"));
         this.session = session;
-        this.roomId =roomId;
+        this.roomId = roomId;
         webSockets.add(this);
-        sessionPool.put(token, session);
+        SESSION_POOL.put(token, session);
         log.info("【websocket消息】有新的连接，总数为:" + webSockets.size());
     }
 
@@ -92,13 +93,13 @@ public class WebSocketService {
     public void onMessage(String message) throws Exception {
         log.info("【websocket消息】收到客户端发来的消息:" + message);
         MessageDTO messageDTO = JsonUtil.jsonToObj(message, MessageDTO.class);
-        Integer id= Integer.valueOf(session.getUserProperties().get("userId").toString());
+        Integer id = Integer.valueOf(session.getUserProperties().get("userId").toString());
         Assert.notNull(accountFeign);
         UserInfoDTO data = accountFeign.getSingleInfo(id).getData();
-        chatService.saveMsg(data,messageDTO,this.roomId);
-        Map<Object,Object> map = new HashMap<>(2);
-        map.put("userInfo",data);
-        map.put("message",message);
+        chatService.saveMsg(data, messageDTO, this.roomId);
+        Map<Object, Object> map = new HashMap<>(2);
+        map.put("userInfo", data);
+        map.put("message", message);
         sendRoomMessage(JsonUtil.mapToJson(map));
     }
 
@@ -112,7 +113,7 @@ public class WebSocketService {
     public void onError(Session session, Throwable error) {
 
         log.error("用户错误,原因:" + error.getMessage());
-        error.printStackTrace();
+        log.error(error.toString());
     }
 
 
@@ -124,11 +125,12 @@ public class WebSocketService {
     public void sendAllMessage(String message) {
         log.info("【websocket消息】广播消息:" + message);
         for (WebSocketService webSocketService : webSockets) {
-            if (webSocketService.session.isOpen() ) {
+            if (webSocketService.session.isOpen()) {
                 webSocketService.session.getAsyncRemote().sendText(message);
             }
         }
     }
+
     public void sendRoomMessage(String message) {
         log.info("【websocket消息】广播消息:" + message);
         for (WebSocketService webSocketService : webSockets) {
@@ -145,13 +147,13 @@ public class WebSocketService {
      * @param message message
      */
     public void sendOneMessage(String token, String message) {
-        Session session = sessionPool.get(token);
+        Session session = SESSION_POOL.get(token);
         if (session != null && session.isOpen()) {
             try {
                 log.info("【websocket消息】 单点消息:" + message);
                 session.getAsyncRemote().sendText(message);
             } catch (Exception e) {
-                e.printStackTrace();
+               log.error(e.getMessage());
             }
         }
     }
@@ -165,7 +167,7 @@ public class WebSocketService {
      */
     public void sendMoreMessage(String[] tokens, String message) {
         for (String userId : tokens) {
-            Session session = sessionPool.get(userId);
+            Session session = SESSION_POOL.get(userId);
             if (session != null && session.isOpen()) {
                 log.info("【websocket消息】 单点消息:" + message);
                 session.getAsyncRemote().sendText(message);

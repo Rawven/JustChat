@@ -26,7 +26,7 @@ public class IpfsClient {
     private static IPFS ipfsClient;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         ipfsClient = new IPFS("/ip4/127.0.0.1/tcp/5001");
     }
 
@@ -35,14 +35,13 @@ public class IpfsClient {
      *
      * @param file 文件
      * @return 返回cid
-     * @throws IOException 文件传输异常
      */
-    public String upload(MultipartFile file){
-        if(file.isEmpty()){
+    public String upload(MultipartFile file) {
+        if (file.isEmpty()) {
             throw new RuntimeException("文件为空");
         }
         String fileName = file.getOriginalFilename();
-        if(StringUtils.isEmpty(fileName)){
+        if (StringUtils.isEmpty(fileName)) {
             throw new RuntimeException("文件名为空");
         }
         // 添加标识
@@ -50,7 +49,7 @@ public class IpfsClient {
         File realFile = addIdentification(file, fileName.substring(0, index), fileName.substring(index));
 
         String cid = upload(realFile);
-        if(StringUtils.isEmpty(cid)){
+        if (StringUtils.isEmpty(cid)) {
             throw new RuntimeException("cid为空,上传失败");
         }
         return cid;
@@ -65,10 +64,10 @@ public class IpfsClient {
      * @param file   原文件
      * @return 文件
      */
-    private File addIdentification(MultipartFile file, String prefix, String suffix){
-        File f = null;
+    private File addIdentification(MultipartFile file, String prefix, String suffix) {
+        File f;
         try {
-            f = File.createTempFile(prefix + System.currentTimeMillis(),suffix);
+            f = File.createTempFile(prefix + System.currentTimeMillis(), suffix);
             file.transferTo(f);
         } catch (IOException e) {
             throw new RuntimeException("文件添加唯一标识失败");
@@ -81,11 +80,10 @@ public class IpfsClient {
      *
      * @param file 文件
      * @return cid
-     * @throws IOException 文件传输异常
      */
-    private String upload(File file){
+    private String upload(File file) {
         NamedStreamable.FileWrapper fileBytes = new NamedStreamable.FileWrapper(file);
-        MerkleNode addResult = null;
+        MerkleNode addResult;
         try {
             addResult = ipfsClient.add(fileBytes).get(0);
         } catch (IOException e) {
@@ -96,9 +94,10 @@ public class IpfsClient {
 
     /**
      * 移除文件
+     *
      * @param cid 文件cid
      */
-    public void remove(String cid){
+    public void remove(String cid) {
         try {
             ipfsClient.pin.rm(Multihash.fromBase58(cid));
         } catch (IOException e) {

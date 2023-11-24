@@ -20,6 +20,6 @@ class AccountServiceImplTest {
         registerModel.setEmail("a2506691786@qq.com")
                 .setUsername("Raven")
                 .setPassword("liujiahui1Y!")
-                ;
+        ;
     }
 }

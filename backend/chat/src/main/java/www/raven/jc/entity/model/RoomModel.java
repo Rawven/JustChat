@@ -1,6 +1,5 @@
 package www.raven.jc.entity.model;
 
-import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
 

@@ -2,13 +2,15 @@ package www.raven.jc.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.InfoService;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -29,17 +31,17 @@ public class InfoController {
     @PostMapping("/defaultInfo")
     public CommonResult<UserInfoDTO> defaultInfo() {
         String userId = request.getHeader("userId");
-        log.info("userId is:{}",userId);
-        return CommonResult.operateSuccess("查找成功",infoService.querySingleInfo(Integer.parseInt(userId)));
+        log.info("userId is:{}", userId);
+        return CommonResult.operateSuccess("查找成功", infoService.querySingleInfo(Integer.parseInt(userId)));
     }
 
     @PostMapping("/getSingleInfo")
     public CommonResult<UserInfoDTO> getSingleInfo(@RequestBody Integer userId) {
-        return CommonResult.operateSuccess("查找成功",infoService.querySingleInfo(userId));
+        return CommonResult.operateSuccess("查找成功", infoService.querySingleInfo(userId));
     }
 
     @PostMapping("/getAllInfo")
     public CommonResult<List<UserInfoDTO>> getAllInfo() {
-        return CommonResult.operateSuccess("查找成功",infoService.queryAllInfo());
+        return CommonResult.operateSuccess("查找成功", infoService.queryAllInfo());
     }
 }

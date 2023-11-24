@@ -23,16 +23,16 @@ public class RoomController {
     private RoomService roomService;
 
     @GetMapping("/queryRoomList/{page}")
-    public CommonResult<RoomRealVO> queryRoomList(@PathVariable("page")  int page) {
+    public CommonResult<RoomRealVO> queryRoomList(@PathVariable("page") int page) {
         List<RoomVO> rooms = roomService.queryRoomPage(page);
         RoomRealVO roomRealVO = new RoomRealVO().setRooms(rooms).setTotal(rooms.size());
-        return CommonResult.operateSuccess("获取房间列表成功",roomRealVO);
+        return CommonResult.operateSuccess("获取房间列表成功", roomRealVO);
     }
 
 
     @PostMapping("/createRoom")
     public CommonResult<Void> createRoom(@RequestBody RoomModel roomModel) {
-         roomService.createRoom(roomModel);
-         return CommonResult.operateSuccess("创建房间成功");
+        roomService.createRoom(roomModel);
+        return CommonResult.operateSuccess("创建房间成功");
     }
 }

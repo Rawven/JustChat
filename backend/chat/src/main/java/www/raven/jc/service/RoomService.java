@@ -21,7 +21,7 @@ public interface RoomService {
     void createRoom(RoomModel roomModel);
 
     /**
-     * qurey room page
+     * query room page
      *
      * @param page page
      * @return {@link List}<{@link RoomVO}>

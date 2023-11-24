@@ -26,7 +26,7 @@ public interface AccountService {
      * @param registerModel register model
      * @return {@link String}
      */
-    String register (RegisterModel registerModel);
+    String register(RegisterModel registerModel);
 
     /**
      * profile upload

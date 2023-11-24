@@ -14,10 +14,8 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class CommonResult<T> {
-    private Integer code;
-
     boolean isSuccess;
-
+    private Integer code;
     private String message;
 
     private T data;

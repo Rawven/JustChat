@@ -3,8 +3,6 @@ package www.raven.jc.entity.dto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import java.util.Date;
-
 /**
  * message dto
  *

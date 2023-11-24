@@ -7,7 +7,7 @@ package www.raven.jc.constant;
  * @date 2023/11/22
  */
 public class Filter {
-    public static final  String TOKEN = "token";
+    public static final String TOKEN = "token";
     public static final String[] WHITE_PATH = {
             "/account/login",
             "/account/register"

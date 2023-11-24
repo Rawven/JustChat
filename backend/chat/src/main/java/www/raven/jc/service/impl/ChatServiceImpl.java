@@ -12,9 +12,7 @@ import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.feign.AccountFeign;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.ChatService;
-import www.raven.jc.util.JsonUtil;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +33,7 @@ public class ChatServiceImpl implements ChatService {
     private AccountFeign accountFeign;
 
     @Override
-    public void saveMsg(UserInfoDTO data, MessageDTO message,String roomId) throws Exception {
+    public void saveMsg(UserInfoDTO data, MessageDTO message, String roomId) {
         long timeStamp = message.getTime();
         String text = message.getText();
         Message realMsg = new Message().setContent(text)
