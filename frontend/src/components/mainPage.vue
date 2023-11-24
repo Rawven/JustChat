@@ -18,6 +18,13 @@
         </template>
       </router-link>
       <el-input placeholder="请输入搜索内容"></el-input>
+      <el-card v-for="room in rooms" :key="room.id" class="box-card">
+        <!-- 在这里展示每个房间的信息 -->
+        <p>{{room.founder}}</p>
+        <p>{{room.maxPeople}}</p>
+        <h2>{{ room.name }}</h2>
+        <p>{{ room.description }}</p>
+      </el-card>
     </el-col>
   </el-row>
 </el-main>
@@ -25,15 +32,38 @@
 </template>
 
 <script>
-
+import axios from "axios";
+import {Host} from "@/main";
 export default {
+
+
   name: 'MainPage',
   data() {
     return {
+      room: {
+        name: '',
+        description: '',
+        founder: '',
+        maxPeople: 1,
+      },
       userInfo: null,
+      rooms : [],
     };
   },
    created() {
+        let page;
+        axios.post("http://"+Host+":7000/chat/queryRoomList", {page},{
+          headers: {
+            'token': localStorage.getItem("token")
+          }
+        })
+            .then(response => {
+              console.log('GetRooms successful:', response.data);
+              this.rooms = response.data; // 将获取的房间数组赋值给 rooms
+            })
+            .catch(error => {
+              console.error('GetRooms error:', error);
+            });
         let item = localStorage.getItem("userData");
         if (item) {
           this.userInfo = JSON.parse(item);

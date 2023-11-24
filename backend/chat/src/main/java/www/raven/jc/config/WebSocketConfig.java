@@ -1,4 +1,4 @@
-package www.raven.jc.websocket;
+package www.raven.jc.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

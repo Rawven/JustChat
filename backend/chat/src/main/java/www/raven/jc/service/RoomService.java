@@ -1,6 +1,9 @@
 package www.raven.jc.service;
 
 import www.raven.jc.entity.model.RoomModel;
+import www.raven.jc.entity.vo.RoomVO;
+
+import java.util.List;
 
 /**
  * room service
@@ -10,5 +13,18 @@ import www.raven.jc.entity.model.RoomModel;
  */
 public interface RoomService {
 
+    /**
+     * create room
+     *
+     * @param roomModel room model
+     */
     void createRoom(RoomModel roomModel);
+
+    /**
+     * qurey room page
+     *
+     * @param page page
+     * @return {@link List}<{@link RoomVO}>
+     */
+    List<RoomVO> queryRoomPage(Integer page);
 }
