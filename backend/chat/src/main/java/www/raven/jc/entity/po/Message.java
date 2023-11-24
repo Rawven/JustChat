@@ -23,5 +23,6 @@ public class Message {
     private Integer messageId;
     private Integer senderId;
     private String content;
+    private Integer roomId;
     private Date timestamp;
 }

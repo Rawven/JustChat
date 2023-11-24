@@ -1,6 +1,7 @@
 package www.raven.jc.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,8 +23,8 @@ public class ChatController {
     @Autowired
     private ChatService chatService;
 
-    @PostMapping("/restoreHistory")
-    public CommonResult<List<MessageVO>> restoreHistory() {
-        return CommonResult.operateSuccess("获取历史记录成功", chatService.restoreHistory());
+    @PostMapping("/restoreHistory/{roomId}")
+    public CommonResult<List<MessageVO>> restoreHistory(@PathVariable("roomId") Integer roomId) {
+        return CommonResult.operateSuccess("获取历史记录成功", chatService.restoreHistory(roomId));
     }
 }

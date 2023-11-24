@@ -20,7 +20,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import HeaderH from "@/components/Header.vue";
 import {Host} from "@/main";
 
@@ -28,6 +27,11 @@ export default {
   name: 'userRegister',
   // eslint-disable-next-line vue/no-unused-components
   components: {HeaderH},
+  inject: {
+    realAxios: {
+      from: 'axiosFilter'
+    }
+  },
   data() {
     return {
       user: {
@@ -51,16 +55,12 @@ export default {
       this.$refs.registerForm.validate((valid) => {
         if (valid) {
           // 发送注册请求
-          axios.post('http://'+Host+':7000/account/register', this.user)
+          this.realAxios.post('http://' + Host + ':7000/account/register', this.user)
               .then(response => {
-                console.log('Registration successful:', response.data);
                 localStorage.setItem("token", response.data.data);
                 // 注册成功后可以进行相关的处理，例如跳转到登录页面
                 this.$router.push('/setAvatar');
               })
-              .catch(error => {
-                console.error('Registration error:', error);
-              });
         } else {
           this.$message.error('Please fill in all required fields.');
         }

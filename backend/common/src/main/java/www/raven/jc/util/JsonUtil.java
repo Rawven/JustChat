@@ -20,4 +20,11 @@ public class JsonUtil {
     public static Map<Object,Object> jsonToMap(String json) throws Exception{
         return OBJECT_MAPPER.readValue(json,Map.class);
     }
+    public static String mapToJson(Map<Object,Object> map) throws Exception{
+        return OBJECT_MAPPER.writeValueAsString(map);
+    }
+    public static <T> T jsonToObj(String json,Class<T> clazz) throws Exception{
+        return OBJECT_MAPPER.readValue(json,clazz);
+    }
+
 }

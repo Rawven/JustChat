@@ -6,9 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import www.raven.jc.dto.UserInfoDTO;
+import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.feign.AccountFeign;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.ChatService;
+import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.JwtUtil;
 
 import javax.websocket.*;
@@ -26,8 +28,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 @Component
 @Slf4j
-@ServerEndpoint("/websocket/{token}")
+@ServerEndpoint("/websocket/{token}/{roomId}")
 public class WebSocketService {
+    private String roomId;
 
     private static AccountFeign accountFeign;
     private static ChatService chatService;
@@ -59,10 +62,11 @@ public class WebSocketService {
      * 链接成功调用的方法
      */
     @OnOpen
-    public void onOpen(Session session, @PathParam(value = "token") String token) {
+    public void onOpen(Session session, @PathParam(value = "token") String token,@PathParam(value = "roomId") String roomId) {
         log.info("【websocket消息】有新的连接，token为:" + token);
         session.getUserProperties().put("userId", JwtUtil.verify(token, "爱你老妈"));
         this.session = session;
+        this.roomId =roomId;
         webSockets.add(this);
         sessionPool.put(token, session);
         log.info("【websocket消息】有新的连接，总数为:" + webSockets.size());
@@ -87,17 +91,15 @@ public class WebSocketService {
     @OnMessage
     public void onMessage(String message) throws Exception {
         log.info("【websocket消息】收到客户端发来的消息:" + message);
+        MessageDTO messageDTO = JsonUtil.jsonToObj(message, MessageDTO.class);
         Integer id= Integer.valueOf(session.getUserProperties().get("userId").toString());
         Assert.notNull(accountFeign);
-        CommonResult<UserInfoDTO> userInfos = accountFeign.getSingleInfo(id);
-        UserInfoDTO data = userInfos.getData();
-        chatService.saveMsg(data,message);
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map<String,Object> map = new HashMap<>(2);
+        UserInfoDTO data = accountFeign.getSingleInfo(id).getData();
+        chatService.saveMsg(data,messageDTO,this.roomId);
+        Map<Object,Object> map = new HashMap<>(2);
         map.put("userInfo",data);
         map.put("message",message);
-        String realMsg = objectMapper.writeValueAsString(map);
-        sendAllMessage(realMsg);
+        sendRoomMessage(JsonUtil.mapToJson(map));
     }
 
     /**
@@ -122,7 +124,15 @@ public class WebSocketService {
     public void sendAllMessage(String message) {
         log.info("【websocket消息】广播消息:" + message);
         for (WebSocketService webSocketService : webSockets) {
-            if (webSocketService.session.isOpen()) {
+            if (webSocketService.session.isOpen() ) {
+                webSocketService.session.getAsyncRemote().sendText(message);
+            }
+        }
+    }
+    public void sendRoomMessage(String message) {
+        log.info("【websocket消息】广播消息:" + message);
+        for (WebSocketService webSocketService : webSockets) {
+            if (webSocketService.session.isOpen() && webSocketService.roomId.equals(this.roomId)) {
                 webSocketService.session.getAsyncRemote().sendText(message);
             }
         }

@@ -1,39 +1,69 @@
 <template>
   <el-container class="container">
-
-    <el-card>
-      <el-image
-          fit="contain"
-          src="https://avatars.githubusercontent.com/u/121878866?s=400&u=44ed833ce20456153341fb5fa7620190c9aaabdd&v=4"
-          style="width: 200px; height: 200px"
-      ></el-image>
-      <el-form ref="loginForm" :model="user" :rules="rules" class="loginK" label-width="80px">
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="user.username" placeholder="请输入用户名"></el-input>
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="user.password" placeholder="请输入密码" type="password"></el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="login">登录</el-button>
-        </el-form-item>
-        <el-button type="primary" @click="toRegister">还没有账号？</el-button>
-      </el-form>
-    </el-card>
+    <el-aside>
+      <el-calendar class="calendar" v-model="value"/>
+    </el-aside>
+    <el-main class="tMain">
+      <el-row>
+        <el-col :span="12">
+          <el-card class="box-card">
+            <el-image
+                fit="contain"
+                src="https://avatars.githubusercontent.com/u/121878866?s=400&u=44ed833ce20456153341fb5fa7620190c9aaabdd&v=4"
+                class="image"
+                style="width: 200px; height: 200px"
+            ></el-image>
+            <el-form ref="loginForm" :model="user" :rules="rules" class="login-form" label-width="80px">
+              <el-form-item label="用户名" prop="username">
+                <el-input v-model="user.username" prefix-icon="el-icon-user"></el-input>
+              </el-form-item>
+              <el-form-item label="密码" prop="password">
+                <el-input v-model="user.password" prefix-icon="el-icon-lock" type="password"></el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" round @click="login" class="button2">登录</el-button>
+              </el-form-item>
+              <el-button type="text" @click="toRegister" class="button">还没有账号？</el-button>
+            </el-form>
+          </el-card>
+        </el-col>
+        <el-col :span="12">
+          <el-row>
+            <el-switch
+                v-model="value2"
+                class="ml-2"
+                style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
+            />
+          </el-row>
+          <el-row>
+            <el-text type="warning" v-if="value2">今日你若冷眼旁待</el-text>
+            <el-text type="warning" v-else>他人祸临己身 无人为你摇旗呐喊</el-text>
+          </el-row>
+        </el-col>
+      </el-row>
+    </el-main>
   </el-container>
 </template>
 
 <script>
-import axios from 'axios';
 import HeaderH from "@/components/Header.vue";
 import {Host} from "@/main";
+import {ref} from "vue";
 
 export default {
+
   name: 'accountName',
   // eslint-disable-next-line vue/no-unused-components
   components: {HeaderH},
+  inject: {
+    realAxios: {
+      from: 'axiosFilter'
+    }
+  },
   data() {
     return {
+      value2: ref(true),
+      value: ref(new Date()),
       user: {
         username: '',
         password: '',
@@ -53,24 +83,18 @@ export default {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
           // 发送登录请求
-          axios.post('http://'+Host+':7000/account/login', this.user)
+          this.realAxios.post('http://' + Host + ':7000/account/login', this.user)
               .then(response => {
-                console.log('Registration successful:', response.data);
                 localStorage.setItem("token", response.data.data);
-                let token = localStorage.getItem("token");
-                axios.post('http://'+Host+':7000/account/defaultInfo', {}, {
+                this.realAxios.post('http://' + Host + ':7000/account/defaultInfo', {}, {
                   headers: {
-                    'token': token
+                    'token': localStorage.getItem("token")
                   }
-                }).then(response => {
-                  console.log('GetUserInfo successful:', response.data);
-                  localStorage.setItem("userData", response.data.data);
+                }).then(response1 => {
+                  localStorage.setItem("userData", JSON.stringify(response1.data.data));
                 })
                 this.$router.push('/mainPage');
               })
-              .catch(error => {
-                console.error('Registration error:', error);
-              });
         } else {
           this.$message.error('Please fill in all required fields.');
         }
@@ -81,35 +105,44 @@ export default {
 </script>
 
 <style scoped>
+.calendar {
+  width: auto;
+}
 
+.button {
+  margin-left: 100px;
+}
+
+.button2 {
+  margin-left: 50px;
+}
+
+.image {
+  margin-left: 50px;
+  border-radius: 50%; /* 设置边框半径为 50%，使图片变成圆形 */
+}
 
 .container {
-  width: 100%;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh; /* 让 .center 占满整个视口高度 */
+  top: 65px; /* 设置距离顶部为 0 */
+  left: 0; /* 设置距离左侧为 0 */
+  position: relative; /* 设置定位类型为绝对定位 */
+  margin: 10px;
+  background-color: #f5f5f5; /* 设置背景颜色为灰色 */
 }
 
-.center {
-  margin-left: 500px;
-  margin-bottom: 50px;
-  width: 100%;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh; /* 让 .center 占满整个视口高度 */
+.tMain {
+
+  width: 500px;
 }
 
 
-.loginK {
-  border-radius: initial;
-  margin-top: 50px; /* 调整上方的间距 */
-  margin-bottom: 50px; /* 调整下方的间距 */
-  /* 其他样式保持不变 */
+.box-card {
+  margin-left: 100px;
+  width: 400px;
 }
 
+.login-form {
+  margin-top: 20px;
+}
 
 </style>

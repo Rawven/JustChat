@@ -27,11 +27,18 @@
 </template>
 
 <script>
-import axios from "axios";
 import {Host} from "@/main";
 
 export default {
   name: 'ChatRoom',
+  inject: {
+    realAxios: {
+      from: 'axiosFilter'
+    }
+  },
+  props:{
+    roomId: String
+  },
   data() {
     return {
       message: '',
@@ -41,17 +48,16 @@ export default {
   },
   created() {
     let token = localStorage.getItem("token");
+    console.log('WebSocket created:', this.roomId)
+    this.socket = new WebSocket(`ws://` + Host + `:8081/websocket/${token}/${this.roomId}`);
 
-    this.socket = new WebSocket(`ws://`+Host+`:8081/websocket/${token}`);
-    console.log('WebSocket created:', token)
     this.socket.onopen = () => {
-      axios.post("http://"+Host+":7000/chat/restoreHistory", {},{
+      this.realAxios.post(`http://` + Host + `:7000/chat/restoreHistory/${this.roomId}`, {}, {
         headers: {
           'token': token
         }
       })
           .then(response => {
-            console.log('Restore history successful:', response.data.data);
             this.messages = response.data.data.map(messageVO => ({
               time: new Date(messageVO.time).getTime(), // 将Date对象转换为时间戳
               text: messageVO.text,
@@ -59,10 +65,6 @@ export default {
               profile: messageVO.profile
             })); // 使用map方法将每个MessageVO对象转换为msg对象
           })
-
-          .catch(error => {
-            console.error('Restore history error:', error);
-          });
       console.log('WebSocket is open now.');
     };
 

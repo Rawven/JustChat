@@ -28,10 +28,20 @@ public class AccountController {
         return CommonResult.operateSuccess("注册成功",accountService.register(registerModel));
     }
 
-    @PostMapping("/profileUpload")
-    public CommonResult<Void> profileUpload(@RequestParam("file") MultipartFile profile) {
-        accountService.profileUpload(profile);
-        return CommonResult.operateSuccess("上传图像成功");
+    @PostMapping("/setProfile")
+    public CommonResult<Void> setProfile(@RequestParam("file") MultipartFile profile) {
+        accountService.setProfile(profile);
+        return CommonResult.operateSuccess("设置头像成功");
+    }
+    @PostMapping("/setSignature")
+    public CommonResult<Void> setSignature(@RequestBody String signature) {
+        accountService.setSignature(signature);
+        return CommonResult.operateSuccess("设置签名成功");
+    }
+    @PostMapping("/setUsername")
+    public CommonResult<Void> setUsername(@RequestBody String username) {
+        accountService.setUsername(username);
+        return CommonResult.operateSuccess("重命名成功");
     }
 
 }

@@ -3,6 +3,7 @@ package www.raven.jc.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import www.raven.jc.entity.model.RoomModel;
+import www.raven.jc.entity.vo.RoomRealVO;
 import www.raven.jc.entity.vo.RoomVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.RoomService;
@@ -21,9 +22,11 @@ public class RoomController {
     @Autowired
     private RoomService roomService;
 
-    @GetMapping("/getRoomList")
-    public CommonResult<List<RoomVO>> getRoomList(@RequestBody Integer page) {
-        return CommonResult.operateSuccess("获取房间列表成功",roomService.queryRoomPage(page));
+    @GetMapping("/queryRoomList/{page}")
+    public CommonResult<RoomRealVO> queryRoomList(@PathVariable("page")  int page) {
+        List<RoomVO> rooms = roomService.queryRoomPage(page);
+        RoomRealVO roomRealVO = new RoomRealVO().setRooms(rooms).setTotal(rooms.size());
+        return CommonResult.operateSuccess("获取房间列表成功",roomRealVO);
     }
 
 

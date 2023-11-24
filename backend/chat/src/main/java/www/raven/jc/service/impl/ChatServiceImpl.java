@@ -1,10 +1,12 @@
 package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import www.raven.jc.dao.MessageMapper;
 import www.raven.jc.dto.UserInfoDTO;
+import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.entity.po.Message;
 import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.feign.AccountFeign;
@@ -33,19 +35,19 @@ public class ChatServiceImpl implements ChatService {
     private AccountFeign accountFeign;
 
     @Override
-    public void saveMsg(UserInfoDTO data, String message) throws Exception {
-        Map<Object, Object> msg = JsonUtil.jsonToMap(message);
-        long timeStamp = (long) msg.get("time");
-        String text = (String) msg.get("text");
+    public void saveMsg(UserInfoDTO data, MessageDTO message,String roomId) throws Exception {
+        long timeStamp = message.getTime();
+        String text = message.getText();
         Message realMsg = new Message().setContent(text)
                 .setTimestamp(new Date(timeStamp))
-                .setSenderId(data.getUserId());
+                .setSenderId(data.getUserId())
+                .setRoomId(Integer.parseInt(roomId));
         Assert.isTrue(mapper.insert(realMsg) > 0, "插入失败");
     }
 
     @Override
-    public List<MessageVO> restoreHistory() {
-        List<Message> messages = mapper.selectList(null);
+    public List<MessageVO> restoreHistory(Integer roomId) {
+        List<Message> messages = mapper.selectList(new QueryWrapper<Message>().eq("room_id", roomId).orderByAsc("timestamp"));
         CommonResult<List<UserInfoDTO>> allInfo = accountFeign.getAllInfo();
         List<UserInfoDTO> data = allInfo.getData();
         Map<Integer, UserInfoDTO> userInfoMap = data.stream()

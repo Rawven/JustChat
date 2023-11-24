@@ -19,11 +19,15 @@
 </template>
 
 <script>
-import axios from 'axios';
 import {Host} from "@/main";
 
 export default {
   name: 'setAvatar',
+  inject: {
+    realAxios: {
+      from: 'axiosFilter'
+    }
+  },
   methods: {
     selectFile(event) {
       this.selectedFile = event.target.files[0];
@@ -37,29 +41,23 @@ export default {
         let formData = new FormData();
         formData.append('file', this.selectedFile);
         let item = localStorage.getItem("token");
-        axios.post('http://'+Host+':7000/account/profileUpload', formData,
+        this.realAxios.post('http://' + Host + ':7000/account/setProfile', formData,
             {
               headers: {
                 'token': item
               }
             })
-            .then(response => {
-              console.log('Avatar upload successful:', response.data);
-              let token = localStorage.getItem("token");
-              axios.post('http://'+Host+':7000/account/defaultInfo', {}, {
+            .then(() => {
+              this.realAxios.post('http://' + Host + ':7000/account/defaultInfo', {}, {
                 headers: {
-                  'token': token
+                  'token': localStorage.getItem("token")
                 }
               }).then(response => {
-                console.log('GetUserInfo successful:', response.data);
-                localStorage.setItem("userData", JSON.stringify(response.data.data));
+                 localStorage.setItem("userData", JSON.stringify(response.data.data));
               })
               this.$router.push('/mainPage');
               // Additional logic after successful avatar upload
             })
-            .catch(error => {
-              console.error('Avatar upload error:', error);
-            });
       } else {
         this.$message.error('请选择要上传的头像文件。');
       }

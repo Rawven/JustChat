@@ -65,9 +65,21 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void profileUpload(MultipartFile profile) {
+    public void setProfile(MultipartFile profile) {
         String upload = ipfsClient.upload(profile);
         String header = request.getHeader("userId");
         Assert.isTrue(userMapper.update(new UpdateWrapper<User>().eq("id",header).set("profile",upload))>0,"插入头像失败");
+    }
+
+    @Override
+    public void setSignature(String signature) {
+        String header = request.getHeader("userId");
+        Assert.isTrue(userMapper.update(new UpdateWrapper<User>().eq("id",header).set("signature",signature))>0,"插入签名失败");
+    }
+
+    @Override
+    public void setUsername(String username) {
+        String header = request.getHeader("userId");
+        Assert.isTrue(userMapper.update(new UpdateWrapper<User>().eq("id",header).set("username",username))>0,"插入用户名失败");
     }
 }

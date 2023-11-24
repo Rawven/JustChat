@@ -33,5 +33,19 @@ public interface AccountService {
      *
      * @param profile profile
      */
-    void profileUpload(MultipartFile profile);
+    void setProfile(MultipartFile profile);
+
+    /**
+     * set signature
+     *
+     * @param signature signature
+     */
+    void setSignature(String signature);
+
+    /**
+     * set username
+     *
+     * @param username username
+     */
+    void setUsername(String username);
 }

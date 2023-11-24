@@ -48,11 +48,13 @@ public class RoomServiceImpl implements RoomService {
         Assert.isTrue(chatRoomPage.getTotal()>0);
         CommonResult<List<UserInfoDTO>> allInfo = accountFeign.getAllInfo();
         List<UserInfoDTO> data = allInfo.getData();
-        Map<Integer, String> map = data.stream().collect(Collectors.toMap(UserInfoDTO::getUserId, UserInfoDTO::getUsername));
+        Map<Integer, UserInfoDTO> map = data.stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
         return chatRoomPage.getRecords().stream().map(chatRoom -> new RoomVO()
+                .setRoomId(chatRoom.getRoomId())
                     .setRoomName(chatRoom.getRoomName())
                     .setRoomDescription(chatRoom.getRoomDescription())
                     .setMaxPeople(chatRoom.getMaxPeople())
-                    .setFounderName(map.get(chatRoom.getFounderId()))).collect(Collectors.toList());
+                    .setFounderName(map.get(chatRoom.getFounderId()).getUsername())
+                .setFounderAvatar(map.get(chatRoom.getFounderId()).getProfile())).collect(Collectors.toList());
     }
 }

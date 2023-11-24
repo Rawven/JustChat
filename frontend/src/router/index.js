@@ -25,19 +25,20 @@ const router = createRouter({
             component: AvatarView
         },
         {
-            path: '/chatRoom',
+            path: '/chatRoom/:roomId',
             name: "RoomView",
-            component : ChatRoomView
+            component: ChatRoomView,
+            props: true
         },
         {
             path: '/mainPage',
-            name :"MainPageView",
-            component : MainPageView
+            name: "MainPageView",
+            component: MainPageView
         },
         {
             path: '/openRoom',
-            name :"OpenRoomView",
-            component : OpenANewRoom
+            name: "OpenRoomView",
+            component: OpenANewRoom
         }
     ]
 })
