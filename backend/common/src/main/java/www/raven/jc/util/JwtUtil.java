@@ -6,6 +6,7 @@ import cn.hutool.jwt.JWTUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -18,10 +19,10 @@ import java.util.Objects;
 public class JwtUtil {
 
 
-    public static String createToken(Integer userId, String key) {
-        HashMap<String, Object> map = new HashMap<>(2);
-        map.put("userId", userId);
-        map.put("expireTime", System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7);
+    public static String createToken(Map<String,Object> map, String key) {
+//        HashMap<String, Object> map = new HashMap<>(2);
+//        map.put("userId", userId);
+//        map.put("expireTime", System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7);
         return JWTUtil.createToken(map, key.getBytes());
     }
 
@@ -31,7 +32,4 @@ public class JwtUtil {
         return Objects.requireNonNull(jwt).getPayload("userId").toString();
     }
 
-//    public static Boolean parseToken(String token) {
-//        return true;
-//    }
 }
