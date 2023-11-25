@@ -2,6 +2,7 @@ package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import www.raven.jc.dao.MessageMapper;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
  * @date 2023/11/22
  */
 @Service
+@Slf4j
 public class ChatServiceImpl implements ChatService {
     @Autowired
     private MessageMapper mapper;
@@ -34,8 +36,10 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public void saveMsg(UserInfoDTO data, MessageDTO message, String roomId) {
+        log.info("data: {}, message: {}, roomId: {}", data, message, roomId);
         long timeStamp = message.getTime();
         String text = message.getText();
+        log.info("timeStamp: {}, text: {}", timeStamp, text);
         Message realMsg = new Message().setContent(text)
                 .setTimestamp(new Date(timeStamp))
                 .setSenderId(data.getUserId())

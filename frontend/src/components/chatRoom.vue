@@ -73,7 +73,7 @@ export default {
       const data = JSON.parse(event.data);
       const msg = {
         time: Date.now(),
-        text: JSON.parse(data.message).text,
+        text: data.message.text,
         user: data.userInfo.username,
         profile: data.userInfo.profile
       };
@@ -90,6 +90,9 @@ export default {
   },
 
   methods: {
+    Host() {
+      return Host
+    },
     sendMessage() {
       if (this.message) {
         const msg = {time: Date.now(), text: this.message};
@@ -128,7 +131,7 @@ export default {
 
 .grid-content {
   margin-right: 200px;
-  width: 43cm;
+  width: 34cm;
   height: 20cm;
 }
 

@@ -1,6 +1,8 @@
 <template>
   <el-container class="container">
-    <h1>注册聊天室</h1>
+
+    <el-card class="card">
+      <h1 class="title">注册聊天室</h1>
     <el-form ref="form" :model="room" label-width="120px" @submit.prevent="submitForm">
       <el-form-item label="聊天室名字:" prop="name">
         <el-input v-model="room.name" auto-complete="off"></el-input>
@@ -15,6 +17,7 @@
         <el-button type="primary" @click="submitForm">提交</el-button>
       </el-form-item>
     </el-form>
+    </el-card>
   </el-container>
 </template>
 
@@ -62,9 +65,38 @@ export default {
 </script>
 
 <style scoped>
+.card{
+  width: 500px;
+  height: 350px;
+  margin-top:  95px;
+  margin-left: 455px;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  animation: fadeIn 2s;
+}
+
+.title{
+  font-size: 24px;
+  color: #409EFF;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+  animation: fadeIn 2s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
 .container {
-  max-width: 600px;
-  margin: 0 auto;
+  width: auto;
+  height: auto;
+  margin:  auto;
   padding: 20px;
 }
 </style>

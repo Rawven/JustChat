@@ -40,7 +40,7 @@ public class LoggingAspect {
      * 定义切点表达式,指定通知功能被应用的范围
      */
 
-    @Pointcut("execution(public * www.raven.jc.service.*.*(..))")
+    @Pointcut("execution(public * www.raven.jc.controller.*.*(..))")
     public void webLog() {
     }
 

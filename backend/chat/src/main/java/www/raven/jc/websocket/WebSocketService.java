@@ -14,6 +14,7 @@ import www.raven.jc.util.JwtUtil;
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -90,17 +91,27 @@ public class WebSocketService {
      * @param message message
      */
     @OnMessage
-    public void onMessage(String message) throws Exception {
+    public void onMessage(String message) {
         log.info("【websocket消息】收到客户端发来的消息:" + message);
-        MessageDTO messageDTO = JsonUtil.jsonToObj(message, MessageDTO.class);
+        MessageDTO messageDTO = null;
+        try {
+            messageDTO = JsonUtil.jsonToObj(message, MessageDTO.class);
+        } catch (Exception e) {
+            log.error("Json转换异常");
+        }
         Integer id = Integer.valueOf(session.getUserProperties().get("userId").toString());
-        Assert.notNull(accountFeign);
+        Assert.notNull(accountFeign,"account服务端异常 is null");
         UserInfoDTO data = accountFeign.getSingleInfo(id).getData();
+        Assert.notNull(chatService,"chatService is null");
         chatService.saveMsg(data, messageDTO, this.roomId);
         Map<Object, Object> map = new HashMap<>(2);
         map.put("userInfo", data);
-        map.put("message", message);
-        sendRoomMessage(JsonUtil.mapToJson(map));
+        map.put("message", messageDTO);
+        try {
+            sendRoomMessage(JsonUtil.mapToJson(map));
+        } catch (Exception e) {
+            log.error("map转json异常");
+        }
     }
 
     /**
@@ -111,9 +122,9 @@ public class WebSocketService {
      */
     @OnError
     public void onError(Session session, Throwable error) {
-
-        log.error("用户错误,原因:" + error.getMessage());
-        log.error(error.toString());
+        log.error("Error occurred on connection, Session ID: " + session.getId());
+        log.error("Details: " + error.getMessage());
+        log.error("Stack trace: {}", (Object) error.getStackTrace());
     }
 
 
