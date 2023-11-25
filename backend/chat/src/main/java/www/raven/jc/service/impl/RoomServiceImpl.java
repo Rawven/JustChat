@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import www.raven.jc.dao.RoomMapper;
+import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.model.RoomModel;
 import www.raven.jc.entity.po.ChatRoom;
@@ -47,19 +48,25 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public List<RoomVO> queryAllRoomPage(Integer page) {
         Page<ChatRoom> chatRoomPage = roomMapper.selectPage(new Page<>(page, 5), null);
-        return buildRoomVO(chatRoomPage);
+        return buildRoomVO(chatRoomPage,accountFeign.getAllInfo().getData());
     }
 
     @Override
-    public List<RoomVO> queryLikedRoomList(String column,String text) {
-        Page<ChatRoom> chatRoomPage = roomMapper.selectPage(new Page<>(1, 5), new QueryWrapper<ChatRoom>().like(column, text));
-        return buildRoomVO(chatRoomPage);
+    public List<RoomVO> queryLikedRoomList(String column,String text,int page) {
+        Page<ChatRoom> chatRoomPage = roomMapper.selectPage(new Page<>(page, 5), new QueryWrapper<ChatRoom>().like(column, text));
+        return buildRoomVO(chatRoomPage,accountFeign.getAllInfo().getData());
     }
 
-    private List<RoomVO> buildRoomVO(Page<ChatRoom> chatRoomPage) {
+    @Override
+    public List<RoomVO> queryUserNameRoomList(String column, String text,int page) {
+        List<UserInfoDTO> queryList = accountFeign.getRelatedInfoList(new QueryUserInfoDTO().setColumn(column).setText(text)).getData();
+        List<Integer> userIds = queryList.stream().map(UserInfoDTO::getUserId).collect(Collectors.toList());
+        Page<ChatRoom> chatRoomPage = roomMapper.selectPage(new Page<>(page, 5), new QueryWrapper<ChatRoom>().in("founder_id", userIds));
+        return buildRoomVO(chatRoomPage,queryList);
+    }
+
+    private List<RoomVO> buildRoomVO(Page<ChatRoom> chatRoomPage,List<UserInfoDTO> data) {
         Assert.isTrue(chatRoomPage.getTotal() > 0);
-        CommonResult<List<UserInfoDTO>> allInfo = accountFeign.getAllInfo();
-        List<UserInfoDTO> data = allInfo.getData();
         Map<Integer, UserInfoDTO> map = data.stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
         return chatRoomPage.getRecords().stream().map(chatRoom -> new RoomVO()
                 .setRoomId(chatRoom.getRoomId())

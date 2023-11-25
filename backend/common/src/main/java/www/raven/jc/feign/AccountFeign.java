@@ -2,6 +2,8 @@ package www.raven.jc.feign;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.result.CommonResult;
 
@@ -31,4 +33,15 @@ public interface AccountFeign {
      */
     @PostMapping("/getAllInfo")
     CommonResult<List<UserInfoDTO>> getAllInfo();
+
+
+    /**
+     * get related info list
+     * get related info list
+     *
+     * @param userInfoDTO user info dto
+     * @return {@link CommonResult}<{@link List}<{@link UserInfoDTO}>>
+     */
+    @PostMapping("/getRelatedInfoList")
+    public CommonResult<List<UserInfoDTO>> getRelatedInfoList(@RequestBody QueryUserInfoDTO userInfoDTO);
 }

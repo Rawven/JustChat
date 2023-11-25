@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.vo.InfoVO;
 import www.raven.jc.result.CommonResult;
@@ -43,5 +44,10 @@ public class InfoController {
     @PostMapping("/getAllInfo")
     public CommonResult<List<UserInfoDTO>> getAllInfo() {
         return CommonResult.operateSuccess("查找成功", infoService.queryAllInfo());
+    }
+
+    @PostMapping("/getRelatedInfoList")
+    public CommonResult<List<UserInfoDTO>> getRelatedInfoList(@RequestBody QueryUserInfoDTO userInfoDTO) {
+        return CommonResult.operateSuccess("查找成功", infoService.queryLikedInfoList(userInfoDTO.getColumn(), userInfoDTO.getText()));
     }
 }

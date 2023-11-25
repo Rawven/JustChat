@@ -34,4 +34,14 @@ public interface InfoService {
      * @return {@link UserInfoDTO}
      */
     InfoVO defaultInfo(Integer userId);
+
+    /**
+     * query liked info list
+     * query liked info list
+     *
+     * @param text   text
+     * @param column column
+     * @return {@link List}<{@link UserInfoDTO}>
+     */
+    List<UserInfoDTO> queryLikedInfoList(String column,String text);
 }

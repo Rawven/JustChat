@@ -1,6 +1,7 @@
 package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,5 +57,18 @@ public class InfoServiceImpl implements InfoService {
                 .setProfile(user.getProfile())
                 .setUserId(user.getId())
                 .setUsername(user.getUsername());
+    }
+
+    @Override
+    public List<UserInfoDTO> queryLikedInfoList(String column, String text) {
+        List<User> users = userMapper.selectList(new QueryWrapper<User>().like(column, text));
+        Assert.notEmpty(users, "没有找到相关用户");
+        return users.stream().map(
+                user -> {
+                    UserInfoDTO userInfoDTO = new UserInfoDTO();
+                    userInfoDTO.setUsername(user.getUsername()).setProfile(user.getProfile()).setUserId(user.getId());
+                    return userInfoDTO;
+                }
+        ).collect(Collectors.toList());
     }
 }

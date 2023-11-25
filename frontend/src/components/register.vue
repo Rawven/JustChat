@@ -3,7 +3,7 @@
 
     <el-card class="box-card">
       <el-header>
-        <el-text class="title">来注册一个账号吧👆👀</el-text>
+        <el-text class="title">来注册一个账号吧👆👨</el-text>
       </el-header>
       <el-form ref="registerForm" :model="user" :rules="rules" label-width="80px">
         <el-form-item label="Username" prop="username">
