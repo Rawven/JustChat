@@ -9,7 +9,7 @@ package www.raven.jc.constant;
 public class Filter {
     public static final String TOKEN = "token";
     public static final String[] WHITE_PATH = {
-            "/account/login",
-            "/account/register"
+            "/account/auth/login",
+            "/account/auth/register"
     };
 }

@@ -15,8 +15,9 @@ import www.raven.jc.service.AccountService;
  * @date 2023/11/20
  */
 @RestController
+@RequestMapping("/auth")
 @ResponseBody
-public class AccountController {
+public class AuthController {
     @Autowired
     private AccountService accountService;
 
@@ -30,22 +31,6 @@ public class AccountController {
         return CommonResult.operateSuccess("注册成功", accountService.register(registerModel));
     }
 
-    @PostMapping("/setProfile")
-    public CommonResult<Void> setProfile(@RequestParam("file") MultipartFile profile) {
-        accountService.setProfile(profile);
-        return CommonResult.operateSuccess("设置头像成功");
-    }
 
-    @PostMapping("/setSignature")
-    public CommonResult<Void> setSignature(@RequestParam("signature") String signature) {
-        accountService.setSignature(signature);
-        return CommonResult.operateSuccess("设置签名成功");
-    }
-
-    @PostMapping("/setUsername")
-    public CommonResult<Void> setUsername(@RequestParam("username") String username) {
-        accountService.setUsername(username);
-        return CommonResult.operateSuccess("重命名成功");
-    }
 
 }

@@ -25,6 +25,12 @@ public class JwtUtil {
 //        map.put("expireTime", System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7);
         return JWTUtil.createToken(map, key.getBytes());
     }
+    public static String createToken(Integer userId, String key) {
+        HashMap<String, Object> map = new HashMap<>(2);
+        map.put("userId", userId);
+        map.put("expireTime", System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7);
+        return JWTUtil.createToken(map, key.getBytes());
+    }
 
     public static String verify(String token, String key) {
         Assert.isTrue(JWTUtil.verify(token, key.getBytes()), "token验证失败");

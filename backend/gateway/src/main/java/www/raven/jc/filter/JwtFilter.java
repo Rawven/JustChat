@@ -5,10 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.gateway.filter.GatewayFilterChain;
-import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,6 +14,8 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import www.raven.jc.constant.Filter;
 import www.raven.jc.util.JwtUtil;
@@ -32,22 +31,22 @@ import java.util.Objects;
  * @author 刘家辉
  * @date 2023/11/22
  */
-@Configuration
 @Component
 @Slf4j
-public class TokenFilter implements GlobalFilter, Ordered {
-    @Value("${Raven.key}")
+public class JwtFilter implements WebFilter {
+    @Value("${raven.key}")
     private String key;
     @Autowired
     private RedissonClient redissonClient;
 
     @Override
-    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
         log(request);
         String path = request.getURI().getPath();
         if (Arrays.stream(Filter.WHITE_PATH).noneMatch(whitePath -> whitePath.equals(path))) {
             List<String> tokens = request.getHeaders().get(Filter.TOKEN);
+
             log.info("token: " + tokens);
             if (tokens == null || tokens.isEmpty()) {
                 return unauthorized(exchange);
@@ -59,7 +58,6 @@ public class TokenFilter implements GlobalFilter, Ordered {
         }
         return chain.filter(exchange);
     }
-
 
     private Mono<Void> unauthorized(ServerWebExchange exchange) {
         ServerHttpResponse response = exchange.getResponse();
@@ -90,11 +88,5 @@ public class TokenFilter implements GlobalFilter, Ordered {
             log.info("Query param: " + paramName + " = " + paramValuesJoined);
         });
 
-    }
-
-
-    @Override
-    public int getOrder() {
-        return 0;
     }
 }

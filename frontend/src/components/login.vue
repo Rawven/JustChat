@@ -83,10 +83,10 @@ export default {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
           // 发送登录请求
-          this.realAxios.post('http://' + Host + ':7000/account/login', this.user)
+          this.realAxios.post('http://' + Host + ':7000/account/auth/login', this.user)
               .then(response => {
                 localStorage.setItem("token", response.data.data);
-                this.realAxios.post('http://' + Host + ':7000/account/defaultInfo', {}, {
+                this.realAxios.post('http://' + Host + ':7000/account/info/defaultInfo', {}, {
                   headers: {
                     'token': localStorage.getItem("token")
                   }

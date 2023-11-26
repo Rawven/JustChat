@@ -59,7 +59,7 @@ export default {
       this.$refs.registerForm.validate((valid) => {
         if (valid) {
           // 发送注册请求
-          this.realAxios.post('http://' + Host + ':7000/account/register', this.user)
+          this.realAxios.post('http://' + Host + ':7000/account/auth/register', this.user)
               .then(response => {
                 localStorage.setItem("token", response.data.data);
                 // 注册成功后可以进行相关的处理，例如跳转到登录页面

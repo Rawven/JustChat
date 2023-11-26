@@ -2,14 +2,13 @@ package www.raven.jc.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.vo.InfoVO;
 import www.raven.jc.result.CommonResult;
+import www.raven.jc.service.AccountService;
 import www.raven.jc.service.InfoService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +21,7 @@ import java.util.List;
  * @date 2023/11/23
  */
 @RestController
+@RequestMapping("/info")
 @ResponseBody
 @Slf4j
 public class InfoController {
@@ -29,6 +29,26 @@ public class InfoController {
     private InfoService infoService;
     @Autowired
     private HttpServletRequest request;
+    @Autowired
+    private AccountService accountService;
+
+    @PostMapping("/setProfile")
+    public CommonResult<Void> setProfile(@RequestParam("file") MultipartFile profile) {
+        accountService.setProfile(profile);
+        return CommonResult.operateSuccess("设置头像成功");
+    }
+
+    @PostMapping("/setSignature")
+    public CommonResult<Void> setSignature(@RequestParam("signature") String signature) {
+        accountService.setSignature(signature);
+        return CommonResult.operateSuccess("设置签名成功");
+    }
+
+    @PostMapping("/setUsername")
+    public CommonResult<Void> setUsername(@RequestParam("username") String username) {
+        accountService.setUsername(username);
+        return CommonResult.operateSuccess("重命名成功");
+    }
 
     @PostMapping("/defaultInfo")
     public CommonResult<InfoVO> defaultInfo() {
