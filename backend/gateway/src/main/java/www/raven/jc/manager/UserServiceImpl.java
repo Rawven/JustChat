@@ -20,7 +20,7 @@ import java.util.List;
  * @date 2023/11/27
  */
 @Service
-public class UserDe implements ReactiveUserDetailsService {
+public class UserServiceImpl implements ReactiveUserDetailsService {
     @Autowired
     private RedissonClient redissonClient;
 

@@ -1,14 +1,16 @@
-package www.raven.jc.filter;
+package www.raven.jc.override;
 
 import cn.hutool.core.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
@@ -18,10 +20,10 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import www.raven.jc.constant.Filter;
 import www.raven.jc.dto.TokenDTO;
-import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.JwtUtil;
 
 import javax.annotation.Resource;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 
@@ -50,20 +52,17 @@ public class DefaultSecurityContextRepository implements ServerSecurityContextRe
     @Override
     public Mono<SecurityContext> load(ServerWebExchange exchange) {
         ServerHttpRequest request = exchange.getRequest();
-        String path = request.getURI().getPath();
         List<String> tokens = request.getHeaders().get(Filter.TOKEN);
         log.info("token: " + tokens);
+        if (tokens == null || tokens.isEmpty()) {
+            return Mono.empty();
+        }
         TokenDTO dto = JwtUtil.verify(tokens.get(0), key);
         Assert.isTrue(Objects.equals(tokens.get(0), redissonClient.getBucket("token:" + dto.getUserId()).get()), "Invalid token");
-        // Create an Authentication object
-        log.info(JsonUtil.objToJson(dto));
-        List<GrantedAuthority> authorityList = AuthorityUtils.createAuthorityList(dto.getRole());
-        log.info(authorityList.toString());
+        request.mutate().header("userId", dto.getUserId().toString()).build();
         Authentication auth = new UsernamePasswordAuthenticationToken(dto.getUserId(), null, AuthorityUtils.createAuthorityList(dto.getRole()));
-        //       ServerHttpRequest realRequest = request.mutate().header("userId", dto.getUserId().toString()).build();
         return tokenAuthenticationManager.authenticate(
                 auth
         ).map(SecurityContextImpl::new);
-
     }
 }

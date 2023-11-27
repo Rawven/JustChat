@@ -25,22 +25,13 @@ public class JwtUtil {
     public static String createToken(Map<String,Object> map, String key) {
         return JWTUtil.createToken(map, key.getBytes());
     }
-//    public static String createToken(Integer userId, String key) {
-//        HashMap<String, Object> map = new HashMap<>(2);
-//        map.put("userId", userId);
-//        map.put("expireTime", System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7);
-//        return JWTUtil.createToken(map, key.getBytes());
-//    }
-
     public static TokenDTO verify(String token, String key) {
         Assert.isTrue(JWTUtil.verify(token, key.getBytes()), "token验证失败");
         JWTPayload payload = JWTUtil.parseToken(token).getPayload();
         NumberWithFormat expireTime = (NumberWithFormat)payload.getClaim("expireTime");
-        long l = expireTime.longValue();
-        Assert.isTrue(l > System.currentTimeMillis(), "token已过期");
         String role = (String) payload.getClaim("role");
         NumberWithFormat userId = (NumberWithFormat) payload.getClaim("userId");
-        return new TokenDTO().setRole(role).setUserId(userId.intValue());
+        return new TokenDTO().setRole(role).setUserId(userId.intValue()).setExpireTime(expireTime.longValue());
     }
 
 }

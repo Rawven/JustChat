@@ -14,4 +14,5 @@ import lombok.experimental.Accessors;
 public class TokenDTO {
     private Integer userId;
     private  String role;
+    private Long expireTime;
 }
