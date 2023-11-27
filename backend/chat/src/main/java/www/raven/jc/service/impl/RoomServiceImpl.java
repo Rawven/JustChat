@@ -11,8 +11,7 @@ import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.model.RoomModel;
 import www.raven.jc.entity.po.ChatRoom;
 import www.raven.jc.entity.vo.RoomVO;
-import www.raven.jc.feign.AccountFeign;
-import www.raven.jc.result.CommonResult;
+import www.raven.jc.feign.UserInfoFeign;
 import www.raven.jc.service.RoomService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,7 +33,7 @@ public class RoomServiceImpl implements RoomService {
     @Autowired
     private HttpServletRequest request;
     @Autowired
-    private AccountFeign accountFeign;
+    private UserInfoFeign accountFeign;
 
     @Override
     public void createRoom(RoomModel roomModel) {

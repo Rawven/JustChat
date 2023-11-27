@@ -34,7 +34,7 @@ import java.util.Objects;
 @Component
 @Slf4j
 public class JwtFilter implements WebFilter {
-    @Value("${raven.key}")
+    @Value("${Raven.key}")
     private String key;
     @Autowired
     private RedissonClient redissonClient;

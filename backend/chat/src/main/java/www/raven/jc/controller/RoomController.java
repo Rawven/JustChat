@@ -2,12 +2,9 @@ package www.raven.jc.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import www.raven.jc.dto.QueryUserInfoDTO;
-import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.model.RoomModel;
 import www.raven.jc.entity.vo.RoomRealVO;
 import www.raven.jc.entity.vo.RoomVO;
-import www.raven.jc.feign.AccountFeign;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.RoomService;
 

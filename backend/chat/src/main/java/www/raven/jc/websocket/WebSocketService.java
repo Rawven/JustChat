@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
-import www.raven.jc.feign.AccountFeign;
+import www.raven.jc.feign.UserInfoFeign;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.JwtUtil;
@@ -14,7 +14,6 @@ import www.raven.jc.util.JwtUtil;
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -33,7 +32,7 @@ public class WebSocketService {
      * 用来存在线连接数
      */
     private static final Map<String, Session> SESSION_POOL = new HashMap<>();
-    private static AccountFeign accountFeign;
+    private static UserInfoFeign accountFeign;
     private static ChatService chatService;
     /**
      * concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
@@ -51,7 +50,7 @@ public class WebSocketService {
     private Session session;
 
     @Autowired
-    public void setAccountFeign(AccountFeign accountFeign) {
+    public void setAccountFeign(UserInfoFeign accountFeign) {
         WebSocketService.accountFeign = accountFeign;
     }
 
