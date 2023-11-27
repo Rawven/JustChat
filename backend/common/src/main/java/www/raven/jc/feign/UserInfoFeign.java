@@ -18,7 +18,7 @@ import java.util.List;
  * @author 刘家辉
  * @date 2023/11/23
  */
-@FeignClient("JC-Account")
+@FeignClient("JC-Userinfo")
 public interface UserInfoFeign {
     /**
      * get single info

@@ -24,6 +24,8 @@ import www.raven.jc.handler.DefaultAuthenticationEntryPoint;
 import www.raven.jc.handler.DefaultAuthenticationFailureHandler;
 import www.raven.jc.manager.UserServiceImpl;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -48,35 +50,35 @@ public class SecurityConfig {
     private DefaultSecurityContextRepository defaultSecurityContextRepository;
     @Autowired
     private DefaultAuthenticationFailureHandler authenticationFailureHandler;
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        //1.允许任何来源
-        configuration.setAllowedOriginPatterns(List.of("http://localhost:5173"));
-        //2.允许任何请求头
-        configuration.addAllowedHeader(CorsConfiguration.ALL);
-        //3.允许任何方法
-        configuration.addAllowedMethod(CorsConfiguration.ALL);
-        //4.允许凭证
-        configuration.setAllowCredentials(true);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+
 
     @Bean
     public   PasswordEncoder passwordEncoder(){
          return new BCryptPasswordEncoder();
     }
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        //1.允许任何来源
+        corsConfiguration.setAllowedOriginPatterns(Collections.singletonList("*"));
+        //2.允许任何请求头
+        corsConfiguration.addAllowedHeader(CorsConfiguration.ALL);
+        //3.允许任何方法
+        corsConfiguration.addAllowedMethod(CorsConfiguration.ALL);
+        //4.允许凭证
+        corsConfiguration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfiguration);
+        return source;
+    }
         @Bean
         public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
-            http
+            http.cors(corsSpec -> corsSpec.configurationSource(corsConfigurationSource()))
                     .authenticationManager(reactiveAuthenticationManager())
                     .securityContextRepository(defaultSecurityContextRepository)
-                    .cors(corsSpec -> corsSpec.configurationSource(corsConfigurationSource()))
                     .csrf(ServerHttpSecurity.CsrfSpec::disable)
                     .authorizeExchange(exchanges -> exchanges
-                            .pathMatchers("/auth/**").permitAll()
+                            .pathMatchers("/auth/**","/ws/**","/webSocket/**").permitAll()
                             .pathMatchers("/chat/**","/info/**").hasRole("USER")
                             .anyExchange().authenticated()
                     )

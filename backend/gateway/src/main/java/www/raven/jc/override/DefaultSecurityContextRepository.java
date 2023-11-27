@@ -57,7 +57,8 @@ public class DefaultSecurityContextRepository implements ServerSecurityContextRe
         TokenDTO dto = JwtUtil.verify(tokens.get(0), key);
         Assert.isTrue(Objects.equals(tokens.get(0), redissonClient.getBucket("token:" + dto.getUserId()).get()), "Invalid token");
         request.mutate().header("userId", dto.getUserId().toString()).build();
-        if(dto.getExpireTime()>System.currentTimeMillis()){
+        if(dto.getExpireTime()<System.currentTimeMillis()){
+            log.info("过期没");
             HashMap<String, Object> stringObjectHashMap = new HashMap<>();
             stringObjectHashMap.put("userId",dto.getUserId());
             stringObjectHashMap.put("role",dto.getRole());

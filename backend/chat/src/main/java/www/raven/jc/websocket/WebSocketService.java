@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.feign.UserInfoFeign;
@@ -98,9 +99,11 @@ public class WebSocketService {
         } catch (Exception e) {
             log.error("Json转换异常");
         }
-        Integer id = Integer.valueOf(session.getUserProperties().get("userId").toString());
+        log.info("this?");
+        TokenDTO tokenDTO = (TokenDTO)(session.getUserProperties().get("userId"));
         Assert.notNull(accountFeign,"account服务端异常 is null");
-        UserInfoDTO data = accountFeign.getSingleInfo(id).getData();
+        UserInfoDTO data = accountFeign.getSingleInfo(tokenDTO.getUserId()).getData();
+        log.info("this2?");
         Assert.notNull(chatService,"chatService is null");
         chatService.saveMsg(data, messageDTO, this.roomId);
         Map<Object, Object> map = new HashMap<>(2);

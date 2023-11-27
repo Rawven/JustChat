@@ -41,14 +41,14 @@ export default {
         let formData = new FormData();
         formData.append('file', this.selectedFile);
         let item = localStorage.getItem("token");
-        this.realAxios.post('http://' + Host + ':7000/account/info/setProfile', formData,
+        this.realAxios.post('http://' + Host + ':7000/info/setProfile', formData,
             {
               headers: {
                 'token': item
               }
             })
             .then(() => {
-              this.realAxios.post('http://' + Host + ':7000/account/info/defaultInfo', {}, {
+              this.realAxios.post('http://' + Host + ':7000/info/defaultInfo', {}, {
                 headers: {
                   'token': localStorage.getItem("token")
                 }
