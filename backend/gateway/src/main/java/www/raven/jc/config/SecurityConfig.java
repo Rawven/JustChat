@@ -52,6 +52,37 @@ public class SecurityConfig {
     private DefaultAuthenticationFailureHandler authenticationFailureHandler;
 
 
+
+    @Bean
+    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
+        http.cors(corsSpec -> corsSpec.configurationSource(corsConfigurationSource()))
+                .authenticationManager(reactiveAuthenticationManager())
+                .securityContextRepository(defaultSecurityContextRepository)
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .authorizeExchange(exchanges -> exchanges
+                        .pathMatchers("/auth/**","/ws/**","/webSocket/**").permitAll()
+                        .pathMatchers("/chat/**","/info/**").hasRole("USER")
+                        .pathMatchers("/admin/**").hasRole("ADMIN")
+                        .anyExchange().authenticated()
+                )
+                .formLogin()
+                // 自定义处理
+                .authenticationFailureHandler(authenticationFailureHandler)
+                .and()
+                .exceptionHandling()
+                .accessDeniedHandler(defaultAccessDeniedHandler)
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(authenticationEntryPoint)
+
+
+
+
+        ;
+        // your other configurations
+        return http.build();
+    }
+
     @Bean
     public   PasswordEncoder passwordEncoder(){
          return new BCryptPasswordEncoder();
@@ -71,34 +102,7 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", corsConfiguration);
         return source;
     }
-        @Bean
-        public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
-            http.cors(corsSpec -> corsSpec.configurationSource(corsConfigurationSource()))
-                    .authenticationManager(reactiveAuthenticationManager())
-                    .securityContextRepository(defaultSecurityContextRepository)
-                    .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                    .authorizeExchange(exchanges -> exchanges
-                            .pathMatchers("/auth/**","/ws/**","/webSocket/**").permitAll()
-                            .pathMatchers("/chat/**","/info/**").hasRole("USER")
-                            .anyExchange().authenticated()
-                    )
-                    .formLogin()
-                    // 自定义处理
-                    .authenticationFailureHandler(authenticationFailureHandler)
-                    .and()
-                    .exceptionHandling()
-                    .accessDeniedHandler(defaultAccessDeniedHandler)
-                    .and()
-                    .exceptionHandling()
-                    .authenticationEntryPoint(authenticationEntryPoint)
 
-
-
-
-            ;
-            // your other configurations
-            return http.build();
-        }
 
     @Bean
     ReactiveAuthenticationManager reactiveAuthenticationManager() {

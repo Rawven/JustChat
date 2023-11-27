@@ -7,20 +7,17 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 /**
- * user
+ * user role
  *
  * @author 刘家辉
- * @date 2023/11/20
+ * @date 2023/11/28
  */
 @TableName
 @Data
 @Accessors(chain = true)
-public class User {
+public class UserRole {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
-    private String username;
-    private String password;
-    private String profile;
-    private String email;
-    private String signature;
+    private Integer userId;
+    private Integer roleId;
 }

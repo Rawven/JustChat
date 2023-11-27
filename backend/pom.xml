@@ -14,6 +14,7 @@
         <module>gateway</module>
         <module>chat</module>
         <module>auth</module>
+        <module>admin</module>
     </modules>
 
     <properties>

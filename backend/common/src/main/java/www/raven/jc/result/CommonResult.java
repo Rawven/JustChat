@@ -53,4 +53,12 @@ public class CommonResult<T> {
                 data
         );
     }
+    public static <T> CommonResult<T> operateFailure(String message, T data) {
+        return new CommonResult<>(
+                ResultCode.FAIL_CODE,
+                false,
+                message,
+                data
+        );
+    }
 }

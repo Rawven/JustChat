@@ -11,3 +11,4 @@ import www.raven.jc.entity.po.ChatRoom;
  */
 public interface RoomMapper extends BaseMapper<ChatRoom> {
 }
+

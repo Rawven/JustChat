@@ -1,11 +1,16 @@
 package www.raven.jc.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import www.raven.jc.entity.model.LoginModel;
+import www.raven.jc.entity.model.RegisterAdminModel;
 import www.raven.jc.entity.model.RegisterModel;
 import www.raven.jc.result.CommonResult;
+import www.raven.jc.result.ResultCode;
 import www.raven.jc.service.AuthService;
+
+import java.util.Objects;
 
 /**
  * account controller
@@ -18,6 +23,8 @@ import www.raven.jc.service.AuthService;
 public class AuthController {
     @Autowired
     private AuthService authService;
+    @Value("${Raven.key}")
+    private String key;
 
     @PostMapping("/login")
     public CommonResult<String> login(@RequestBody LoginModel loginModel) {
@@ -26,9 +33,20 @@ public class AuthController {
 
     @PostMapping("/register")
     public CommonResult<String> register(@RequestBody RegisterModel registerModel) {
-        return CommonResult.operateSuccess("注册成功", authService.register(registerModel));
+        return CommonResult.operateSuccess("注册成功", authService.registerCommonRole(registerModel));
     }
 
+    @PostMapping("/registerAdmin")
+    public CommonResult<String> register(@RequestBody RegisterAdminModel registerModel) {
+        if(Objects.equals(registerModel.getPrivateKey(), key)) {
+            RegisterModel model = new RegisterModel().setUsername(registerModel.getUsername())
+                    .setPassword(registerModel.getPassword())
+                    .setEmail(registerModel.getEmail());
+            return CommonResult.operateSuccess("注册成功", authService.registerCommonRole(model));
+        }else {
+            return CommonResult.operateFailure("注册失败", "私钥错误");
+        }
+    }
 
 
 }

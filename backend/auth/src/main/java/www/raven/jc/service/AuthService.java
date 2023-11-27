@@ -2,6 +2,7 @@ package www.raven.jc.service;
 
 
 import www.raven.jc.entity.model.LoginModel;
+import www.raven.jc.entity.model.RegisterAdminModel;
 import www.raven.jc.entity.model.RegisterModel;
 
 /**
@@ -25,7 +26,15 @@ public interface AuthService {
      * @param registerModel register model
      * @return {@link String}
      */
-    String register(RegisterModel registerModel);
+    String registerCommonRole(RegisterModel registerModel);
+
+    /**
+     * register admin role
+     *
+     * @param registerModel register model
+     * @return {@link String}
+     */
+    String registerAdminRole(RegisterModel registerModel);
 
 
 }
