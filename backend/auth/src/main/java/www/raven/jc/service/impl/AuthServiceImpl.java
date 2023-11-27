@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import www.raven.jc.dao.UserMapper;
 import www.raven.jc.entity.model.LoginModel;
@@ -15,6 +16,8 @@ import www.raven.jc.service.AuthService;
 import www.raven.jc.util.JwtUtil;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * account service impl
@@ -30,20 +33,17 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private RedissonClient redissonClient;
     @Autowired
-    private HttpServletRequest request;
-
+    private PasswordEncoder passwordEncoder;
     @Value("${Raven.key}")
     private String key;
 
     @Override
     public String login(LoginModel loginModel) {
         User user = userMapper.selectOne(new QueryWrapper<User>().
-                eq("username", loginModel.getUsername()).
-                eq("password", loginModel.getPassword()));
-        Assert.notNull(user, "用户名或密码错误");
-        String token = JwtUtil.createToken(user.getId(), key);
-        redissonClient.getBucket("token:" + user.getId()).set(token);
-        return token;
+                eq("username", loginModel.getUsername()));
+        Assert.notNull(user, "用户不存在");
+        Assert.isTrue(passwordEncoder.matches(loginModel.getPassword(), user.getPassword()), "密码错误");
+        return getTokenClaims(user);
     }
 
     @Override
@@ -53,9 +53,17 @@ public class AuthServiceImpl implements AuthService {
         User user = new User();
         Assert.isTrue(userMapper.insert(user.
                 setUsername(registerModel.getUsername()).
-                setPassword(registerModel.getPassword())
+                setPassword(passwordEncoder.encode(registerModel.getPassword()))
                 .setEmail(registerModel.getEmail())) > 0);
-        String token = JwtUtil.createToken(user.getId(), key);
+        return getTokenClaims(user);
+    }
+
+    private String getTokenClaims(User user) {
+        HashMap<String, Object> claims = new HashMap<>(3);
+        claims.put("userId", user.getId());
+        claims.put("role",user.getRole());
+        claims.put("expireTime", System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7);
+        String token = JwtUtil.createToken(claims, key);
         redissonClient.getBucket("token:" + user.getId()).set(token);
         return token;
     }

@@ -5,19 +5,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import www.raven.jc.constant.Filter;
+import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.util.JwtUtil;
 
 import java.nio.charset.StandardCharsets;
@@ -33,7 +31,7 @@ import java.util.Objects;
  */
 @Component
 @Slf4j
-public class JwtFilter implements WebFilter {
+public class ToolFilter implements WebFilter {
     @Value("${Raven.key}")
     private String key;
     @Autowired
@@ -42,18 +40,16 @@ public class JwtFilter implements WebFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
-        log(request);
         String path = request.getURI().getPath();
         if (Arrays.stream(Filter.WHITE_PATH).noneMatch(whitePath -> whitePath.equals(path))) {
             List<String> tokens = request.getHeaders().get(Filter.TOKEN);
-
             log.info("token: " + tokens);
             if (tokens == null || tokens.isEmpty()) {
                 return unauthorized(exchange);
             }
-            String userId = JwtUtil.verify(tokens.get(0), key);
-            Assert.isTrue(Objects.equals(tokens.get(0), redissonClient.getBucket("token:" + userId).get()), "Invalid token");
-            ServerHttpRequest realRequest = request.mutate().header("userId", userId).build();
+            TokenDTO dto = JwtUtil.verify(tokens.get(0), key);
+            Assert.isTrue(Objects.equals(tokens.get(0), redissonClient.getBucket("token:" + dto.getUserId()).get()), "Invalid token");
+            ServerHttpRequest realRequest = request.mutate().header("userId", dto.getUserId().toString()).build();
             return chain.filter(exchange.mutate().request(realRequest).build());
         }
         return chain.filter(exchange);
@@ -65,28 +61,6 @@ public class JwtFilter implements WebFilter {
         DataBuffer buffer = response.bufferFactory().wrap("Invalid token".getBytes(StandardCharsets.UTF_8));
         log.info("token验证失败");
         return response.writeWith(Mono.just(buffer));
-
-    }
-
-    public void log(ServerHttpRequest request) {
-        log.info("出现一次请求");
-        // 打印请求方法和URL
-        log.info("Request method: " + request.getMethod());
-        log.info("Request URL: " + request.getURI());
-
-        // 打印请求头
-        HttpHeaders headers = request.getHeaders();
-        headers.forEach((headerName, headerValues) -> {
-            String headerValuesJoined = String.join(", ", headerValues);
-            log.info("Header: " + headerName + " = " + headerValuesJoined);
-        });
-
-        // 打印查询参数
-        MultiValueMap<String, String> queryParams = request.getQueryParams();
-        queryParams.forEach((paramName, paramValues) -> {
-            String paramValuesJoined = String.join(", ", paramValues);
-            log.info("Query param: " + paramName + " = " + paramValuesJoined);
-        });
 
     }
 }

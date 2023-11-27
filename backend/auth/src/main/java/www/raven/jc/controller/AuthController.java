@@ -14,7 +14,6 @@ import www.raven.jc.service.AuthService;
  * @date 2023/11/20
  */
 @RestController
-@RequestMapping("/auth")
 @ResponseBody
 public class AuthController {
     @Autowired

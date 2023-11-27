@@ -4,23 +4,29 @@ package www.raven.jc.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.DelegatingReactiveAuthenticationManager;
+import org.springframework.security.authentication.ReactiveAuthenticationManager;
+import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
-import www.raven.jc.filter.JwtFilter;
+import reactor.core.publisher.Mono;
+import www.raven.jc.filter.DefaultSecurityContextRepository;
+import www.raven.jc.filter.TokenAuthenticationManager;
+import www.raven.jc.filter.ToolFilter;
+import www.raven.jc.handler.DefaultAccessDeniedHandler;
+import www.raven.jc.handler.DefaultAuthenticationEntryPoint;
+import www.raven.jc.handler.DefaultAuthenticationFailureHandler;
+import www.raven.jc.manager.UserDe;
 
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
  * security config
@@ -32,7 +38,19 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebFluxSecurity
 public class SecurityConfig {
     @Autowired
-    private JwtFilter jwtFilter;
+    private UserDe userDe;
+    @Autowired
+    private ToolFilter toolFilter;
+    @Autowired
+    private TokenAuthenticationManager tokenAuthenticationManager;
+    @Autowired
+    private DefaultAccessDeniedHandler defaultAccessDeniedHandler;
+    @Autowired
+    private DefaultAuthenticationEntryPoint authenticationEntryPoint;
+    @Autowired
+    private DefaultSecurityContextRepository defaultSecurityContextRepository;
+    @Autowired
+    private DefaultAuthenticationFailureHandler authenticationFailureHandler;
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -55,16 +73,44 @@ public class SecurityConfig {
     }
         @Bean
         public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
-            http.cors(corsSpec -> corsSpec.configurationSource(corsConfigurationSource()))
+            http .authenticationManager(reactiveAuthenticationManager())
+                    .securityContextRepository(defaultSecurityContextRepository)
+                    .cors(corsSpec -> corsSpec.configurationSource(corsConfigurationSource()))
                     .csrf(ServerHttpSecurity.CsrfSpec::disable)
                     .authorizeExchange(exchanges -> exchanges
-                            .pathMatchers("/account/auth/**").permitAll()
-                            .pathMatchers("/chat/**","/account/info/**").hasRole("USER")
+                            .pathMatchers("/auth/**").permitAll()
+                            .pathMatchers("/chat/**","/info/**").hasRole("USER")
                             .anyExchange().authenticated()
                     )
-                    .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+                    .formLogin()
+                    // 自定义处理
+                    .authenticationFailureHandler(authenticationFailureHandler)
+                    .and()
+                    .exceptionHandling()
+                    .accessDeniedHandler(defaultAccessDeniedHandler)
+                    .and()
+                    .exceptionHandling()
+                    .authenticationEntryPoint(authenticationEntryPoint)
+                    .and()
+                    .addFilterAt(toolFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+
+
             ;
             // your other configurations
             return http.build();
         }
+
+    @Bean
+    ReactiveAuthenticationManager reactiveAuthenticationManager() {
+        LinkedList<ReactiveAuthenticationManager> managers = new LinkedList<>();
+        managers.add(authentication -> {
+            // 其他登陆方式 (比如手机号验证码登陆) 可在此设置不得抛出异常或者 Mono.error
+            return Mono.empty();
+        });
+        // 必须放最后不然会优先使用用户名密码校验但是用户名密码不对时此 AuthenticationManager 会调用 Mono.error 造成后面的 AuthenticationManager 不生效
+        managers.add(new UserDetailsRepositoryReactiveAuthenticationManager(userDe));
+        managers.add(tokenAuthenticationManager);
+        return new DelegatingReactiveAuthenticationManager(managers);
+    }
+
 }

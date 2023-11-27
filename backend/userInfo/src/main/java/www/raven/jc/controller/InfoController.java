@@ -9,7 +9,6 @@ import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.dto.UserRoleInfo;
 import www.raven.jc.entity.vo.InfoVO;
 import www.raven.jc.result.CommonResult;
-import www.raven.jc.service.AccountService;
 import www.raven.jc.service.InfoService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +21,6 @@ import java.util.List;
  * @date 2023/11/23
  */
 @RestController
-@RequestMapping("/info")
 @ResponseBody
 @Slf4j
 public class InfoController {
@@ -30,8 +28,6 @@ public class InfoController {
     private InfoService infoService;
     @Autowired
     private HttpServletRequest request;
-    @Autowired
-    private AccountService accountService;
 
     @GetMapping("/get/{userId}")
     public UserRoleInfo get(@PathVariable("userId") int userId) {
@@ -40,19 +36,19 @@ public class InfoController {
 
     @PostMapping("/setProfile")
     public CommonResult<Void> setProfile(@RequestParam("file") MultipartFile profile) {
-        accountService.setProfile(profile);
+        infoService.setProfile(profile);
         return CommonResult.operateSuccess("设置头像成功");
     }
 
     @PostMapping("/setSignature")
     public CommonResult<Void> setSignature(@RequestParam("signature") String signature) {
-        accountService.setSignature(signature);
+        infoService.setSignature(signature);
         return CommonResult.operateSuccess("设置签名成功");
     }
 
     @PostMapping("/setUsername")
     public CommonResult<Void> setUsername(@RequestParam("username") String username) {
-        accountService.setUsername(username);
+        infoService.setUsername(username);
         return CommonResult.operateSuccess("重命名成功");
     }
 
