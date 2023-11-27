@@ -23,6 +23,7 @@ public class JwtUtil {
 
 
     public static String createToken(Map<String,Object> map, String key) {
+        map.put("expireTime",System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7);
         return JWTUtil.createToken(map, key.getBytes());
     }
     public static TokenDTO verify(String token, String key) {

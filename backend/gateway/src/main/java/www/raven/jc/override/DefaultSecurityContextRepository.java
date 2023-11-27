@@ -5,10 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -18,12 +15,12 @@ import org.springframework.security.web.server.context.ServerSecurityContextRepo
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-import www.raven.jc.constant.Filter;
+import www.raven.jc.constant.JwtConstant;
 import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.util.JwtUtil;
 
 import javax.annotation.Resource;
-import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -52,7 +49,7 @@ public class DefaultSecurityContextRepository implements ServerSecurityContextRe
     @Override
     public Mono<SecurityContext> load(ServerWebExchange exchange) {
         ServerHttpRequest request = exchange.getRequest();
-        List<String> tokens = request.getHeaders().get(Filter.TOKEN);
+        List<String> tokens = request.getHeaders().get(JwtConstant.TOKEN);
         log.info("token: " + tokens);
         if (tokens == null || tokens.isEmpty()) {
             return Mono.empty();
@@ -60,6 +57,14 @@ public class DefaultSecurityContextRepository implements ServerSecurityContextRe
         TokenDTO dto = JwtUtil.verify(tokens.get(0), key);
         Assert.isTrue(Objects.equals(tokens.get(0), redissonClient.getBucket("token:" + dto.getUserId()).get()), "Invalid token");
         request.mutate().header("userId", dto.getUserId().toString()).build();
+        if(dto.getExpireTime()>System.currentTimeMillis()){
+            HashMap<String, Object> stringObjectHashMap = new HashMap<>();
+            stringObjectHashMap.put("userId",dto.getUserId());
+            stringObjectHashMap.put("role",dto.getRole());
+            String token = JwtUtil.createToken(stringObjectHashMap, key);
+            redissonClient.getBucket("token:" + dto.getUserId()).set(token);
+            exchange.getResponse().getHeaders().set(JwtConstant.REFRESH,token);
+        }
         Authentication auth = new UsernamePasswordAuthenticationToken(dto.getUserId(), null, AuthorityUtils.createAuthorityList(dto.getRole()));
         return tokenAuthenticationManager.authenticate(
                 auth
