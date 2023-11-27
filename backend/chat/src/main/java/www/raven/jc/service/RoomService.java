@@ -41,9 +41,7 @@ public interface RoomService {
     List<RoomVO> queryLikedRoomList(String column,String text,int page);
 
     /**
-     * query user name room list
-     * query user name room list
-     *
+     * query username room list*
      * @param column column
      * @param text   text
      * @param page   page

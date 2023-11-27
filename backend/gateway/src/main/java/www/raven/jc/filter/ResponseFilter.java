@@ -24,6 +24,7 @@ import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.ORIGINAL_RESPONSE_CONTENT_TYPE_ATTR;
 
@@ -54,7 +55,7 @@ public class ResponseFilter implements GlobalFilter, Ordered {
         ServerHttpResponseDecorator response = new ServerHttpResponseDecorator(originalResponse) {
             @Override
             public Mono<Void> writeWith(Publisher<? extends DataBuffer> body) {
-                if (getStatusCode().equals(HttpStatus.OK) && body instanceof Flux) {
+                if (Objects.requireNonNull(getStatusCode()).equals(HttpStatus.OK) && body instanceof Flux) {
                     // 获取ContentType，判断是否返回JSON格式数据
                     String originalResponseContentType = exchange.getAttribute(ORIGINAL_RESPONSE_CONTENT_TYPE_ATTR);
                     if (StringUtils.isNotBlank(originalResponseContentType) && originalResponseContentType.contains("application/json")) {

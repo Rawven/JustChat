@@ -90,6 +90,7 @@
                 <version>${mybatis-plus.version}</version>
             </dependency>
 
+
         </dependencies>
     </dependencyManagement>
 

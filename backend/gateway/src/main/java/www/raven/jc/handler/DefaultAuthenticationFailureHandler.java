@@ -12,8 +12,6 @@ import reactor.core.publisher.Mono;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.util.JsonUtil;
 
-import java.util.Map;
-
 /**
  * @author ShiLei
  * @version 1.0.0
@@ -28,7 +26,7 @@ public class DefaultAuthenticationFailureHandler implements ServerAuthentication
         return Mono.defer(() -> Mono.just(webFilterExchange.getExchange()
                 .getResponse()).flatMap(response -> {
             DataBufferFactory dataBufferFactory = response.bufferFactory();
-            CommonResult resultVO = CommonResult.operateFailWithMessage("登录失败");
+            CommonResult<Void> resultVO = CommonResult.operateFailWithMessage("登录失败");
             // 账号不存在
             if (exception instanceof UsernameNotFoundException) {
                 resultVO = CommonResult.operateFailWithMessage("账号不存在");

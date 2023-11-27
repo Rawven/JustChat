@@ -4,9 +4,6 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
       enabled: true
-  redis:
-    address: redis://10.21.32.221:6379
-    password: 123456
   application:
     name: JC-Userinfo
   cloud:

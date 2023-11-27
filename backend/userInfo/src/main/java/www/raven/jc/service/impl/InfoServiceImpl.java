@@ -4,7 +4,6 @@ import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -34,8 +33,6 @@ public class InfoServiceImpl implements InfoService {
     private UserMapper userMapper;
     @Autowired
     private IpfsClient ipfsClient;
-    @Autowired
-    private RedissonClient redissonClient;
     @Autowired
     private HttpServletRequest request;
 
