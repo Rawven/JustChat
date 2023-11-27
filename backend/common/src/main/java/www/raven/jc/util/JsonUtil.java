@@ -21,7 +21,7 @@ public class JsonUtil {
         OBJECT_MAPPER = new ObjectMapper();
     }
 
-    public static Map<Object, Object> jsonToMap(String json)  {
+    public static Map<Object, Object> jsonToMap(String json) {
         try {
             return OBJECT_MAPPER.readValue(json, Map.class);
         } catch (JsonProcessingException e) {
@@ -30,7 +30,7 @@ public class JsonUtil {
         }
     }
 
-    public static String mapToJson(Map<Object, Object> map)  {
+    public static String mapToJson(Map<Object, Object> map) {
         try {
             return OBJECT_MAPPER.writeValueAsString(map);
         } catch (JsonProcessingException e) {
@@ -39,7 +39,7 @@ public class JsonUtil {
         }
     }
 
-    public static <T> T jsonToObj(String json, Class<T> clazz)  {
+    public static <T> T jsonToObj(String json, Class<T> clazz) {
         try {
             return OBJECT_MAPPER.readValue(json, clazz);
         } catch (JsonProcessingException e) {
@@ -48,7 +48,7 @@ public class JsonUtil {
         }
     }
 
-    public static <T> String objToJson(T obj)  {
+    public static <T> String objToJson(T obj) {
         try {
             return OBJECT_MAPPER.writeValueAsString(obj);
         } catch (JsonProcessingException e) {

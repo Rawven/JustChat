@@ -16,7 +16,6 @@ public interface ChatService {
 
     /**
      * save msg
-
      *
      * @param data    data
      * @param message message
@@ -25,6 +24,7 @@ public interface ChatService {
     void saveMsg(UserInfoDTO data, MessageDTO message, String roomId);
 
     /**
+     * restore history
      *
      * @param roomId room id
      * @return {@link List}<{@link MessageVO}>

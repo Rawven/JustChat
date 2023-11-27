@@ -25,10 +25,12 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * @author ShiLei
- * @version 1.0.0
- * @date 2021/3/11 16:27
- * @description 存储认证授权的相关信息
+ * default security context repository
+ * <p>
+ * 存储认证授权的相关信息
+ *
+ * @author 刘家辉
+ * @date 2023/11/28
  */
 @Component
 @Slf4j
@@ -50,21 +52,19 @@ public class DefaultSecurityContextRepository implements ServerSecurityContextRe
     public Mono<SecurityContext> load(ServerWebExchange exchange) {
         ServerHttpRequest request = exchange.getRequest();
         List<String> tokens = request.getHeaders().get(JwtConstant.TOKEN);
-        log.info("token: " + tokens);
         if (tokens == null || tokens.isEmpty()) {
             return Mono.empty();
         }
         TokenDTO dto = JwtUtil.verify(tokens.get(0), key);
         Assert.isTrue(Objects.equals(tokens.get(0), redissonClient.getBucket("token:" + dto.getUserId()).get()), "Invalid token");
         request.mutate().header("userId", dto.getUserId().toString()).build();
-        if(dto.getExpireTime()<System.currentTimeMillis()){
-            log.info("过期没");
-            HashMap<String, Object> stringObjectHashMap = new HashMap<>();
-            stringObjectHashMap.put("userId",dto.getUserId());
-            stringObjectHashMap.put("role",dto.getRole());
-            String token = JwtUtil.createToken(stringObjectHashMap, key);
+        if (dto.getExpireTime() < System.currentTimeMillis()) {
+            HashMap<String, Object> map = new HashMap<>(3);
+            map.put("userId", dto.getUserId());
+            map.put("role", dto.getRole());
+            String token = JwtUtil.createToken(map, key);
             redissonClient.getBucket("token:" + dto.getUserId()).set(token);
-            exchange.getResponse().getHeaders().set(JwtConstant.REFRESH,token);
+            exchange.getResponse().getHeaders().set(JwtConstant.REFRESH, token);
         }
         Authentication auth = new UsernamePasswordAuthenticationToken(dto.getUserId(), null, AuthorityUtils.createAuthorityList(dto.getRole()));
         return tokenAuthenticationManager.authenticate(

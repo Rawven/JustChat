@@ -2,7 +2,6 @@ package www.raven.jc.service;
 
 
 import www.raven.jc.entity.model.LoginModel;
-import www.raven.jc.entity.model.RegisterAdminModel;
 import www.raven.jc.entity.model.RegisterModel;
 
 /**

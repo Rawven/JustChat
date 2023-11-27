@@ -2,15 +2,12 @@ package www.raven.jc.util;
 
 import cn.hutool.core.convert.NumberWithFormat;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.jwt.JWT;
 import cn.hutool.jwt.JWTPayload;
 import cn.hutool.jwt.JWTUtil;
 import lombok.extern.slf4j.Slf4j;
 import www.raven.jc.dto.TokenDTO;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * jwt util
@@ -22,14 +19,15 @@ import java.util.Objects;
 public class JwtUtil {
 
 
-    public static String createToken(Map<String,Object> map, String key) {
-        map.put("expireTime",System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7);
+    public static String createToken(Map<String, Object> map, String key) {
+        map.put("expireTime", System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7);
         return JWTUtil.createToken(map, key.getBytes());
     }
+
     public static TokenDTO verify(String token, String key) {
         Assert.isTrue(JWTUtil.verify(token, key.getBytes()), "token验证失败");
         JWTPayload payload = JWTUtil.parseToken(token).getPayload();
-        NumberWithFormat expireTime = (NumberWithFormat)payload.getClaim("expireTime");
+        NumberWithFormat expireTime = (NumberWithFormat) payload.getClaim("expireTime");
         String role = (String) payload.getClaim("role");
         NumberWithFormat userId = (NumberWithFormat) payload.getClaim("userId");
         return new TokenDTO().setRole(role).setUserId(userId.intValue()).setExpireTime(expireTime.longValue());

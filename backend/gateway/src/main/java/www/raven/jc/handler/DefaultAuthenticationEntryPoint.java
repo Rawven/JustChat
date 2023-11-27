@@ -15,10 +15,12 @@ import www.raven.jc.util.JsonUtil;
 import java.nio.charset.Charset;
 
 /**
- * @author ShiLei
- * @version 1.0.0
- * @date 2021/3/11 15:17
- * @description 未认证处理
+ * default authentication entry point
+ * <p>
+ * 未认证处理
+ *
+ * @author 刘家辉
+ * @date 2023/11/28
  */
 @Component
 public class DefaultAuthenticationEntryPoint implements ServerAuthenticationEntryPoint {

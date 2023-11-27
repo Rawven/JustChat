@@ -13,10 +13,12 @@ import www.raven.jc.result.CommonResult;
 import www.raven.jc.util.JsonUtil;
 
 /**
- * @author ShiLei
- * @version 1.0.0
- * @date 2021/3/11 15:14
- * @description 登录失败处理
+ * default authentication failure handler
+ * <p>
+ * 登录失败处理
+ *
+ * @author 刘家辉
+ * @date 2023/11/28
  */
 @Component
 public class DefaultAuthenticationFailureHandler implements ServerAuthenticationFailureHandler {

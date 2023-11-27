@@ -8,7 +8,6 @@ import org.springframework.security.authentication.DelegatingReactiveAuthenticat
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,17 +16,15 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import reactor.core.publisher.Mono;
-import www.raven.jc.override.DefaultSecurityContextRepository;
-import www.raven.jc.override.TokenAuthenticationManager;
 import www.raven.jc.handler.DefaultAccessDeniedHandler;
 import www.raven.jc.handler.DefaultAuthenticationEntryPoint;
 import www.raven.jc.handler.DefaultAuthenticationFailureHandler;
 import www.raven.jc.manager.UserServiceImpl;
+import www.raven.jc.override.DefaultSecurityContextRepository;
+import www.raven.jc.override.TokenAuthenticationManager;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * security config
@@ -52,7 +49,6 @@ public class SecurityConfig {
     private DefaultAuthenticationFailureHandler authenticationFailureHandler;
 
 
-
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         http.cors(corsSpec -> corsSpec.configurationSource(corsConfigurationSource()))
@@ -60,8 +56,8 @@ public class SecurityConfig {
                 .securityContextRepository(defaultSecurityContextRepository)
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/auth/**","/ws/**","/webSocket/**").permitAll()
-                        .pathMatchers("/chat/**","/info/**").hasRole("USER")
+                        .pathMatchers("/auth/**", "/ws/**", "/webSocket/**").permitAll()
+                        .pathMatchers("/chat/**", "/info/**").hasRole("USER")
                         .pathMatchers("/admin/**").hasRole("ADMIN")
                         .anyExchange().authenticated()
                 )
@@ -76,17 +72,16 @@ public class SecurityConfig {
                 .authenticationEntryPoint(authenticationEntryPoint)
 
 
-
-
         ;
         // your other configurations
         return http.build();
     }
 
     @Bean
-    public   PasswordEncoder passwordEncoder(){
-         return new BCryptPasswordEncoder();
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
+
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();

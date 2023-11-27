@@ -8,10 +8,11 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 /**
- * @author ShiLei
- * @version 1.0.0
- * @date 2021/3/11 13:23
- * @description token 认证处理
+ * token authentication manager
+ * token 认证处理
+ *
+ * @author 刘家辉
+ * @date 2023/11/28
  */
 @Component
 @Primary

@@ -100,11 +100,11 @@ public class WebSocketService {
             log.error("Json转换异常");
         }
         log.info("this?");
-        TokenDTO tokenDTO = (TokenDTO)(session.getUserProperties().get("userId"));
-        Assert.notNull(accountFeign,"account服务端异常 is null");
+        TokenDTO tokenDTO = (TokenDTO) (session.getUserProperties().get("userId"));
+        Assert.notNull(accountFeign, "account服务端异常 is null");
         UserInfoDTO data = accountFeign.getSingleInfo(tokenDTO.getUserId()).getData();
         log.info("this2?");
-        Assert.notNull(chatService,"chatService is null");
+        Assert.notNull(chatService, "chatService is null");
         chatService.saveMsg(data, messageDTO, this.roomId);
         Map<Object, Object> map = new HashMap<>(2);
         map.put("userInfo", data);
@@ -166,7 +166,7 @@ public class WebSocketService {
                 log.info("【websocket消息】 单点消息:" + message);
                 session.getAsyncRemote().sendText(message);
             } catch (Exception e) {
-               log.error(e.getMessage());
+                log.error(e.getMessage());
             }
         }
     }

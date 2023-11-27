@@ -47,24 +47,24 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public List<RoomVO> queryAllRoomPage(Integer page) {
         Page<ChatRoom> chatRoomPage = roomMapper.selectPage(new Page<>(page, 5), null);
-        return buildRoomVO(chatRoomPage,accountFeign.getAllInfo().getData());
+        return buildRoomVO(chatRoomPage, accountFeign.getAllInfo().getData());
     }
 
     @Override
-    public List<RoomVO> queryLikedRoomList(String column,String text,int page) {
+    public List<RoomVO> queryLikedRoomList(String column, String text, int page) {
         Page<ChatRoom> chatRoomPage = roomMapper.selectPage(new Page<>(page, 5), new QueryWrapper<ChatRoom>().like(column, text));
-        return buildRoomVO(chatRoomPage,accountFeign.getAllInfo().getData());
+        return buildRoomVO(chatRoomPage, accountFeign.getAllInfo().getData());
     }
 
     @Override
-    public List<RoomVO> queryUserNameRoomList(String column, String text,int page) {
+    public List<RoomVO> queryUserNameRoomList(String column, String text, int page) {
         List<UserInfoDTO> queryList = accountFeign.getRelatedInfoList(new QueryUserInfoDTO().setColumn(column).setText(text)).getData();
         List<Integer> userIds = queryList.stream().map(UserInfoDTO::getUserId).collect(Collectors.toList());
         Page<ChatRoom> chatRoomPage = roomMapper.selectPage(new Page<>(page, 5), new QueryWrapper<ChatRoom>().in("founder_id", userIds));
-        return buildRoomVO(chatRoomPage,queryList);
+        return buildRoomVO(chatRoomPage, queryList);
     }
 
-    private List<RoomVO> buildRoomVO(Page<ChatRoom> chatRoomPage,List<UserInfoDTO> data) {
+    private List<RoomVO> buildRoomVO(Page<ChatRoom> chatRoomPage, List<UserInfoDTO> data) {
         Assert.isTrue(chatRoomPage.getTotal() > 0);
         Map<Integer, UserInfoDTO> map = data.stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
         return chatRoomPage.getRecords().stream().map(chatRoom -> new RoomVO()

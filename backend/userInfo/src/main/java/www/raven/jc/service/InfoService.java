@@ -34,6 +34,7 @@ public interface InfoService {
      * @param username username
      */
     void setUsername(String username);
+
     /**
      * query single info
      *
@@ -65,7 +66,7 @@ public interface InfoService {
      * @param column column
      * @return {@link List}<{@link UserInfoDTO}>
      */
-    List<UserInfoDTO> queryLikedInfoList(String column,String text);
+    List<UserInfoDTO> queryLikedInfoList(String column, String text);
 
     /**
      * get

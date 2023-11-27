@@ -28,20 +28,22 @@ public class RoomController {
         RoomRealVO roomRealVO = new RoomRealVO().setRooms(rooms).setTotal(rooms.size());
         return CommonResult.operateSuccess("获取房间列表成功", roomRealVO);
     }
+
     @GetMapping("/queryRelatedRoomList/{text}/{choice}/{page}")
-    public CommonResult<RoomRealVO> queryRelatedRoomList(@PathVariable("text") String text,@PathVariable("choice") int choice,
+    public CommonResult<RoomRealVO> queryRelatedRoomList(@PathVariable("text") String text, @PathVariable("choice") int choice,
                                                          @PathVariable("page") int page) {
         List<RoomVO> rooms;
         //roomName查找
-        if(choice==1) {
-             rooms = roomService.queryLikedRoomList("room_name", text,page);
-        }else {
+        if (choice == 1) {
+            rooms = roomService.queryLikedRoomList("room_name", text, page);
+        } else {
             //userName查找
-             rooms = roomService.queryUserNameRoomList("username", text, page);
+            rooms = roomService.queryUserNameRoomList("username", text, page);
         }
         RoomRealVO roomRealVO = new RoomRealVO().setRooms(rooms).setTotal(rooms.size());
         return CommonResult.operateSuccess("获取房间列表成功", roomRealVO);
     }
+
     @PostMapping("/createRoom")
     public CommonResult<Void> createRoom(@RequestBody RoomModel roomModel) {
         roomService.createRoom(roomModel);

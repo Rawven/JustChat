@@ -38,15 +38,16 @@ public interface RoomService {
      * @param page   page
      * @return {@link List}<{@link RoomVO}>
      */
-    List<RoomVO> queryLikedRoomList(String column,String text,int page);
+    List<RoomVO> queryLikedRoomList(String column, String text, int page);
 
     /**
      * query username room list*
+     *
      * @param column column
      * @param text   text
      * @param page   page
      * @return {@link List}<{@link RoomVO}>
      */
-    List<RoomVO> queryUserNameRoomList(String column,String text,int page);
+    List<RoomVO> queryUserNameRoomList(String column, String text, int page);
 
 }

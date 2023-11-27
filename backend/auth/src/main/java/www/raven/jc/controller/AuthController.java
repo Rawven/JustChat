@@ -2,12 +2,14 @@ package www.raven.jc.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import www.raven.jc.entity.model.LoginModel;
 import www.raven.jc.entity.model.RegisterAdminModel;
 import www.raven.jc.entity.model.RegisterModel;
 import www.raven.jc.result.CommonResult;
-import www.raven.jc.result.ResultCode;
 import www.raven.jc.service.AuthService;
 
 import java.util.Objects;
@@ -38,12 +40,12 @@ public class AuthController {
 
     @PostMapping("/registerAdmin")
     public CommonResult<String> register(@RequestBody RegisterAdminModel registerModel) {
-        if(Objects.equals(registerModel.getPrivateKey(), key)) {
+        if (Objects.equals(registerModel.getPrivateKey(), key)) {
             RegisterModel model = new RegisterModel().setUsername(registerModel.getUsername())
                     .setPassword(registerModel.getPassword())
                     .setEmail(registerModel.getEmail());
             return CommonResult.operateSuccess("注册成功", authService.registerCommonRole(model));
-        }else {
+        } else {
             return CommonResult.operateFailure("注册失败", "私钥错误");
         }
     }

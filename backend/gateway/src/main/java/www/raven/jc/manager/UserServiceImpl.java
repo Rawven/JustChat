@@ -5,7 +5,9 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.*;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import www.raven.jc.dto.TokenDTO;
@@ -30,6 +32,6 @@ public class UserServiceImpl implements ReactiveUserDetailsService {
         RBucket<Object> bucket = redissonClient.getBucket("token:" + username);
         TokenDTO dto = JwtUtil.verify(bucket.get().toString(), "爱你老妈");
         List<GrantedAuthority> authorityList = AuthorityUtils.createAuthorityList(dto.getRole());
-        return Mono.just(new User(dto.getUserId().toString(), null,authorityList));
+        return Mono.just(new User(dto.getUserId().toString(), null, authorityList));
     }
 }

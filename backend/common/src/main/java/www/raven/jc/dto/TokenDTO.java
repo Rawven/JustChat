@@ -10,9 +10,9 @@ import lombok.experimental.Accessors;
  * @date 2023/11/27
  */
 @Data
-@Accessors (chain = true)
+@Accessors(chain = true)
 public class TokenDTO {
     private Integer userId;
-    private  String role;
+    private String role;
     private Long expireTime;
 }

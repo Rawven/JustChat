@@ -13,7 +13,6 @@ import www.raven.jc.dao.RolesMapper;
 import www.raven.jc.dao.UserMapper;
 import www.raven.jc.dao.UserRoleMapper;
 import www.raven.jc.entity.model.LoginModel;
-import www.raven.jc.entity.model.RegisterAdminModel;
 import www.raven.jc.entity.model.RegisterModel;
 import www.raven.jc.entity.po.Role;
 import www.raven.jc.entity.po.User;
@@ -22,7 +21,6 @@ import www.raven.jc.service.AuthService;
 import www.raven.jc.util.JwtUtil;
 
 import java.util.HashMap;
-import java.util.Objects;
 
 /**
  * account service impl
@@ -56,20 +54,20 @@ public class AuthServiceImpl implements AuthService {
         Assert.notNull(userRole, "用户角色不存在");
         Role role = rolesMapper.selectById(userRole.getRoleId());
         Assert.notNull(role, "角色不存在");
-        return getTokenClaims(user,role);
+        return getTokenClaims(user, role);
     }
 
     @Override
     public String registerCommonRole(RegisterModel registerModel) {
-        return register(registerModel,RoleConstant.COMMON_ROLE);
+        return register(registerModel, RoleConstant.COMMON_ROLE);
     }
 
     @Override
     public String registerAdminRole(RegisterModel registerModel) {
-       return register(registerModel,RoleConstant.ADMIN_ROLE);
+        return register(registerModel, RoleConstant.ADMIN_ROLE);
     }
 
-    private String register(RegisterModel registerModel,Integer roleId){
+    private String register(RegisterModel registerModel, Integer roleId) {
         Assert.isNull(userMapper.selectOne(new QueryWrapper<User>().
                 eq("username", registerModel.getUsername())));
         User user = new User();
@@ -89,7 +87,7 @@ public class AuthServiceImpl implements AuthService {
     private String getTokenClaims(User user, Role role) {
         HashMap<String, Object> claims = new HashMap<>(3);
         claims.put("userId", user.getId());
-        claims.put("role",role.getValue());
+        claims.put("role", role.getValue());
         claims.put("expireTime", System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7);
         String token = JwtUtil.createToken(claims, key);
         redissonClient.getBucket("token:" + user.getId()).set(token);

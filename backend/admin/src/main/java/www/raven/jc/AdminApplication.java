@@ -21,7 +21,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @MapperScan("www.raven.jc.dao")
 @EnableFeignClients(basePackages = {"www.raven.jc.feign"})
 public class AdminApplication {
-    public static void main( String[] args ) {
+    public static void main(String[] args) {
         SpringApplication.run(AdminApplication.class, args);
     }
 }

@@ -27,6 +27,7 @@
         <spring.boot.version>2.6.13</spring.boot.version>
         <lombok>1.18.28</lombok>
         <jackson>2.15.2</jackson>
+        <redisson>3.17.1</redisson>
         <mysql-connector.version>8.0.31</mysql-connector.version>
         <mybatis-plus.version>3.5.4</mybatis-plus.version>
         <hutool>5.8.22</hutool>
@@ -72,6 +73,16 @@
                 <version>${spring.boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>${redisson}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
