@@ -21,7 +21,15 @@ import {provide} from 'vue'
 import {ElMessage} from 'element-plus'
 // 创建一个axios实例
 const axiosFilter = axios.create();
-
+// 添加请求拦截器
+axiosFilter.interceptors.request.use(function (config) {
+  // 在发送请求之前做些什么
+  console.log("开始调用,URL" + config.url + ",method:" + config.method + ",data:" + JSON.stringify(config.data))
+  return config;
+}, function (error) {
+  // 对请求错误做些什么
+  return Promise.reject(error);
+});
 // 添加响应拦截器
 axiosFilter.interceptors.response.use(function (response) {
   // 对响应数据做点什么
