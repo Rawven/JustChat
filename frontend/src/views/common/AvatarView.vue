@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import Avatar from '@/components/setAvatar.vue';
+import Avatar from '@/components/common/setAvatar.vue';
 
 export default {
   components: {

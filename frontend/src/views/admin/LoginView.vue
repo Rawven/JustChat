@@ -1,15 +1,15 @@
 <template>
   <div>
-    <Info/>
+    <Login/>
   </div>
 </template>
 
 <script>
-import Info from '@/components/updateInfo.vue';
+import Login from '@/components/admin/Login.vue';
 
 export default {
   components: {
-    Info
+    Login
   }
 };
 </script>

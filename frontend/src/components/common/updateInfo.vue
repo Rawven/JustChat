@@ -103,7 +103,7 @@ export default {
       })
     },
     goBack() {
-      this.$router.push('/mainPage');
+      this.$router.push('/common/mainPage');
     },
   },
 };

@@ -50,7 +50,7 @@ public class AuthServiceImpl implements AuthService {
                 eq("username", loginModel.getUsername()));
         Assert.notNull(user, "用户不存在");
         Assert.isTrue(passwordEncoder.matches(loginModel.getPassword(), user.getPassword()), "密码错误");
-        UserRole userRole = userRoleMapper.selectById(user.getId());
+        UserRole userRole = userRoleMapper.selectOne(new QueryWrapper<UserRole>().eq("user_id",user.getId()));
         Assert.notNull(userRole, "用户角色不存在");
         Role role = rolesMapper.selectById(userRole.getRoleId());
         Assert.notNull(role, "角色不存在");

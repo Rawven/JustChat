@@ -40,7 +40,6 @@ public interface UserInfoFeign {
 
     /**
      * get related info list
-     * get related info list
      *
      * @param userInfoDTO user info dto
      * @return {@link CommonResult}<{@link List}<{@link UserInfoDTO}>>
@@ -48,13 +47,4 @@ public interface UserInfoFeign {
     @PostMapping("/getRelatedInfoList")
     CommonResult<List<UserInfoDTO>> getRelatedInfoList(@RequestBody QueryUserInfoDTO userInfoDTO);
 
-
-    /**
-     * get
-     *
-     * @param userId user id
-     * @return {@link UserRoleInfo}
-     */
-    @GetMapping("/get/{userId}")
-    UserRoleInfo get(@PathVariable("userId") int userId);
 }

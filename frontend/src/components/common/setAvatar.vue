@@ -55,7 +55,7 @@ export default {
               }).then(response => {
                  localStorage.setItem("userData", JSON.stringify(response.data.data));
               })
-              this.$router.push('/mainPage');
+              this.$router.push('/common/mainPage');
               // Additional logic after successful avatar upload
             })
       } else {

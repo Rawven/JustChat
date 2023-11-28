@@ -11,7 +11,7 @@
               <div v-for="msg in messages" :key="msg.time" class="message">
                 <el-aside class="meSide">
                   <el-row class="message-user">{{ msg.user }}</el-row>
-                  <img :src="'http://10.39.13.70:8083/ipfs/'+msg.profile" alt="User profile" class="message-profile">
+                  <img :src="'http://10.44.59.225:8083/ipfs/'+msg.profile" alt="User profile" class="message-profile">
                 </el-aside>
                 <el-card class="message-content">
                   <p class="message-time">{{ new Date(msg.time).toLocaleString() }}</p>

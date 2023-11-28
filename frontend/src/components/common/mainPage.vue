@@ -3,12 +3,12 @@
     <el-row class="row-bg" justify="center" type="flex">
       <el-col v-if="userInfo" :span="8">
         <el-card class="box-card">
-          <img :src="'http://10.39.13.70:8083/ipfs/'+userInfo.profile" alt="User Avatar" class="avatar">
+          <img :src="'http://10.44.59.225:8083/ipfs/'+userInfo.profile" alt="User Avatar" class="avatar">
           <h2 class="username">你好!😘 {{ userInfo.username }}</h2>
           <h2 class="signature">个性签名: {{
               userInfo.signature ? userInfo.signature : '这个用户很懒 什么也没留下'
             }}</h2>
-          <router-link to="/updateInfo" class="linkText">更改个人信息</router-link>
+          <router-link to="/common/updateInfo" class="linkText">更改个人信息</router-link>
         </el-card>
       </el-col>
       <el-col :span="16">
@@ -122,7 +122,7 @@ export default {
       })
     },
     enterRoom(roomId) {
-      this.$router.push({path: `/chatRoom/` + Number(roomId)});
+      this.$router.push({path: `/common/chatRoom/` + Number(roomId)});
     },
     getRooms(page) {
       this.realAxios.get(`http://` + Host + `:7000/chat/queryRoomList/${page}`, {

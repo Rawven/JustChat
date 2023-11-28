@@ -63,7 +63,7 @@ export default {
               .then(response => {
                 localStorage.setItem("token", response.data.data);
                 // 注册成功后可以进行相关的处理，例如跳转到登录页面
-                this.$router.push('/setAvatar');
+                this.$router.push('/common/setAvatar');
               })
         } else {
           this.$message.error('Please fill in all required fields.');

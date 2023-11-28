@@ -1,15 +1,15 @@
 <template>
   <div>
-    <Register/>
+    <Info/>
   </div>
 </template>
 
 <script>
-import Register from '@/components/register.vue';
+import Info from '@/components/common/updateInfo.vue';
 
 export default {
   components: {
-    Register
+    Info
   }
 };
 </script>

@@ -29,11 +29,6 @@ public class InfoController {
     @Autowired
     private HttpServletRequest request;
 
-    @GetMapping("/get/{userId}")
-    public UserRoleInfo get(@PathVariable("userId") int userId) {
-        return infoService.get(userId);
-    }
-
     @PostMapping("/setProfile")
     public CommonResult<Void> setProfile(@RequestParam("file") MultipartFile profile) {
         infoService.setProfile(profile);

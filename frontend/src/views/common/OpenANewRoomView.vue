@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import Open from '@/components/openANewRoom.vue';
+import Open from '@/components/common/openANewRoom.vue';
 
 export default {
   components: {

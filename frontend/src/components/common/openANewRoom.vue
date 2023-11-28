@@ -52,7 +52,7 @@ export default {
               .then(() => {
                 ElMessage.success('创建成功')
                 // 注册成功后可以进行相关的处理，例如跳转到登录页面
-                this.$router.push('/mainPage');
+                this.$router.push('/common/mainPage');
               })
         } else {
           console.log('error submit!!');

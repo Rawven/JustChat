@@ -68,11 +68,4 @@ public interface InfoService {
      */
     List<UserInfoDTO> queryLikedInfoList(String column, String text);
 
-    /**
-     * get
-     *
-     * @param userId user id
-     * @return {@link UserRoleInfo}
-     */
-    UserRoleInfo get(int userId);
 }

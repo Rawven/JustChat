@@ -86,13 +86,6 @@ public class InfoServiceImpl implements InfoService {
         ).collect(Collectors.toList());
     }
 
-    @Override
-    public UserRoleInfo get(int userId) {
-        User user = userMapper.selectById(userId);
-        Assert.notNull(user, "用户不存在");
-        return new UserRoleInfo().setUserId(user.getId()).setUsername(user.getUsername()).setPassword(user.getPassword()).setRole(user.getRole());
-    }
-
 
     @Override
     public void setProfile(MultipartFile profile) {
