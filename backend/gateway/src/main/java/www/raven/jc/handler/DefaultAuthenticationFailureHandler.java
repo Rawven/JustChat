@@ -28,25 +28,25 @@ public class DefaultAuthenticationFailureHandler implements ServerAuthentication
         return Mono.defer(() -> Mono.just(webFilterExchange.getExchange()
                 .getResponse()).flatMap(response -> {
             DataBufferFactory dataBufferFactory = response.bufferFactory();
-            CommonResult<Void> resultVO = CommonResult.operateFailWithMessage("登录失败");
+            CommonResult<Void> resultVO = CommonResult.operateFail("登录失败");
             // 账号不存在
             if (exception instanceof UsernameNotFoundException) {
-                resultVO = CommonResult.operateFailWithMessage("账号不存在");
+                resultVO = CommonResult.operateFail("账号不存在");
                 // 用户名或密码错误
             } else if (exception instanceof BadCredentialsException) {
-                resultVO = CommonResult.operateFailWithMessage("用户名或密码错误");
+                resultVO = CommonResult.operateFail("用户名或密码错误");
                 // 账号已过期
             } else if (exception instanceof AccountExpiredException) {
-                resultVO = CommonResult.operateFailWithMessage("账号已过期");
+                resultVO = CommonResult.operateFail("账号已过期");
                 // 账号已被锁定
             } else if (exception instanceof LockedException) {
-                resultVO = CommonResult.operateFailWithMessage("账号已被锁定");
+                resultVO = CommonResult.operateFail("账号已被锁定");
                 // 用户凭证已失效
             } else if (exception instanceof CredentialsExpiredException) {
-                resultVO = CommonResult.operateFailWithMessage("用户凭证已失效");
+                resultVO = CommonResult.operateFail("用户凭证已失效");
                 // 账号已被禁用
             } else if (exception instanceof DisabledException) {
-                resultVO = CommonResult.operateFailWithMessage("账号已被禁用");
+                resultVO = CommonResult.operateFail("账号已被禁用");
             }
             DataBuffer dataBuffer = dataBufferFactory.wrap(JsonUtil.objToJson(resultVO).getBytes());
             return response.writeWith(Mono.just(dataBuffer));

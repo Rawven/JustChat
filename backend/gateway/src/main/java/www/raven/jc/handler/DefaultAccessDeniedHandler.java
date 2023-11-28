@@ -31,7 +31,7 @@ public class DefaultAccessDeniedHandler implements ServerAccessDeniedHandler {
                     response.setStatusCode(HttpStatus.OK);
                     response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
                     DataBufferFactory dataBufferFactory = response.bufferFactory();
-                    String result = JsonUtil.objToJson(CommonResult.operateFailWithMessage("鉴权失败"));
+                    String result = JsonUtil.objToJson(CommonResult.operateFail("鉴权失败"));
                     DataBuffer buffer = dataBufferFactory.wrap(result.getBytes(
                             Charset.defaultCharset()));
                     return response.writeWith(Mono.just(buffer));

@@ -6,8 +6,10 @@ import io.ipfs.api.MerkleNode;
 import io.ipfs.api.NamedStreamable;
 import io.ipfs.multihash.Multihash;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import www.raven.jc.exception.IpfsException;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -21,15 +23,13 @@ import java.io.IOException;
  * @date 2023/11/21
  */
 @RefreshScope
-@Component
 public class IpfsClient {
+
     private static IPFS ipfsClient;
 
-    @PostConstruct
-    public void init() {
-        ipfsClient = new IPFS("/ip4/127.0.0.1/tcp/5001");
+    public IpfsClient(String api) {
+        ipfsClient = new IPFS(api);
     }
-
     /**
      * 上传文件到ipfs
      *
@@ -38,11 +38,11 @@ public class IpfsClient {
      */
     public String upload(MultipartFile file) {
         if (file.isEmpty()) {
-            throw new RuntimeException("文件为空");
+            throw new IpfsException("文件为空");
         }
         String fileName = file.getOriginalFilename();
         if (StringUtils.isEmpty(fileName)) {
-            throw new RuntimeException("文件名为空");
+            throw new IpfsException("文件名为空");
         }
         // 添加标识
         int index = fileName.lastIndexOf('.');
@@ -50,7 +50,7 @@ public class IpfsClient {
 
         String cid = upload(realFile);
         if (StringUtils.isEmpty(cid)) {
-            throw new RuntimeException("cid为空,上传失败");
+            throw new IpfsException("cid为空,上传失败");
         }
         return cid;
     }
@@ -70,7 +70,7 @@ public class IpfsClient {
             f = File.createTempFile(prefix + System.currentTimeMillis(), suffix);
             file.transferTo(f);
         } catch (IOException e) {
-            throw new RuntimeException("文件添加唯一标识失败");
+            throw new IpfsException("文件添加唯一标识失败");
         }
         return f;
     }
@@ -87,7 +87,7 @@ public class IpfsClient {
         try {
             addResult = ipfsClient.add(fileBytes).get(0);
         } catch (IOException e) {
-            throw new RuntimeException("文件上传失败");
+            throw new IpfsException("文件上传失败");
         }
         return addResult.hash.toString();
     }
@@ -101,7 +101,7 @@ public class IpfsClient {
         try {
             ipfsClient.pin.rm(Multihash.fromBase58(cid));
         } catch (IOException e) {
-            throw new RuntimeException("文件移除失败");
+            throw new IpfsException("文件删除失败");
         }
     }
 }

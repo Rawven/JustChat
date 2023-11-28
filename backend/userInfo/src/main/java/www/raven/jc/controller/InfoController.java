@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
-import www.raven.jc.dto.UserRoleInfo;
 import www.raven.jc.entity.vo.InfoVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.InfoService;

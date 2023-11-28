@@ -18,3 +18,5 @@ server:
   port: 8080
 Raven:
   key: 爱你老妈
+Ipfs:
+  api: /ip4/127.0.0.1/tcp/5001

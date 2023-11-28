@@ -33,13 +33,10 @@ public class CommonResult<T> {
         this.data = data;
     }
 
-    public static CommonResult<Void> operateFailWithMessage(String message) {
+    public static CommonResult<Void> operateFail(String message) {
         return new CommonResult<>(ResultCode.FAIL_CODE, false, message);
     }
 
-    public static CommonResult<Void> operateFailDueToToken(Integer code, String message) {
-        return new CommonResult<>(code, false, message);
-    }
 
     public static CommonResult<Void> operateSuccess(String message) {
         return new CommonResult<>(ResultCode.SUCCESS_CODE, true, message);

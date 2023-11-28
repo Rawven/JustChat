@@ -31,7 +31,7 @@ public class DefaultAuthenticationEntryPoint implements ServerAuthenticationEntr
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
             response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
             DataBufferFactory dataBufferFactory = response.bufferFactory();
-            String result = JsonUtil.objToJson(CommonResult.operateFailWithMessage("未认证"));
+            String result = JsonUtil.objToJson(CommonResult.operateFail("未认证"));
             DataBuffer buffer = dataBufferFactory.wrap(result.getBytes(
                     Charset.defaultCharset()));
             return response.writeWith(Mono.just(buffer));

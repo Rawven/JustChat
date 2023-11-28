@@ -93,17 +93,10 @@ public class WebSocketService {
     @OnMessage
     public void onMessage(String message) {
         log.info("【websocket消息】收到客户端发来的消息:" + message);
-        MessageDTO messageDTO = null;
-        try {
-            messageDTO = JsonUtil.jsonToObj(message, MessageDTO.class);
-        } catch (Exception e) {
-            log.error("Json转换异常");
-        }
-        log.info("this?");
+        MessageDTO messageDTO = JsonUtil.jsonToObj(message, MessageDTO.class);
         TokenDTO tokenDTO = (TokenDTO) (session.getUserProperties().get("userId"));
         Assert.notNull(accountFeign, "account服务端异常 is null");
         UserInfoDTO data = accountFeign.getSingleInfo(tokenDTO.getUserId()).getData();
-        log.info("this2?");
         Assert.notNull(chatService, "chatService is null");
         chatService.saveMsg(data, messageDTO, this.roomId);
         Map<Object, Object> map = new HashMap<>(2);

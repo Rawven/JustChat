@@ -11,6 +11,8 @@
         <module name="common" />
         <module name="auth" />
         <module name="chat" />
+        <module name="admin" />
+        <module name="common-User" />
         <module name="gateway" />
       </profile>
     </annotationProcessing>

@@ -2,7 +2,6 @@ package www.raven.jc.service;
 
 import org.springframework.web.multipart.MultipartFile;
 import www.raven.jc.dto.UserInfoDTO;
-import www.raven.jc.dto.UserRoleInfo;
 import www.raven.jc.entity.vo.InfoVO;
 
 import java.util.List;

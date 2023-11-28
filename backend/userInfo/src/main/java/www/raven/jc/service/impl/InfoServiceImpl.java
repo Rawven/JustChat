@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 import www.raven.jc.client.IpfsClient;
 import www.raven.jc.dao.UserMapper;
 import www.raven.jc.dto.UserInfoDTO;
-import www.raven.jc.dto.UserRoleInfo;
 import www.raven.jc.entity.po.User;
 import www.raven.jc.entity.vo.InfoVO;
 import www.raven.jc.service.InfoService;
