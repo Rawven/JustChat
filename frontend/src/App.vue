@@ -27,7 +27,12 @@ axiosFilter.interceptors.response.use(function (response) {
   // 对响应数据做点什么
   if (response.data.code !== 200) {
     ElMessage.error(response.data.message);
-    return Promise.reject(response.data.message);
+    return Promise.reject(new Error(response.data.message));
+  }
+  if(response.headers.get("new-Token")!=null){
+    console.log("令牌过期，自动刷新");
+    let new1 = response.headers.get("new-Token");
+    localStorage.setItem("token", String(new1));
   }
   console.log("调用成功,URL" + response.config.url + ",data:" + JSON.stringify(response.data))
   return response;
