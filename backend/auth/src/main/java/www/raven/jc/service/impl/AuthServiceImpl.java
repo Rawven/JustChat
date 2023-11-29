@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.constant.RoleConstant;
 import www.raven.jc.dao.RolesMapper;
 import www.raven.jc.dao.UserRoleMapper;
@@ -56,12 +57,12 @@ public class AuthServiceImpl implements AuthService {
         Assert.notNull(role, "角色不存在");
         return getTokenClaims(user, role);
     }
-
+    @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public String registerCommonRole(RegisterModel registerModel) {
         return register(registerModel, RoleConstant.COMMON_ROLE);
     }
-
+    @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public String registerAdminRole(RegisterModel registerModel) {
         return register(registerModel, RoleConstant.ADMIN_ROLE);

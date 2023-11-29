@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import www.raven.jc.client.IpfsClient;
 import www.raven.jc.dao.UserMapper;
@@ -85,7 +86,7 @@ public class InfoServiceImpl implements InfoService {
         ).collect(Collectors.toList());
     }
 
-
+    @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void setProfile(MultipartFile profile) {
         String upload = ipfsClient.upload(profile);
@@ -93,12 +94,13 @@ public class InfoServiceImpl implements InfoService {
         Assert.isTrue(userMapper.update(new UpdateWrapper<User>().eq("id", header).set("profile", upload)) > 0, "插入头像失败");
     }
 
+    @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void setSignature(String signature) {
         String header = request.getHeader("userId");
         Assert.isTrue(userMapper.update(new UpdateWrapper<User>().eq("id", header).set("signature", signature)) > 0, "插入签名失败");
     }
-
+    @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void setUsername(String username) {
         String header = request.getHeader("userId");

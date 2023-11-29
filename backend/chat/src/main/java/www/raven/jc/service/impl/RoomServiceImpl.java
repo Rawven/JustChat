@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.dao.RoomMapper;
 import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
@@ -34,7 +35,7 @@ public class RoomServiceImpl implements RoomService {
     private HttpServletRequest request;
     @Autowired
     private UserInfoFeign accountFeign;
-
+    @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void createRoom(RoomModel roomModel) {
         ChatRoom room = new ChatRoom().setRoomName(roomModel.getName())
