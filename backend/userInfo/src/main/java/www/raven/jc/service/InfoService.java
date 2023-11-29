@@ -2,6 +2,7 @@ package www.raven.jc.service;
 
 import org.springframework.web.multipart.MultipartFile;
 import www.raven.jc.dto.UserInfoDTO;
+import www.raven.jc.entity.vo.AllInfoVO;
 import www.raven.jc.entity.vo.InfoVO;
 
 import java.util.List;
@@ -67,4 +68,10 @@ public interface InfoService {
      */
     List<UserInfoDTO> queryLikedInfoList(String column, String text);
 
+    /**
+     * query all user
+     *
+     * @return {@link List}<{@link AllInfoVO}>
+     */
+    List<AllInfoVO> queryAllUser();
 }

@@ -44,7 +44,7 @@ export default {
     submitForm() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          this.realAxios.post('http://' + Host + ':7000/chat/createRoom', this.room, {
+          this.realAxios.post('http://' + Host + ':7000/chat/user/createRoom', this.room, {
             headers: {
               'token': localStorage.getItem("token")
             }

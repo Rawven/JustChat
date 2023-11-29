@@ -13,6 +13,7 @@ import www.raven.jc.client.IpfsClient;
 import www.raven.jc.dao.UserMapper;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.User;
+import www.raven.jc.entity.vo.AllInfoVO;
 import www.raven.jc.entity.vo.InfoVO;
 import www.raven.jc.service.InfoService;
 
@@ -82,6 +83,19 @@ public class InfoServiceImpl implements InfoService {
                     UserInfoDTO userInfoDTO = new UserInfoDTO();
                     userInfoDTO.setUsername(user.getUsername()).setProfile(user.getProfile()).setUserId(user.getId());
                     return userInfoDTO;
+                }
+        ).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AllInfoVO> queryAllUser() {
+        List<User> users = userMapper.selectList(null);
+        return users.stream().map(
+                user -> {
+                    AllInfoVO allInfoVO = new AllInfoVO();
+                    allInfoVO.setUserId(user.getId()).setUsername(user.getUsername()).setProfile(user.getProfile())
+                            .setEmail(user.getEmail()).setSignature(user.getSignature());
+                    return allInfoVO;
                 }
         ).collect(Collectors.toList());
     }

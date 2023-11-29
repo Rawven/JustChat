@@ -21,6 +21,7 @@ import java.util.List;
  */
 @RestController
 @ResponseBody
+@RequestMapping("/user")
 @Slf4j
 public class InfoController {
     @Autowired

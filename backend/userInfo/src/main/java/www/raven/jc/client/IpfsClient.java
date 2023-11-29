@@ -6,12 +6,9 @@ import io.ipfs.api.MerkleNode;
 import io.ipfs.api.NamedStreamable;
 import io.ipfs.multihash.Multihash;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import www.raven.jc.exception.IpfsException;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 

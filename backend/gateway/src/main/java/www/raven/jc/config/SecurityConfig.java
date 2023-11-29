@@ -57,8 +57,8 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/auth/**", "/ws/**", "/webSocket/**").permitAll()
-                        .pathMatchers("/chat/**", "/info/**").hasRole("USER")
-                        .pathMatchers("/admin/**").hasRole("ADMIN")
+                        .pathMatchers("/chat/user/**", "/info/user/**").hasRole("USER")
+                        .pathMatchers("/admin/**","/info/admin","/chat/admin/").hasRole("ADMIN")
                         .anyExchange().authenticated()
                 )
                 .formLogin()

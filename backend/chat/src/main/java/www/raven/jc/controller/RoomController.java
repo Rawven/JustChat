@@ -18,6 +18,7 @@ import java.util.List;
  */
 @RestController
 @ResponseBody
+@RequestMapping("/user")
 public class RoomController {
     @Autowired
     private RoomService roomService;

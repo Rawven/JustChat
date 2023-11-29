@@ -48,7 +48,7 @@ export default {
               }
             })
             .then(() => {
-              this.realAxios.post('http://' + Host + ':7000/info/defaultInfo', {}, {
+              this.realAxios.post('http://' + Host + ':7000/info/user/defaultInfo', {}, {
                 headers: {
                   'token': localStorage.getItem("token")
                 }

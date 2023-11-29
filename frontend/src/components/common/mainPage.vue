@@ -125,7 +125,7 @@ export default {
       this.$router.push({path: `/common/chatRoom/` + Number(roomId)});
     },
     getRooms(page) {
-      this.realAxios.get(`http://` + Host + `:7000/chat/queryRoomList/${page}`, {
+      this.realAxios.get(`http://` + Host + `:7000/chat/user/queryRoomList/${page}`, {
         headers: {
           'token': localStorage.getItem("token")
         }
