@@ -64,7 +64,7 @@ export default {
           this.realAxios.post('http://' + Host + ':7000/auth/login', this.user)
               .then(response => {
                 localStorage.setItem("token", response.data.data);
-                this.$router.push('/adminDashboard');
+                this.$router.push('/admin/mainPage');
               })
         } else {
           this.$message.error('Please fill in all required fields.');

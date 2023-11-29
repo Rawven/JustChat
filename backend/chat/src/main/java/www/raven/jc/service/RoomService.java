@@ -1,6 +1,7 @@
 package www.raven.jc.service;
 
 import www.raven.jc.entity.model.RoomModel;
+import www.raven.jc.entity.vo.AllRoomVO;
 import www.raven.jc.entity.vo.RoomVO;
 
 import java.util.List;
@@ -49,5 +50,6 @@ public interface RoomService {
      * @return {@link List}<{@link RoomVO}>
      */
     List<RoomVO> queryUserNameRoomList(String column, String text, int page);
+
 
 }

@@ -44,7 +44,7 @@ public class AuthController {
             RegisterModel model = new RegisterModel().setUsername(registerModel.getUsername())
                     .setPassword(registerModel.getPassword())
                     .setEmail(registerModel.getEmail());
-            return CommonResult.operateSuccess("注册成功", authService.registerCommonRole(model));
+            return CommonResult.operateSuccess("注册成功", authService.registerAdminRole(model));
         } else {
             return CommonResult.operateFailure("注册失败", "私钥错误");
         }

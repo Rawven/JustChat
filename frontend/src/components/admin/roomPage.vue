@@ -14,8 +14,8 @@
         <el-main class="main">
           <el-card class="main-card">
             <el-table :data="tableData" style="width: 100%">
-              <el-table-column prop="id" label="Room ID"></el-table-column>
-              <el-table-column prop="creator" label="创建者"></el-table-column>
+              <el-table-column prop="roomId" label="Room ID"></el-table-column>
+              <el-table-column prop="founder" label="创建者"></el-table-column>
               <el-table-column prop="maxPeople" label="最大人数"></el-table-column>
               <el-table-column prop="description" label="描述"></el-table-column>
               <el-table-column
@@ -36,12 +36,29 @@
 </template>
 
 <script>
+import {Host} from "@/main";
+
 export default {
   name:'admin_roomPage',
   data() {
     return {
+      data:{
+        roomId:'',
+        founder:'',
+        maxPeople:'',
+        description:''
+      },
       tableData: [] // 这里应该是你的房间数据
     }
+  },
+  created() {
+    this.realAxios.get("http://" + Host + ":7000/chat/admin/queryAllRoom", {
+      headers: {
+        'token': localStorage.getItem('token')
+      }
+    }).then(response => {
+      this.tableData = response.data.data;
+    });
   },
   methods: {
     goToUserPage() {
@@ -105,6 +122,8 @@ export default {
 .mainC, .aside, .main {
   height: 100%;
 }
+
+
 
 
 

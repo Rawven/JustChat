@@ -71,6 +71,11 @@ const router = createRouter({
                     path: 'roomPage',
                     name: 'AdminRoomPageView',
                     component: () => import('@/views/admin/RoomView.vue')
+                },
+                {
+                    path: 'register',
+                    name: 'AdminRegisterView',
+                    component: () => import('@/views/admin/RegisterView.vue')
                 }
                 // {
                 //     path: 'mainPage',

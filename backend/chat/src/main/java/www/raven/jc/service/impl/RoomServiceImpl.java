@@ -11,6 +11,7 @@ import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.model.RoomModel;
 import www.raven.jc.entity.po.ChatRoom;
+import www.raven.jc.entity.vo.AllRoomVO;
 import www.raven.jc.entity.vo.RoomVO;
 import www.raven.jc.feign.UserInfoFeign;
 import www.raven.jc.service.RoomService;
@@ -64,6 +65,7 @@ public class RoomServiceImpl implements RoomService {
         Page<ChatRoom> chatRoomPage = roomMapper.selectPage(new Page<>(page, 5), new QueryWrapper<ChatRoom>().in("founder_id", userIds));
         return buildRoomVO(chatRoomPage, queryList);
     }
+
 
     private List<RoomVO> buildRoomVO(Page<ChatRoom> chatRoomPage, List<UserInfoDTO> data) {
         Assert.isTrue(chatRoomPage.getTotal() > 0);

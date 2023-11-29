@@ -58,7 +58,7 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/auth/**", "/ws/**", "/webSocket/**").permitAll()
                         .pathMatchers("/chat/user/**", "/info/user/**").hasRole("USER")
-                        .pathMatchers("/admin/**","/info/admin","/chat/admin/").hasRole("ADMIN")
+                        .pathMatchers("/admin/**","/info/admin/**","/chat/admin/**").hasRole("ADMIN")
                         .anyExchange().authenticated()
                 )
                 .formLogin()

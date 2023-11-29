@@ -15,16 +15,27 @@
           <el-card class="main-card">
             <el-table :data="tableData" style="width: 100%">
               <el-table-column prop="userId" label="用户id"></el-table-column>
-              <el-table-column prop="name" label="姓名"></el-table-column>
+              <el-table-column prop="profile" label="头像" class="profile">
+                <template v-slot="scope">
+                  <img :src="'http://10.44.59.225:8083/ipfs/'+scope.row.profile" alt="User Avatar" class="small-round-avatar">
+                </template>
+              </el-table-column>
+              <el-table-column prop="username" label="姓名"></el-table-column>
               <el-table-column prop="email" label="Email"></el-table-column>
               <el-table-column prop="signature" label="个性签名"></el-table-column>
               <el-table-column
                   fixed="right"
                   label="操作"
-                  width="120">
+                  width="200">
                 <template v-slot="scope">
-                  <el-button @click="handleEdit(scope.$index, scope.row)" type="text" size="small">编辑</el-button>
-                  <el-button @click="handleDelete(scope.$index, scope.row)" type="text" size="small">删除</el-button>
+                  <el-row>
+                    <el-col :span="12">
+                      <el-button type="primary" round @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                    </el-col>
+                    <el-col :span="12">
+                      <el-button type="info" round @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                    </el-col>
+                  </el-row>
                 </template>
               </el-table-column>
             </el-table>
@@ -39,7 +50,7 @@
 import {Host} from "@/main";
 
 export default {
-  name:'admin_mainPage',
+  name: 'admin_mainPage',
   inject: {
     realAxios: {
       from: 'axiosFilter'
@@ -47,17 +58,24 @@ export default {
   },
   data() {
     return {
+      data: {
+        userId: '',
+        username: '',
+        email: '',
+        signature: '',
+        profile: '',
+      },
       tableData: [] // 这里应该是你的用户数据
     }
   },
   created() {
-        this.realAxios.get("http://"+Host+":7000/info/getAllUserInfo",{
-          headers:{
-            'token': localStorage.getItem('token')
-          }
-        }).then(response => {
-          this.tableData = response.data.data;
-        });
+    this.realAxios.get("http://" + Host + ":7000/info/admin/queryAllUser", {
+      headers: {
+        'token': localStorage.getItem('token')
+      }
+    }).then(response => {
+      this.tableData = response.data.data;
+    });
   },
   methods: {
     goToRoomPage() {
@@ -74,7 +92,7 @@ export default {
 </script>
 
 <style scoped>
-.now{
+.now {
   font-size: 24px;
   color: #409EFF;
   font-weight: bold;
@@ -91,11 +109,13 @@ export default {
     opacity: 1;
   }
 }
+
 .aside {
   margin: 2px;
   background-color: #13ce66;
   color: white; /* 设置文字颜色为白色，以便在黑色背景上看清楚 */
 }
+
 html, body {
   height: 100%;
   margin: 0;
@@ -106,14 +126,23 @@ html, body {
   width: 100%;
   height: 100%;
 }
+
 .main {
   /* 在这里添加你想要的独特布局样式 */
 }
+.small-round-avatar {
+  width: 50px; /* 设置图片宽度 */
+  height: 50px; /* 设置图片高度 */
+  border-radius: 50%; /* 设置边框半径为50%，使图片变圆 */
+  object-fit: cover; /* 保持图片的纵横比 */
+}
+
 .box-card {
   width: 100%;
   height: 1000px;
   background-color: #2c3e50;
 }
+
 .main-card {
   width: 100%;
   height: 100%;
