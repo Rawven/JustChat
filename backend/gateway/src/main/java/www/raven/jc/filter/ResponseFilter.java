@@ -5,6 +5,7 @@ import com.alibaba.cloud.commons.lang.StringUtils;
 import com.alibaba.nacos.shaded.com.google.common.base.Joiner;
 import com.alibaba.nacos.shaded.com.google.common.base.Throwables;
 import com.alibaba.nacos.shaded.com.google.common.collect.Lists;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -25,6 +26,7 @@ import www.raven.jc.util.JsonUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.ORIGINAL_RESPONSE_CONTENT_TYPE_ATTR;
@@ -61,20 +63,29 @@ public class ResponseFilter implements GlobalFilter, Ordered {
                     if (StringUtils.isNotBlank(originalResponseContentType) && originalResponseContentType.contains("application/json")) {
                         Flux<? extends DataBuffer> fluxBody = Flux.from(body);
                         //（返回数据内如果字符串过大，默认会切割）解决返回体分段传输
-                        return super.writeWith(fluxBody.collectList().map(dataBuffers -> {
-                            StringBuilder sb = new StringBuilder();
+                        return super.writeWith(fluxBody.buffer().map(dataBuffers -> {
+                            List<String> list = Lists.newArrayList();
                             dataBuffers.forEach(dataBuffer -> {
-                                byte[] content = new byte[dataBuffer.readableByteCount()];
-                                dataBuffer.read(content);
-                                DataBufferUtils.release(dataBuffer);
-                                sb.append(new String(content, StandardCharsets.UTF_8));
+                                try {
+                                    byte[] content = new byte[dataBuffer.readableByteCount()];
+                                    dataBuffer.read(content);
+                                    DataBufferUtils.release(dataBuffer);
+                                    list.add(new String(content, StandardCharsets.UTF_8));
+                                } catch (Exception e) {
+                                    log.info("加载Response字节流异常，失败原因：{}", Throwables.getStackTraceAsString(e));
+                                }
                             });
-                            CommonResult commonResult = JsonUtil.jsonToObj(sb.toString(), CommonResult.class);
+                            StringBuilder sb = new StringBuilder();
+                            if( list.get(0).lastIndexOf("{")>list.get(0).lastIndexOf("}")){
+                                sb.append(list.get(0), 0, list.get(0).lastIndexOf("{")-1).append("]");
+                            }
+                            Map<String,Object> commonResult = JsonUtil.jsonToMap(sb.toString());
                             log.info("该请求的返回");
-                            log.info("Response Code: {}", commonResult.getCode());
-                            log.info("Response Message: {}", commonResult.getMessage());
-                            log.info("Response Data: {}", JsonUtil.objToJson(commonResult.getData()));
-                            byte[] uppedContent = new String(sb.toString().getBytes(), StandardCharsets.UTF_8).getBytes();
+                            log.info("Response Code: {}", commonResult.get("code"));
+                            log.info("Response Message: {}", commonResult.get("message"));
+                            log.info("Response Data: {}", JsonUtil.objToJson(commonResult.get("data")));
+                            String responseData = JOINER.join(list);
+                            byte[] uppedContent = new String(responseData.getBytes(), StandardCharsets.UTF_8).getBytes();
                             originalResponse.getHeaders().setContentLength(uppedContent.length);
                             return bufferFactory.wrap(uppedContent);
                         }));
