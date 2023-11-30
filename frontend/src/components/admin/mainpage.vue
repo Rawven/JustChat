@@ -75,7 +75,7 @@ export default {
       },
       currentPage: 1, // 新增属性，用于存储当前的页数
       totalRooms: 0, // 新增属性，用于存储房间总数
-      pageSize: 5,
+      pageSize: 8,
       users: [] // 这里应该是你的房间数据
     }
   },

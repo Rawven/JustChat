@@ -5,9 +5,8 @@ import com.alibaba.cloud.commons.lang.StringUtils;
 import com.alibaba.nacos.shaded.com.google.common.base.Joiner;
 import com.alibaba.nacos.shaded.com.google.common.base.Throwables;
 import com.alibaba.nacos.shaded.com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -21,6 +20,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import www.raven.jc.result.CommonResult;
+import www.raven.jc.util.JsonUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -37,10 +38,9 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.O
  */
 
 @Component
+@Slf4j
 public class ResponseFilter implements GlobalFilter, Ordered {
-
-    private static final Logger log = LoggerFactory.getLogger(ResponseFilter.class);
-    private static Joiner joiner = Joiner.on("");
+    private static final Joiner JOINER = Joiner.on("");
 
     @Override
     public int getOrder() {
@@ -73,8 +73,12 @@ public class ResponseFilter implements GlobalFilter, Ordered {
                                     log.info("加载Response字节流异常，失败原因：{}", Throwables.getStackTraceAsString(e));
                                 }
                             });
-                            String responseData = joiner.join(list);
-                            log.info("返回参数responseData：" + responseData);
+                            CommonResult commonResult = JsonUtil.jsonToObj(list.get(0), CommonResult.class);
+                            log.info("该请求的返回");
+                            log.info("Response Code: {}", commonResult.getCode());
+                            log.info("Response Message: {}", commonResult.getMessage());
+                            log.info("Response Data: {}", JsonUtil.objToJson(commonResult.getData()));
+                            String responseData = JOINER.join(list);
                             byte[] uppedContent = new String(responseData.getBytes(), StandardCharsets.UTF_8).getBytes();
                             originalResponse.getHeaders().setContentLength(uppedContent.length);
                             return bufferFactory.wrap(uppedContent);
