@@ -3,6 +3,8 @@ package www.raven.jc.dto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.util.List;
+
 /**
  * token dto
  *
@@ -13,6 +15,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class TokenDTO {
     private Integer userId;
-    private String role;
+    private List<String> role;
     private Long expireTime;
 }

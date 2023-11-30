@@ -3,6 +3,7 @@ package www.raven.jc.service.impl;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -88,9 +89,9 @@ public class InfoServiceImpl implements InfoService {
     }
 
     @Override
-    public List<AllInfoVO> queryAllUser() {
-        List<User> users = userMapper.selectList(null);
-        return users.stream().map(
+    public List<AllInfoVO> queryPageUser(Integer page) {
+        Page<User> userPage = userMapper.selectPage(new Page<>(page, 8), null);
+        return userPage.getRecords().stream().map(
                 user -> {
                     AllInfoVO allInfoVO = new AllInfoVO();
                     allInfoVO.setUserId(user.getId()).setUsername(user.getUsername()).setProfile(user.getProfile())

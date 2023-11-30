@@ -23,12 +23,4 @@ import java.util.List;
 public class AdminController {
 
 
-    //TODO 修改一下权限角色在token中的存放 变为数组 然后admin主页的user和room的查询都用分页查询 userinfo那边的接口要改一下
-    @Autowired
-    private RoomService roomService;
-    @GetMapping("/queryAllRoom")
-    public CommonResult<List<AllRoomVO>>  getAllRoom(){
-       //    return CommonResult.operateSuccess("获取所有房间成功",roomService.queryAllRoom());
-        return null;
-    }
 }

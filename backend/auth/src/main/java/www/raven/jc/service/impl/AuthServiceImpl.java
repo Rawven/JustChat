@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.constant.RoleConstant;
+import www.raven.jc.dao.RolesDAO;
 import www.raven.jc.dao.RolesMapper;
 import www.raven.jc.dao.UserRoleMapper;
 import www.raven.jc.dao.UserMapper;
@@ -21,7 +22,10 @@ import www.raven.jc.entity.po.UserRole;
 import www.raven.jc.service.AuthService;
 import www.raven.jc.util.JwtUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * account service impl
@@ -39,6 +43,8 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private UserRoleMapper userRoleMapper;
     @Autowired
+    private RolesDAO rolesDAO;
+    @Autowired
     private RedissonClient redissonClient;
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -51,24 +57,29 @@ public class AuthServiceImpl implements AuthService {
                 eq("username", loginModel.getUsername()));
         Assert.notNull(user, "用户不存在");
         Assert.isTrue(passwordEncoder.matches(loginModel.getPassword(), user.getPassword()), "密码错误");
-        UserRole userRole = userRoleMapper.selectOne(new QueryWrapper<UserRole>().eq("user_id",user.getId()));
-        Assert.notNull(userRole, "用户角色不存在");
-        Role role = rolesMapper.selectById(userRole.getRoleId());
-        Assert.notNull(role, "角色不存在");
-        return getTokenClaims(user, role);
+        List<UserRole> userRoles = userRoleMapper.selectList(new QueryWrapper<UserRole>().eq("user_id", user.getId()));
+        Assert.notNull(userRoles, "用户角色不存在");
+        List<Role> roles = rolesMapper.selectBatchIds(userRoles.stream().map(UserRole::getRoleId).collect(Collectors.toList()));
+        Assert.isTrue(!roles.isEmpty(), "角色不存在");
+        return getTokenClaims(user, roles);
     }
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public String registerCommonRole(RegisterModel registerModel) {
-        return register(registerModel, RoleConstant.COMMON_ROLE);
+        ArrayList<Integer> list = new ArrayList<>();
+        list.add(RoleConstant.COMMON_ROLE);
+        return register(registerModel, list);
     }
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public String registerAdminRole(RegisterModel registerModel) {
-        return register(registerModel, RoleConstant.ADMIN_ROLE);
+        ArrayList<Integer> list = new ArrayList<>();
+        list.add(RoleConstant.ADMIN_ROLE);
+        list.add(RoleConstant.COMMON_ROLE);
+        return register(registerModel,list);
     }
 
-    private String register(RegisterModel registerModel, Integer roleId) {
+    private String register(RegisterModel registerModel, List<Integer> roleId) {
         Assert.isNull(userMapper.selectOne(new QueryWrapper<User>().
                 eq("username", registerModel.getUsername())));
         User user = new User();
@@ -76,19 +87,25 @@ public class AuthServiceImpl implements AuthService {
                 setUsername(registerModel.getUsername()).
                 setPassword(passwordEncoder.encode(registerModel.getPassword()))
                 .setEmail(registerModel.getEmail())) > 0);
-        UserRole userRole = new UserRole().setUserId(user.getId()).setRoleId(roleId);
-        Assert.isTrue(userRoleMapper.insert(userRole) > 0);
-        Role role = rolesMapper.selectById(roleId);
-        role.setUserCount(role.getUserCount() + 1);
-        Assert.isTrue(rolesMapper.updateById(role) > 0);
-        return getTokenClaims(user, role);
+        List<Role> roles = rolesMapper.selectBatchIds(roleId);
+        //TODO 用mybatis-plus的IService来实现一下批量更新 批量插入吧
+        for (Integer id:roleId) {
+            UserRole userRole = new UserRole().setUserId(user.getId()).setRoleId(id);
+            Assert.isTrue(userRoleMapper.insert(userRole) > 0);
+            Role role = rolesMapper.selectById(id);
+            roles.add(role);
+            role.setUserCount(role.getUserCount() + 1);
+            Assert.isTrue(rolesMapper.updateById(role) > 0);
+        }
+        return getTokenClaims(user, roles);
     }
 
 
-    private String getTokenClaims(User user, Role role) {
+    private String getTokenClaims(User user, List<Role> role) {
         HashMap<String, Object> claims = new HashMap<>(3);
         claims.put("userId", user.getId());
-        claims.put("role", role.getValue());
+        List<String> values = role.stream().map(Role::getValue).collect(Collectors.toList());
+        claims.put("role", values);
         claims.put("expireTime", System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7);
         String token = JwtUtil.createToken(claims, key);
         redissonClient.getBucket("token:" + user.getId()).set(token);

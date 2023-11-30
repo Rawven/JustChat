@@ -25,9 +25,10 @@ public interface RoomService {
      * query room page
      *
      * @param page page
+     * @param size size
      * @return {@link List}<{@link RoomVO}>
      */
-    List<RoomVO> queryAllRoomPage(Integer page);
+    List<RoomVO> queryAllRoomPage(Integer page,Integer size);
 
     /**
      * query liked room list

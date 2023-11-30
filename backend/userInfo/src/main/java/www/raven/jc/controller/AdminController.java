@@ -2,10 +2,7 @@ package www.raven.jc.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import www.raven.jc.entity.vo.AllInfoVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.InfoService;
@@ -28,8 +25,8 @@ public class AdminController {
     private InfoService infoService;
 
     @GetMapping("/queryAllUser")
-    public CommonResult<List<AllInfoVO>> queryAllUser() {
-        return CommonResult.operateSuccess("查找成功", infoService.queryAllUser());
+    public CommonResult<List<AllInfoVO>> queryAllUser(@RequestBody Integer page) {
+        return CommonResult.operateSuccess("查找成功", infoService.queryPageUser(page));
     }
 
 }

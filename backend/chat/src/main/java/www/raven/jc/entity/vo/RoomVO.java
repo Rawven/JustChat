@@ -17,6 +17,5 @@ public class RoomVO {
     private String roomName;
     private String roomDescription;
     private String founderName;
-    private String founderAvatar;
     private Integer maxPeople;
 }

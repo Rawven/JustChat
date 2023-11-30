@@ -84,7 +84,6 @@ export default {
         roomName: '',
         roomDescription: '',
         founderName: '',
-        founderAvatar: '',
         maxPeople: 1,
       },
       userInfo: {
@@ -125,7 +124,7 @@ export default {
       this.$router.push({path: `/common/chatRoom/` + Number(roomId)});
     },
     getRooms(page) {
-      this.realAxios.get(`http://` + Host + `:7000/chat/user/queryRoomList/${page}`, {
+      this.realAxios.get(`http://` + Host + `:7000/chat/user/queryRoomList/${page}/${5}`, {
         headers: {
           'token': localStorage.getItem("token")
         }

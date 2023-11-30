@@ -47,8 +47,8 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public List<RoomVO> queryAllRoomPage(Integer page) {
-        Page<ChatRoom> chatRoomPage = roomMapper.selectPage(new Page<>(page, 5), null);
+    public List<RoomVO> queryAllRoomPage(Integer page,Integer size) {
+        Page<ChatRoom> chatRoomPage = roomMapper.selectPage(new Page<>(page, size), null);
         return buildRoomVO(chatRoomPage, accountFeign.getAllInfo().getData());
     }
 
@@ -75,8 +75,7 @@ public class RoomServiceImpl implements RoomService {
                 .setRoomName(chatRoom.getRoomName())
                 .setRoomDescription(chatRoom.getRoomDescription())
                 .setMaxPeople(chatRoom.getMaxPeople())
-                .setFounderName(map.get(chatRoom.getFounderId()).getUsername())
-                .setFounderAvatar(map.get(chatRoom.getFounderId()).getProfile())).collect(Collectors.toList());
+                .setFounderName(map.get(chatRoom.getFounderId()).getUsername())).collect(Collectors.toList());
     }
 
 

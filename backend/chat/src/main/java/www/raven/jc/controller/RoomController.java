@@ -23,9 +23,9 @@ public class RoomController {
     @Autowired
     private RoomService roomService;
 
-    @GetMapping("/queryRoomList/{page}")
-    public CommonResult<RoomRealVO> queryRoomList(@PathVariable("page") int page) {
-        List<RoomVO> rooms = roomService.queryAllRoomPage(page);
+    @GetMapping("/queryRoomList/{page}/{size}")
+    public CommonResult<RoomRealVO> queryRoomList(@PathVariable("page") int page,@PathVariable("size") int size) {
+        List<RoomVO> rooms = roomService.queryAllRoomPage(page,size);
         RoomRealVO roomRealVO = new RoomRealVO().setRooms(rooms).setTotal(rooms.size());
         return CommonResult.operateSuccess("获取房间列表成功", roomRealVO);
     }

@@ -69,9 +69,9 @@ public interface InfoService {
     List<UserInfoDTO> queryLikedInfoList(String column, String text);
 
     /**
-     * query all user
-     *
+     * query page user
+     * @param page page
      * @return {@link List}<{@link AllInfoVO}>
      */
-    List<AllInfoVO> queryAllUser();
+    List<AllInfoVO> queryPageUser(Integer page);
 }

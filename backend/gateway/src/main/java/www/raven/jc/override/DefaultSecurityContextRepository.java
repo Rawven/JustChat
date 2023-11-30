@@ -65,8 +65,9 @@ public class DefaultSecurityContextRepository implements ServerSecurityContextRe
             String token = JwtUtil.createToken(map, key);
             redissonClient.getBucket("token:" + dto.getUserId()).set(token);
             exchange.getResponse().getHeaders().set(JwtConstant.REFRESH, token);
+
         }
-        Authentication auth = new UsernamePasswordAuthenticationToken(dto.getUserId(), null, AuthorityUtils.createAuthorityList(dto.getRole()));
+        Authentication auth = new UsernamePasswordAuthenticationToken(dto.getUserId(), null,  AuthorityUtils.createAuthorityList(dto.getRole().toArray(new String[0])));
         return tokenAuthenticationManager.authenticate(
                 auth
         ).map(SecurityContextImpl::new);
