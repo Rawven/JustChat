@@ -13,7 +13,7 @@
         </el-aside>
         <el-main class="main">
           <el-card class="main-card">
-            <el-table :data="tableData" style="width: 100%">
+            <el-table :data="users" style="width: 100%">
               <el-table-column prop="userId" label="用户id"></el-table-column>
               <el-table-column prop="profile" label="头像" class="profile">
                 <template v-slot="scope">
@@ -39,6 +39,14 @@
                 </template>
               </el-table-column>
             </el-table>
+            <el-pagination class="pagination-container"
+                           background
+                           layout="prev, pager, next"
+                           :total="totalRooms"
+                           v-model:current-page="currentPage"
+                           :page-size="pageSize"
+                           @current-change="handlePageChange"
+            />
           </el-card>
         </el-main>
       </el-container>
@@ -58,28 +66,41 @@ export default {
   },
   data() {
     return {
-      data: {
+      user: {
         userId: '',
         username: '',
         email: '',
         signature: '',
         profile: '',
       },
-      tableData: [] // 这里应该是你的用户数据
+      currentPage: 1, // 新增属性，用于存储当前的页数
+      totalRooms: 0, // 新增属性，用于存储房间总数
+      pageSize: 5,
+      users: [] // 这里应该是你的房间数据
     }
   },
   created() {
-    this.realAxios.get("http://" + Host + ":7000/info/admin/queryAllUser", {
-      headers: {
-        'token': localStorage.getItem('token')
-      }
-    }).then(response => {
-      this.tableData = response.data.data;
-    });
+ this.getUsers(this.currentPage)
   },
   methods: {
     goToRoomPage() {
       this.$router.push('/admin/roomPage');
+    },
+    getUsers(page) {
+      this.realAxios.get(`http://` + Host + `:7000/info/admin/queryAllUser/${page}`, {
+        headers: {
+          'token': localStorage.getItem("token")
+        }
+      }).then(response => {
+        // 将获取的房间数组赋值给 rooms
+        this.users = response.data.data.users;
+        // 将获取的房间总数赋值给 totalRooms
+        this.totalRooms = parseInt(response.data.data.total);
+      })
+    },
+    handlePageChange(page) {
+      this.currentPage = page;
+      this.getUsers(page);
     },
     handleEdit(index, row) {
       // 这里是你的编辑逻辑

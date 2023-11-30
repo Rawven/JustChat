@@ -13,6 +13,7 @@ import reactor.core.publisher.Mono;
 import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.util.JwtUtil;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -31,7 +32,7 @@ public class UserServiceImpl implements ReactiveUserDetailsService {
     public Mono<UserDetails> findByUsername(String username) {
         RBucket<Object> bucket = redissonClient.getBucket("token:" + username);
         TokenDTO dto = JwtUtil.verify(bucket.get().toString(), "爱你老妈");
-        List<GrantedAuthority> authorityList = AuthorityUtils.createAuthorityList(dto.getRole());
+        List<GrantedAuthority> authorityList = AuthorityUtils.createAuthorityList( dto.getRole().toArray(new String[0]));
         return Mono.just(new User(dto.getUserId().toString(), null, authorityList));
     }
 }

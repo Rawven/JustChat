@@ -11,9 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.constant.RoleConstant;
 import www.raven.jc.dao.RolesDAO;
-import www.raven.jc.dao.RolesMapper;
-import www.raven.jc.dao.UserRoleMapper;
-import www.raven.jc.dao.UserMapper;
+import www.raven.jc.dao.UserRoleDAO;
+import www.raven.jc.dao.mapper.RolesMapper;
+import www.raven.jc.dao.mapper.UserRoleMapper;
+import www.raven.jc.dao.mapper.UserMapper;
 import www.raven.jc.entity.model.LoginModel;
 import www.raven.jc.entity.model.RegisterModel;
 import www.raven.jc.entity.po.Role;
@@ -44,6 +45,8 @@ public class AuthServiceImpl implements AuthService {
     private UserRoleMapper userRoleMapper;
     @Autowired
     private RolesDAO rolesDAO;
+    @Autowired
+    private UserRoleDAO userRoleDAO;
     @Autowired
     private RedissonClient redissonClient;
     @Autowired
@@ -88,15 +91,13 @@ public class AuthServiceImpl implements AuthService {
                 setPassword(passwordEncoder.encode(registerModel.getPassword()))
                 .setEmail(registerModel.getEmail())) > 0);
         List<Role> roles = rolesMapper.selectBatchIds(roleId);
-        //TODO 用mybatis-plus的IService来实现一下批量更新 批量插入吧
-        for (Integer id:roleId) {
-            UserRole userRole = new UserRole().setUserId(user.getId()).setRoleId(id);
-            Assert.isTrue(userRoleMapper.insert(userRole) > 0);
-            Role role = rolesMapper.selectById(id);
-            roles.add(role);
+        List<UserRole> userRoles = new ArrayList<>();
+        for (Role role: roles) {
+            userRoles.add(new UserRole().setUserId(user.getId()).setRoleId(role.getRoleId()));
             role.setUserCount(role.getUserCount() + 1);
-            Assert.isTrue(rolesMapper.updateById(role) > 0);
         }
+        Assert.isTrue(rolesDAO.saveOrUpdateBatch(roles));
+        Assert.isTrue(userRoleDAO.saveBatch(userRoles));
         return getTokenClaims(user, roles);
     }
 

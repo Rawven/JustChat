@@ -23,7 +23,7 @@ public interface UserInfoFeign {
      * @param userId user id
      * @return {@link CommonResult}<{@link UserInfoDTO}>
      */
-    @PostMapping("/getSingleInfo")
+    @PostMapping("/user/getSingleInfo")
     CommonResult<UserInfoDTO> getSingleInfo(Integer userId);
 
     /**
@@ -31,7 +31,7 @@ public interface UserInfoFeign {
      *
      * @return {@link CommonResult}<{@link List}<{@link UserInfoDTO}>>
      */
-    @PostMapping("/getAllInfo")
+    @PostMapping("/user/getAllInfo")
     CommonResult<List<UserInfoDTO>> getAllInfo();
 
 
@@ -41,7 +41,7 @@ public interface UserInfoFeign {
      * @param userInfoDTO user info dto
      * @return {@link CommonResult}<{@link List}<{@link UserInfoDTO}>>
      */
-    @PostMapping("/getRelatedInfoList")
+    @PostMapping("/user/getRelatedInfoList")
     CommonResult<List<UserInfoDTO>> getRelatedInfoList(@RequestBody QueryUserInfoDTO userInfoDTO);
 
 }

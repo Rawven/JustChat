@@ -55,6 +55,11 @@ import {Host} from "@/main";
 
 export default {
   name:'admin_roomPage',
+  inject: {
+    realAxios: {
+      from: 'axiosFilter'
+    }
+  },
   data() {
     return {
       room: {
@@ -84,7 +89,7 @@ export default {
         }
       }).then(response => {
         // 将获取的房间数组赋值给 rooms
-        this.rooms = response.data.data.rooms;
+        this.tableData = response.data.data.rooms;
         // 将获取的房间总数赋值给 totalRooms
         this.totalRooms = parseInt(response.data.data.total);
       })

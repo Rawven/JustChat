@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import www.raven.jc.entity.vo.AllInfoVO;
+import www.raven.jc.entity.vo.RealAllInfoVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.InfoService;
 
@@ -24,9 +25,10 @@ public class AdminController {
     @Autowired
     private InfoService infoService;
 
-    @GetMapping("/queryAllUser")
-    public CommonResult<List<AllInfoVO>> queryAllUser(@RequestBody Integer page) {
-        return CommonResult.operateSuccess("查找成功", infoService.queryPageUser(page));
+    @GetMapping("/queryAllUser/{page}")
+    public CommonResult<RealAllInfoVO> queryAllUser(@PathVariable("page") Integer page) {
+        List<AllInfoVO> list = infoService.queryPageUser(page);
+        return CommonResult.operateSuccess("查找成功", new RealAllInfoVO().setUsers(list).setTotal(list.size()));
     }
 
 }

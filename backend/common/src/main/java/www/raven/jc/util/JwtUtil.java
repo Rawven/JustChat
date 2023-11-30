@@ -7,6 +7,7 @@ import cn.hutool.jwt.JWTUtil;
 import lombok.extern.slf4j.Slf4j;
 import www.raven.jc.dto.TokenDTO;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,7 +29,7 @@ public class JwtUtil {
         Assert.isTrue(JWTUtil.verify(token, key.getBytes()), "token验证失败");
         JWTPayload payload = JWTUtil.parseToken(token).getPayload();
         NumberWithFormat expireTime = (NumberWithFormat) payload.getClaim("expireTime");
-        String role = (String) payload.getClaim("role");
+        List<String> role = (List<String>) payload.getClaim("role");
         NumberWithFormat userId = (NumberWithFormat) payload.getClaim("userId");
         return new TokenDTO().setRole(role).setUserId(userId.intValue()).setExpireTime(expireTime.longValue());
     }
