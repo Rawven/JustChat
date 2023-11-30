@@ -27,8 +27,7 @@ public class AdminController {
 
     @GetMapping("/queryAllUser/{page}")
     public CommonResult<RealAllInfoVO> queryAllUser(@PathVariable("page") Integer page) {
-        List<AllInfoVO> list = infoService.queryPageUser(page);
-        return CommonResult.operateSuccess("查找成功", new RealAllInfoVO().setUsers(list).setTotal(list.size()));
+        return CommonResult.operateSuccess("查找成功",infoService.queryPageUser(page));
     }
 
 }

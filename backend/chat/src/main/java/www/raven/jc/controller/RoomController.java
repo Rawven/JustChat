@@ -3,12 +3,9 @@ package www.raven.jc.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import www.raven.jc.entity.model.RoomModel;
-import www.raven.jc.entity.vo.RoomRealVO;
-import www.raven.jc.entity.vo.RoomVO;
+import www.raven.jc.entity.vo.RealRoomVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.RoomService;
-
-import java.util.List;
 
 /**
  * room controller
@@ -24,16 +21,14 @@ public class RoomController {
     private RoomService roomService;
 
     @GetMapping("/queryRoomList/{page}/{size}")
-    public CommonResult<RoomRealVO> queryRoomList(@PathVariable("page") int page,@PathVariable("size") int size) {
-        List<RoomVO> rooms = roomService.queryAllRoomPage(page,size);
-        RoomRealVO roomRealVO = new RoomRealVO().setRooms(rooms).setTotal(rooms.size());
-        return CommonResult.operateSuccess("获取房间列表成功", roomRealVO);
+    public CommonResult<RealRoomVO> queryRoomList(@PathVariable("page") int page, @PathVariable("size") int size) {
+        return CommonResult.operateSuccess("获取房间列表成功", roomService.queryAllRoomPage(page,size));
     }
 
     @GetMapping("/queryRelatedRoomList/{text}/{choice}/{page}")
-    public CommonResult<RoomRealVO> queryRelatedRoomList(@PathVariable("text") String text, @PathVariable("choice") int choice,
+    public CommonResult<RealRoomVO> queryRelatedRoomList(@PathVariable("text") String text, @PathVariable("choice") int choice,
                                                          @PathVariable("page") int page) {
-        List<RoomVO> rooms;
+        RealRoomVO rooms;
         //roomName查找
         if (choice == 1) {
             rooms = roomService.queryLikedRoomList("room_name", text, page);
@@ -41,8 +36,7 @@ public class RoomController {
             //userName查找
             rooms = roomService.queryUserNameRoomList("username", text, page);
         }
-        RoomRealVO roomRealVO = new RoomRealVO().setRooms(rooms).setTotal(rooms.size());
-        return CommonResult.operateSuccess("获取房间列表成功", roomRealVO);
+        return CommonResult.operateSuccess("获取房间列表成功", rooms);
     }
 
     @PostMapping("/createRoom")

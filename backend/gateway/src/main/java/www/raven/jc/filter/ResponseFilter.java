@@ -61,25 +61,20 @@ public class ResponseFilter implements GlobalFilter, Ordered {
                     if (StringUtils.isNotBlank(originalResponseContentType) && originalResponseContentType.contains("application/json")) {
                         Flux<? extends DataBuffer> fluxBody = Flux.from(body);
                         //（返回数据内如果字符串过大，默认会切割）解决返回体分段传输
-                        return super.writeWith(fluxBody.buffer().map(dataBuffers -> {
-                            List<String> list = Lists.newArrayList();
+                        return super.writeWith(fluxBody.collectList().map(dataBuffers -> {
+                            StringBuilder sb = new StringBuilder();
                             dataBuffers.forEach(dataBuffer -> {
-                                try {
-                                    byte[] content = new byte[dataBuffer.readableByteCount()];
-                                    dataBuffer.read(content);
-                                    DataBufferUtils.release(dataBuffer);
-                                    list.add(new String(content, StandardCharsets.UTF_8));
-                                } catch (Exception e) {
-                                    log.info("加载Response字节流异常，失败原因：{}", Throwables.getStackTraceAsString(e));
-                                }
+                                byte[] content = new byte[dataBuffer.readableByteCount()];
+                                dataBuffer.read(content);
+                                DataBufferUtils.release(dataBuffer);
+                                sb.append(new String(content, StandardCharsets.UTF_8));
                             });
-                            CommonResult commonResult = JsonUtil.jsonToObj(list.get(0), CommonResult.class);
+                            CommonResult commonResult = JsonUtil.jsonToObj(sb.toString(), CommonResult.class);
                             log.info("该请求的返回");
                             log.info("Response Code: {}", commonResult.getCode());
                             log.info("Response Message: {}", commonResult.getMessage());
                             log.info("Response Data: {}", JsonUtil.objToJson(commonResult.getData()));
-                            String responseData = JOINER.join(list);
-                            byte[] uppedContent = new String(responseData.getBytes(), StandardCharsets.UTF_8).getBytes();
+                            byte[] uppedContent = new String(sb.toString().getBytes(), StandardCharsets.UTF_8).getBytes();
                             originalResponse.getHeaders().setContentLength(uppedContent.length);
                             return bufferFactory.wrap(uppedContent);
                         }));

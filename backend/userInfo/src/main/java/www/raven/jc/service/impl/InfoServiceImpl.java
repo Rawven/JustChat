@@ -16,6 +16,7 @@ import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.User;
 import www.raven.jc.entity.vo.AllInfoVO;
 import www.raven.jc.entity.vo.InfoVO;
+import www.raven.jc.entity.vo.RealAllInfoVO;
 import www.raven.jc.service.InfoService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -89,9 +90,10 @@ public class InfoServiceImpl implements InfoService {
     }
 
     @Override
-    public List<AllInfoVO> queryPageUser(Integer page) {
+    public RealAllInfoVO queryPageUser(Integer page) {
+        Long total = userMapper.selectCount(null);
         Page<User> userPage = userMapper.selectPage(new Page<>(page, 8), null);
-        return userPage.getRecords().stream().map(
+        List<AllInfoVO> collect = userPage.getRecords().stream().map(
                 user -> {
                     AllInfoVO allInfoVO = new AllInfoVO();
                     allInfoVO.setUserId(user.getId()).setUsername(user.getUsername()).setProfile(user.getProfile())
@@ -99,6 +101,7 @@ public class InfoServiceImpl implements InfoService {
                     return allInfoVO;
                 }
         ).collect(Collectors.toList());
+        return new RealAllInfoVO().setTotal(Math.toIntExact(total)).setUsers(collect);
     }
 
     @Transactional(rollbackFor = IllegalArgumentException.class)

@@ -11,6 +11,7 @@ import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.model.RoomModel;
 import www.raven.jc.entity.po.ChatRoom;
+import www.raven.jc.entity.vo.RealRoomVO;
 import www.raven.jc.entity.vo.RoomVO;
 import www.raven.jc.feign.UserInfoFeign;
 import www.raven.jc.service.RoomService;
@@ -46,23 +47,29 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public List<RoomVO> queryAllRoomPage(Integer page,Integer size) {
+    public RealRoomVO queryAllRoomPage(Integer page, Integer size) {
+        Long total = roomMapper.selectCount(null);
         Page<ChatRoom> chatRoomPage = roomMapper.selectPage(new Page<>(page, size), null);
-        return buildRoomVO(chatRoomPage, accountFeign.getAllInfo().getData());
+        List<RoomVO> rooms = buildRoomVO(chatRoomPage, accountFeign.getAllInfo().getData());
+        return new RealRoomVO().setRooms(rooms).setTotal(Math.toIntExact(total));
     }
 
     @Override
-    public List<RoomVO> queryLikedRoomList(String column, String text, int page) {
+    public RealRoomVO queryLikedRoomList(String column, String text, int page) {
+        Long total = roomMapper.selectCount(null);
         Page<ChatRoom> chatRoomPage = roomMapper.selectPage(new Page<>(page, 5), new QueryWrapper<ChatRoom>().like(column, text));
-        return buildRoomVO(chatRoomPage, accountFeign.getAllInfo().getData());
+        List<RoomVO> rooms = buildRoomVO(chatRoomPage, accountFeign.getAllInfo().getData());
+        return new RealRoomVO().setRooms(rooms).setTotal(Math.toIntExact(total));
     }
 
     @Override
-    public List<RoomVO> queryUserNameRoomList(String column, String text, int page) {
+    public RealRoomVO queryUserNameRoomList(String column, String text, int page) {
+        Long total = roomMapper.selectCount(null);
         List<UserInfoDTO> queryList = accountFeign.getRelatedInfoList(new QueryUserInfoDTO().setColumn(column).setText(text)).getData();
         List<Integer> userIds = queryList.stream().map(UserInfoDTO::getUserId).collect(Collectors.toList());
         Page<ChatRoom> chatRoomPage = roomMapper.selectPage(new Page<>(page, 5), new QueryWrapper<ChatRoom>().in("founder_id", userIds));
-        return buildRoomVO(chatRoomPage, queryList);
+        List<RoomVO> rooms = buildRoomVO(chatRoomPage, queryList);
+        return new RealRoomVO().setRooms(rooms).setTotal(Math.toIntExact(total));
     }
 
 

@@ -1,7 +1,7 @@
 package www.raven.jc.service;
 
 import www.raven.jc.entity.model.RoomModel;
-import www.raven.jc.entity.vo.AllRoomVO;
+import www.raven.jc.entity.vo.RealRoomVO;
 import www.raven.jc.entity.vo.RoomVO;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public interface RoomService {
      * @param size size
      * @return {@link List}<{@link RoomVO}>
      */
-    List<RoomVO> queryAllRoomPage(Integer page,Integer size);
+    RealRoomVO queryAllRoomPage(Integer page, Integer size);
 
     /**
      * query liked room list
@@ -40,7 +40,7 @@ public interface RoomService {
      * @param page   page
      * @return {@link List}<{@link RoomVO}>
      */
-    List<RoomVO> queryLikedRoomList(String column, String text, int page);
+    RealRoomVO queryLikedRoomList(String column, String text, int page);
 
     /**
      * query username room list*
@@ -50,7 +50,7 @@ public interface RoomService {
      * @param page   page
      * @return {@link List}<{@link RoomVO}>
      */
-    List<RoomVO> queryUserNameRoomList(String column, String text, int page);
+    RealRoomVO queryUserNameRoomList(String column, String text, int page);
 
 
 }

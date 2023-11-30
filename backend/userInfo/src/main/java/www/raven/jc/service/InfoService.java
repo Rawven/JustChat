@@ -4,6 +4,7 @@ import org.springframework.web.multipart.MultipartFile;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.vo.AllInfoVO;
 import www.raven.jc.entity.vo.InfoVO;
+import www.raven.jc.entity.vo.RealAllInfoVO;
 
 import java.util.List;
 
@@ -73,5 +74,5 @@ public interface InfoService {
      * @param page page
      * @return {@link List}<{@link AllInfoVO}>
      */
-    List<AllInfoVO> queryPageUser(Integer page);
+    RealAllInfoVO queryPageUser(Integer page);
 }
