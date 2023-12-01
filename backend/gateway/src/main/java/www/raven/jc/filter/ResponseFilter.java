@@ -75,15 +75,7 @@ public class ResponseFilter implements GlobalFilter, Ordered {
                                     log.info("加载Response字节流异常，失败原因：{}", Throwables.getStackTraceAsString(e));
                                 }
                             });
-                            StringBuilder sb = new StringBuilder();
-                            if( list.get(0).lastIndexOf("{")>list.get(0).lastIndexOf("}")){
-                                sb.append(list.get(0), 0, list.get(0).lastIndexOf("{")-1).append("]");
-                            }
-                            Map<String,Object> commonResult = JsonUtil.jsonToMap(sb.toString());
-                            log.info("该请求的返回");
-                            log.info("Response Code: {}", commonResult.get("code"));
-                            log.info("Response Message: {}", commonResult.get("message"));
-                            log.info("Response Data: {}", JsonUtil.objToJson(commonResult.get("data")));
+                            logResponse(list.get(0));
                             String responseData = JOINER.join(list);
                             byte[] uppedContent = new String(responseData.getBytes(), StandardCharsets.UTF_8).getBytes();
                             originalResponse.getHeaders().setContentLength(uppedContent.length);
@@ -100,6 +92,17 @@ public class ResponseFilter implements GlobalFilter, Ordered {
             }
         };
         return chain.filter(exchange.mutate().response(response).build());
+    }
+
+    public static void logResponse(String str) {
+        StringBuilder sb = new StringBuilder();
+        int index = str.indexOf("\"data\"");
+        String strr = str.substring(0,index-1);
+        sb.append(strr).append("}");
+        Map<String,Object> commonResult = JsonUtil.jsonToMap(sb.toString());
+        log.info("该请求的返回");
+        log.info("Response Code: {}", commonResult.get("code"));
+        log.info("Response Message: {}", commonResult.get("message"));
     }
 
 
