@@ -15,7 +15,6 @@
         <module>chat</module>
         <module>auth</module>
         <module>admin</module>
-        <module>common-User</module>
     </modules>
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
