@@ -6,20 +6,29 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import www.raven.jc.client.IpfsClient;
+import www.raven.jc.dao.RolesDAO;
+import www.raven.jc.dao.UserRoleDAO;
+import www.raven.jc.dao.mapper.RolesMapper;
 import www.raven.jc.dao.mapper.UserMapper;
+import www.raven.jc.dao.mapper.UserRoleMapper;
+import www.raven.jc.dto.RoleDTO;
+import www.raven.jc.dto.UserAuthDTO;
 import www.raven.jc.dto.UserInfoDTO;
+import www.raven.jc.dto.UserRegisterDTO;
+import www.raven.jc.entity.po.Role;
 import www.raven.jc.entity.po.User;
+import www.raven.jc.entity.po.UserRole;
 import www.raven.jc.entity.vo.AllInfoVO;
 import www.raven.jc.entity.vo.InfoVO;
 import www.raven.jc.entity.vo.RealAllInfoVO;
-import www.raven.jc.service.InfoService;
+import www.raven.jc.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,16 +40,21 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
-public class InfoServiceImpl implements InfoService {
+public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private RolesMapper rolesMapper;
+    @Autowired
+    private UserRoleMapper userRoleMapper;
+    @Autowired
+    private RolesDAO rolesDAO;
+    @Autowired
+    private UserRoleDAO userRoleDAO;
     @Autowired
     private IpfsClient ipfsClient;
     @Autowired
     private HttpServletRequest request;
-
-    @Value("${Raven.key}")
-    private String key;
 
 
     @Override
@@ -102,6 +116,44 @@ public class InfoServiceImpl implements InfoService {
                 }
         ).collect(Collectors.toList());
         return new RealAllInfoVO().setTotal(Math.toIntExact(total)).setUsers(collect);
+    }
+
+    @Override
+    public UserAuthDTO querySingleInfoByName(String username) {
+        User user = userMapper.selectOne(new QueryWrapper<User>().eq("username", username));
+        Assert.notNull(user, "用户不存在");
+        return new UserAuthDTO().setPassword(user.getPassword()).setUserId(user.getId()).setUsername(user.getUsername());
+    }
+
+    @Override
+    public List<RoleDTO> queryRolesById(Integer userId) {
+        List<UserRole> roleIds = userRoleMapper.selectList(new QueryWrapper<UserRole>().eq("user_id", userId));
+        Assert.notEmpty(roleIds, "用户没有角色");
+        List<Role> roles = rolesMapper.selectBatchIds(roleIds.stream().map(UserRole::getRoleId).collect(Collectors.toList()));
+        return roles.stream().map(
+                role -> {
+                    RoleDTO roleDTO = new RoleDTO();
+                    roleDTO.setValue(role.getValue());
+                    return roleDTO;
+                }
+        ).collect(Collectors.toList());
+    }
+    @Override
+    public UserAuthDTO insert(UserRegisterDTO user) {
+        User realUser = new User().
+                setUsername(user.getUsername()).
+                setPassword(user.getPassword())
+                .setEmail(user.getEmail());
+        Assert.isTrue(userMapper.insert(realUser) > 0);
+        List<Role> roles = rolesMapper.selectBatchIds(user.getRoleIds());
+        List<UserRole> userRoles = new ArrayList<>();
+        for (Role role: roles) {
+            userRoles.add(new UserRole().setUserId(realUser.getId()).setRoleId(role.getRoleId()));
+            role.setUserCount(role.getUserCount() + 1);
+        }
+        Assert.isTrue(rolesDAO.saveOrUpdateBatch(roles));
+        Assert.isTrue(userRoleDAO.saveBatch(userRoles));
+        return new UserAuthDTO().setUserId(realUser.getId()).setUsername(realUser.getUsername()).setPassword(realUser.getPassword());
     }
 
     @Transactional(rollbackFor = IllegalArgumentException.class)

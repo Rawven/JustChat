@@ -1,7 +1,10 @@
 package www.raven.jc.service;
 
 import org.springframework.web.multipart.MultipartFile;
+import www.raven.jc.dto.RoleDTO;
+import www.raven.jc.dto.UserAuthDTO;
 import www.raven.jc.dto.UserInfoDTO;
+import www.raven.jc.dto.UserRegisterDTO;
 import www.raven.jc.entity.vo.AllInfoVO;
 import www.raven.jc.entity.vo.InfoVO;
 import www.raven.jc.entity.vo.RealAllInfoVO;
@@ -14,7 +17,7 @@ import java.util.List;
  * @author 刘家辉
  * @date 2023/11/23
  */
-public interface InfoService {
+public interface UserService {
     /**
      * profile upload
      *
@@ -75,4 +78,28 @@ public interface InfoService {
      * @return {@link List}<{@link AllInfoVO}>
      */
     RealAllInfoVO queryPageUser(Integer page);
+
+    /**
+     * query single info by name
+     *
+     * @param username username
+     * @return {@link UserAuthDTO}
+     */
+    UserAuthDTO querySingleInfoByName(String username);
+
+    /**
+     * query roles by id
+     *
+     * @param userId user id
+     * @return {@link List}<{@link RoleDTO}>
+     */
+    List<RoleDTO> queryRolesById(Integer userId);
+
+    /**
+     * insert
+     *
+     * @param user user
+     * @return {@link UserAuthDTO}
+     */
+    UserAuthDTO insert(UserRegisterDTO user);
 }

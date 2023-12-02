@@ -8,7 +8,7 @@ import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.vo.InfoVO;
 import www.raven.jc.result.CommonResult;
-import www.raven.jc.service.InfoService;
+import www.raven.jc.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -25,46 +25,46 @@ import java.util.List;
 @Slf4j
 public class InfoController {
     @Autowired
-    private InfoService infoService;
+    private UserService userService;
     @Autowired
     private HttpServletRequest request;
 
     @PostMapping("/setProfile")
     public CommonResult<Void> setProfile(@RequestParam("file") MultipartFile profile) {
-        infoService.setProfile(profile);
+        userService.setProfile(profile);
         return CommonResult.operateSuccess("设置头像成功");
     }
 
     @PostMapping("/setSignature")
     public CommonResult<Void> setSignature(@RequestParam("signature") String signature) {
-        infoService.setSignature(signature);
+        userService.setSignature(signature);
         return CommonResult.operateSuccess("设置签名成功");
     }
 
     @PostMapping("/setUsername")
     public CommonResult<Void> setUsername(@RequestParam("username") String username) {
-        infoService.setUsername(username);
+        userService.setUsername(username);
         return CommonResult.operateSuccess("重命名成功");
     }
 
     @PostMapping("/defaultInfo")
     public CommonResult<InfoVO> defaultInfo() {
         String userId = request.getHeader("userId");
-        return CommonResult.operateSuccess("查找成功", infoService.defaultInfo(Integer.parseInt(userId)));
+        return CommonResult.operateSuccess("查找成功", userService.defaultInfo(Integer.parseInt(userId)));
     }
 
     @PostMapping("/getSingleInfo")
     public CommonResult<UserInfoDTO> getSingleInfo(@RequestBody Integer userId) {
-        return CommonResult.operateSuccess("查找成功", infoService.querySingleInfo(userId));
+        return CommonResult.operateSuccess("查找成功", userService.querySingleInfo(userId));
     }
 
     @PostMapping("/getAllInfo")
     public CommonResult<List<UserInfoDTO>> getAllInfo() {
-        return CommonResult.operateSuccess("查找成功", infoService.queryAllInfo());
+        return CommonResult.operateSuccess("查找成功", userService.queryAllInfo());
     }
 
     @PostMapping("/getRelatedInfoList")
     public CommonResult<List<UserInfoDTO>> getRelatedInfoList(@RequestBody QueryUserInfoDTO userInfoDTO) {
-        return CommonResult.operateSuccess("查找成功", infoService.queryLikedInfoList(userInfoDTO.getColumn(), userInfoDTO.getText()));
+        return CommonResult.operateSuccess("查找成功", userService.queryLikedInfoList(userInfoDTO.getColumn(), userInfoDTO.getText()));
     }
 }

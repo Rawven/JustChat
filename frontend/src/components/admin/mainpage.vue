@@ -81,7 +81,7 @@ export default {
   },
   created() {
  this.getUsers(this.currentPage)
-  },
+ 1 1 1 1 1 1 1 1 1 1 1                           },
   methods: {
     goToRoomPage() {
       this.$router.push('/admin/roomPage');

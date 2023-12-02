@@ -15,7 +15,6 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableAspectJAutoProxy
-@MapperScan("www.raven.jc.dao")
 public class AuthApplication {
     public static void main(String[] args) {
         SpringApplication.run(AuthApplication.class, args);
