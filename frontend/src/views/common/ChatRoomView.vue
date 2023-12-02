@@ -11,8 +11,8 @@ export default {
   components: {
     Chat
   },
-  data(){
-    return{
+  data() {
+    return {
       roomId: this.$route.params.roomId
     }
   }

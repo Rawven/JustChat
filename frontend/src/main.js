@@ -10,7 +10,7 @@ import VueParticles from 'vue-particles'
 
 const app = createApp(App)
 app.use(VueParticles)
-export const Host="10.44.59.225"
+export const Host = "10.44.59.225"
 app.use(createPinia())
 app.use(router)
 app.use(ElementPlus)

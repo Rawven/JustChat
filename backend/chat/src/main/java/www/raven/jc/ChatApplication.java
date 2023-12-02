@@ -16,7 +16,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableAspectJAutoProxy
-@MapperScan("www.raven.jc.dao")
+@MapperScan("www.raven.jc.dao.mapper")
 @EnableFeignClients(basePackages = {"www.raven.jc.feign"})
 public class ChatApplication {
     public static void main(String[] args) {

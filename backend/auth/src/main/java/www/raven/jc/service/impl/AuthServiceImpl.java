@@ -69,7 +69,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private String register(RegisterModel registerModel, List<Integer> roleIds) {
-        Assert.isNull(userFeign.getUserToAuth(registerModel.getUsername()).getData());
+        Assert.isFalse(userFeign.checkUserExit(registerModel.getUsername()).getData());
         UserRegisterDTO user = new UserRegisterDTO();
         user.setEmail(registerModel.getEmail()).setPassword(passwordEncoder.encode(registerModel.getPassword()))
                         .setUsername(registerModel.getUsername()).setRoleIds(roleIds);

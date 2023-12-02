@@ -1,16 +1,16 @@
 <template>
   <el-container class="container">
     <el-aside>
-      <el-calendar class="calendar" v-model="value"/>
+      <el-calendar v-model="value" class="calendar"/>
     </el-aside>
     <el-main class="tMain">
       <el-row>
         <el-col :span="12">
           <el-card class="box-card">
             <el-image
+                class="image"
                 fit="contain"
                 src="https://avatars.githubusercontent.com/u/121878866?s=400&u=44ed833ce20456153341fb5fa7620190c9aaabdd&v=4"
-                class="image"
                 style="width: 200px; height: 200px"
             ></el-image>
             <el-form ref="loginForm" :model="user" :rules="rules" class="login-form" label-width="80px">
@@ -21,9 +21,9 @@
                 <el-input v-model="user.password" prefix-icon="el-icon-lock" type="password"></el-input>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" round @click="login" class="button2">登录</el-button>
+                <el-button class="button2" round type="primary" @click="login">登录</el-button>
               </el-form-item>
-              <el-button type="text" @click="toRegister" class="button">还没有账号？</el-button>
+              <el-button class="button" type="text" @click="toRegister">还没有账号？</el-button>
             </el-form>
           </el-card>
         </el-col>
@@ -36,8 +36,8 @@
             />
           </el-row>
           <el-row>
-            <el-text type="warning" v-if="value2">今日你若冷眼旁待</el-text>
-            <el-text type="warning" v-else>他人祸临己身 无人为你摇旗呐喊</el-text>
+            <el-text v-if="value2" type="warning">今日你若冷眼旁待</el-text>
+            <el-text v-else type="warning">他人祸临己身 无人为你摇旗呐喊</el-text>
           </el-row>
         </el-col>
       </el-row>
@@ -86,7 +86,7 @@ export default {
           this.realAxios.post('http://' + Host + ':7000/auth/login', this.user)
               .then(response => {
                 localStorage.setItem("token", response.data.data);
-                this.realAxios.post('http://' + Host + ':7000/info/defaultInfo', {}, {
+                this.realAxios.post('http://' + Host + ':7000/user/common/defaultInfo', {}, {
                   headers: {
                     'token': localStorage.getItem("token")
                   }

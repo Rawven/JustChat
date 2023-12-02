@@ -7,14 +7,16 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="userInfo" />
         <module name="common" />
         <module name="auth" />
         <module name="chat" />
         <module name="admin" />
-        <module name="common-User" />
+        <module name="user" />
         <module name="gateway" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="common-User" target="11" />
+    </bytecodeTargetLevel>
   </component>
 </project>

@@ -121,7 +121,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserAuthDTO querySingleInfoByName(String username) {
         User user = userMapper.selectOne(new QueryWrapper<User>().eq("username", username));
-        Assert.notNull(user, "用户不存在");
         return new UserAuthDTO().setPassword(user.getPassword()).setUserId(user.getId()).setUsername(user.getUsername());
     }
 
@@ -139,6 +138,7 @@ public class UserServiceImpl implements UserService {
         ).collect(Collectors.toList());
     }
     @Override
+    @Transactional(rollbackFor = IllegalArgumentException.class)
     public UserAuthDTO insert(UserRegisterDTO user) {
         User realUser = new User().
                 setUsername(user.getUsername()).
@@ -154,6 +154,12 @@ public class UserServiceImpl implements UserService {
         Assert.isTrue(rolesDAO.saveOrUpdateBatch(roles));
         Assert.isTrue(userRoleDAO.saveBatch(userRoles));
         return new UserAuthDTO().setUserId(realUser.getId()).setUsername(realUser.getUsername()).setPassword(realUser.getPassword());
+    }
+
+    @Override
+    public Boolean checkUserExit(String username) {
+        User user = userMapper.selectOne(new QueryWrapper<User>().eq("username", username));
+        return user != null;
     }
 
     @Transactional(rollbackFor = IllegalArgumentException.class)

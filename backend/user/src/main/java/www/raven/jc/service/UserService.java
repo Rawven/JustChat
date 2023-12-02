@@ -102,4 +102,12 @@ public interface UserService {
      * @return {@link UserAuthDTO}
      */
     UserAuthDTO insert(UserRegisterDTO user);
+
+    /**
+     * check user exit
+     *
+     * @param username username
+     * @return {@link Boolean}
+     */
+    Boolean checkUserExit(String username);
 }

@@ -55,7 +55,7 @@ const router = createRouter({
         },
         {
             path: '/admin',
-            children:[
+            children: [
                 {
                     path: 'login',
                     name: 'AdminLoginView',

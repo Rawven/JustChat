@@ -41,19 +41,19 @@ export default {
         let formData = new FormData();
         formData.append('file', this.selectedFile);
         let item = localStorage.getItem("token");
-        this.realAxios.post('http://' + Host + ':7000/info/setProfile', formData,
+        this.realAxios.post('http://' + Host + ':7000/user/common/setProfile', formData,
             {
               headers: {
                 'token': item
               }
             })
             .then(() => {
-              this.realAxios.post('http://' + Host + ':7000/info/user/defaultInfo', {}, {
+              this.realAxios.post('http://' + Host + ':7000/user/common/defaultInfo', {}, {
                 headers: {
                   'token': localStorage.getItem("token")
                 }
               }).then(response => {
-                 localStorage.setItem("userData", JSON.stringify(response.data.data));
+                localStorage.setItem("userData", JSON.stringify(response.data.data));
               })
               this.$router.push('/common/mainPage');
               // Additional logic after successful avatar upload

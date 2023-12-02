@@ -50,7 +50,7 @@ export default {
       let formData = new FormData();
       formData.append('username', this.form.username);
       let item = localStorage.getItem("token");
-      this.realAxios.post('http://' + Host + ':7000/info/user/setUsername', formData,
+      this.realAxios.post('http://' + Host + ':7000/user/common/setUsername', formData,
           {
             headers: {
               'token': item
@@ -65,7 +65,7 @@ export default {
       let formData = new FormData();
       formData.append('signature', this.form.signature);
       let item = localStorage.getItem("token");
-      this.realAxios.post('http://' + Host + ':7000/info/user/setSignature', formData,
+      this.realAxios.post('http://' + Host + ':7000/user/common/setSignature', formData,
           {
             headers: {
               'token': item
@@ -82,7 +82,7 @@ export default {
         formData.append('file', this.selectedFile);
       }
       let item = localStorage.getItem("token");
-      this.realAxios.post('http://' + Host + ':7000/info/user/setProfile', formData,
+      this.realAxios.post('http://' + Host + ':7000/user/common/setProfile', formData,
           {
             headers: {
               'token': item
@@ -93,8 +93,8 @@ export default {
             this.getLatestInfo();
           })
     },
-    getLatestInfo(){
-      this.realAxios.post('http://' + Host + ':7000/info/user/defaultInfo', {}, {
+    getLatestInfo() {
+      this.realAxios.post('http://' + Host + ':7000/user/common/defaultInfo', {}, {
         headers: {
           'token': localStorage.getItem("token")
         }

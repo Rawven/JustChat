@@ -6,9 +6,9 @@
     </el-header>
     <el-main class="thisContainer">
       <div>
-      <keep-alive>
-        <router-view/>
-      </keep-alive>
+        <keep-alive>
+          <router-view/>
+        </keep-alive>
       </div>
     </el-main>
   </el-container>
@@ -37,7 +37,7 @@ axiosFilter.interceptors.response.use(function (response) {
     ElMessage.error(response.data.message);
     return Promise.reject(new Error(response.data.message));
   }
-  if(response.headers.get("new-Token")!=null){
+  if (response.headers.get("new-Token") != null) {
     console.log("令牌过期，自动刷新");
     let new1 = response.headers.get("new-Token");
     localStorage.setItem("token", String(new1));
@@ -54,7 +54,7 @@ provide('axiosFilter', axiosFilter);
 </script>
 
 <style scoped>
-.thisContainer{
+.thisContainer {
   height: 100%;
   width: 100%;
   background-color: #f2f2f2;

@@ -8,7 +8,7 @@
           <h2 class="signature">个性签名: {{
               userInfo.signature ? userInfo.signature : '这个用户很懒 什么也没留下'
             }}</h2>
-          <router-link to="/common/updateInfo" class="linkText">更改个人信息</router-link>
+          <router-link class="linkText" to="/common/updateInfo">更改个人信息</router-link>
         </el-card>
       </el-col>
       <el-col :span="16">
@@ -17,11 +17,12 @@
             <button class="button" @click="navigate">建立个新的聊天室</button>
           </template>
         </router-link>
-        <el-input class="inputHolder" placeholder="请输入内容来查找房间" v-model="searchInput" @keyup.enter="submitSearch(1)"></el-input>
-          <el-radio-group class="radio" v-model="radio" >
-            <el-radio :label="0" border>根据用户名</el-radio>
-            <el-radio :label="1" border>根据房间名</el-radio>
-          </el-radio-group>
+        <el-input v-model="searchInput" class="inputHolder" placeholder="请输入内容来查找房间"
+                  @keyup.enter="submitSearch(1)"></el-input>
+        <el-radio-group v-model="radio" class="radio">
+          <el-radio :label="0" border>根据用户名</el-radio>
+          <el-radio :label="1" border>根据房间名</el-radio>
+        </el-radio-group>
         <el-main class="cardContainer">
           <el-table :data="rooms" style="width: 100%">
             <el-table-column label="房间名" width="180">
@@ -36,12 +37,12 @@
             </el-table-column>
             <el-table-column label="最大人数" width="180">
               <template #default="scope">
-                <el-tag size="default" class="room-max-people">{{ scope.row.maxPeople }}</el-tag>
+                <el-tag class="room-max-people" size="default">{{ scope.row.maxPeople }}</el-tag>
               </template>
             </el-table-column>
             <el-table-column label="创建者" width="180">
               <template #default="scope">
-                <el-tag size="default" class="room-founder">{{ scope.row.founderName }}</el-tag>
+                <el-tag class="room-founder" size="default">{{ scope.row.founderName }}</el-tag>
               </template>
             </el-table-column>
             <el-table-column label="操作" width="180">
@@ -50,12 +51,12 @@
               </template>
             </el-table-column>
           </el-table>
-          <el-pagination class="pagination-container"
-                         background
-                         layout="prev, pager, next"
-                         :total="totalRooms"
-                         v-model:current-page="currentPage"
+          <el-pagination v-model:current-page="currentPage"
                          :page-size="pageSize"
+                         :total="totalRooms"
+                         background
+                         class="pagination-container"
+                         layout="prev, pager, next"
                          @current-change="handlePageChange"
           />
         </el-main>
@@ -67,6 +68,7 @@
 <script>
 import {Host} from "@/main";
 import {ref} from "vue";
+
 export default {
 
   name: 'MainPage',
@@ -111,7 +113,7 @@ export default {
     },
     submitSearch(value) {
       // 在这里发送请求到后端
-      this.realAxios.get(`http://` + Host + `:7000/chat/queryRelatedRoomList/${this.searchInput}/${this.radio}/${value}`, {
+      this.realAxios.get(`http://` + Host + `:7000/chat/common/queryRelatedRoomList/${this.searchInput}/${this.radio}/${value}`, {
         headers: {
           'token': localStorage.getItem("token")
         }
@@ -124,7 +126,7 @@ export default {
       this.$router.push({path: `/common/chatRoom/` + Number(roomId)});
     },
     getRooms(page) {
-      this.realAxios.get(`http://` + Host + `:7000/chat/user/queryRoomList/${page}/${5}`, {
+      this.realAxios.get(`http://` + Host + `:7000/chat/common/queryRoomList/${page}/${5}`, {
         headers: {
           'token': localStorage.getItem("token")
         }
@@ -144,11 +146,11 @@ export default {
 </script>
 
 <style scoped>
-.radio{
+.radio {
   margin: 20px;
 }
 
-.inputHolder{
+.inputHolder {
   width: 400px;
 }
 

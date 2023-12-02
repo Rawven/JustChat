@@ -89,6 +89,7 @@ export default {
     opacity: 1;
   }
 }
+
 .box-card {
   position: absolute; /* 设置定位类型为绝对定位 */
   top: 175px; /* 设置距离顶部的距离 */

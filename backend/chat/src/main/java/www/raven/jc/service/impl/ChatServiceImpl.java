@@ -11,7 +11,7 @@ import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.entity.po.Message;
 import www.raven.jc.entity.vo.MessageVO;
-import www.raven.jc.feign.UserInfoFeign;
+import www.raven.jc.feign.UserFeign;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.ChatService;
 
@@ -33,7 +33,7 @@ public class ChatServiceImpl implements ChatService {
     @Autowired
     private MessageMapper mapper;
     @Autowired
-    private UserInfoFeign accountFeign;
+    private UserFeign userFeign;
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void saveMsg(UserInfoDTO data, MessageDTO message, String roomId) {
@@ -51,7 +51,7 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public List<MessageVO> restoreHistory(Integer roomId) {
         List<Message> messages = mapper.selectList(new QueryWrapper<Message>().eq("room_id", roomId).orderByAsc("timestamp"));
-        CommonResult<List<UserInfoDTO>> allInfo = accountFeign.getAllInfo();
+        CommonResult<List<UserInfoDTO>> allInfo = userFeign.getAllInfo();
         List<UserInfoDTO> data = allInfo.getData();
         Map<Integer, UserInfoDTO> userInfoMap = data.stream()
                 .collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));

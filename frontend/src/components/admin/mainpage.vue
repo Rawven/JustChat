@@ -14,15 +14,16 @@
         <el-main class="main">
           <el-card class="main-card">
             <el-table :data="users" style="width: 100%">
-              <el-table-column prop="userId" label="用户id"></el-table-column>
-              <el-table-column prop="profile" label="头像" class="profile">
+              <el-table-column label="用户id" prop="userId"></el-table-column>
+              <el-table-column class="profile" label="头像" prop="profile">
                 <template v-slot="scope">
-                  <img :src="'http://10.44.59.225:8083/ipfs/'+scope.row.profile" alt="User Avatar" class="small-round-avatar">
+                  <img :src="'http://10.44.59.225:8083/ipfs/'+scope.row.profile" alt="User Avatar"
+                       class="small-round-avatar">
                 </template>
               </el-table-column>
-              <el-table-column prop="username" label="姓名"></el-table-column>
-              <el-table-column prop="email" label="Email"></el-table-column>
-              <el-table-column prop="signature" label="个性签名"></el-table-column>
+              <el-table-column label="姓名" prop="username"></el-table-column>
+              <el-table-column label="Email" prop="email"></el-table-column>
+              <el-table-column label="个性签名" prop="signature"></el-table-column>
               <el-table-column
                   fixed="right"
                   label="操作"
@@ -30,21 +31,21 @@
                 <template v-slot="scope">
                   <el-row>
                     <el-col :span="12">
-                      <el-button type="primary" round @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                      <el-button round type="primary" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
                     </el-col>
                     <el-col :span="12">
-                      <el-button type="info" round @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                      <el-button round type="info" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                     </el-col>
                   </el-row>
                 </template>
               </el-table-column>
             </el-table>
-            <el-pagination class="pagination-container"
-                           background
-                           layout="prev, pager, next"
-                           :total="totalRooms"
-                           v-model:current-page="currentPage"
+            <el-pagination v-model:current-page="currentPage"
                            :page-size="pageSize"
+                           :total="totalRooms"
+                           background
+                           class="pagination-container"
+                           layout="prev, pager, next"
                            @current-change="handlePageChange"
             />
           </el-card>
@@ -80,14 +81,14 @@ export default {
     }
   },
   created() {
- this.getUsers(this.currentPage)
- 1 1 1 1 1 1 1 1 1 1 1                           },
+    this.getUsers(this.currentPage)
+  },
   methods: {
     goToRoomPage() {
       this.$router.push('/admin/roomPage');
     },
     getUsers(page) {
-      this.realAxios.get(`http://` + Host + `:7000/info/admin/queryAllUser/${page}`, {
+      this.realAxios.get(`http://` + Host + `:7000/user/admin/queryAllUser/${page}`, {
         headers: {
           'token': localStorage.getItem("token")
         }
@@ -151,6 +152,7 @@ html, body {
 .main {
   /* 在这里添加你想要的独特布局样式 */
 }
+
 .small-round-avatar {
   width: 50px; /* 设置图片宽度 */
   height: 50px; /* 设置图片高度 */

@@ -21,13 +21,25 @@ import java.util.List;
  */
 @RestController
 @ResponseBody
-@RequestMapping("/user")
+@RequestMapping("/common")
 @Slf4j
-public class InfoController {
+public class CommonController {
     @Autowired
     private UserService userService;
     @Autowired
     private HttpServletRequest request;
+
+
+    /**
+     * check user exit
+     *
+     * @param username username
+     * @return {@link CommonResult}<{@link Boolean}>
+     */
+    @PostMapping("/checkUserExit")
+    CommonResult<Boolean> checkUserExit(@RequestBody String username){
+        return CommonResult.operateSuccess("查找成功",userService.checkUserExit(username));
+    }
 
     @PostMapping("/setProfile")
     public CommonResult<Void> setProfile(@RequestParam("file") MultipartFile profile) {

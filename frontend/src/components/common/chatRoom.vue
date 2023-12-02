@@ -36,7 +36,7 @@ export default {
       from: 'axiosFilter'
     }
   },
-  props:{
+  props: {
     roomId: String
   },
   data() {
@@ -52,7 +52,7 @@ export default {
     this.socket = new WebSocket(`ws://` + Host + `:8081/websocket/${token}/${this.roomId}`);
 
     this.socket.onopen = () => {
-      this.realAxios.post(`http://` + Host + `:7000/chat/restoreHistory/${this.roomId}`, {}, {
+      this.realAxios.post(`http://` + Host + `:7000/chat/common/restoreHistory/${this.roomId}`, {}, {
         headers: {
           'token': token
         }

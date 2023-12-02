@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
-import www.raven.jc.feign.UserInfoFeign;
+import www.raven.jc.feign.UserFeign;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.JwtUtil;
@@ -33,7 +33,7 @@ public class WebSocketService {
      * 用来存在线连接数
      */
     private static final Map<String, Session> SESSION_POOL = new HashMap<>();
-    private static UserInfoFeign accountFeign;
+    private static UserFeign userFeign;
     private static ChatService chatService;
     /**
      * concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
@@ -51,8 +51,8 @@ public class WebSocketService {
     private Session session;
 
     @Autowired
-    public void setAccountFeign(UserInfoFeign accountFeign) {
-        WebSocketService.accountFeign = accountFeign;
+    public void setAccountFeign(UserFeign accountFeign) {
+        WebSocketService.userFeign = accountFeign;
     }
 
     @Autowired
@@ -95,8 +95,8 @@ public class WebSocketService {
         log.info("【websocket消息】收到客户端发来的消息:" + message);
         MessageDTO messageDTO = JsonUtil.jsonToObj(message, MessageDTO.class);
         TokenDTO tokenDTO = (TokenDTO) (session.getUserProperties().get("userId"));
-        Assert.notNull(accountFeign, "account服务端异常 is null");
-        UserInfoDTO data = accountFeign.getSingleInfo(tokenDTO.getUserId()).getData();
+        Assert.notNull(userFeign, "account服务端异常 is null");
+        UserInfoDTO data = userFeign.getSingleInfo(tokenDTO.getUserId()).getData();
         Assert.notNull(chatService, "chatService is null");
         chatService.saveMsg(data, messageDTO, this.roomId);
         Map<Object, Object> map = new HashMap<>(2);

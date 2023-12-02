@@ -13,7 +13,7 @@ import www.raven.jc.entity.model.RoomModel;
 import www.raven.jc.entity.po.ChatRoom;
 import www.raven.jc.entity.vo.RealRoomVO;
 import www.raven.jc.entity.vo.RoomVO;
-import www.raven.jc.feign.UserInfoFeign;
+import www.raven.jc.feign.UserFeign;
 import www.raven.jc.service.RoomService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,7 +35,7 @@ public class RoomServiceImpl implements RoomService {
     @Autowired
     private HttpServletRequest request;
     @Autowired
-    private UserInfoFeign accountFeign;
+    private UserFeign userFeign;
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void createRoom(RoomModel roomModel) {
@@ -50,7 +50,7 @@ public class RoomServiceImpl implements RoomService {
     public RealRoomVO queryAllRoomPage(Integer page, Integer size) {
         Long total = roomMapper.selectCount(null);
         Page<ChatRoom> chatRoomPage = roomMapper.selectPage(new Page<>(page, size), null);
-        List<RoomVO> rooms = buildRoomVO(chatRoomPage, accountFeign.getAllInfo().getData());
+        List<RoomVO> rooms = buildRoomVO(chatRoomPage, userFeign.getAllInfo().getData());
         return new RealRoomVO().setRooms(rooms).setTotal(Math.toIntExact(total));
     }
 
@@ -58,14 +58,14 @@ public class RoomServiceImpl implements RoomService {
     public RealRoomVO queryLikedRoomList(String column, String text, int page) {
         Long total = roomMapper.selectCount(null);
         Page<ChatRoom> chatRoomPage = roomMapper.selectPage(new Page<>(page, 5), new QueryWrapper<ChatRoom>().like(column, text));
-        List<RoomVO> rooms = buildRoomVO(chatRoomPage, accountFeign.getAllInfo().getData());
+        List<RoomVO> rooms = buildRoomVO(chatRoomPage, userFeign.getAllInfo().getData());
         return new RealRoomVO().setRooms(rooms).setTotal(Math.toIntExact(total));
     }
 
     @Override
     public RealRoomVO queryUserNameRoomList(String column, String text, int page) {
         Long total = roomMapper.selectCount(null);
-        List<UserInfoDTO> queryList = accountFeign.getRelatedInfoList(new QueryUserInfoDTO().setColumn(column).setText(text)).getData();
+        List<UserInfoDTO> queryList = userFeign.getRelatedInfoList(new QueryUserInfoDTO().setColumn(column).setText(text)).getData();
         List<Integer> userIds = queryList.stream().map(UserInfoDTO::getUserId).collect(Collectors.toList());
         Page<ChatRoom> chatRoomPage = roomMapper.selectPage(new Page<>(page, 5), new QueryWrapper<ChatRoom>().in("founder_id", userIds));
         List<RoomVO> rooms = buildRoomVO(chatRoomPage, queryList);

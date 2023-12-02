@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import www.raven.jc.dto.*;
 import www.raven.jc.result.CommonResult;
 
+import java.awt.datatransfer.Clipboard;
 import java.util.List;
 
 /**
@@ -22,7 +23,7 @@ public interface UserFeign {
      * @param userId user id
      * @return {@link CommonResult}<{@link UserInfoDTO}>
      */
-    @PostMapping("/user/getSingleInfo")
+    @PostMapping("/common/getSingleInfo")
     CommonResult<UserInfoDTO> getSingleInfo(Integer userId);
 
     /**
@@ -30,7 +31,7 @@ public interface UserFeign {
      *
      * @return {@link CommonResult}<{@link List}<{@link UserInfoDTO}>>
      */
-    @PostMapping("/user/getAllInfo")
+    @PostMapping("/common/getAllInfo")
     CommonResult<List<UserInfoDTO>> getAllInfo();
 
 
@@ -40,33 +41,42 @@ public interface UserFeign {
      * @param userInfoDTO user info dto
      * @return {@link CommonResult}<{@link List}<{@link UserInfoDTO}>>
      */
-    @PostMapping("/user/getRelatedInfoList")
+    @PostMapping("/common/getRelatedInfoList")
     CommonResult<List<UserInfoDTO>> getRelatedInfoList(@RequestBody QueryUserInfoDTO userInfoDTO);
 
     /**
-     * get single info by name
+     * insert
+     *
+     * @param user user
+     * @return {@link CommonResult}<{@link UserAuthDTO}>
+     */
+    @PostMapping("/admin/insert")
+    CommonResult<UserAuthDTO> insert(@RequestBody UserRegisterDTO user);
+
+    /**
+     * get user to auth
      *
      * @param username username
-     * @return {@link CommonResult}<{@link UserInfoDTO}>
+     * @return {@link CommonResult}<{@link UserAuthDTO}>
      */
-    @PostMapping("/auth/getSingleInfoByName")
+    @PostMapping("/admin/getUserToAuth")
     CommonResult<UserAuthDTO> getUserToAuth(String username);
-    //TODO 加路径
+
     /**
      * get roles by id
      *
      * @param userId user id
      * @return {@link CommonResult}<{@link List}<{@link RoleDTO}>>
      */
-    @PostMapping("/auth/getRolesById")
+    @PostMapping("/admin/getRolesById")
     CommonResult<List<RoleDTO>> getRolesById(Integer userId);
 
     /**
-     * insert
+     * check user exit
      *
-     * @param user user
+     * @param username username
      * @return {@link CommonResult}<{@link Boolean}>
      */
-    @PostMapping("/auth/insert")
-    CommonResult<UserAuthDTO> insert(UserRegisterDTO user);
+    @PostMapping("/common/checkUserExit")
+    CommonResult<Boolean> checkUserExit(String username);
 }

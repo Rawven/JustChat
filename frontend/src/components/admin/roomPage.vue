@@ -14,11 +14,11 @@
         <el-main class="main">
           <el-card class="main-card">
             <el-table :data="tableData" style="width: 100%">
-              <el-table-column prop="roomId" label="Room ID"></el-table-column>
-              <el-table-column prop="roomName" label="Room Name"></el-table-column>
-              <el-table-column prop="founderName" label="创建者"></el-table-column>
-              <el-table-column prop="maxPeople" label="最大人数"></el-table-column>
-              <el-table-column prop="roomDescription" label="描述"></el-table-column>
+              <el-table-column label="Room ID" prop="roomId"></el-table-column>
+              <el-table-column label="Room Name" prop="roomName"></el-table-column>
+              <el-table-column label="创建者" prop="founderName"></el-table-column>
+              <el-table-column label="最大人数" prop="maxPeople"></el-table-column>
+              <el-table-column label="描述" prop="roomDescription"></el-table-column>
               <el-table-column
                   fixed="right"
                   label="操作"
@@ -26,21 +26,21 @@
                 <template v-slot="scope">
                   <el-row>
                     <el-col :span="12">
-                      <el-button type="primary" round @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                      <el-button round type="primary" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
                     </el-col>
                     <el-col :span="12">
-                      <el-button type="info" round @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                      <el-button round type="info" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                     </el-col>
                   </el-row>
                 </template>
               </el-table-column>
             </el-table>
-            <el-pagination class="pagination-container"
-                           background
-                           layout="prev, pager, next"
-                           :total="totalRooms"
-                           v-model:current-page="currentPage"
+            <el-pagination v-model:current-page="currentPage"
                            :page-size="pageSize"
+                           :total="totalRooms"
+                           background
+                           class="pagination-container"
+                           layout="prev, pager, next"
                            @current-change="handlePageChange"
             />
           </el-card>
@@ -54,7 +54,7 @@
 import {Host} from "@/main";
 
 export default {
-  name:'admin_roomPage',
+  name: 'admin_roomPage',
   inject: {
     realAxios: {
       from: 'axiosFilter'
@@ -83,7 +83,7 @@ export default {
       this.$router.push('/admin/mainPage');
     },
     getRooms(page) {
-      this.realAxios.get(`http://` + Host + `:7000/chat/user/queryRoomList/${page}/${8}`, {
+      this.realAxios.get(`http://` + Host + `:7000/chat/common/queryRoomList/${page}/${8}`, {
         headers: {
           'token': localStorage.getItem("token")
         }
@@ -109,7 +109,7 @@ export default {
 </script>
 
 <style scoped>
-.now{
+.now {
   font-size: 24px;
   color: #409EFF;
   font-weight: bold;
@@ -126,6 +126,7 @@ export default {
     opacity: 1;
   }
 }
+
 .aside {
   margin: 0;
   background-color: #13ce66;
@@ -148,17 +149,16 @@ export default {
   height: 1000px;
   background-color: #2c3e50;
 }
+
 .main-card {
   margin: 0;
   width: 100%;
   height: 100%;
 }
+
 .mainC, .aside, .main {
   height: 100%;
 }
-
-
-
 
 
 </style>
