@@ -1,13 +1,16 @@
 package www.raven.jc.dao;
 
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.stereotype.Service;
+import www.raven.jc.dao.mapper.MessageMapper;
 import www.raven.jc.entity.po.Message;
 
 /**
- * message dao
+ * message daoimpl
  *
  * @author 刘家辉
  * @date 2023/12/01
  */
-public interface MessageDAO extends IService<Message> {
+@Service
+public class MessageDAO extends ServiceImpl<MessageMapper, Message> {
 }

@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import www.raven.jc.dao.MessageDAO;
 import www.raven.jc.dao.mapper.MessageMapper;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
@@ -31,7 +32,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ChatServiceImpl implements ChatService {
     @Autowired
-    private MessageMapper mapper;
+    private MessageDAO messageDAO;
     @Autowired
     private UserFeign userFeign;
     @Transactional(rollbackFor = IllegalArgumentException.class)
@@ -45,12 +46,12 @@ public class ChatServiceImpl implements ChatService {
                 .setTimestamp(new Date(timeStamp))
                 .setSenderId(data.getUserId())
                 .setRoomId(Integer.parseInt(roomId));
-        Assert.isTrue(mapper.insert(realMsg) > 0, "插入失败");
+        Assert.isTrue(messageDAO.getBaseMapper().insert(realMsg) > 0, "插入失败");
     }
 
     @Override
     public List<MessageVO> restoreHistory(Integer roomId) {
-        List<Message> messages = mapper.selectList(new QueryWrapper<Message>().eq("room_id", roomId).orderByAsc("timestamp"));
+        List<Message> messages = messageDAO.getBaseMapper().selectList(new QueryWrapper<Message>().eq("room_id", roomId).orderByAsc("timestamp"));
         CommonResult<List<UserInfoDTO>> allInfo = userFeign.getAllInfo();
         List<UserInfoDTO> data = allInfo.getData();
         Map<Integer, UserInfoDTO> userInfoMap = data.stream()

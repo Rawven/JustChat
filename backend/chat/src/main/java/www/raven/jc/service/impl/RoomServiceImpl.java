@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import www.raven.jc.dao.RoomDAO;
 import www.raven.jc.dao.mapper.RoomMapper;
 import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
@@ -31,7 +32,7 @@ import java.util.stream.Collectors;
 @Service
 public class RoomServiceImpl implements RoomService {
     @Autowired
-    private RoomMapper roomMapper;
+    private RoomDAO roomDAO;
     @Autowired
     private HttpServletRequest request;
     @Autowired
@@ -43,31 +44,31 @@ public class RoomServiceImpl implements RoomService {
                 .setRoomDescription(roomModel.getDescription())
                 .setMaxPeople(roomModel.getMaxPeople()).
                 setFounderId(Integer.parseInt(request.getHeader("userId")));
-        Assert.isTrue(roomMapper.insert(room) > 0);
+        Assert.isTrue(roomDAO.getBaseMapper().insert(room) > 0);
     }
 
     @Override
     public RealRoomVO queryAllRoomPage(Integer page, Integer size) {
-        Long total = roomMapper.selectCount(null);
-        Page<ChatRoom> chatRoomPage = roomMapper.selectPage(new Page<>(page, size), null);
+        Long total = roomDAO.getBaseMapper().selectCount(null);
+        Page<ChatRoom> chatRoomPage = roomDAO.getBaseMapper().selectPage(new Page<>(page, size), null);
         List<RoomVO> rooms = buildRoomVO(chatRoomPage, userFeign.getAllInfo().getData());
         return new RealRoomVO().setRooms(rooms).setTotal(Math.toIntExact(total));
     }
 
     @Override
     public RealRoomVO queryLikedRoomList(String column, String text, int page) {
-        Long total = roomMapper.selectCount(null);
-        Page<ChatRoom> chatRoomPage = roomMapper.selectPage(new Page<>(page, 5), new QueryWrapper<ChatRoom>().like(column, text));
+        Long total = roomDAO.getBaseMapper().selectCount(null);
+        Page<ChatRoom> chatRoomPage = roomDAO.getBaseMapper().selectPage(new Page<>(page, 5), new QueryWrapper<ChatRoom>().like(column, text));
         List<RoomVO> rooms = buildRoomVO(chatRoomPage, userFeign.getAllInfo().getData());
         return new RealRoomVO().setRooms(rooms).setTotal(Math.toIntExact(total));
     }
 
     @Override
     public RealRoomVO queryUserNameRoomList(String column, String text, int page) {
-        Long total = roomMapper.selectCount(null);
+        Long total = roomDAO.getBaseMapper().selectCount(null);
         List<UserInfoDTO> queryList = userFeign.getRelatedInfoList(new QueryUserInfoDTO().setColumn(column).setText(text)).getData();
         List<Integer> userIds = queryList.stream().map(UserInfoDTO::getUserId).collect(Collectors.toList());
-        Page<ChatRoom> chatRoomPage = roomMapper.selectPage(new Page<>(page, 5), new QueryWrapper<ChatRoom>().in("founder_id", userIds));
+        Page<ChatRoom> chatRoomPage = roomDAO.getBaseMapper().selectPage(new Page<>(page, 5), new QueryWrapper<ChatRoom>().in("founder_id", userIds));
         List<RoomVO> rooms = buildRoomVO(chatRoomPage, queryList);
         return new RealRoomVO().setRooms(rooms).setTotal(Math.toIntExact(total));
     }
