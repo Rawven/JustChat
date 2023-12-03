@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.dao.MessageDAO;
-import www.raven.jc.dao.mapper.MessageMapper;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.entity.po.Message;
@@ -35,6 +34,7 @@ public class ChatServiceImpl implements ChatService {
     private MessageDAO messageDAO;
     @Autowired
     private UserFeign userFeign;
+
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void saveMsg(UserInfoDTO data, MessageDTO message, String roomId) {

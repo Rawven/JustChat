@@ -1,12 +1,9 @@
 package www.raven.jc.dao;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import www.raven.jc.dao.mapper.RolesMapper;
-import www.raven.jc.dao.mapper.UserRoleMapper;
 import www.raven.jc.entity.po.Role;
-import www.raven.jc.entity.po.UserRole;
 
 /**
  * roles dao
@@ -16,5 +13,5 @@ import www.raven.jc.entity.po.UserRole;
  */
 
 @Service
-public class RolesDAO  extends ServiceImpl<RolesMapper, Role> {
+public class RolesDAO extends ServiceImpl<RolesMapper, Role> {
 }

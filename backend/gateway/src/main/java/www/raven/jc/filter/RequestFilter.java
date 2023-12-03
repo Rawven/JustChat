@@ -4,10 +4,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import www.raven.jc.result.CommonResult;
+import www.raven.jc.result.ResultCode;
+import www.raven.jc.util.JsonUtil;
+import www.raven.jc.util.JwtUtil;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 /**
  * request filter
@@ -17,7 +27,7 @@ import reactor.core.publisher.Mono;
  */
 @Slf4j
 @Component
-public class RequestFilter implements GlobalFilter , Ordered {
+public class RequestFilter implements GlobalFilter, Ordered {
     @Override
     public int getOrder() {
         // -2 is response filter, request filter should be called before that
@@ -27,6 +37,20 @@ public class RequestFilter implements GlobalFilter , Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
+        long time = Long.parseLong(Objects.requireNonNull(request.getHeaders().get(JwtUtil.TIME)).get(0));
+        if(time< System.currentTimeMillis()){
+            // 获取响应对象
+            ServerHttpResponse response = exchange.getResponse();
+            // 设置响应的状态码和内容类型
+            response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+            CommonResult<Object> result = CommonResult.operateFailure(ResultCode.TOKEN_EXPIRED_CODE, "Token expired, please reapply for a token");
+            // 返回响应
+            String responseBody =JsonUtil.objToJson(result);
+            // 返回响应
+            return response.writeWith(Mono.just(responseBody).map(str -> response.bufferFactory().wrap(str.getBytes(StandardCharsets.UTF_8))));
+        }
+        log.info("RequestFilter执行");
         log.info("收到一次请求");
         log.info("Request Method: " + request.getMethodValue());
         log.info("Request URI: " + request.getURI());

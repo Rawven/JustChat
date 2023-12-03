@@ -74,6 +74,7 @@ public interface UserService {
 
     /**
      * query page user
+     *
      * @param page page
      * @return {@link List}<{@link AllInfoVO}>
      */

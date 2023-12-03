@@ -38,17 +38,17 @@ public class AdminController {
      * @return {@link CommonResult}<{@link Boolean}>
      */
     @PostMapping("/insert")
-    CommonResult<UserAuthDTO> insert(@RequestBody UserRegisterDTO user){
+    CommonResult<UserAuthDTO> insert(@RequestBody UserRegisterDTO user) {
         return CommonResult.operateSuccess("插入成功", userService.insert(user));
     }
 
     @PostMapping("/getUserToAuth")
-    CommonResult<UserAuthDTO> getUserToAuth(@RequestBody String username){
+    CommonResult<UserAuthDTO> getUserToAuth(@RequestBody String username) {
         return CommonResult.operateSuccess("查找成功", userService.querySingleInfoByName(username));
     }
 
     @PostMapping("/getRolesById")
-    CommonResult<List<RoleDTO>> getRolesById(@RequestBody Integer userId){
+    CommonResult<List<RoleDTO>> getRolesById(@RequestBody Integer userId) {
         return CommonResult.operateSuccess("查找成功", userService.queryRolesById(userId));
     }
 

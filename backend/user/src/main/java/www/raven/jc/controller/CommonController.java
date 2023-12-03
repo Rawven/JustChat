@@ -37,8 +37,8 @@ public class CommonController {
      * @return {@link CommonResult}<{@link Boolean}>
      */
     @PostMapping("/checkUserExit")
-    CommonResult<Boolean> checkUserExit(@RequestBody String username){
-        return CommonResult.operateSuccess("查找成功",userService.checkUserExit(username));
+    CommonResult<Boolean> checkUserExit(@RequestBody String username) {
+        return CommonResult.operateSuccess("查找成功", userService.checkUserExit(username));
     }
 
     @PostMapping("/setProfile")

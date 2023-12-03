@@ -6,7 +6,6 @@ import www.raven.jc.dao.mapper.RoomMapper;
 import www.raven.jc.entity.po.ChatRoom;
 
 /**
- * room daoimpl
  *
  * @author 刘家辉
  * @date 2023/12/01

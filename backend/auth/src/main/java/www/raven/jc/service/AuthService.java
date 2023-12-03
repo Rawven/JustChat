@@ -36,4 +36,11 @@ public interface AuthService {
     String registerAdminRole(RegisterModel registerModel);
 
 
+    /**
+     * refresh token
+     *
+     * @param token token
+     * @return {@link String}
+     */
+    String refreshToken(String token);
 }

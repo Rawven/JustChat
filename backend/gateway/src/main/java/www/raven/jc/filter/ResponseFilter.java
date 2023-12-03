@@ -5,7 +5,6 @@ import com.alibaba.cloud.commons.lang.StringUtils;
 import com.alibaba.nacos.shaded.com.google.common.base.Joiner;
 import com.alibaba.nacos.shaded.com.google.common.base.Throwables;
 import com.alibaba.nacos.shaded.com.google.common.collect.Lists;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import www.raven.jc.result.CommonResult;
 import www.raven.jc.util.JsonUtil;
 
 import java.nio.charset.StandardCharsets;
@@ -43,6 +41,18 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.O
 @Slf4j
 public class ResponseFilter implements GlobalFilter, Ordered {
     private static final Joiner JOINER = Joiner.on("");
+    private static final String CONTENT_TYPE ="application/json";
+
+    public static void logResponse(String str) {
+        StringBuilder sb = new StringBuilder();
+        int index = str.indexOf("\"data\"");
+        String realStr = str.substring(0, index - 1);
+        sb.append(realStr).append("}");
+        Map<String, Object> commonResult = JsonUtil.jsonToMap(sb.toString());
+        log.info("该请求的返回");
+        log.info("Response Code: {}", commonResult.get("code"));
+        log.info("Response Message: {}", commonResult.get("message"));
+    }
 
     @Override
     public int getOrder() {
@@ -60,7 +70,7 @@ public class ResponseFilter implements GlobalFilter, Ordered {
                 if (Objects.requireNonNull(getStatusCode()).equals(HttpStatus.OK) && body instanceof Flux) {
                     // 获取ContentType，判断是否返回JSON格式数据
                     String originalResponseContentType = exchange.getAttribute(ORIGINAL_RESPONSE_CONTENT_TYPE_ATTR);
-                    if (StringUtils.isNotBlank(originalResponseContentType) && originalResponseContentType.contains("application/json")) {
+                    if (StringUtils.isNotBlank(originalResponseContentType) && originalResponseContentType.contains(CONTENT_TYPE)) {
                         Flux<? extends DataBuffer> fluxBody = Flux.from(body);
                         //（返回数据内如果字符串过大，默认会切割）解决返回体分段传输
                         return super.writeWith(fluxBody.buffer().map(dataBuffers -> {
@@ -92,17 +102,6 @@ public class ResponseFilter implements GlobalFilter, Ordered {
             }
         };
         return chain.filter(exchange.mutate().response(response).build());
-    }
-
-    public static void logResponse(String str) {
-        StringBuilder sb = new StringBuilder();
-        int index = str.indexOf("\"data\"");
-        String strr = str.substring(0,index-1);
-        sb.append(strr).append("}");
-        Map<String,Object> commonResult = JsonUtil.jsonToMap(sb.toString());
-        log.info("该请求的返回");
-        log.info("Response Code: {}", commonResult.get("code"));
-        log.info("Response Message: {}", commonResult.get("message"));
     }
 
 

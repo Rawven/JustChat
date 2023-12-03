@@ -23,7 +23,7 @@ public class JsonUtil {
 
     public static Map jsonToMap(String json) {
         try {
-            return  OBJECT_MAPPER.readValue(json, Map.class);
+            return OBJECT_MAPPER.readValue(json, Map.class);
         } catch (JsonProcessingException e) {
             log.error("JsonUtil jsonToMap error:{}", e.getMessage());
             throw new RuntimeException(e);

@@ -15,6 +15,7 @@ import www.raven.jc.client.IpfsClient;
 public class IpfsConfig {
     @Value("${Ipfs.api}")
     private String api;
+
     @Bean
     public IpfsClient ipfsClient() {
         return new IpfsClient(api);

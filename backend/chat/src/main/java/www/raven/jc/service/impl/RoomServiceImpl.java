@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.dao.RoomDAO;
-import www.raven.jc.dao.mapper.RoomMapper;
 import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.model.RoomModel;
@@ -37,6 +36,7 @@ public class RoomServiceImpl implements RoomService {
     private HttpServletRequest request;
     @Autowired
     private UserFeign userFeign;
+
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void createRoom(RoomModel roomModel) {

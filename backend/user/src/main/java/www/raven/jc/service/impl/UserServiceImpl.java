@@ -13,9 +13,6 @@ import www.raven.jc.client.IpfsClient;
 import www.raven.jc.dao.RolesDAO;
 import www.raven.jc.dao.UserDAO;
 import www.raven.jc.dao.UserRoleDAO;
-import www.raven.jc.dao.mapper.RolesMapper;
-import www.raven.jc.dao.mapper.UserMapper;
-import www.raven.jc.dao.mapper.UserRoleMapper;
 import www.raven.jc.dto.RoleDTO;
 import www.raven.jc.dto.UserAuthDTO;
 import www.raven.jc.dto.UserInfoDTO;
@@ -134,6 +131,7 @@ public class UserServiceImpl implements UserService {
                 }
         ).collect(Collectors.toList());
     }
+
     @Override
     @Transactional(rollbackFor = IllegalArgumentException.class)
     public UserAuthDTO insert(UserRegisterDTO user) {
@@ -144,7 +142,7 @@ public class UserServiceImpl implements UserService {
         Assert.isTrue(userDAO.getBaseMapper().insert(realUser) > 0);
         List<Role> roles = rolesDAO.getBaseMapper().selectBatchIds(user.getRoleIds());
         List<UserRole> userRoles = new ArrayList<>();
-        for (Role role: roles) {
+        for (Role role : roles) {
             userRoles.add(new UserRole().setUserId(realUser.getId()).setRoleId(role.getId()));
             role.setUserCount(role.getUserCount() + 1);
         }
@@ -173,6 +171,7 @@ public class UserServiceImpl implements UserService {
         String header = request.getHeader("userId");
         Assert.isTrue(userDAO.getBaseMapper().update(new UpdateWrapper<User>().eq("id", header).set("signature", signature)) > 0, "插入签名失败");
     }
+
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void setUsername(String username) {

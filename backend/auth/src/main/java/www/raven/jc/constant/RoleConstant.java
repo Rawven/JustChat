@@ -1,8 +1,6 @@
 package www.raven.jc.constant;
 
-import javax.annotation.PostConstruct;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * role constant
@@ -11,9 +9,10 @@ import java.util.Map;
  * @date 2023/11/28
  */
 public class RoleConstant {
-    public static HashMap<Integer,String> MAP= new HashMap<>(2);
     public static final Integer ADMIN_ROLE = 2;
     public static final Integer COMMON_ROLE = 1;
+    public static HashMap<Integer, String> MAP = new HashMap<>(2);
+
     static {
         MAP.put(ADMIN_ROLE, "ROLE_ADMIN");
         MAP.put(COMMON_ROLE, "ROLE_USER");

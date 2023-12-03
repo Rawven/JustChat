@@ -18,6 +18,7 @@ import java.util.Map;
  */
 @Slf4j
 public class JwtUtil {
+    public static final String TIME ="expireTime";
 
 
     public static String createToken(Map<String, Object> map, String key) {

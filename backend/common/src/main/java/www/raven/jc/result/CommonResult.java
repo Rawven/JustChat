@@ -33,7 +33,7 @@ public class CommonResult<T> {
         this.data = data;
     }
 
-    public static CommonResult<Void> operateFail(String message) {
+    public static CommonResult<Void> operateFailure(String message) {
         return new CommonResult<>(ResultCode.FAIL_CODE, false, message);
     }
 
@@ -54,6 +54,21 @@ public class CommonResult<T> {
     public static <T> CommonResult<T> operateFailure(String message, T data) {
         return new CommonResult<>(
                 ResultCode.FAIL_CODE,
+                false,
+                message,
+                data
+        );
+    }
+    public static <T> CommonResult<T> operateFailure(Integer code, String message) {
+        return new CommonResult<>(
+                code,
+                false,
+                message
+        );
+    }
+    public static <T> CommonResult<T> operateFailure(Integer code, String message, T data) {
+        return new CommonResult<>(
+                code,
                 false,
                 message,
                 data

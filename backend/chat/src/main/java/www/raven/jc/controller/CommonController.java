@@ -29,7 +29,7 @@ public class CommonController {
 
     @GetMapping("/queryRoomList/{page}/{size}")
     public CommonResult<RealRoomVO> queryRoomList(@PathVariable("page") int page, @PathVariable("size") int size) {
-        return CommonResult.operateSuccess("获取房间列表成功", roomService.queryAllRoomPage(page,size));
+        return CommonResult.operateSuccess("获取房间列表成功", roomService.queryAllRoomPage(page, size));
     }
 
     @GetMapping("/queryRelatedRoomList/{text}/{choice}/{page}")
@@ -51,6 +51,7 @@ public class CommonController {
         roomService.createRoom(roomModel);
         return CommonResult.operateSuccess("创建房间成功");
     }
+
     @PostMapping("/restoreHistory/{roomId}")
     public CommonResult<List<MessageVO>> restoreHistory(@PathVariable("roomId") Integer roomId) {
         return CommonResult.operateSuccess("获取历史记录成功", chatService.restoreHistory(roomId));

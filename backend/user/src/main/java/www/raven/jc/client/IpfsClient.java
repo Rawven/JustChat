@@ -27,6 +27,7 @@ public class IpfsClient {
     public IpfsClient(String api) {
         ipfsClient = new IPFS(api);
     }
+
     /**
      * 上传文件到ipfs
      *

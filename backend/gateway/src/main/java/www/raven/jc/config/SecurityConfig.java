@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.DelegatingReactiveAuthenticationManager;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
-import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -53,7 +52,7 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/auth/**", "/ws/**", "/webSocket/**").permitAll()
                         .pathMatchers("/chat/user/**", "/user/**").hasRole("USER")
-                        .pathMatchers("/admin/**","/user/admin/**","/chat/admin/**").hasRole("ADMIN")
+                        .pathMatchers("/admin/**", "/user/admin/**", "/chat/admin/**").hasRole("ADMIN")
                         .anyExchange().authenticated()
                 )
                 .formLogin()

@@ -50,5 +50,10 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/refresh")
+    public CommonResult<String> refresh(@RequestBody String token) {
+        return CommonResult.operateSuccess("刷新成功", authService.refreshToken(token));
+    }
+
 
 }

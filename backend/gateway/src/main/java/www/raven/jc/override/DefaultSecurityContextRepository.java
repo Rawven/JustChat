@@ -50,6 +50,7 @@ public class DefaultSecurityContextRepository implements ServerSecurityContextRe
 
     @Override
     public Mono<SecurityContext> load(ServerWebExchange exchange) {
+        log.info("DefaultSecurityContextRepository执行");
         ServerHttpRequest request = exchange.getRequest();
         List<String> tokens = request.getHeaders().get(JwtConstant.TOKEN);
         if (tokens == null || tokens.isEmpty()) {
@@ -57,17 +58,8 @@ public class DefaultSecurityContextRepository implements ServerSecurityContextRe
         }
         TokenDTO dto = JwtUtil.verify(tokens.get(0), key);
         Assert.isTrue(Objects.equals(tokens.get(0), redissonClient.getBucket("token:" + dto.getUserId()).get()), "Invalid token");
-        request.mutate().header("userId", dto.getUserId().toString()).build();
-        if (dto.getExpireTime() < System.currentTimeMillis()) {
-            HashMap<String, Object> map = new HashMap<>(3);
-            map.put("userId", dto.getUserId());
-            map.put("role", dto.getRole());
-            String token = JwtUtil.createToken(map, key);
-            redissonClient.getBucket("token:" + dto.getUserId()).set(token);
-            exchange.getResponse().getHeaders().set(JwtConstant.REFRESH, token);
-
-        }
-        Authentication auth = new UsernamePasswordAuthenticationToken(dto.getUserId(), null,  AuthorityUtils.createAuthorityList(dto.getRole().toArray(new String[0])));
+        request.mutate().header(JwtUtil.TIME, String.valueOf(dto.getExpireTime())).header("userId", dto.getUserId().toString()).build();
+        Authentication auth = new UsernamePasswordAuthenticationToken(dto.getUserId(), null, AuthorityUtils.createAuthorityList(dto.getRole().toArray(new String[0])));
         return tokenAuthenticationManager.authenticate(
                 auth
         ).map(SecurityContextImpl::new);

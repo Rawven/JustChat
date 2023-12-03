@@ -6,7 +6,7 @@ import www.raven.jc.dao.mapper.MessageMapper;
 import www.raven.jc.entity.po.Message;
 
 /**
- * message daoimpl
+ * message
  *
  * @author 刘家辉
  * @date 2023/12/01
