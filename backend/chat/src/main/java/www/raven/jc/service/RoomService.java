@@ -53,4 +53,10 @@ public interface RoomService {
     RealRoomVO queryUserNameRoomList(String column, String text, int page);
 
 
+    /**
+     * apply to join room
+     *
+     * @param roomId room id
+     */
+    void applyToJoinRoom(Integer roomId);
 }

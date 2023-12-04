@@ -13,6 +13,8 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
  * @author 刘家辉
  * @date 2023/11/22
  */
+//TODO 分库分表 单独分出一个chat库吧
+
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableAspectJAutoProxy

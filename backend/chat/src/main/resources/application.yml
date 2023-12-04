@@ -5,6 +5,18 @@ spring:
   application:
     name: JC-Chat
   cloud:
+    stream:
+      bindings:
+        producer-out-0:
+          destination: broadcast
+      rocketmq:
+        bindings:
+          producer-out-0:
+            producer:
+              group: output_1
+        binder:
+          name-server: 10.21.32.154
+
     nacos:
       discovery:
         server-addr: 10.21.32.154:8848

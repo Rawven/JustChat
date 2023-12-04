@@ -19,7 +19,7 @@ import java.util.List;
  */
 @RestController
 @ResponseBody
-@RequestMapping("/common")
+@RequestMapping("/common/user")
 public class CommonController {
 
     @Autowired
@@ -27,24 +27,6 @@ public class CommonController {
     @Autowired
     private RoomService roomService;
 
-    @GetMapping("/queryRoomList/{page}/{size}")
-    public CommonResult<RealRoomVO> queryRoomList(@PathVariable("page") int page, @PathVariable("size") int size) {
-        return CommonResult.operateSuccess("获取房间列表成功", roomService.queryAllRoomPage(page, size));
-    }
-
-    @GetMapping("/queryRelatedRoomList/{text}/{choice}/{page}")
-    public CommonResult<RealRoomVO> queryRelatedRoomList(@PathVariable("text") String text, @PathVariable("choice") int choice,
-                                                         @PathVariable("page") int page) {
-        RealRoomVO rooms;
-        //roomName查找
-        if (choice == 1) {
-            rooms = roomService.queryLikedRoomList("room_name", text, page);
-        } else {
-            //userName查找
-            rooms = roomService.queryUserNameRoomList("username", text, page);
-        }
-        return CommonResult.operateSuccess("获取房间列表成功", rooms);
-    }
 
     @PostMapping("/createRoom")
     public CommonResult<Void> createRoom(@RequestBody RoomModel roomModel) {
@@ -52,8 +34,10 @@ public class CommonController {
         return CommonResult.operateSuccess("创建房间成功");
     }
 
-    @PostMapping("/restoreHistory/{roomId}")
-    public CommonResult<List<MessageVO>> restoreHistory(@PathVariable("roomId") Integer roomId) {
-        return CommonResult.operateSuccess("获取历史记录成功", chatService.restoreHistory(roomId));
+    @PostMapping("/applyToJoinRoom")
+    public CommonResult<Void> applyToJoinRoom(@RequestParam("roomId") Integer roomId) {
+        roomService.applyToJoinRoom(roomId);
+        return CommonResult.operateSuccess("申请加入房间成功");
     }
+
 }

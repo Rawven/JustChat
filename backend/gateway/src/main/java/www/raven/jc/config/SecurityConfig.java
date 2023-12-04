@@ -48,7 +48,6 @@ public class SecurityConfig {
                 .authenticationManager(reactiveAuthenticationManager())
                 .securityContextRepository(defaultSecurityContextRepository)
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                //TODO 这里要大改
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/auth/**", "/ws/**", "/webSocket/**").permitAll()
                         .pathMatchers("/chat/user/**", "/user/**").hasRole("USER")

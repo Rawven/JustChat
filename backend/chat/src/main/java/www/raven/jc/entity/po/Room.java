@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
 @TableName("chat_room")
 @Data
 @Accessors(chain = true)
-public class ChatRoom {
+public class Room {
     @TableId(value = "room_id", type = IdType.AUTO)
     private Integer roomId;
     private String roomName;

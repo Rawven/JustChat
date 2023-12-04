@@ -1,7 +1,7 @@
 package www.raven.jc.dao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import www.raven.jc.entity.po.ChatRoom;
+import www.raven.jc.entity.po.Room;
 
 /**
  * room mapper
@@ -9,6 +9,6 @@ import www.raven.jc.entity.po.ChatRoom;
  * @author 刘家辉
  * @date 2023/11/23
  */
-public interface RoomMapper extends BaseMapper<ChatRoom> {
+public interface RoomMapper extends BaseMapper<Room> {
 }
 
