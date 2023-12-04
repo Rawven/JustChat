@@ -35,16 +35,17 @@ axiosFilter.interceptors.request.use(function (config) {
 axiosFilter.interceptors.response.use(function (response) {
   // 对响应数据做点什么
   if (response.data.code !== 200) {
+    if (response.data.code === 402) {
+      ElMessage.info("令牌过期，自动刷新");
+      axiosFilter.post('http://' + Host + ':7000/auth/refreshToken', {'token': localStorage.getItem("token")}).then(response1 => {
+        localStorage.setItem("token", response1.data.data);
+      })
+      this.$router.go(0);
+    }
     ElMessage.error(response.data.message);
     return Promise.reject(new Error(response.data.message));
   }
-  if (response.data.code === 402) {
-    ElMessage.info("令牌过期，自动刷新");
-    axiosFilter.post('http://' + Host + ':7000/auth/refreshToken', {'token': localStorage.getItem("token")}).then(response1 => {
-      localStorage.setItem("token", response1.data.data);
-    })
-    this.$router.go(0);
-  }
+
   console.log("调用成功,URL" + response.config.url + ",data:" + JSON.stringify(response.data))
   return response;
 }, function (error) {

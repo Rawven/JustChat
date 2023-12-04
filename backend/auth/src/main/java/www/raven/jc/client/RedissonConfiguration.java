@@ -15,7 +15,8 @@ import org.springframework.context.annotation.Configuration;
  * @date 2023/11/22
  */
 @Configuration
-public class RedissonConfiguration {
+public class
+RedissonConfiguration {
 
     @Value("${spring.redis.address}")
     private String address;
