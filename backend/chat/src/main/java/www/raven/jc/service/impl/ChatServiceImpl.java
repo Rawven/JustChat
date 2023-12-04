@@ -4,13 +4,21 @@ import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.messaging.support.GenericMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.dao.MessageDAO;
+import www.raven.jc.dao.RoomDAO;
+import www.raven.jc.dao.UserRoomDAO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.entity.po.Message;
+import www.raven.jc.entity.po.Room;
+import www.raven.jc.entity.po.UserRoom;
 import www.raven.jc.entity.vo.MessageVO;
+import www.raven.jc.event.JoinRoomApplyEvent;
+import www.raven.jc.event.UserSendMsgEvent;
 import www.raven.jc.feign.UserFeign;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.ChatService;
@@ -33,7 +41,11 @@ public class ChatServiceImpl implements ChatService {
     @Autowired
     private MessageDAO messageDAO;
     @Autowired
+    private UserRoomDAO userRoomDAO;
+    @Autowired
     private UserFeign userFeign;
+    @Autowired
+    private StreamBridge streamBridge;
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
@@ -47,6 +59,11 @@ public class ChatServiceImpl implements ChatService {
                 .setSenderId(data.getUserId())
                 .setRoomId(Integer.parseInt(roomId));
         Assert.isTrue(messageDAO.getBaseMapper().insert(realMsg) > 0, "插入失败");
+        List<UserRoom> ids = userRoomDAO.getBaseMapper().selectList(new QueryWrapper<UserRoom>().eq("room_id", roomId));
+        List<Integer> userIds = ids.stream().map(UserRoom::getUserId).collect(Collectors.toList());
+        org.springframework.messaging.Message<UserSendMsgEvent> msg = new GenericMessage<>(
+                new UserSendMsgEvent(data.getUserId(),Integer.valueOf(roomId),userIds,message.getText()));
+        streamBridge.send("producer-out-0", msg);
     }
 
     @Override

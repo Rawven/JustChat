@@ -18,9 +18,8 @@ import java.sql.Timestamp;
 public class Notification {
     private Integer id;
     private Integer userId;
-    private Integer chatRoomId;
     private String type;
     private String message;
     private String status;
-    private Timestamp timestamp;
+    private Long timestamp;
 }

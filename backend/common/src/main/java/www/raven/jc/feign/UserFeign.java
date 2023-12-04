@@ -2,7 +2,6 @@ package www.raven.jc.feign;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import www.raven.jc.dto.*;
 import www.raven.jc.result.CommonResult;
 
@@ -41,7 +40,7 @@ public interface UserFeign {
      * @return {@link CommonResult}<{@link List}<{@link UserInfoDTO}>>
      */
     @PostMapping("/common/getRelatedInfoList")
-    CommonResult<List<UserInfoDTO>> getRelatedInfoList(@RequestBody QueryUserInfoDTO userInfoDTO);
+    CommonResult<List<UserInfoDTO>> getRelatedInfoList( QueryUserInfoDTO userInfoDTO);
 
     /**
      * insert
@@ -50,7 +49,7 @@ public interface UserFeign {
      * @return {@link CommonResult}<{@link UserAuthDTO}>
      */
     @PostMapping("/admin/insert")
-    CommonResult<UserAuthDTO> insert(@RequestBody UserRegisterDTO user);
+    CommonResult<UserAuthDTO> insert( UserRegisterDTO user);
 
     /**
      * get user to auth

@@ -28,7 +28,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @Component
 @Slf4j
 @ServerEndpoint("/websocket/{token}/{roomId}")
-public class WebSocketService {
+public class ChatHandler {
     /**
      * 用来存在线连接数
      */
@@ -39,7 +39,7 @@ public class WebSocketService {
      * concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
      * 虽然@Component默认是单例模式的，但springboot还是会为每个websocket连接初始化一个bean，所以可以用一个静态set保存起来。
      */
-    private static CopyOnWriteArraySet<WebSocketService> webSockets = new CopyOnWriteArraySet<>();
+    private static CopyOnWriteArraySet<ChatHandler> webSockets = new CopyOnWriteArraySet<>();
     /**
      * room id
      * 对应是在哪个聊天室
@@ -52,12 +52,12 @@ public class WebSocketService {
 
     @Autowired
     public void setAccountFeign(UserFeign accountFeign) {
-        WebSocketService.userFeign = accountFeign;
+        ChatHandler.userFeign = accountFeign;
     }
 
     @Autowired
     public void setChatService(ChatService chatService) {
-        WebSocketService.chatService = chatService;
+        ChatHandler.chatService = chatService;
     }
 
     /**
@@ -66,7 +66,7 @@ public class WebSocketService {
     @OnOpen
     public void onOpen(Session session, @PathParam(value = "token") String token, @PathParam(value = "roomId") String roomId) {
         log.info("【websocket消息】有新的连接，token为:" + token);
-        session.getUserProperties().put("userId", JwtUtil.verify(token, "爱你老妈"));
+        session.getUserProperties().put("userDto", JwtUtil.verify(token, "爱你老妈"));
         this.session = session;
         this.roomId = roomId;
         webSockets.add(this);
@@ -94,7 +94,7 @@ public class WebSocketService {
     public void onMessage(String message) {
         log.info("【websocket消息】收到客户端发来的消息:" + message);
         MessageDTO messageDTO = JsonUtil.jsonToObj(message, MessageDTO.class);
-        TokenDTO tokenDTO = (TokenDTO) (session.getUserProperties().get("userId"));
+        TokenDTO tokenDTO = (TokenDTO) (session.getUserProperties().get("userDto"));
         Assert.notNull(userFeign, "account服务端异常 is null");
         UserInfoDTO data = userFeign.getSingleInfo(tokenDTO.getUserId()).getData();
         Assert.notNull(chatService, "chatService is null");
@@ -130,18 +130,18 @@ public class WebSocketService {
      */
     public void sendAllMessage(String message) {
         log.info("【websocket消息】广播消息:" + message);
-        for (WebSocketService webSocketService : webSockets) {
-            if (webSocketService.session.isOpen()) {
-                webSocketService.session.getAsyncRemote().sendText(message);
+        for (ChatHandler chatHandler : webSockets) {
+            if (chatHandler.session.isOpen()) {
+                chatHandler.session.getAsyncRemote().sendText(message);
             }
         }
     }
 
     public void sendRoomMessage(String message) {
         log.info("【websocket消息】广播消息:" + message);
-        for (WebSocketService webSocketService : webSockets) {
-            if (webSocketService.session.isOpen() && webSocketService.roomId.equals(this.roomId)) {
-                webSocketService.session.getAsyncRemote().sendText(message);
+        for (ChatHandler chatHandler : webSockets) {
+            if (chatHandler.session.isOpen() && chatHandler.roomId.equals(this.roomId)) {
+                chatHandler.session.getAsyncRemote().sendText(message);
             }
         }
     }
