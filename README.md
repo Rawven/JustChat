@@ -2,11 +2,11 @@
 
 技术栈
 
-| 前端         | 后端                 | 数据库 |
-| ------------ | -------------------- | ------ |
-| Vue          | spring-cloud-alibaba | mysql  |
-| element-plus | spring-security      | redis  |
-|              |                      | ipfs   |
+| 前端         | 后端                 | 数据库 | 中间件 |        
+| ------------ | -------------------- | ------ | ------ |
+| Vue          | spring-cloud-alibaba | mysql  | rocketMq|
+| element-plus | spring-security      | redis  | nacos |
+|              |                      | ipfs   |       |
 
 
 
