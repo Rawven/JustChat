@@ -9,10 +9,26 @@
               userInfo.signature ? userInfo.signature : '这个用户很懒 什么也没留下'
             }}</h2>
           <div class="flex-container">
-            <el-badge :value="messageCount" class="item">
-              <el-button>消息通知</el-button>
-            </el-badge>
-          <router-link class="linkText" to="/common/updateInfo">更改个人信息</router-link>
+            <el-dropdown trigger="click">
+                 <span class="el-dropdown-link">
+                   <el-badge :value="messageCount" class="item">
+                <el-button>消息通知</el-button>
+                   </el-badge>
+            </span>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item class="clearfix">
+                    群聊消息
+                    <el-badge class="mark" :value="12"/>
+                  </el-dropdown-item>
+                  <el-dropdown-item class="clearfix">
+                    申请
+                    <el-badge class="mark" :value="3"/>
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+            <router-link class="linkText" to="/common/updateInfo">更改个人信息</router-link>
           </div>
         </el-card>
       </el-col>
@@ -87,7 +103,7 @@ export default {
       radio: ref(0),
       searchInput: '',
       websocket: null,
-      messageCount:0,
+      messageCount: 0,
       room: {
         roomId: '',
         roomName: '',
@@ -118,7 +134,7 @@ export default {
     Host() {
       return Host
     },
-    initWebSocket(){
+    initWebSocket() {
       let token = localStorage.getItem("token");
       this.websocket = new WebSocket(`ws://` + Host + `:8080/websocket/${token}`);
       this.websocket.onopen = () => {
@@ -133,7 +149,7 @@ export default {
       };
     },
 
-    updateMessageCount(){
+    updateMessageCount() {
       this.realAxios.post(`http://` + Host + `:7000/user/common/queryUnreadMessageCount`, {}, {
         headers: {
           'token': localStorage.getItem("token")
@@ -184,11 +200,13 @@ export default {
 .inputHolder {
   width: 400px;
 }
+
 .flex-container {
   display: flex;
   align-items: center;
-  margin:20px;
+  margin: 20px;
 }
+
 .linkText {
   font-size: 24px;
   color: #409EFF;
@@ -197,6 +215,7 @@ export default {
   margin-bottom: 20px;
   animation: fadeIn 2s;
 }
+
 .item {
   margin-right: 20px; /* 左边距离增加20px */
 }
@@ -261,7 +280,8 @@ export default {
   height: 500px; /* 设置容器的高度 */
   margin: 20px; /* 添加外边距 */
 }
-.linkText{
+
+.linkText {
   margin-left: 20px;
 }
 

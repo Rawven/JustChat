@@ -1,5 +1,9 @@
 package www.raven.jc.service;
 
+import www.raven.jc.entity.vo.NoticeVO;
+
+import java.util.List;
+
 /**
  * notice service
  *
@@ -7,6 +11,10 @@ package www.raven.jc.service;
  * @date 2023/12/04
  */
 public interface NoticeService {
-
-    void receive();
+    /**
+     * load notice
+     *
+     * @return {@link List}<{@link NoticeVO}>
+     */
+    List<NoticeVO> loadNotice();
 }

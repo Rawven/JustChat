@@ -1,6 +1,7 @@
 package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -10,12 +11,14 @@ import www.raven.jc.constant.NoticeConstant;
 import www.raven.jc.dao.NoticeDAO;
 import www.raven.jc.dao.UserDAO;
 import www.raven.jc.entity.po.Notification;
+import www.raven.jc.entity.vo.NoticeVO;
 import www.raven.jc.event.JoinRoomApplyEvent;
 import www.raven.jc.event.UserSendMsgEvent;
 import www.raven.jc.service.NoticeService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.websocket.NotificationHandler;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,10 +39,10 @@ public class NoticeServiceImpl implements NoticeService {
     private NotificationHandler notificationHandler;
     @Autowired
     private UserDAO userDAO;
-    @Override
-    public void receive() {
+    @Autowired
+    private HttpServletRequest request;
 
-    }
+
     @Bean
     public Consumer<Message<JoinRoomApplyEvent>> eventUserJoinRoomApply() {
         return msg -> {
@@ -78,4 +81,11 @@ public class NoticeServiceImpl implements NoticeService {
         notificationHandler.sendMessageToIds(msg,map);
     }
 
+    @Override
+    public List<NoticeVO> loadNotice() {
+           Integer userId = Integer.parseInt(request.getHeader("userId"));
+        List<Notification> userId1 = noticeDAO.getBaseMapper().selectList(new QueryWrapper<Notification>().eq("user_id", userId));
+
+        return null;
+    }
 }
