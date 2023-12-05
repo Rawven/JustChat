@@ -111,4 +111,12 @@ public interface UserService {
      * @return {@link Boolean}
      */
     Boolean checkUserExit(String username);
+
+    /**
+     * query batch info
+     *
+     * @param userIds user ids
+     * @return {@link List}<{@link UserInfoDTO}>
+     */
+    List<UserInfoDTO> queryBatchInfo(List<Integer> userIds);
 }

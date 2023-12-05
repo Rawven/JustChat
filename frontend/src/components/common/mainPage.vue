@@ -8,7 +8,12 @@
           <h2 class="signature">个性签名: {{
               userInfo.signature ? userInfo.signature : '这个用户很懒 什么也没留下'
             }}</h2>
+          <div class="flex-container">
+            <el-badge :value="messageCount" class="item">
+              <el-button>消息通知</el-button>
+            </el-badge>
           <router-link class="linkText" to="/common/updateInfo">更改个人信息</router-link>
+          </div>
         </el-card>
       </el-col>
       <el-col :span="16">
@@ -81,6 +86,8 @@ export default {
     return {
       radio: ref(0),
       searchInput: '',
+      websocket: null,
+      messageCount:0,
       room: {
         roomId: '',
         roomName: '',
@@ -101,7 +108,7 @@ export default {
   },
   created() {
     this.getRooms(this.currentPage);
-
+    this.updateMessageCount();
     let item = localStorage.getItem("userData");
     if (item) {
       this.userInfo = JSON.parse(item);
@@ -110,6 +117,30 @@ export default {
   methods: {
     Host() {
       return Host
+    },
+    initWebSocket(){
+      let token = localStorage.getItem("token");
+      this.websocket = new WebSocket(`ws://` + Host + `:8080/websocket/${token}`);
+      this.websocket.onopen = () => {
+        console.log('WebSocket is open now.');
+      };
+      this.websocket.onmessage = (event) => {
+        console.log('WebSocket message received:', event.data);
+        this.messageCount++;
+      };
+      this.websocket.onclose = () => {
+        console.log('WebSocket is closed now.');
+      };
+    },
+
+    updateMessageCount(){
+      this.realAxios.post(`http://` + Host + `:7000/user/common/queryUnreadMessageCount`, {}, {
+        headers: {
+          'token': localStorage.getItem("token")
+        }
+      }).then(response => {
+        this.messageCount = response.data.data;
+      })
     },
     submitSearch(value) {
       // 在这里发送请求到后端
@@ -153,7 +184,11 @@ export default {
 .inputHolder {
   width: 400px;
 }
-
+.flex-container {
+  display: flex;
+  align-items: center;
+  margin:20px;
+}
 .linkText {
   font-size: 24px;
   color: #409EFF;
@@ -161,6 +196,9 @@ export default {
   text-align: center;
   margin-bottom: 20px;
   animation: fadeIn 2s;
+}
+.item {
+  margin-right: 20px; /* 左边距离增加20px */
 }
 
 .button {
@@ -218,27 +256,14 @@ export default {
   padding: 30px;
 }
 
-
-.main {
-  background-color: #F5F5F5;
-  color: #333;
-  text-align: center;
-  margin-left: 10px;
-  width: 100%;
-  padding: 0;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
 .cardContainer {
   width: 950px; /* 设置容器的宽度 */
   height: 500px; /* 设置容器的高度 */
   margin: 20px; /* 添加外边距 */
 }
-
+.linkText{
+  margin-left: 20px;
+}
 
 .row-bg {
   width: 100%;

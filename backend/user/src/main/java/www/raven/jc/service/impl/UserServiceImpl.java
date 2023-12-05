@@ -157,6 +157,19 @@ public class UserServiceImpl implements UserService {
         return user != null;
     }
 
+    @Override
+    public List<UserInfoDTO> queryBatchInfo(List<Integer> userIds) {
+        List<User> users = userDAO.getBaseMapper().selectBatchIds(userIds);
+        return users.stream().map(
+                user -> {
+                    UserInfoDTO userInfoDTO = new UserInfoDTO();
+                    userInfoDTO.setUsername(user.getUsername()).setProfile(user.getProfile()).setUserId(user.getId());
+                    return userInfoDTO;
+                }
+        ).collect(Collectors.toList());
+    }
+
+
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void setProfile(MultipartFile profile) {

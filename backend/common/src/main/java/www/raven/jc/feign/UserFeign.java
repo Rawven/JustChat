@@ -77,4 +77,15 @@ public interface UserFeign {
      */
     @PostMapping("/common/checkUserExit")
     CommonResult<Boolean> checkUserExit(String username);
+
+
+    /**
+     * get batch info
+     *
+     * @param userIds user ids
+     * @return {@link CommonResult}<{@link List}<{@link UserInfoDTO}>>
+     */
+    @PostMapping("/common/getBatchInfo")
+    CommonResult<List<UserInfoDTO>> getBatchInfo(List<Integer> userIds);
+
 }

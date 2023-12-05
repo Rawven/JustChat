@@ -69,7 +69,9 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public List<MessageVO> restoreHistory(Integer roomId) {
         List<Message> messages = messageDAO.getBaseMapper().selectList(new QueryWrapper<Message>().eq("room_id", roomId).orderByAsc("timestamp"));
-        CommonResult<List<UserInfoDTO>> allInfo = userFeign.getAllInfo();
+        List<UserRoom> ids = userRoomDAO.getBaseMapper().selectList(new QueryWrapper<UserRoom>().eq("room_id", roomId));
+        List<Integer> userIds = ids.stream().map(UserRoom::getUserId).collect(Collectors.toList());
+        CommonResult<List<UserInfoDTO>> allInfo = userFeign.getBatchInfo(userIds);
         List<UserInfoDTO> data = allInfo.getData();
         Map<Integer, UserInfoDTO> userInfoMap = data.stream()
                 .collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
