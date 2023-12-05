@@ -1,6 +1,6 @@
 <template>
-  <el-container class="container">
-    <el-card class="box-card">
+  <el-container class="container flex h-screen bg-gray-800 text-white">
+    <el-card class="box-card flex items-center justify-between p-4">
       <el-row class="title"> 欢迎来到聊天室！😄</el-row>
       <el-row :gutter="20">
         <el-col :span="18">
@@ -8,10 +8,10 @@
             <el-input v-model="message" placeholder="请输入消息"></el-input>
             <el-button type="primary" @click="sendMessage">发送消息</el-button>
             <el-card class="message-card">
-              <div v-for="msg in messages" :key="msg.time" class="message">
+              <div v-for="msg in messages" :key="msg.time" class="message flex items-center justify-between py-4">
                 <el-aside class="meSide">
                   <el-row class="message-user">{{ msg.user }}</el-row>
-                  <img :src="'http://10.44.59.225:8083/ipfs/'+msg.profile" alt="User profile" class="message-profile">
+                  <img :src="'http://10.44.59.225:8083/ipfs/'+msg.profile" alt="User profile" class="message-profile relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
                 </el-aside>
                 <el-card class="message-content">
                   <p class="message-time">{{ new Date(msg.time).toLocaleString() }}</p>
@@ -52,7 +52,7 @@ export default {
     this.socket = new WebSocket(`ws://` + Host + `:8081/websocket/${token}/${this.roomId}`);
 
     this.socket.onopen = () => {
-      this.realAxios.post(`http://` + Host + `:7000/chat/common/restoreHistory/${this.roomId}`, {}, {
+      this.realAxios.post(`http://` + Host + `:7000/chat/common/query/restoreHistory/${this.roomId}`, {}, {
         headers: {
           'token': token
         }
@@ -131,8 +131,8 @@ export default {
 
 .grid-content {
   margin-right: 200px;
-  width: 34cm;
-  height: 20cm;
+  width: 125%;
+  height: 40cm;
 }
 
 .box-card {

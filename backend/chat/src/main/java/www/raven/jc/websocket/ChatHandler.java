@@ -98,7 +98,6 @@ public class ChatHandler {
         Assert.notNull(userFeign, "account服务端异常 is null");
         UserInfoDTO data = userFeign.getSingleInfo(tokenDTO.getUserId()).getData();
         Assert.notNull(chatService, "chatService is null");
-        chatService.saveMsg(data, messageDTO, this.roomId);
         Map<Object, Object> map = new HashMap<>(2);
         map.put("userInfo", data);
         map.put("message", messageDTO);
@@ -107,6 +106,7 @@ public class ChatHandler {
         } catch (Exception e) {
             log.error("map转json异常");
         }
+        chatService.saveMsg(data, messageDTO, this.roomId);
     }
 
     /**

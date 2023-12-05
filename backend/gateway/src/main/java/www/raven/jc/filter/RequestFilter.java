@@ -37,6 +37,9 @@ public class RequestFilter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
+        if(request.getURI().getPath().contains("login")|| request.getURI().getPath().contains("register")){
+            return chain.filter(exchange);
+        }
         long time = Long.parseLong(Objects.requireNonNull(request.getHeaders().get(JwtUtil.TIME)).get(0));
         if(time< System.currentTimeMillis()){
             // 获取响应对象

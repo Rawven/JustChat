@@ -41,7 +41,7 @@ public class NoticeServiceImpl implements NoticeService {
 
     }
     @Bean
-    public Consumer<Message<JoinRoomApplyEvent>> joinRoomApplyEventConsumer() {
+    public Consumer<Message<JoinRoomApplyEvent>> eventUserJoinRoomApply() {
         return msg -> {
             log.info("receive join room apply event:{}",msg.toString());
             JoinRoomApplyEvent payload = msg.getPayload();
@@ -49,7 +49,8 @@ public class NoticeServiceImpl implements NoticeService {
             Notification notice =new Notification().setUserId(founderId)
                     .setMessage(JsonUtil.objToJson(payload))
                     .setType(NoticeConstant.TYPE_JOIN_ROOM_APPLY)
-                    .setTimestamp(System.currentTimeMillis());
+                    .setTimestamp(System.currentTimeMillis())
+                    .setStatus(NoticeConstant.STATUS_UNREAD);
             Assert.isTrue(noticeDAO.save(notice));
             ArrayList<Integer> ids = new ArrayList<>();
             ids.add(founderId);
@@ -57,7 +58,7 @@ public class NoticeServiceImpl implements NoticeService {
         };
     }
     @Bean
-    public Consumer<Message<UserSendMsgEvent>> userSendMsgEventConsumer() {
+    public Consumer<Message<UserSendMsgEvent>> eventUserSendMsg() {
         return msg -> {
             log.info("receive user send msg event:{}",msg.toString());
             UserSendMsgEvent payload = msg.getPayload();
@@ -65,7 +66,8 @@ public class NoticeServiceImpl implements NoticeService {
             Notification notice =new Notification().setUserId(userId)
                     .setMessage(JsonUtil.objToJson(payload))
                     .setType(NoticeConstant.TYPE_USER_SEND_MSG)
-                    .setTimestamp(System.currentTimeMillis());
+                    .setTimestamp(System.currentTimeMillis())
+                    .setStatus(NoticeConstant.STATUS_UNREAD);
             Assert.isTrue(noticeDAO.save(notice));
             sendMsgToUser(payload.getIdsFromRoom(), "有人发消息了");
         };

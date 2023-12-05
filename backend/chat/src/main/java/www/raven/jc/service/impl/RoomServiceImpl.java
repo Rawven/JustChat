@@ -91,7 +91,7 @@ public class RoomServiceImpl implements RoomService {
         Room room = roomDAO.getBaseMapper().selectById(roomId);
         Integer founderId = room.getFounderId();
         Message<JoinRoomApplyEvent> msg = new GenericMessage<JoinRoomApplyEvent>(new JoinRoomApplyEvent(userId,founderId,roomId));
-        streamBridge.send("producer-out-0", msg);
+        streamBridge.send("producer-out-1", msg);
     }
 
 

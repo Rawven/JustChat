@@ -7,21 +7,25 @@ spring:
   cloud:
     stream:
       bindings:
+        producer-out-1:
+          destination: eventRoomApply
         producer-out-0:
-          destination: broadcast
+          destination: eventUserSendMsg
       rocketmq:
         bindings:
+          producer-out-1:
+            producer:
+              group: output-1
           producer-out-0:
             producer:
-              group: output_1
+              group: output-0
         binder:
-          name-server: 10.21.32.154
-
+          name-server: 10.21.32.221:9876
     nacos:
       discovery:
         server-addr: 10.21.32.154:8848
   datasource:
-    url: jdbc:mysql://10.21.32.154:3306/JustChat?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    url: jdbc:mysql://10.21.32.154:3306/JC_chat?useUnicode=true&characterEncoding=utf-8&useSSL=false
     username: user
     password: 123456
 server:

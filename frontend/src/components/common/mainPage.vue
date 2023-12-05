@@ -113,7 +113,7 @@ export default {
     },
     submitSearch(value) {
       // 在这里发送请求到后端
-      this.realAxios.get(`http://` + Host + `:7000/chat/common/queryRelatedRoomList/${this.searchInput}/${this.radio}/${value}`, {
+      this.realAxios.get(`http://` + Host + `:7000/chat/common/query/queryRelatedRoomList/${this.searchInput}/${this.radio}/${value}`, {
         headers: {
           'token': localStorage.getItem("token")
         }
@@ -126,7 +126,7 @@ export default {
       this.$router.push({path: `/common/chatRoom/` + Number(roomId)});
     },
     getRooms(page) {
-      this.realAxios.get(`http://` + Host + `:7000/chat/common/queryRoomList/${page}/${5}`, {
+      this.realAxios.get(`http://` + Host + `:7000/chat/common/query/queryRoomList/${page}/${5}`, {
         headers: {
           'token': localStorage.getItem("token")
         }

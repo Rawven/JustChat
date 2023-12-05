@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
  * @author 刘家辉
  * @date 2023/11/23
  */
-@TableName("chat_room")
+@TableName("room")
 @Data
 @Accessors(chain = true)
 public class Room {
