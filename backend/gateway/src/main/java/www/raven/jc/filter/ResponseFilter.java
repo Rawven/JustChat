@@ -41,7 +41,7 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.O
 @Slf4j
 public class ResponseFilter implements GlobalFilter, Ordered {
     private static final Joiner JOINER = Joiner.on("");
-    private static final String CONTENT_TYPE ="application/json";
+    private static final String CONTENT_TYPE = "application/json";
 
     public static void logResponse(String str) {
         StringBuilder sb = new StringBuilder();

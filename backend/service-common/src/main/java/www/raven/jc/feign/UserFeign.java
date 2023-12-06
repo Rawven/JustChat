@@ -40,7 +40,7 @@ public interface UserFeign {
      * @return {@link CommonResult}<{@link List}<{@link UserInfoDTO}>>
      */
     @PostMapping("/common/getRelatedInfoList")
-    CommonResult<List<UserInfoDTO>> getRelatedInfoList( QueryUserInfoDTO userInfoDTO);
+    CommonResult<List<UserInfoDTO>> getRelatedInfoList(QueryUserInfoDTO userInfoDTO);
 
     /**
      * insert
@@ -49,7 +49,7 @@ public interface UserFeign {
      * @return {@link CommonResult}<{@link UserAuthDTO}>
      */
     @PostMapping("/admin/insert")
-    CommonResult<UserAuthDTO> insert( UserRegisterDTO user);
+    CommonResult<UserAuthDTO> insert(UserRegisterDTO user);
 
     /**
      * get user to auth

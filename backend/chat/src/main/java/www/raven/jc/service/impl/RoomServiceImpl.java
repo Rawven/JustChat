@@ -90,7 +90,7 @@ public class RoomServiceImpl implements RoomService {
                 "您已经在这个聊天室了");
         Room room = roomDAO.getBaseMapper().selectById(roomId);
         Integer founderId = room.getFounderId();
-        Message<JoinRoomApplyEvent> msg = new GenericMessage<JoinRoomApplyEvent>(new JoinRoomApplyEvent(userId,founderId,roomId));
+        Message<JoinRoomApplyEvent> msg = new GenericMessage<JoinRoomApplyEvent>(new JoinRoomApplyEvent(userId, founderId, roomId));
         streamBridge.send("producer-out-1", msg);
     }
 

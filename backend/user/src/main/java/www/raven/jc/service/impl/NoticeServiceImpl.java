@@ -46,10 +46,10 @@ public class NoticeServiceImpl implements NoticeService {
     @Bean
     public Consumer<Message<JoinRoomApplyEvent>> eventUserJoinRoomApply() {
         return msg -> {
-            log.info("receive join room apply event:{}",msg.toString());
+            log.info("receive join room apply event:{}", msg.toString());
             JoinRoomApplyEvent payload = msg.getPayload();
             Integer founderId = payload.getFounderId();
-            Notification notice =new Notification().setUserId(founderId)
+            Notification notice = new Notification().setUserId(founderId)
                     .setMessage(JsonUtil.objToJson(payload))
                     .setType(NoticeConstant.TYPE_JOIN_ROOM_APPLY)
                     .setTimestamp(System.currentTimeMillis())
@@ -60,13 +60,14 @@ public class NoticeServiceImpl implements NoticeService {
             sendMsgToUser(ids, "有人申请加入你的聊天室");
         };
     }
+
     @Bean
     public Consumer<Message<UserSendMsgEvent>> eventUserSendMsg() {
         return msg -> {
-            log.info("receive user send msg event:{}",msg.toString());
+            log.info("receive user send msg event:{}", msg.toString());
             UserSendMsgEvent payload = msg.getPayload();
             Integer userId = payload.getUserId();
-            Notification notice =new Notification().setUserId(userId)
+            Notification notice = new Notification().setUserId(userId)
                     .setMessage(JsonUtil.objToJson(payload))
                     .setType(NoticeConstant.TYPE_USER_SEND_MSG)
                     .setTimestamp(System.currentTimeMillis())
@@ -75,15 +76,16 @@ public class NoticeServiceImpl implements NoticeService {
             sendMsgToUser(payload.getIdsFromRoom(), "有人发消息了");
         };
     }
+
     private void sendMsgToUser(List<Integer> userId, String msg) {
         HashMap<Integer, Integer> map = new HashMap<>(userId.size());
         userId.forEach(id -> map.put(id, 1));
-        notificationHandler.sendMessageToIds(msg,map);
+        notificationHandler.sendMessageToIds(msg, map);
     }
 
     @Override
     public List<NoticeVO> loadNotice() {
-           Integer userId = Integer.parseInt(request.getHeader("userId"));
+        Integer userId = Integer.parseInt(request.getHeader("userId"));
         List<Notification> userId1 = noticeDAO.getBaseMapper().selectList(new QueryWrapper<Notification>().eq("user_id", userId));
 
         return null;

@@ -3,13 +3,9 @@ package www.raven.jc.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import www.raven.jc.entity.model.RoomModel;
-import www.raven.jc.entity.vo.MessageVO;
-import www.raven.jc.entity.vo.RealRoomVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.service.RoomService;
-
-import java.util.List;
 
 /**
  * room controller

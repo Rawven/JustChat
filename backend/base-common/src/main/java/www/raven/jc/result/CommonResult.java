@@ -59,6 +59,7 @@ public class CommonResult<T> {
                 data
         );
     }
+
     public static <T> CommonResult<T> operateFailure(Integer code, String message) {
         return new CommonResult<>(
                 code,
@@ -66,6 +67,7 @@ public class CommonResult<T> {
                 message
         );
     }
+
     public static <T> CommonResult<T> operateFailure(Integer code, String message, T data) {
         return new CommonResult<>(
                 code,

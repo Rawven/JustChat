@@ -59,7 +59,7 @@ public class ChatServiceImpl implements ChatService {
         List<UserRoom> ids = userRoomDAO.getBaseMapper().selectList(new QueryWrapper<UserRoom>().eq("room_id", roomId));
         List<Integer> userIds = ids.stream().map(UserRoom::getUserId).collect(Collectors.toList());
         org.springframework.messaging.Message<UserSendMsgEvent> msg = new GenericMessage<>(
-                new UserSendMsgEvent(data.getUserId(),Integer.valueOf(roomId),userIds,message.getText()));
+                new UserSendMsgEvent(data.getUserId(), Integer.valueOf(roomId), userIds, message.getText()));
         streamBridge.send("producer-out-0", msg);
     }
 

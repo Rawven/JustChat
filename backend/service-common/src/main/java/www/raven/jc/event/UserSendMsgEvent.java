@@ -13,7 +13,7 @@ import java.util.List;
  * @date 2023/12/04
  */
 @Data
-@Accessors (chain = true)
+@Accessors(chain = true)
 @AllArgsConstructor
 public class UserSendMsgEvent {
     private Integer userId;

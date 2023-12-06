@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.util.JwtUtil;
+
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
@@ -48,7 +49,7 @@ public class NotificationHandler {
     public void onOpen(Session session, @PathParam(value = "token") String token, @PathParam(value = "roomId") String roomId) {
         log.info("【websocket消息】有新的连接，token为:" + token);
         TokenDTO verify = JwtUtil.verify(token, "爱你老妈");
-        session.getUserProperties().put("userDto",verify);
+        session.getUserProperties().put("userDto", verify);
         this.userId = verify.getUserId();
         this.session = session;
         webSockets.add(this);
@@ -96,19 +97,12 @@ public class NotificationHandler {
     }
 
 
-
-
-
-
-
-
-
     /**
      * send all message
      *
      * @param message message
      */
-    public void sendMessageToIds(String message,Map<Integer,Integer> ids) {
+    public void sendMessageToIds(String message, Map<Integer, Integer> ids) {
         log.info("【websocket消息】广播消息:" + message);
         for (NotificationHandler webSocketService : webSockets) {
             if (webSocketService.session.isOpen() && ids.containsKey(webSocketService.userId)) {

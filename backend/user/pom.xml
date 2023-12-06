@@ -8,9 +8,7 @@
         <artifactId>backend</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-
     <artifactId>user</artifactId>
-
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>

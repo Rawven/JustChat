@@ -28,7 +28,8 @@ import java.util.Objects;
 @Slf4j
 @Component
 public class RequestFilter implements GlobalFilter, Ordered {
-    private static final String WHITE_PATH ="auth";
+    private static final String WHITE_PATH = "auth";
+
     @Override
     public int getOrder() {
         // -2 is response filter, request filter should be called before that
@@ -38,11 +39,11 @@ public class RequestFilter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
-        if(request.getURI().getPath().contains(WHITE_PATH)){
+        if (request.getURI().getPath().contains(WHITE_PATH)) {
             return chain.filter(exchange);
         }
         long time = Long.parseLong(Objects.requireNonNull(request.getHeaders().get(JwtUtil.TIME)).get(0));
-        if(time< System.currentTimeMillis()){
+        if (time < System.currentTimeMillis()) {
             // 获取响应对象
             ServerHttpResponse response = exchange.getResponse();
             // 设置响应的状态码和内容类型
@@ -50,7 +51,7 @@ public class RequestFilter implements GlobalFilter, Ordered {
             response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
             CommonResult<Object> result = CommonResult.operateFailure(ResultCode.TOKEN_EXPIRED_CODE, "Token expired, please reapply for a token");
             // 返回响应
-            String responseBody =JsonUtil.objToJson(result);
+            String responseBody = JsonUtil.objToJson(result);
             // 返回响应
             return response.writeWith(Mono.just(responseBody).map(str -> response.bufferFactory().wrap(str.getBytes(StandardCharsets.UTF_8))));
         }

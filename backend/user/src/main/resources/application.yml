@@ -9,17 +9,17 @@ spring:
   cloud:
     stream:
       function:
-          definition: eventUserSendMsg;eventUserJoinRoomApply
+        definition: eventUserSendMsg;eventUserJoinRoomApply
       rocketmq:
         binder:
           name-server: 10.21.32.221:9876
         bindings:
           eventUserJoinRoomApply-in-0:
             consumer:
-                  messageModel: BROADCASTING
+              messageModel: BROADCASTING
           eventUserSendMsg-in-0:
             consumer:
-                  messageModel: BROADCASTING
+              messageModel: BROADCASTING
       bindings:
         eventUserJoinRoomApply-in-0:
           destination: eventRoomApply

@@ -74,9 +74,10 @@ public class CommonController {
     public CommonResult<List<UserInfoDTO>> getAllInfo() {
         return CommonResult.operateSuccess("查找成功", userService.queryAllInfo());
     }
+
     @PostMapping("/common/getBatchInfo")
-    CommonResult<List<UserInfoDTO>> getBatchInfo(List<Integer> userIds){
-        return CommonResult.operateSuccess("查找成功",userService.queryBatchInfo(userIds));
+    CommonResult<List<UserInfoDTO>> getBatchInfo(List<Integer> userIds) {
+        return CommonResult.operateSuccess("查找成功", userService.queryBatchInfo(userIds));
     }
 
     @PostMapping("/getRelatedInfoList")
