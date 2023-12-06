@@ -62,7 +62,7 @@
         </dependency>
         <dependency>
             <groupId>www.Raven</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>service-common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>

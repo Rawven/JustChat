@@ -28,6 +28,7 @@ import java.util.Objects;
 @Slf4j
 @Component
 public class RequestFilter implements GlobalFilter, Ordered {
+    private static final String WHITE_PATH ="auth";
     @Override
     public int getOrder() {
         // -2 is response filter, request filter should be called before that
@@ -37,7 +38,7 @@ public class RequestFilter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
-        if(request.getURI().getPath().contains("login")|| request.getURI().getPath().contains("register")){
+        if(request.getURI().getPath().contains(WHITE_PATH)){
             return chain.filter(exchange);
         }
         long time = Long.parseLong(Objects.requireNonNull(request.getHeaders().get(JwtUtil.TIME)).get(0));

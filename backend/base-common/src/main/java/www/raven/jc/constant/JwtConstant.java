@@ -8,5 +8,4 @@ package www.raven.jc.constant;
  */
 public class JwtConstant {
     public static final String TOKEN = "token";
-    public static final String REFRESH = "new-Token";
 }

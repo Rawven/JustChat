@@ -20,7 +20,6 @@ import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.util.JwtUtil;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 

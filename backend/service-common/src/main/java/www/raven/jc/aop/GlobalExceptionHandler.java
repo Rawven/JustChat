@@ -1,5 +1,4 @@
 package www.raven.jc.aop;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -19,7 +18,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NullPointerException.class)
     public CommonResult<Void> handlerNullPointerException(NullPointerException ex) {
         log.error("空指针异常", ex);
-        return CommonResult.operateFailure("后端逻辑有误 请通知管理员");
+        return CommonResult.operateFailure("后端逻辑有误会 请通知管理员");
     }
 
     @ResponseBody
