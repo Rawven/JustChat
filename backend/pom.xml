@@ -10,12 +10,12 @@
     <packaging>pom</packaging>
     <modules>
         <module>user</module>
-        <module>base-common</module>
+        <module>common-base</module>
         <module>gateway</module>
         <module>chat</module>
         <module>auth</module>
         <module>admin</module>
-        <module>service-common</module>
+        <module>common-service</module>
     </modules>
     <properties>
         <maven.compiler.source>11</maven.compiler.source>

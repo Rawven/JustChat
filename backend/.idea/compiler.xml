@@ -7,13 +7,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="common-service" />
         <module name="auth" />
         <module name="chat" />
         <module name="admin" />
-        <module name="base-common" />
         <module name="user" />
         <module name="gateway" />
-        <module name="service-common" />
+        <module name="common-base" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

@@ -14,7 +14,7 @@
             <url>https://www.jitpack.io</url>
         </repository>
     </repositories>
-    <artifactId>base-common</artifactId>
+    <artifactId>common-base</artifactId>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>

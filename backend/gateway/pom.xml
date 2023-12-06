@@ -29,7 +29,7 @@
         </dependency>
         <dependency>
             <groupId>www.Raven</groupId>
-            <artifactId>base-common</artifactId>
+            <artifactId>common-base</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
