@@ -3,6 +3,8 @@ package www.raven.jc.service.impl;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RBucket;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.Message;
@@ -19,9 +21,11 @@ import www.raven.jc.util.JsonUtil;
 import www.raven.jc.websocket.NotificationHandler;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -33,6 +37,7 @@ import java.util.function.Consumer;
 @Service
 @Slf4j
 public class NoticeServiceImpl implements NoticeService {
+    private final static long EXPIRE_TIME = 10;
     @Autowired
     private NoticeDAO noticeDAO;
     @Autowired
@@ -41,13 +46,19 @@ public class NoticeServiceImpl implements NoticeService {
     private UserDAO userDAO;
     @Autowired
     private HttpServletRequest request;
+    @Autowired
+    private RedissonClient redissonClient;
 
 
     @Bean
     public Consumer<Message<JoinRoomApplyEvent>> eventUserJoinRoomApply() {
         return msg -> {
-            log.info("receive join room apply event:{}", msg.toString());
             JoinRoomApplyEvent payload = msg.getPayload();
+            if(redissonClient.getBucket(payload.getSnowFlakeId()).isExists()){
+                log.info("重复的消息，不处理");
+                return;
+            }
+            log.info("receive join room apply event:{}", msg.toString());
             Integer founderId = payload.getFounderId();
             Notification notice = new Notification().setUserId(founderId)
                     .setMessage(JsonUtil.objToJson(payload))
@@ -58,6 +69,9 @@ public class NoticeServiceImpl implements NoticeService {
             ArrayList<Integer> ids = new ArrayList<>();
             ids.add(founderId);
             sendMsgToUser(ids, "有人申请加入你的聊天室");
+            RBucket<Object> bucket = redissonClient.getBucket(payload.getSnowFlakeId());
+            //消息有十分钟有效时间
+            bucket.set(payload.getSnowFlakeId(), EXPIRE_TIME, TimeUnit.MINUTES);
         };
     }
 

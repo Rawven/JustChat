@@ -17,4 +17,5 @@ public class JoinRoomApplyEvent {
     private Integer applyId;
     private Integer founderId;
     private Integer roomId;
+    private String snowFlakeId;
 }

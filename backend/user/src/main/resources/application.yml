@@ -1,4 +1,7 @@
 spring:
+  redis:
+    address: redis://10.21.32.221:6379
+    password: 123456
   servlet:
     multipart:
       max-file-size: 10MB
@@ -22,6 +25,8 @@ spring:
               messageModel: BROADCASTING
       bindings:
         eventUserJoinRoomApply-in-0:
+          consumer:
+            max-attempts: 3
           destination: eventRoomApply
           group: user-module-room-apply
         eventUserSendMsg-in-0:

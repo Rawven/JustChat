@@ -11,6 +11,7 @@
         <option value="$PROJECT_DIR$/common-User/pom.xml" />
       </set>
     </option>
+    <option name="workspaceImportForciblyTurnedOn" value="true" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="11" project-jdk-type="JavaSDK" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="11" project-jdk-type="JavaSDK" />
 </project>

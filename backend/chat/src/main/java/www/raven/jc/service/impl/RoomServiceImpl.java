@@ -1,6 +1,7 @@
 package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,7 +91,7 @@ public class RoomServiceImpl implements RoomService {
                 "您已经在这个聊天室了");
         Room room = roomDAO.getBaseMapper().selectById(roomId);
         Integer founderId = room.getFounderId();
-        Message<JoinRoomApplyEvent> msg = new GenericMessage<JoinRoomApplyEvent>(new JoinRoomApplyEvent(userId, founderId, roomId));
+        Message<JoinRoomApplyEvent> msg = new GenericMessage<JoinRoomApplyEvent>(new JoinRoomApplyEvent(userId, founderId, roomId, IdUtil.getSnowflakeNextIdStr()));
         streamBridge.send("producer-out-1", msg);
     }
 

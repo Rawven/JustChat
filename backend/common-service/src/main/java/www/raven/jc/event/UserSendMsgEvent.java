@@ -20,4 +20,5 @@ public class UserSendMsgEvent {
     private Integer roomId;
     private List<Integer> idsFromRoom;
     private String msg;
+    private String snowFlakeId;
 }

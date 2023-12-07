@@ -1,6 +1,7 @@
 package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,7 @@ public class ChatServiceImpl implements ChatService {
     @Autowired
     private StreamBridge streamBridge;
 
+
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void saveMsg(UserInfoDTO data, MessageDTO message, String roomId) {
@@ -59,7 +61,8 @@ public class ChatServiceImpl implements ChatService {
         List<UserRoom> ids = userRoomDAO.getBaseMapper().selectList(new QueryWrapper<UserRoom>().eq("room_id", roomId));
         List<Integer> userIds = ids.stream().map(UserRoom::getUserId).collect(Collectors.toList());
         org.springframework.messaging.Message<UserSendMsgEvent> msg = new GenericMessage<>(
-                new UserSendMsgEvent(data.getUserId(), Integer.valueOf(roomId), userIds, message.getText()));
+                new UserSendMsgEvent(data.getUserId(), Integer.valueOf(roomId), userIds, message.getText(),
+                        IdUtil.getSnowflakeNextIdStr()));
         streamBridge.send("producer-out-0", msg);
     }
 
