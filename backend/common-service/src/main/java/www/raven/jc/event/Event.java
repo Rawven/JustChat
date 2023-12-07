@@ -5,16 +5,14 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 /**
- * join room apply event
+ * event
  *
  * @author 刘家辉
- * @date 2023/12/04
+ * @date 2023/12/07
  */
 @Data
 @Accessors
 @AllArgsConstructor
-public class JoinRoomApplyEvent {
-    private Integer applyId;
-    private Integer founderId;
-    private Integer roomId;
+public class Event {
+    private String data;
 }

@@ -17,4 +17,11 @@ public interface NoticeService {
      * @return {@link List}<{@link NoticeVO}>
      */
     List<NoticeVO> loadNotice();
+
+    /**
+     * delete new room msg notice
+     *
+     * @param roomId room id
+     */
+    void deleteNewRoomMsgNotice(Integer roomId);
 }

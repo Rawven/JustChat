@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.rocketmq.common.message.MessageConst;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.messaging.Message;
@@ -19,11 +20,15 @@ import www.raven.jc.entity.po.Room;
 import www.raven.jc.entity.po.UserRoom;
 import www.raven.jc.entity.vo.RealRoomVO;
 import www.raven.jc.entity.vo.RoomVO;
+import www.raven.jc.event.Event;
 import www.raven.jc.event.JoinRoomApplyEvent;
 import www.raven.jc.feign.UserFeign;
 import www.raven.jc.service.RoomService;
+import www.raven.jc.util.JsonUtil;
+import www.raven.jc.util.MqUtil;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -91,8 +96,7 @@ public class RoomServiceImpl implements RoomService {
                 "您已经在这个聊天室了");
         Room room = roomDAO.getBaseMapper().selectById(roomId);
         Integer founderId = room.getFounderId();
-        Message<JoinRoomApplyEvent> msg = new GenericMessage<JoinRoomApplyEvent>(new JoinRoomApplyEvent(userId, founderId, roomId, IdUtil.getSnowflakeNextIdStr()));
-        streamBridge.send("producer-out-1", msg);
+        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new JoinRoomApplyEvent(userId, founderId, roomId)), new String[]{"APPLY"}));
     }
 
 

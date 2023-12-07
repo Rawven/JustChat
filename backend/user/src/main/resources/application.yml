@@ -19,18 +19,22 @@ spring:
         bindings:
           eventUserJoinRoomApply-in-0:
             consumer:
+              tags: APPLY
               messageModel: BROADCASTING
           eventUserSendMsg-in-0:
             consumer:
+              tags: RECORD
               messageModel: BROADCASTING
       bindings:
         eventUserJoinRoomApply-in-0:
           consumer:
             max-attempts: 3
-          destination: eventRoomApply
+          destination: eventChatToUser
           group: user-module-room-apply
         eventUserSendMsg-in-0:
-          destination: eventUserSendMsg
+          consumer:
+            max-attempts: 3
+          destination: eventChatToUser
           group: user-module-user-msg
     nacos:
       discovery:

@@ -10,4 +10,5 @@ public class NoticeConstant {
     public static final String TYPE_JOIN_ROOM_APPLY = "join_room_apply";
     public static final String TYPE_USER_SEND_MSG = "user_send_msg";
     public static final String STATUS_UNREAD = "unread";
+    public static final Object STATUS_DONE = "done";
 }

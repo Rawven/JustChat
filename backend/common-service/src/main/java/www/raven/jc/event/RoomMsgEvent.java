@@ -15,10 +15,9 @@ import java.util.List;
 @Data
 @Accessors(chain = true)
 @AllArgsConstructor
-public class UserSendMsgEvent {
+public class RoomMsgEvent{
     private Integer userId;
     private Integer roomId;
     private List<Integer> idsFromRoom;
     private String msg;
-    private String snowFlakeId;
 }

@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.common.message.MessageConst;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.messaging.support.GenericMessage;
@@ -16,12 +17,16 @@ import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.entity.po.Message;
 import www.raven.jc.entity.po.UserRoom;
 import www.raven.jc.entity.vo.MessageVO;
-import www.raven.jc.event.UserSendMsgEvent;
+import www.raven.jc.event.Event;
+import www.raven.jc.event.RoomMsgEvent;
 import www.raven.jc.feign.UserFeign;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.ChatService;
+import www.raven.jc.util.JsonUtil;
+import www.raven.jc.util.MqUtil;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -60,14 +65,14 @@ public class ChatServiceImpl implements ChatService {
         Assert.isTrue(messageDAO.getBaseMapper().insert(realMsg) > 0, "插入失败");
         List<UserRoom> ids = userRoomDAO.getBaseMapper().selectList(new QueryWrapper<UserRoom>().eq("room_id", roomId));
         List<Integer> userIds = ids.stream().map(UserRoom::getUserId).collect(Collectors.toList());
-        org.springframework.messaging.Message<UserSendMsgEvent> msg = new GenericMessage<>(
-                new UserSendMsgEvent(data.getUserId(), Integer.valueOf(roomId), userIds, message.getText(),
-                        IdUtil.getSnowflakeNextIdStr()));
-        streamBridge.send("producer-out-0", msg);
+        RoomMsgEvent roomMsgEvent = new RoomMsgEvent(data.getUserId(), Integer.valueOf(roomId), userIds, message.getText());
+        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(roomMsgEvent), new String[]{"RECORD"}));
     }
 
     @Override
     public List<MessageVO> restoreHistory(Integer roomId) {
+        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(roomMsgEvent), new String[]{"DELETE"}));
+
         List<Message> messages = messageDAO.getBaseMapper().selectList(new QueryWrapper<Message>().eq("room_id", roomId).orderByAsc("timestamp"));
         List<UserRoom> ids = userRoomDAO.getBaseMapper().selectList(new QueryWrapper<UserRoom>().eq("room_id", roomId));
         List<Integer> userIds = ids.stream().map(UserRoom::getUserId).collect(Collectors.toList());
