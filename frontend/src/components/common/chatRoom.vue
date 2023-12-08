@@ -19,12 +19,8 @@
             <path d="M19 12H5"></path>
           </svg>
         </a>
-        <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
-          <span class="flex h-full w-full items-center justify-center rounded-full bg-muted">GC</span>
-        </span>
         <div>
-          <h2 class="text-lg font-semibold">Group Chat</h2>
-          <p class="text-sm text-gray-400">12 members</p>
+          <h2 class="text-lg font-semibold">{{this.theRoom.roomName}}</h2>
         </div>
       </div>
       <a class="text-gray-500 hover:text-gray-900" href="#">
@@ -71,7 +67,7 @@
         <div v-else>
           <div class="flex items-end space-x-2">
         <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full mt-2">
-          <span class="flex h-full w-full items-center justify-center rounded-full bg-muted">UA</span>
+          <span class="flex h-full w-full items-center justify-center rounded-full bg-muted">{{ message.user }}</span>
         </span>
             <div class="rounded-lg border shadow-sm bg-blue-50 text-blue-700" data-v0-t="card">
               <div class="p-6">
@@ -128,8 +124,8 @@ export default {
     }
   },
   props: {
-    roomId: {
-      type: Number,
+    room: {
+      type: String,
       required: true
     },
     user: {
@@ -139,6 +135,14 @@ export default {
   },
   data() {
     return {
+      theRoom: {
+        roomId: '',
+        lastMsg: '',
+        roomProfile: '',
+        roomName: '',
+        founderName: '',
+        maxPeople: 1,
+      },
       message: '',
       messages: [],
       socket: null,
@@ -146,11 +150,12 @@ export default {
   },
   created() {
     let token = localStorage.getItem("token");
-    console.log('WebSocket created:', this.roomId)
-    this.socket = new WebSocket(`ws://` + Host + `:8081/websocket/${token}/${this.roomId}`);
+    this.theRoom = JSON.parse(this.room);
+    console.log('WebSocket created:', this.theRoom)
+    this.socket = new WebSocket(`ws://` + Host + `:8081/websocket/${token}/${this.theRoom.roomId}`);
 
     this.socket.onopen = () => {
-      this.realAxios.post(`http://` + Host + `:7000/chat/common/query/restoreHistory/${this.roomId}`, {}, {
+      this.realAxios.post(`http://` + Host + `:7000/chat/common/query/restoreHistory/${this.theRoom.roomId}`, {}, {
         headers: {
           'token': token
         }

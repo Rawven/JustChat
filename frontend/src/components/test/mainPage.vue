@@ -40,7 +40,7 @@
         </div>
       </nav>
     </aside>
-    <chat-room v-if="this.nowRoomId !==0" :room-id="Number(this.nowRoomId)" :user="this.userInfo.username"></chat-room>
+    <chat-room v-if="this.nowRoomId !==0" :room="JSON.stringify(this.rooms[this.nowRoomId-1])" :user="this.userInfo.username"></chat-room>
   </el-container>
 </template>
 
