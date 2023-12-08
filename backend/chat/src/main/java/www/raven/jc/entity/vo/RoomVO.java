@@ -15,7 +15,10 @@ import lombok.experimental.Accessors;
 public class RoomVO {
     private Integer roomId;
     private String roomName;
-    private String roomDescription;
-    private String founderName;
-    private Integer maxPeople;
+    /**
+     *  用founder profile 代替
+     */
+    private String roomProfile;
+    private String lastMsg;
+    private String lastMsgSender;
 }

@@ -46,7 +46,7 @@ public class CommonController {
      * @param userId user id
      * @return {@link CommonResult}<{@link Void}>
      */
-    @PostMapping("/common/userLogout")
+    @PostMapping("/userLogout")
     CommonResult<Void> saveLogOutTime(@RequestBody  Integer userId){
         userService.saveTime(userId);
         return CommonResult.operateSuccess("登出成功");
@@ -86,8 +86,8 @@ public class CommonController {
         return CommonResult.operateSuccess("查找成功", userService.queryAllInfo());
     }
 
-    @PostMapping("/common/getBatchInfo")
-    CommonResult<List<UserInfoDTO>> getBatchInfo(List<Integer> userIds) {
+    @PostMapping("/getBatchInfo")
+    CommonResult<List<UserInfoDTO>> getBatchInfo(@RequestBody  List<Integer> userIds) {
         return CommonResult.operateSuccess("查找成功", userService.queryBatchInfo(userIds));
     }
 

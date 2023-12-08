@@ -28,7 +28,7 @@ public interface RoomService {
      * @param size size
      * @return {@link List}<{@link RoomVO}>
      */
-    RealRoomVO queryAllRoomPage(Integer page, Integer size);
+    RealRoomVO initUserMainPage(Integer page, Integer size);
 
     /**
      * query liked room list

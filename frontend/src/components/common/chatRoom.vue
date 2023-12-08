@@ -1,29 +1,120 @@
 <template>
-  <el-container class="container flex h-screen bg-gray-800 text-white">
-    <el-card class="box-card flex items-center justify-between p-4">
-      <el-row class="title"> 欢迎来到聊天室！😄</el-row>
-      <el-row :gutter="20">
-        <el-col :span="18">
-          <el-card class="grid-content bg-purple">
-            <el-input v-model="message" placeholder="请输入消息"></el-input>
-            <el-button type="primary" @click="sendMessage">发送消息</el-button>
-            <el-card class="message-card">
-              <div v-for="msg in messages" :key="msg.time" class="message flex items-center justify-between py-4">
-                <el-aside class="meSide">
-                  <el-row class="message-user">{{ msg.user }}</el-row>
-                  <img :src="'http://10.44.59.225:8083/ipfs/'+msg.profile" alt="User profile" class="message-profile relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
-                </el-aside>
-                <el-card class="message-content">
-                  <p class="message-time">{{ new Date(msg.time).toLocaleString() }}</p>
-                  <p class="message-text">{{ msg.text }}</p>
-                </el-card>
+  <div class="flex flex-col flex-1 w-auto">
+    <header class="flex items-center justify-between p-4 bg-white border-b border-gray-200">
+      <div class="flex items-center space-x-4">
+        <a class="text-gray-500 hover:text-gray-900" href="#">
+          <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="50"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="w-6 h-6"
+          >
+            <path d="m12 19-7-7 7-7"></path>
+            <path d="M19 12H5"></path>
+          </svg>
+        </a>
+        <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
+          <span class="flex h-full w-full items-center justify-center rounded-full bg-muted">GC</span>
+        </span>
+        <div>
+          <h2 class="text-lg font-semibold">Group Chat</h2>
+          <p class="text-sm text-gray-400">12 members</p>
+        </div>
+      </div>
+      <a class="text-gray-500 hover:text-gray-900" href="#">
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="50"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="w-6 h-6"
+        >
+          <path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"></path>
+          <path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path>
+          <path d="M12 2v2"></path>
+          <path d="M12 22v-2"></path>
+          <path d="m17 20.66-1-1.73"></path>
+          <path d="M11 10.27 7 3.34"></path>
+          <path d="m20.66 17-1.73-1"></path>
+          <path d="m3.34 7 1.73 1"></path>
+          <path d="M14 12h8"></path>
+          <path d="M2 12h2"></path>
+          <path d="m20.66 7-1.73 1"></path>
+          <path d="m3.34 17 1.73-1"></path>
+          <path d="m17 3.34-1 1.73"></path>
+          <path d="m11 13.73-4 6.93"></path>
+        </svg>
+      </a>
+    </header>
+    <main class="flex-1 p-4 space-y-4 main-content">
+      <div v-for="(message, index) in messages" :key="index">
+        <div v-if="isMe(message)">
+          <div class="flex flex-col items-end space-y-2">
+            <div class="rounded-lg border shadow-sm bg-green-50 text-green-700" data-v0-t="card">
+              <div class="p-6">
+                <p>{{message.text}}</p>
               </div>
-            </el-card>
-          </el-card>
-        </el-col>
-      </el-row>
-    </el-card>
-  </el-container>
+            </div>
+          </div>
+        </div>
+        <div v-else>
+          <div class="flex items-end space-x-2">
+        <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full mt-2">
+          <span class="flex h-full w-full items-center justify-center rounded-full bg-muted">UA</span>
+        </span>
+            <div class="rounded-lg border shadow-sm bg-blue-50 text-blue-700" data-v0-t="card">
+              <div class="p-6">
+                <p>{{ message.text }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+    </main>
+    <footer class="p-4 bg-white border-t border-gray-200">
+      <div class="flex items-center space-x-4">
+        <button
+            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10">
+          <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="50"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="w-6 h-6"
+          >
+            <path d="M5 12h14"></path>
+            <path d="M12 5v14"></path>
+          </svg>
+        </button>
+        <input
+            v-model="message"
+            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 flex-1"
+            placeholder="Type a message"
+        />
+        <button
+            @click="sendMessage"
+            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+          Send
+        </button>
+      </div>
+    </footer>
+  </div>
 </template>
 
 <script>
@@ -37,7 +128,14 @@ export default {
     }
   },
   props: {
-    roomId: String
+    roomId: {
+      type: Number,
+      required: true
+    },
+    user: {
+      type: String,
+      required: true
+    },
   },
   data() {
     return {
@@ -90,6 +188,9 @@ export default {
   },
 
   methods: {
+    isMe(message){
+      return message.user === this.user;
+    },
     Host() {
       return Host
     },
@@ -111,13 +212,9 @@ export default {
 </script>
 
 <style scoped>
-.title {
-  font-size: 24px;
-  color: #409EFF;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 20px;
-  animation: fadeIn 2s;
+.main-content {
+  height: 100%; /* 设置高度为视口的100% */
+  overflow-y: auto; /* 当内容溢出时显示滚动条 */
 }
 
 @keyframes fadeIn {
@@ -129,83 +226,6 @@ export default {
   }
 }
 
-.grid-content {
-  margin-right: 200px;
-  width: 125%;
-  height: 40cm;
-}
 
-.box-card {
-  position: absolute;
-  top: 75px;
-  left: 100px;
-  margin-right: 400px;
-  padding: 20px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-  width: 90%;
-  height: 100%;
-}
-
-.meSide {
-  width: 80px; /* 调整宽度 */
-  height: 150px; /* 调整高度 */
-}
-
-.message {
-  display: flex;
-  border: 1px solid #d3dce6;
-  border-radius: 4px;
-  padding: 10px;
-  margin-bottom: 10px;
-  height: 120px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1); /* 添加阴影 */
-  background-color: #fff; /* 添加背景色 */
-}
-
-.message-card {
-  width: 100%;
-  height: 100%;
-}
-
-.message-profile {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  margin-right: 10px;
-}
-
-.message-content {
-  display: flex;
-  left: 100px;
-  flex-direction: column;
-  padding: 10px; /* 添加内边距 */
-  border: 1px solid #d3dce6; /* 添加边框 */
-  border-radius: 20px; /* 添加圆角 */
-  margin-right: auto; /* 添加这一行 */
-}
-
-
-.message-user {
-  order: 2;
-}
-
-.message-time {
-  order: 1;
-  color: #409EFF;
-  font-size: 12px;
-  top: 20px;
-}
-
-.message-text {
-  order: 3;
-  margin-top: 5px;
-  font-size: 16px;
-}
-
-.bg-purple {
-  background: #d3dce6;
-  padding: 20px;
-  border-radius: 4px;
-}
 
 </style>

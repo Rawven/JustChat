@@ -22,4 +22,5 @@ public class Room {
     private String roomDescription;
     private Integer founderId;
     private Integer maxPeople;
+    private Integer lastMsgId;
 }

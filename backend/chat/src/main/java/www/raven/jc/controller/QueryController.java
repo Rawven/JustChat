@@ -25,9 +25,9 @@ public class QueryController {
     @Autowired
     private RoomService roomService;
 
-    @GetMapping("/queryRoomList/{page}/{size}")
-    public CommonResult<RealRoomVO> queryRoomList(@PathVariable("page") int page, @PathVariable("size") int size) {
-        return CommonResult.operateSuccess("获取房间列表成功", roomService.queryAllRoomPage(page, size));
+    @GetMapping("/queryUserRoomList/{page}/{size}")
+    public CommonResult<RealRoomVO> initUserMainPage(@PathVariable("page") int page, @PathVariable("size") int size) {
+        return CommonResult.operateSuccess("获取房间列表成功", roomService.initUserMainPage(page, size));
     }
 
     @GetMapping("/queryRelatedRoomList/{text}/{choice}/{page}")
