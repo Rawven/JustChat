@@ -119,4 +119,11 @@ public interface UserService {
      * @return {@link List}<{@link UserInfoDTO}>
      */
     List<UserInfoDTO> queryBatchInfo(List<Integer> userIds);
+
+    /**
+     * save time
+     *
+     * @param userId user id
+     */
+    void saveTime(Integer userId);
 }

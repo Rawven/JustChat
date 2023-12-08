@@ -40,6 +40,17 @@ public class CommonController {
     CommonResult<Boolean> checkUserExit(@RequestBody String username) {
         return CommonResult.operateSuccess("查找成功", userService.checkUserExit(username));
     }
+    /**
+     * user logout
+     *
+     * @param userId user id
+     * @return {@link CommonResult}<{@link Void}>
+     */
+    @PostMapping("/common/userLogout")
+    CommonResult<Void> saveLogOutTime(@RequestBody  Integer userId){
+        userService.saveTime(userId);
+        return CommonResult.operateSuccess("登出成功");
+    }
 
     @PostMapping("/setProfile")
     public CommonResult<Void> setProfile(@RequestParam("file") MultipartFile profile) {

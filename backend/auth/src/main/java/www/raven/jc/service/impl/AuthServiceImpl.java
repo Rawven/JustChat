@@ -77,6 +77,14 @@ public class AuthServiceImpl implements AuthService {
         return getTokenClaims(verify.getUserId(), verify.getRole());
     }
 
+    @Override
+    public void logout(String token) {
+        TokenDTO verify = JwtUtil.verify(token, key);
+        redissonClient.getBucket("token:" + verify.getUserId()).delete();
+        CommonResult<Void> voidCommonResult = userFeign.saveLogOutTime(verify.getUserId());
+        Assert.isTrue(voidCommonResult.getCode() == 200);
+    }
+
     private String register(RegisterModel registerModel, List<Integer> roleIds) {
         Assert.isFalse(userFeign.checkUserExit(registerModel.getUsername()).getData());
         UserRegisterDTO user = new UserRegisterDTO();

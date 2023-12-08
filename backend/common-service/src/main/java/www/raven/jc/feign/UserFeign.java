@@ -88,4 +88,12 @@ public interface UserFeign {
     @PostMapping("/common/getBatchInfo")
     CommonResult<List<UserInfoDTO>> getBatchInfo(List<Integer> userIds);
 
+    /**
+     * user logout
+     *
+     * @param userId user id
+     * @return {@link CommonResult}<{@link Void}>
+     */
+    @PostMapping("/common/userLogout")
+    CommonResult<Void> saveLogOutTime(Integer userId);
 }

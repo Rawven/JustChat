@@ -43,4 +43,12 @@ public interface AuthService {
      * @return {@link String}
      */
     String refreshToken(String token);
+
+    /**
+     * logout
+     *
+     * @param token token
+     * @return {@link String}
+     */
+    void logout(String token);
 }

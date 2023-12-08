@@ -49,6 +49,11 @@ public class AuthController {
             return CommonResult.operateFailure("注册失败", "私钥错误");
         }
     }
+    @PostMapping("/logout")
+    public CommonResult<Void> logout(@RequestBody String token) {
+        authService.logout(token);
+        return CommonResult.operateSuccess("登出成功");
+    }
 
     @PostMapping("/refresh")
     public CommonResult<String> refresh(@RequestBody String token) {

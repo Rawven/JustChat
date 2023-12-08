@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.sql.Date;
+
 /**
  * user
  *
@@ -23,4 +25,6 @@ public class User {
     private String profile;
     private String email;
     private String signature;
+    private Date lastOnlineTime;
+
 }

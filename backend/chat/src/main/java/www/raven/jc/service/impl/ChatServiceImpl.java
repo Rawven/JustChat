@@ -71,7 +71,7 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public List<MessageVO> restoreHistory(Integer roomId) {
-        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(roomMsgEvent), new String[]{"DELETE"}));
+       // streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(roomMsgEvent), new String[]{"DELETE"}));
 
         List<Message> messages = messageDAO.getBaseMapper().selectList(new QueryWrapper<Message>().eq("room_id", roomId).orderByAsc("timestamp"));
         List<UserRoom> ids = userRoomDAO.getBaseMapper().selectList(new QueryWrapper<UserRoom>().eq("room_id", roomId));

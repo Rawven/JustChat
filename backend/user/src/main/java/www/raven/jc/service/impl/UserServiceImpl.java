@@ -169,6 +169,11 @@ public class UserServiceImpl implements UserService {
         ).collect(Collectors.toList());
     }
 
+    @Override
+    public void saveTime(Integer userId) {
+        Assert.isTrue(userDAO.getBaseMapper().update(new UpdateWrapper<User>().eq("id", userId).set("last_online_time", System.currentTimeMillis())) > 0, "登出失败");
+    }
+
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override

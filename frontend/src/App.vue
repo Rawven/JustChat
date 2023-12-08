@@ -14,47 +14,56 @@
   </el-container>
 </template>
 
-<script setup>
-import HeaderH from "@/components/Header.vue";
-import axios from 'axios';
-import {provide} from 'vue'
-import {ElMessage} from 'element-plus'
+<script>
 import {Host} from "@/main";
-// 创建一个axios实例
-const axiosFilter = axios.create();
-// 添加请求拦截器
-axiosFilter.interceptors.request.use(function (config) {
-  // 在发送请求之前做些什么
-  console.log("开始调用,URL" + config.url + ",method:" + config.method + ",data:" + JSON.stringify(config.data))
-  return config;
-}, function (error) {
-  // 对请求错误做些什么
-  return Promise.reject(error);
-});
-// 添加响应拦截器
-axiosFilter.interceptors.response.use(function (response) {
-  // 对响应数据做点什么
-  if (response.data.code !== 200) {
-    if (response.data.code === 402) {
-      ElMessage.info("令牌过期，自动刷新");
-      axiosFilter.post('http://' + Host + ':7000/auth/refreshToken', {'token': localStorage.getItem("token")}).then(response1 => {
-        localStorage.setItem("token", response1.data.data);
-      })
-      this.$router.go(0);
+
+export default {
+  name: 'App',
+  inject: {
+    realAxios: {
+      from: 'axiosFilter'
     }
-    ElMessage.error(response.data.message);
-    return Promise.reject(new Error(response.data.message));
+  },
+  data() {
+    return {
+      gap_time: 0,
+      beforeUnload_time: 0,
+    };
+  },
+  methods: {
+    // 关闭窗口之前执行
+    beforeunloadHandler() {
+      this.beforeUnload_time = new Date().getTime();
+    },
+    unloadHandler() {
+      this.gap_time = new Date().getTime() - this.beforeUnload_time;
+      //判断是窗口关闭还是刷新 毫秒数判断 网上大部分写的是5
+      if (this.gap_time <= 10) {
+         this.realAxios.post('http://'+Host+':7000/user/common/logout',{},{
+           headers: {
+             'token': localStorage.getItem("token")
+           }
+         })
+        localStorage.removeItem("token");
+        localStorage.removeItem("userData");
+        this.$router.push('/common/login');
+      } else {
+        console.log(document.domain);
+        return confirm("确定要离开本系统么？");
+      }
+    },
+  },
+  unmounted() {//vue可换为destroyed()生命周期，不过这个也可以用
+    // 移除监听
+    window.removeEventListener("beforeunload", () => this.beforeunloadHandler());
+    window.removeEventListener("unload", () => this.unloadHandler());
+  },
+  mounted() {
+    // 监听浏览器关闭
+    window.addEventListener("beforeunload", () => this.beforeunloadHandler());
+    window.addEventListener("unload", () => this.unloadHandler());
   }
-
-  console.log("调用成功,URL" + response.config.url + ",data:" + JSON.stringify(response.data))
-  return response;
-}, function (error) {
-  // 对响应错误做点什么
-  return Promise.reject(error);
-});
-// 提供axiosFilter
-provide('axiosFilter', axiosFilter);
-
+}
 </script>
 
 <style scoped>
