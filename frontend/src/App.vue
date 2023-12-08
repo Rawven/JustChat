@@ -1,24 +1,19 @@
 <template>
-  <!-- 你的业务内容放在这里 -->
-  <el-container>
-    <el-header>
-      <HeaderH></HeaderH>
-    </el-header>
-    <el-main class="thisContainer">
-      <div>
-        <keep-alive>
-          <router-view/>
-        </keep-alive>
-      </div>
-    </el-main>
-  </el-container>
+  <router-view v-slot="{ Component }">
+    <keep-alive>
+      <component :is="Component" />
+    </keep-alive>
+  </router-view>
 </template>
-
 <script>
 import {Host} from "@/main";
+import {ParticlesBg} from "particles-bg-vue";
 
 export default {
   name: 'App',
+  components: {
+    ParticlesBg
+  },
   inject: {
     realAxios: {
       from: 'axiosFilter'
@@ -66,18 +61,21 @@ export default {
 }
 </script>
 
-<style scoped>
-.thisContainer {
+<style >
+html,
+body,
+#app{
   height: 100%;
-  width: 100%;
-  background-color: #f2f2f2;
-  overflow: auto;
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  margin: 10px;
+  margin: 0;
+  padding: 0;
+}
+ #app {
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
 }
 
 </style>

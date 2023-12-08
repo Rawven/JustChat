@@ -3,8 +3,22 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/backend/account/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backend/account/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/admin/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/admin/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/auth/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/auth/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/chat/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/chat/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/common-base/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/common-base/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/common-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/common-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/gateway/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backend/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backend/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/user/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/user/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
   </component>

@@ -1,6 +1,5 @@
 <template>
   <el-container>
-
     <el-card class="box-card">
       <el-header>
         <el-text class="title">来注册一个账号吧👆👨</el-text>
@@ -24,13 +23,11 @@
 </template>
 
 <script>
-import HeaderH from "@/components/Header.vue";
 import {Host} from "@/main";
 
 export default {
   name: 'userRegister',
   // eslint-disable-next-line vue/no-unused-components
-  components: {HeaderH},
   inject: {
     realAxios: {
       from: 'axiosFilter'

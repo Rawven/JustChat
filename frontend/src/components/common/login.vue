@@ -1,8 +1,6 @@
 <template>
   <el-container class="container">
-    <el-aside>
-      <el-calendar v-model="value" class="calendar"/>
-    </el-aside>
+    <particles-bg type="random" :canvas="{backgroundColor:'#888'}" :bg="true"/>
     <el-main class="tMain">
       <el-row>
         <el-col :span="12">
@@ -27,34 +25,23 @@
             </el-form>
           </el-card>
         </el-col>
-        <el-col :span="12">
-          <el-row>
-            <el-switch
-                v-model="value2"
-                class="ml-2"
-                style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
-            />
-          </el-row>
-          <el-row>
-            <el-text v-if="value2" type="warning">今日你若冷眼旁待</el-text>
-            <el-text v-else type="warning">他人祸临己身 无人为你摇旗呐喊</el-text>
-          </el-row>
-        </el-col>
       </el-row>
     </el-main>
   </el-container>
 </template>
 
 <script>
-import HeaderH from "@/components/Header.vue";
 import {Host} from "@/main";
 import {ref} from "vue";
+import {ParticlesBg} from "particles-bg-vue";
 
 export default {
+  components: {
+    ParticlesBg
+  },
 
   name: 'accountName',
   // eslint-disable-next-line vue/no-unused-components
-  components: {HeaderH},
   inject: {
     realAxios: {
       from: 'axiosFilter'
@@ -105,44 +92,45 @@ export default {
 </script>
 
 <style scoped>
-.calendar {
-  width: auto;
-}
 
 .button {
   margin-left: 100px;
 }
 
 .button2 {
-  margin-left: 50px;
+  margin-left: 70px;
 }
 
 .image {
-  margin-left: 50px;
+  margin-left: 30px;
   border-radius: 50%; /* 设置边框半径为 50%，使图片变成圆形 */
 }
 
 .container {
-  top: 65px; /* 设置距离顶部为 0 */
+  position: fixed; /* 设置定位类型为固定定位 */
+  top: 0; /* 设置距离顶部为 0 */
   left: 0; /* 设置距离左侧为 0 */
-  position: relative; /* 设置定位类型为绝对定位 */
-  margin: 10px;
+  right: 0; /* 设置距离右侧为 0 */
+  bottom: 0; /* 设置距离底部为 0 */
   background-color: #f5f5f5; /* 设置背景颜色为灰色 */
 }
 
 .tMain {
-
-  width: 500px;
+  position: relative; /* 设置定位类型为相对定位 */
+  width: 100%; /* 设置宽度为100% */
+  height: 100%; /* 设置高度为100% */
 }
 
-
 .box-card {
-  margin-left: 100px;
+  position: absolute; /* 设置定位类型为绝对定位 */
+  top: 50%; /* 设置距离顶部为50% */
+  left: 50%; /* 设置距离左侧为50% */
+  transform: translate(-50%, 25%); /* 向左和向上移动50% */
   width: 400px;
 }
 
 .login-form {
-  margin-top: 20px;
+  margin-top: auto; /* 设置上边距为自动 */
+  margin-bottom: auto; /* 设置下边距为自动 */
 }
-
 </style>

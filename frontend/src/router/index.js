@@ -11,6 +11,11 @@ const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
         {
+            path: '/test',
+            name: 'TestView',
+            component: () => import('@/components/test/mainPage.vue')
+        },
+        {
 
             path: '/common',
             children: [
