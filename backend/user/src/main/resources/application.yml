@@ -12,30 +12,20 @@ spring:
   cloud:
     stream:
       function:
-        definition: eventUserSendMsg;eventUserJoinRoomApply
+        definition: eventChatToUser;
       rocketmq:
         binder:
           name-server: 10.21.32.221:9876
         bindings:
-          eventUserJoinRoomApply-in-0:
+          eventChatToUser-in-0:
             consumer:
-              tags: APPLY
-              messageModel: BROADCASTING
-          eventUserSendMsg-in-0:
-            consumer:
-              tags: RECORD
-              messageModel: BROADCASTING
+                messageModel: BROADCASTING
       bindings:
-        eventUserJoinRoomApply-in-0:
+        eventChatToUser-in-0:
           consumer:
             max-attempts: 3
           destination: eventChatToUser
-          group: user-module-room-apply
-        eventUserSendMsg-in-0:
-          consumer:
-            max-attempts: 3
-          destination: eventChatToUser
-          group: user-module-user-msg
+          group: user-module
     nacos:
       discovery:
         server-addr: 10.21.32.154:8848

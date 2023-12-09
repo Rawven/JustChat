@@ -72,6 +72,7 @@ export default {
           // 发送登录请求
           this.realAxios.post('http://' + Host + ':7000/auth/login', this.user)
               .then(response => {
+                localStorage.removeItem("token");
                 localStorage.setItem("token", response.data.data);
                 this.realAxios.post('http://' + Host + ':7000/user/common/defaultInfo', {}, {
                   headers: {

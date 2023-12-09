@@ -11,10 +11,12 @@ import org.springframework.messaging.support.GenericMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.dao.MessageDAO;
+import www.raven.jc.dao.RoomDAO;
 import www.raven.jc.dao.UserRoomDAO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.entity.po.Message;
+import www.raven.jc.entity.po.Room;
 import www.raven.jc.entity.po.UserRoom;
 import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.event.Event;
@@ -46,6 +48,8 @@ public class ChatServiceImpl implements ChatService {
     @Autowired
     private UserRoomDAO userRoomDAO;
     @Autowired
+    private RoomDAO roomDAO;
+    @Autowired
     private UserFeign userFeign;
     @Autowired
     private StreamBridge streamBridge;
@@ -63,10 +67,12 @@ public class ChatServiceImpl implements ChatService {
                 .setSenderId(data.getUserId())
                 .setRoomId(Integer.parseInt(roomId));
         Assert.isTrue(messageDAO.getBaseMapper().insert(realMsg) > 0, "插入失败");
+        Assert.isTrue(roomDAO.getBaseMapper().updateById(new Room().setRoomId(Integer.valueOf(roomId)).setLastMsgId(realMsg.getMessageId()))>0, "更新失败");
         List<UserRoom> ids = userRoomDAO.getBaseMapper().selectList(new QueryWrapper<UserRoom>().eq("room_id", roomId));
         List<Integer> userIds = ids.stream().map(UserRoom::getUserId).collect(Collectors.toList());
-        RoomMsgEvent roomMsgEvent = new RoomMsgEvent(data.getUserId(), Integer.valueOf(roomId), userIds, message.getText());
-        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(roomMsgEvent), new String[]{"RECORD"}));
+        RoomMsgEvent roomMsgEvent = new RoomMsgEvent(data.getUserId(), Integer.valueOf(roomId), userIds, JsonUtil.objToJson(realMsg));
+        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(roomMsgEvent), "RECORD"));
+        log.info("广播出去了" );
     }
 
     @Override

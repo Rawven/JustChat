@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public class MqUtil {
 
-    public static Message<Event>  createMsg(String data, String[] tag) {
+    public static Message<Event>  createMsg(String data, String tag) {
         Map<String, Object> headers = new HashMap<>(2);
         headers.put(MessageConst.PROPERTY_KEYS, IdUtil.getSnowflakeNextIdStr());
         headers.put(MessageConst.PROPERTY_TAGS, tag);

@@ -113,7 +113,7 @@ public class RoomServiceImpl implements RoomService {
                 "您已经在这个聊天室了");
         Room room = roomDAO.getBaseMapper().selectById(roomId);
         Integer founderId = room.getFounderId();
-        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new JoinRoomApplyEvent(userId, founderId, roomId)), new String[]{"APPLY"}));
+        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new JoinRoomApplyEvent(userId, founderId, roomId)), "APPLY"));
     }
 
 

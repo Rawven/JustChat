@@ -21,7 +21,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 @Component
 @Slf4j
-@ServerEndpoint("/websocket")
+@ServerEndpoint("/websocket/{token}")
 public class NotificationHandler {
     /**
      * 用来存在线连接数
@@ -46,7 +46,7 @@ public class NotificationHandler {
      * 链接成功调用的方法
      */
     @OnOpen
-    public void onOpen(Session session, @PathParam(value = "token") String token, @PathParam(value = "roomId") String roomId) {
+    public void onOpen(Session session, @PathParam(value = "token") String token) {
         log.info("【websocket消息】有新的连接，token为:" + token);
         TokenDTO verify = JwtUtil.verify(token, "爱你老妈");
         session.getUserProperties().put("userDto", verify);

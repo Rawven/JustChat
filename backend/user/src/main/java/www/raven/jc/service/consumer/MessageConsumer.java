@@ -1,6 +1,7 @@
 package www.raven.jc.service.consumer;
 
 import cn.hutool.core.lang.Assert;
+import com.alibaba.cloud.stream.binder.rocketmq.constant.RocketMQConst;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.common.message.MessageConst;
 import org.redisson.api.RBucket;
@@ -37,8 +38,12 @@ import java.util.function.Consumer;
 @Slf4j
 public class MessageConsumer {
     private final static long EXPIRE_TIME = 10;
+    private static final String TAGS_APPLY = "APPLY";
+    private static final String TAGS_RECORD = "RECORD";
     @Autowired
     private NoticeDAO noticeDAO;
+    @Autowired
+    private UserDAO userDAO;
     @Autowired
     private NotificationHandler notificationHandler;
 
@@ -46,11 +51,29 @@ public class MessageConsumer {
     private RedissonClient redissonClient;
 
 
+
     @Bean
-    public Consumer<Message<Event>> eventUserJoinRoomApply() {
-        return msg -> {
+    public Consumer<Message<Event>> eventChatToUser() {
+    return msg ->{
+        String tags = Objects.requireNonNull(msg.getHeaders().get("ROCKET_TAGS")).toString();
+        if(TAGS_APPLY.equals(tags)){
+            eventUserJoinRoomApply(msg);
+        }else if (TAGS_RECORD.equals(tags)){
+            eventUserSendMsg(msg);
+        }else {
+            log.info("非法的消息，不处理");
+        }
+    };
+    }
+
+    /**
+     * 通知用户有人想要入群
+     *
+     * @param msg msg
+     */
+    public void eventUserJoinRoomApply(Message<Event> msg) {
             //查看是否已经处理过了
-            Object id = msg.getHeaders().get(MessageConst.PROPERTY_KEYS);
+            Object id = msg.getHeaders().get("ROCKET_KEYS");
             if(id == null||checkExist(id)){
                 log.info("重复或非法的消息，不处理");
                 return;
@@ -68,28 +91,29 @@ public class MessageConsumer {
             ids.add(founderId);
             sendMsgToUser(ids, "有人申请加入你的聊天室");
             saveIdInCache(id.toString());
-        };
     }
 
-    @Bean
-    public Consumer<Message<Event>> eventUserSendMsg() {
-        return msg -> {
-            Object id = msg.getHeaders().get(MessageConst.PROPERTY_KEYS);
+
+    /**
+     * 通知在线用户有新消息
+     *
+     * @param msg msg
+     */
+    public void eventUserSendMsg(Message<Event> msg) {
+            Object id = msg.getHeaders().get("ROCKET_KEYS");
             if(id == null||checkExist(id)){
                 log.info("重复或非法的消息，不处理");
                 return;
             }
+            log.info("收到消息");
             RoomMsgEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), RoomMsgEvent.class);
             Integer userId = payload.getUserId();
-            Notification notice = new Notification().setUserId(userId)
-                    .setMessage(JsonUtil.objToJson(payload))
-                    .setType(NoticeConstant.TYPE_USER_SEND_MSG)
-                    .setTimestamp(System.currentTimeMillis())
-                    .setStatus(NoticeConstant.STATUS_UNREAD);
-            Assert.isTrue(noticeDAO.save(notice));
-            sendMsgToUser(payload.getIdsFromRoom(), "有人发消息了");
+            HashMap<Object, Object> map = new HashMap<>(3);
+            map.put("roomId", payload.getRoomId());
+            map.put("username", userDAO.getBaseMapper().selectById(userId).getUsername());
+            map.put("msg", payload.getMsg());
+            sendMsgToUser(payload.getIdsFromRoom(), JsonUtil.mapToJson(map));
             saveIdInCache(Objects.requireNonNull(id).toString());
-        };
     }
     private Boolean checkExist(Object id){
         RBucket<Object> bucket = redissonClient.getBucket(id.toString());

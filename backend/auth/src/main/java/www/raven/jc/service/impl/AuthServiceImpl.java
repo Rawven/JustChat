@@ -104,7 +104,7 @@ public class AuthServiceImpl implements AuthService {
         HashMap<String, Object> claims = new HashMap<>(3);
         claims.put("userId", userId);
         claims.put("role", role);
-        claims.put("expireTime", System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7);
+        claims.put("expireTime", System.currentTimeMillis() + 1000 * 60 * 30);
         String token = JwtUtil.createToken(claims, key);
         redissonClient.getBucket("token:" + userId).set(token);
         return token;

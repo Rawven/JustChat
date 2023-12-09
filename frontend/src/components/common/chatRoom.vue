@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col flex-1 max-w-full mainDiv">
-    <header class="flex items-center justify-between p-4 bg-white border-b border-gray-200">
+    <header class="flex items-center justify-between p-4 bg-white border-b border-gray-200 theH">
       <div class="flex items-center space-x-4">
         <a class="text-gray-500 hover:text-gray-900" href="#">
           <svg
@@ -53,7 +53,7 @@
         </svg>
       </a>
     </header>
-    <main class="flex-1 p-4 space-y-4 main-content">
+    <main class="flex-1 p-4 space-y-4  main-content">
       <div v-for="(message, index) in messages" :key="index">
         <div v-if="isMe(message)">
           <div class="flex flex-col items-end space-y-2">
@@ -78,7 +78,7 @@
         </div>
         </div>
     </main>
-    <footer class="p-4 bg-white border-t border-gray-200">
+    <footer class="p-4 bg-white border-t border-gray-200 useFoot">
       <div class="flex items-center space-x-4 this">
         <button
             class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10">
@@ -226,9 +226,9 @@ body {
 
 
 .main-content {
-  height: 100%; /* 设置高度为视口的100% */
-  width: 95%;
+  height: 90%; /* 设置高度为视口的100% */
   overflow-y: auto; /* 当内容溢出时显示滚动条 */
+  padding-top: 30px;
 }
 
 @keyframes fadeIn {
@@ -238,6 +238,19 @@ body {
   to {
     opacity: 1;
   }
+}
+.useFoot,.main-content,.theH{
+  box-sizing: border-box;
+
+  width: 87%;
+  position: fixed;
+}
+.theH{
+  top: 0;
+}
+.useFoot{
+  animation: fadeIn 1s;
+  bottom: 0;
 }
 
 

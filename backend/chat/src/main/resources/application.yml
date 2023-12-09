@@ -8,9 +8,9 @@ spring:
     stream:
       bindings:
         producer-out-1:
-          destination: eventRoomApply
+          destination: eventChatToUser
         producer-out-0:
-          destination: eventUserSendMsg
+          destination: eventChatToUser
       rocketmq:
         bindings:
           producer-out-1:
