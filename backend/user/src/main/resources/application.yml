@@ -19,7 +19,7 @@ spring:
         bindings:
           eventChatToUser-in-0:
             consumer:
-                messageModel: BROADCASTING
+              messageModel: BROADCASTING
       bindings:
         eventChatToUser-in-0:
           consumer:

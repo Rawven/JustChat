@@ -69,6 +69,14 @@ public class ChatHandler {
         session.getUserProperties().put("userDto", JwtUtil.verify(token, "爱你老妈"));
         this.session = session;
         this.roomId = roomId;
+        Session sessionExisted = SESSION_POOL.get(token);
+        if (sessionExisted != null) {
+            try {
+                sessionExisted.close();
+            } catch (Exception e) {
+                log.error("关闭已存在的session失败");
+            }
+        }
         webSockets.add(this);
         SESSION_POOL.put(token, session);
         log.info("【websocket消息】有新的连接，总数为:" + webSockets.size());

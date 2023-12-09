@@ -1,13 +1,10 @@
 package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.rocketmq.common.message.MessageConst;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
-import org.springframework.messaging.support.GenericMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.dao.MessageDAO;
@@ -19,7 +16,6 @@ import www.raven.jc.entity.po.Message;
 import www.raven.jc.entity.po.Room;
 import www.raven.jc.entity.po.UserRoom;
 import www.raven.jc.entity.vo.MessageVO;
-import www.raven.jc.event.Event;
 import www.raven.jc.event.RoomMsgEvent;
 import www.raven.jc.feign.UserFeign;
 import www.raven.jc.result.CommonResult;
@@ -28,7 +24,6 @@ import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -67,20 +62,19 @@ public class ChatServiceImpl implements ChatService {
                 .setSenderId(data.getUserId())
                 .setRoomId(Integer.parseInt(roomId));
         Assert.isTrue(messageDAO.getBaseMapper().insert(realMsg) > 0, "插入失败");
-        Assert.isTrue(roomDAO.getBaseMapper().updateById(new Room().setRoomId(Integer.valueOf(roomId)).setLastMsgId(realMsg.getMessageId()))>0, "更新失败");
+        Assert.isTrue(roomDAO.getBaseMapper().updateById(new Room().setRoomId(Integer.valueOf(roomId)).setLastMsgId(realMsg.getMessageId())) > 0, "更新失败");
         List<UserRoom> ids = userRoomDAO.getBaseMapper().selectList(new QueryWrapper<UserRoom>().eq("room_id", roomId));
         List<Integer> userIds = ids.stream().map(UserRoom::getUserId).collect(Collectors.toList());
         RoomMsgEvent roomMsgEvent = new RoomMsgEvent(data.getUserId(), Integer.valueOf(roomId), userIds, JsonUtil.objToJson(realMsg));
         streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(roomMsgEvent), "RECORD"));
-        log.info("广播出去了" );
+        log.info("广播出去了");
     }
 
     @Override
     public List<MessageVO> restoreHistory(Integer roomId) {
-       // streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(roomMsgEvent), new String[]{"DELETE"}));
         log.info(roomId.toString());
         List<Message> messages = messageDAO.getBaseMapper().selectList(new QueryWrapper<Message>().eq("room_id", roomId).orderByAsc("timestamp"));
-      List<Integer> userIds = messages.stream().map(Message::getSenderId).collect(Collectors.toList());
+        List<Integer> userIds = messages.stream().map(Message::getSenderId).collect(Collectors.toList());
         log.info("userIds: {}", userIds);
         CommonResult<List<UserInfoDTO>> allInfo = userFeign.getBatchInfo(userIds);
         List<UserInfoDTO> data = allInfo.getData();

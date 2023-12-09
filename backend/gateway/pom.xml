@@ -6,7 +6,6 @@
         <artifactId>backend</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <groupId>www.Raven</groupId>
     <artifactId>gateway</artifactId>
     <name>gateway</name>
     <url>http://maven.apache.org</url>

@@ -1,13 +1,10 @@
 package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.rocketmq.common.message.MessageConst;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
-import org.springframework.messaging.support.GenericMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.dao.MessageDAO;
@@ -21,7 +18,6 @@ import www.raven.jc.entity.po.Room;
 import www.raven.jc.entity.po.UserRoom;
 import www.raven.jc.entity.vo.RealRoomVO;
 import www.raven.jc.entity.vo.RoomVO;
-import www.raven.jc.event.Event;
 import www.raven.jc.event.JoinRoomApplyEvent;
 import www.raven.jc.feign.UserFeign;
 import www.raven.jc.result.CommonResult;
@@ -30,7 +26,6 @@ import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -73,7 +68,7 @@ public class RoomServiceImpl implements RoomService {
         List<UserRoom> userId1 = userRoomDAO.getBaseMapper().selectList(new QueryWrapper<UserRoom>().eq("user_id", userId));
         List<Integer> roomIds = userId1.stream().map(UserRoom::getRoomId).collect(Collectors.toList());
         Page<Room> roomsPage = roomDAO.getBaseMapper().selectPage(new Page<>(page, size), new QueryWrapper<Room>().in("room_id", roomIds));
-        List<Integer> ids = roomsPage.getRecords().stream() .map(Room::getLastMsgId).collect(Collectors.toList());
+        List<Integer> ids = roomsPage.getRecords().stream().map(Room::getLastMsgId).collect(Collectors.toList());
         List<Message> messages = messageDAO.getBaseMapper().selectBatchIds(ids);
         CommonResult<List<UserInfoDTO>> batchInfo = userFeign.getBatchInfo(messages.stream().map(Message::getSenderId).collect(Collectors.toList()));
         Assert.isTrue(batchInfo.getCode() == 200);
@@ -85,7 +80,7 @@ public class RoomServiceImpl implements RoomService {
                 .setLastMsg(JsonUtil.objToJson(messageMap.get(room.getLastMsgId())))
                 .setLastMsgSender(map.get(messageMap.get(room.getLastMsgId()).getSenderId()).getUsername())
                 .setRoomProfile(map.get(room.getFounderId()).getProfile())).collect(Collectors.toList());
-       return new RealRoomVO().setRooms(rooms).setTotal(roomIds.size());
+        return new RealRoomVO().setRooms(rooms).setTotal(roomIds.size());
     }
 
     @Override

@@ -48,7 +48,6 @@ public interface AuthService {
      * logout
      *
      * @param token token
-     * @return {@link String}
      */
     void logout(String token);
 }

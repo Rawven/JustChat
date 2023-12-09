@@ -52,6 +52,14 @@ public class NotificationHandler {
         session.getUserProperties().put("userDto", verify);
         this.userId = verify.getUserId();
         this.session = session;
+        Session sessionExisted = SESSION_POOL.get(token);
+        if (sessionExisted != null) {
+            try {
+                sessionExisted.close();
+            } catch (Exception e) {
+                log.error("关闭已存在的session失败");
+            }
+        }
         webSockets.add(this);
         SESSION_POOL.put(token, session);
         log.info("【websocket消息】有新的连接，总数为:" + webSockets.size());
@@ -110,42 +118,7 @@ public class NotificationHandler {
             }
         }
     }
-//
-//
-//    /**
-//     * send one message
-//     *
-//     * @param token   user id
-//     * @param message message
-//     */
-//    public void sendOneMessage(String token, String message) {
-//        Session session = SESSION_POOL.get(token);
-//        if (session != null && session.isOpen()) {
-//            try {
-//                log.info("【websocket消息】 单点消息:" + message);
-//                session.getAsyncRemote().sendText(message);
-//            } catch (Exception e) {
-//                log.error(e.getMessage());
-//            }
-//        }
-//    }
-//
-//
-//    /**
-//     * send more message
-//     *
-//     * @param tokens  user ids
-//     * @param message message
-//     */
-//    public void sendMoreMessage(String[] tokens, String message) {
-//        for (String userId : tokens) {
-//            Session session = SESSION_POOL.get(userId);
-//            if (session != null && session.isOpen()) {
-//                log.info("【websocket消息】 单点消息:" + message);
-//                session.getAsyncRemote().sendText(message);
-//            }
-//        }
-//    }
+
 
     @Override
     public int hashCode() {

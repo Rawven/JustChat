@@ -16,7 +16,7 @@ public class RoomVO {
     private Integer roomId;
     private String roomName;
     /**
-     *  用founder profile 代替
+     * 用founder profile 代替
      */
     private String roomProfile;
     private String lastMsg;

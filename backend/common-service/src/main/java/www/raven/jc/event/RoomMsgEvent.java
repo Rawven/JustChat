@@ -17,7 +17,7 @@ import java.util.List;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoomMsgEvent{
+public class RoomMsgEvent {
     private Integer userId;
     private Integer roomId;
     private List<Integer> idsFromRoom;

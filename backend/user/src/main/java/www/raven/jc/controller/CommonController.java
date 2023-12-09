@@ -40,6 +40,7 @@ public class CommonController {
     CommonResult<Boolean> checkUserExit(@RequestBody String username) {
         return CommonResult.operateSuccess("查找成功", userService.checkUserExit(username));
     }
+
     /**
      * user logout
      *
@@ -47,7 +48,7 @@ public class CommonController {
      * @return {@link CommonResult}<{@link Void}>
      */
     @PostMapping("/userLogout")
-    CommonResult<Void> saveLogOutTime(@RequestBody  Integer userId){
+    CommonResult<Void> saveLogOutTime(@RequestBody Integer userId) {
         userService.saveTime(userId);
         return CommonResult.operateSuccess("登出成功");
     }
@@ -87,7 +88,7 @@ public class CommonController {
     }
 
     @PostMapping("/getBatchInfo")
-    CommonResult<List<UserInfoDTO>> getBatchInfo(@RequestBody  List<Integer> userIds) {
+    CommonResult<List<UserInfoDTO>> getBatchInfo(@RequestBody List<Integer> userIds) {
         return CommonResult.operateSuccess("查找成功", userService.queryBatchInfo(userIds));
     }
 

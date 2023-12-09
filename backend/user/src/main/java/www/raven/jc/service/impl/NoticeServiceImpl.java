@@ -32,15 +32,15 @@ public class NoticeServiceImpl implements NoticeService {
     public List<NoticeVO> loadNotice() {
         Integer userId = Integer.parseInt(request.getHeader("userId"));
         List<Notification> userId1 = noticeDAO.getBaseMapper().selectList(new QueryWrapper<Notification>().eq("user_id", userId).eq("status", NoticeConstant.STATUS_UNREAD).orderByDesc("timestamp"));
-           return userId1.stream().map(
-                    notification -> {
-                        NoticeVO noticeVO = new NoticeVO();
-                        noticeVO.setType(notification.getType())
-                                .setMessage(notification.getMessage())
-                                .setTimestamp(notification.getTimestamp());
-                        return noticeVO;
-                    }
-            ).collect(Collectors.toList());
+        return userId1.stream().map(
+                notification -> {
+                    NoticeVO noticeVO = new NoticeVO();
+                    noticeVO.setType(notification.getType())
+                            .setMessage(notification.getMessage())
+                            .setTimestamp(notification.getTimestamp());
+                    return noticeVO;
+                }
+        ).collect(Collectors.toList());
     }
 
     @Override
