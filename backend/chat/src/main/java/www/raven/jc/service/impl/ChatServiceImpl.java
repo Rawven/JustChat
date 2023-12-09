@@ -55,26 +55,25 @@ public class ChatServiceImpl implements ChatService {
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void saveMsg(UserInfoDTO data, MessageDTO message, String roomId) {
-        log.info("data: {}, message: {}, roomId: {}", data, message, roomId);
         long timeStamp = message.getTime();
         String text = message.getText();
-        log.info("timeStamp: {}, text: {}", timeStamp, text);
         Message realMsg = new Message().setContent(text)
                 .setTimestamp(new Date(timeStamp))
                 .setSenderId(data.getUserId())
                 .setRoomId(Integer.parseInt(roomId));
+        //保存消息
         Assert.isTrue(messageDAO.getBaseMapper().insert(realMsg) > 0, "插入失败");
+        //更新聊天室的最后一条消息
         Assert.isTrue(roomDAO.getBaseMapper().updateById(new Room().setRoomId(Integer.valueOf(roomId)).setLastMsgId(realMsg.getMessageId())) > 0, "更新失败");
         List<UserRoom> ids = userRoomDAO.getBaseMapper().selectList(new QueryWrapper<UserRoom>().eq("room_id", roomId));
         List<Integer> userIds = ids.stream().map(UserRoom::getUserId).collect(Collectors.toList());
         RoomMsgEvent roomMsgEvent = new RoomMsgEvent(data.getUserId(), Integer.valueOf(roomId), userIds, JsonUtil.objToJson(realMsg));
+        //通知user模块有新消息
         streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(roomMsgEvent), "RECORD"));
-        log.info("广播出去了");
     }
 
     @Override
     public List<MessageVO> restoreHistory(Integer roomId) {
-        log.info(roomId.toString());
         // 获取两天内的消息
         LocalDateTime twoDaysAgo = LocalDateTime.now().minusDays(2);
         Date twoDaysAgoDate = Date.from(twoDaysAgo.atZone(ZoneId.systemDefault()).toInstant());
@@ -82,8 +81,9 @@ public class ChatServiceImpl implements ChatService {
                 .eq("room_id", roomId)
                 .ge("timestamp", twoDaysAgoDate)
                 .orderByAsc("timestamp"));   List<Integer> userIds = messages.stream().map(Message::getSenderId).collect(Collectors.toList());
-        log.info("userIds: {}", userIds);
+         //查出聊天室内用户的信息
         CommonResult<List<UserInfoDTO>> allInfo = userFeign.getBatchInfo(userIds);
+        Assert.isTrue(allInfo.getCode() == 200, "userFeign调用失败");
         List<UserInfoDTO> data = allInfo.getData();
         Map<Integer, UserInfoDTO> userInfoMap = data.stream()
                 .collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));

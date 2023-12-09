@@ -18,26 +18,14 @@ import java.util.List;
  * @date 2023/11/23
  */
 public interface UserService {
-    /**
-     * profile upload
-     *
-     * @param profile profile
-     */
-    void setProfile(MultipartFile profile);
 
     /**
-     * set signature
+     * update by column
      *
-     * @param signature signature
+     * @param column column
+     * @param value  value
      */
-    void setSignature(String signature);
-
-    /**
-     * set username
-     *
-     * @param username username
-     */
-    void setUsername(String username);
+    void updateByColumn(String column,String value);
 
     /**
      * query single info
@@ -81,12 +69,13 @@ public interface UserService {
     RealAllInfoVO queryPageUser(Integer page);
 
     /**
-     * query single info by name
+     * query single info by column
      *
-     * @param username username
+     * @param column column
+     * @param value  value
      * @return {@link UserAuthDTO}
      */
-    UserAuthDTO querySingleInfoByName(String username);
+    public UserAuthDTO querySingleInfoByColumn(String column,String value) ;
 
     /**
      * query roles by id

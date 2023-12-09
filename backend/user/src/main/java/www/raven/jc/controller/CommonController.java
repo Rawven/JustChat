@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import www.raven.jc.client.IpfsClient;
 import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.vo.InfoVO;
@@ -28,6 +29,8 @@ public class CommonController {
     private UserService userService;
     @Autowired
     private HttpServletRequest request;
+    @Autowired
+    private IpfsClient ipfsClient;
 
 
     /**
@@ -55,19 +58,19 @@ public class CommonController {
 
     @PostMapping("/setProfile")
     public CommonResult<Void> setProfile(@RequestParam("file") MultipartFile profile) {
-        userService.setProfile(profile);
+        userService.updateByColumn("profile",ipfsClient.upload(profile));
         return CommonResult.operateSuccess("设置头像成功");
     }
 
     @PostMapping("/setSignature")
     public CommonResult<Void> setSignature(@RequestParam("signature") String signature) {
-        userService.setSignature(signature);
+        userService.updateByColumn("signature",signature);
         return CommonResult.operateSuccess("设置签名成功");
     }
 
     @PostMapping("/setUsername")
     public CommonResult<Void> setUsername(@RequestParam("username") String username) {
-        userService.setUsername(username);
+        userService.updateByColumn("username",username);
         return CommonResult.operateSuccess("重命名成功");
     }
 

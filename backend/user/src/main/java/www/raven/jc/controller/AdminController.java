@@ -44,7 +44,7 @@ public class AdminController {
 
     @PostMapping("/getUserToAuth")
     CommonResult<UserAuthDTO> getUserToAuth(@RequestBody String username) {
-        return CommonResult.operateSuccess("查找成功", userService.querySingleInfoByName(username));
+        return CommonResult.operateSuccess("查找成功", userService.querySingleInfoByColumn("username",username));
     }
 
     @PostMapping("/getRolesById")

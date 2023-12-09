@@ -45,22 +45,35 @@ public class UserServiceImpl implements UserService {
     private UserDAO userDAO;
     @Autowired
     private UserRoleDAO userRoleDAO;
-    @Autowired
-    private IpfsClient ipfsClient;
-    @Autowired
-    private HttpServletRequest request;
 
 
     @Override
     public UserInfoDTO querySingleInfo(Integer userId) {
         User user = userDAO.getById(userId);
-        log.info("userId is:{}", userId);
-        log.info("查询到的用户信息为:{}", user);
         Assert.notNull(user, "用户不存在");
         UserInfoDTO userInfoDTO = new UserInfoDTO();
         userInfoDTO.setUsername(user.getUsername()).setProfile(user.getProfile()).setUserId(user.getId());
         return userInfoDTO;
     }
+    @Override
+    public UserAuthDTO querySingleInfoByColumn(String column,String value) {
+        User user = userDAO.getBaseMapper().selectOne(new QueryWrapper<User>().eq(column, value));
+        return new UserAuthDTO().setPassword(user.getPassword()).setUserId(user.getId()).setUsername(user.getUsername());
+    }
+
+
+    @Override
+    public List<UserInfoDTO> queryBatchInfo(List<Integer> userIds) {
+        List<User> users = userDAO.getBaseMapper().selectBatchIds(userIds);
+        return users.stream().map(
+                user -> {
+                    UserInfoDTO userInfoDTO = new UserInfoDTO();
+                    userInfoDTO.setUsername(user.getUsername()).setProfile(user.getProfile()).setUserId(user.getId());
+                    return userInfoDTO;
+                }
+        ).collect(Collectors.toList());
+    }
+
 
     @Override
     public List<UserInfoDTO> queryAllInfo() {
@@ -72,6 +85,29 @@ public class UserServiceImpl implements UserService {
                     return userInfoDTO;
                 }
         ).collect(Collectors.toList());
+    }
+    @Override
+    public void updateByColumn(String column,String value){
+        Assert.isTrue(userDAO.getBaseMapper().update(new UpdateWrapper<User>().set(column, value)) > 0, "更新失败");
+    }
+
+    @Override
+    @Transactional(rollbackFor = IllegalArgumentException.class)
+    public UserAuthDTO insert(UserRegisterDTO user) {
+        User realUser = new User().
+                setUsername(user.getUsername()).
+                setPassword(user.getPassword())
+                .setEmail(user.getEmail());
+        Assert.isTrue(userDAO.getBaseMapper().insert(realUser) > 0);
+        List<Role> roles = rolesDAO.getBaseMapper().selectBatchIds(user.getRoleIds());
+        List<UserRole> userRoles = new ArrayList<>();
+        for (Role role : roles) {
+            userRoles.add(new UserRole().setUserId(realUser.getId()).setRoleId(role.getId()));
+            role.setUserCount(role.getUserCount() + 1);
+        }
+        Assert.isTrue(rolesDAO.saveOrUpdateBatch(roles));
+        Assert.isTrue(userRoleDAO.saveBatch(userRoles));
+        return new UserAuthDTO().setUserId(realUser.getId()).setUsername(realUser.getUsername()).setPassword(realUser.getPassword());
     }
 
     @Override
@@ -112,11 +148,7 @@ public class UserServiceImpl implements UserService {
         return new RealAllInfoVO().setTotal(Math.toIntExact(total)).setUsers(collect);
     }
 
-    @Override
-    public UserAuthDTO querySingleInfoByName(String username) {
-        User user = userDAO.getBaseMapper().selectOne(new QueryWrapper<User>().eq("username", username));
-        return new UserAuthDTO().setPassword(user.getPassword()).setUserId(user.getId()).setUsername(user.getUsername());
-    }
+
 
     @Override
     public List<RoleDTO> queryRolesById(Integer userId) {
@@ -133,40 +165,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(rollbackFor = IllegalArgumentException.class)
-    public UserAuthDTO insert(UserRegisterDTO user) {
-        User realUser = new User().
-                setUsername(user.getUsername()).
-                setPassword(user.getPassword())
-                .setEmail(user.getEmail());
-        Assert.isTrue(userDAO.getBaseMapper().insert(realUser) > 0);
-        List<Role> roles = rolesDAO.getBaseMapper().selectBatchIds(user.getRoleIds());
-        List<UserRole> userRoles = new ArrayList<>();
-        for (Role role : roles) {
-            userRoles.add(new UserRole().setUserId(realUser.getId()).setRoleId(role.getId()));
-            role.setUserCount(role.getUserCount() + 1);
-        }
-        Assert.isTrue(rolesDAO.saveOrUpdateBatch(roles));
-        Assert.isTrue(userRoleDAO.saveBatch(userRoles));
-        return new UserAuthDTO().setUserId(realUser.getId()).setUsername(realUser.getUsername()).setPassword(realUser.getPassword());
-    }
-
-    @Override
     public Boolean checkUserExit(String username) {
         User user = userDAO.getBaseMapper().selectOne(new QueryWrapper<User>().eq("username", username));
         return user != null;
-    }
-
-    @Override
-    public List<UserInfoDTO> queryBatchInfo(List<Integer> userIds) {
-        List<User> users = userDAO.getBaseMapper().selectBatchIds(userIds);
-        return users.stream().map(
-                user -> {
-                    UserInfoDTO userInfoDTO = new UserInfoDTO();
-                    userInfoDTO.setUsername(user.getUsername()).setProfile(user.getProfile()).setUserId(user.getId());
-                    return userInfoDTO;
-                }
-        ).collect(Collectors.toList());
     }
 
     @Override
@@ -175,25 +176,4 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    @Transactional(rollbackFor = IllegalArgumentException.class)
-    @Override
-    public void setProfile(MultipartFile profile) {
-        String upload = ipfsClient.upload(profile);
-        String header = request.getHeader("userId");
-        Assert.isTrue(userDAO.getBaseMapper().update(new UpdateWrapper<User>().eq("id", header).set("profile", upload)) > 0, "插入头像失败");
-    }
-
-    @Transactional(rollbackFor = IllegalArgumentException.class)
-    @Override
-    public void setSignature(String signature) {
-        String header = request.getHeader("userId");
-        Assert.isTrue(userDAO.getBaseMapper().update(new UpdateWrapper<User>().eq("id", header).set("signature", signature)) > 0, "插入签名失败");
-    }
-
-    @Transactional(rollbackFor = IllegalArgumentException.class)
-    @Override
-    public void setUsername(String username) {
-        String header = request.getHeader("userId");
-        Assert.isTrue(userDAO.getBaseMapper().update(new UpdateWrapper<User>().eq("id", header).set("username", username)) > 0, "插入用户名失败");
-    }
 }

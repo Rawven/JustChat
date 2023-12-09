@@ -31,7 +31,9 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     public List<NoticeVO> loadNotice() {
         Integer userId = Integer.parseInt(request.getHeader("userId"));
-        List<Notification> userId1 = noticeDAO.getBaseMapper().selectList(new QueryWrapper<Notification>().eq("user_id", userId).eq("status", NoticeConstant.STATUS_UNREAD).orderByDesc("timestamp"));
+        //TODO
+        List<Notification> userId1 = noticeDAO.getBaseMapper().selectList(new QueryWrapper<Notification>().eq("user_id", userId).
+                eq("status", NoticeConstant.STATUS_UNREAD).orderByDesc("timestamp"));
         return userId1.stream().map(
                 notification -> {
                     NoticeVO noticeVO = new NoticeVO();

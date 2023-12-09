@@ -52,6 +52,7 @@ public class MessageConsumer {
     public Consumer<Message<Event>> eventChatToUser() {
         return msg -> {
             String tags = Objects.requireNonNull(msg.getHeaders().get("ROCKET_TAGS")).toString();
+            //判断消息类型
             if (TAGS_APPLY.equals(tags)) {
                 eventUserJoinRoomApply(msg);
             } else if (TAGS_RECORD.equals(tags)) {
@@ -85,6 +86,7 @@ public class MessageConsumer {
         Assert.isTrue(noticeDAO.save(notice));
         ArrayList<Integer> ids = new ArrayList<>();
         ids.add(founderId);
+        //TODO 待修改
         sendMsgToUser(ids, "有人申请加入你的聊天室");
         saveIdInCache(id.toString());
     }

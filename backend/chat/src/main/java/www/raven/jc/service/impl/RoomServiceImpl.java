@@ -65,13 +65,16 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public RealRoomVO initUserMainPage(Integer page, Integer size) {
         int userId = Integer.parseInt(request.getHeader("userId"));
-        List<UserRoom> userId1 = userRoomDAO.getBaseMapper().selectList(new QueryWrapper<UserRoom>().eq("user_id", userId));
-        List<Integer> roomIds = userId1.stream().map(UserRoom::getRoomId).collect(Collectors.toList());
+        //获取用户加入的聊天室id
+        List<UserRoom> roomIdList = userRoomDAO.getBaseMapper().selectList(new QueryWrapper<UserRoom>().eq("user_id", userId));
+        List<Integer> roomIds = roomIdList.stream().map(UserRoom::getRoomId).collect(Collectors.toList());
+        //分页查询？
         Page<Room> roomsPage = roomDAO.getBaseMapper().selectPage(new Page<>(page, size), new QueryWrapper<Room>().in("room_id", roomIds));
         List<Integer> ids = roomsPage.getRecords().stream().map(Room::getLastMsgId).collect(Collectors.toList());
+        //获取所有聊天室的最后一条消息
         List<Message> messages = messageDAO.getBaseMapper().selectBatchIds(ids);
         CommonResult<List<UserInfoDTO>> batchInfo = userFeign.getBatchInfo(messages.stream().map(Message::getSenderId).collect(Collectors.toList()));
-        Assert.isTrue(batchInfo.getCode() == 200);
+        Assert.isTrue(batchInfo.getCode() == 200,"userFeign调用失败");
         Map<Integer, UserInfoDTO> map = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
         Map<Integer, Message> messageMap = messages.stream().collect(Collectors.toMap(Message::getMessageId, Function.identity()));
         List<RoomVO> rooms = roomsPage.getRecords().stream().map(room -> new RoomVO()
@@ -108,6 +111,7 @@ public class RoomServiceImpl implements RoomService {
                 "您已经在这个聊天室了");
         Room room = roomDAO.getBaseMapper().selectById(roomId);
         Integer founderId = room.getFounderId();
+        //通知user模块 插入一条申请记录
         streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new JoinRoomApplyEvent(userId, founderId, roomId)), "APPLY"));
     }
 
