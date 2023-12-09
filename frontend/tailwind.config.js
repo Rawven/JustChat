@@ -3,7 +3,7 @@
 // eslint-disable-next-line no-undef
 module.exports = {
   content: [
-    "./src/components/test/*.vue",
+    "./src/components/**/*.vue",
   ],
   theme: {
     extend: {},

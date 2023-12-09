@@ -26,6 +26,7 @@
             class="flex items-center space-x-4 border rounded-lg p-2 cursor-pointer bg-white list-room"
             v-for="(room, index) in rooms"
             :key="index"
+            @click="checkOut(room.roomId)"
         >
       <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
         <img :src="'http://10.44.59.225:8083/ipfs/'+room.roomProfile" alt="User Avatar" class="avatar">
@@ -40,7 +41,7 @@
         </div>
       </nav>
     </aside>
-    <chat-room v-if="this.nowRoomId !==0" :room="JSON.stringify(this.rooms[this.nowRoomId-1])" :user="this.userInfo.username"></chat-room>
+    <chat-room v-if="nowRoomId >=1" :key="nowRoomId" :room="JSON.stringify(this.rooms[Number(nowRoomId)-1])" :user="this.userInfo.username"></chat-room>
   </el-container>
 </template>
 
@@ -50,6 +51,14 @@ import {ref} from "vue";
 import ChatRoom from "@/components/common/chatRoom.vue";
 
 export default {
+  watch: {
+    nowRoomId(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        // nowRoomId has changed. You can add your logic here to re-render the chat-room component
+        this.nowRoomId = newVal;
+      }
+    },
+  },
 
   name: 'MainPage',
   components: {ChatRoom},
@@ -93,9 +102,14 @@ export default {
     }
 
   },
+
   methods: {
+    ref,
     Host() {
       return Host
+    },
+    checkOut(roomId) {
+      this.nowRoomId = roomId;
     },
     initWebSocket() {
       let token = localStorage.getItem("token");
@@ -142,6 +156,7 @@ export default {
         this.rooms = response.data.data.rooms;
       })
     },
+
     enterRoom(roomId) {
       this.$router.push({path: `/common/chatRoom/` + Number(roomId)});
     },
@@ -173,8 +188,8 @@ body {
   overflow: hidden;
 }
 .containerM {
-  width: 275%;
-  height: 72%;
+  width: 323%;
+  height: 62%;
   margin: 0;
 }
 

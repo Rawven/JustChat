@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col flex-1 w-auto">
+  <div class="flex flex-col flex-1 max-w-full mainDiv">
     <header class="flex items-center justify-between p-4 bg-white border-b border-gray-200">
       <div class="flex items-center space-x-4">
         <a class="text-gray-500 hover:text-gray-900" href="#">
@@ -79,7 +79,7 @@
         </div>
     </main>
     <footer class="p-4 bg-white border-t border-gray-200">
-      <div class="flex items-center space-x-4">
+      <div class="flex items-center space-x-4 this">
         <button
             class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10">
           <svg
@@ -217,8 +217,17 @@ export default {
 </script>
 
 <style scoped>
+body {
+  overflow: hidden; /* 阻止整个页面滚动 */
+}
+.this{
+  overflow: hidden;
+}
+
+
 .main-content {
   height: 100%; /* 设置高度为视口的100% */
+  width: 95%;
   overflow-y: auto; /* 当内容溢出时显示滚动条 */
 }
 
