@@ -36,8 +36,6 @@
         <log>1.2.3</log>
 
     </properties>
-
-
     <dependencyManagement>
         <dependencies>
             <dependency>

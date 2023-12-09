@@ -23,6 +23,8 @@ import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -73,8 +75,13 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public List<MessageVO> restoreHistory(Integer roomId) {
         log.info(roomId.toString());
-        List<Message> messages = messageDAO.getBaseMapper().selectList(new QueryWrapper<Message>().eq("room_id", roomId).orderByAsc("timestamp"));
-        List<Integer> userIds = messages.stream().map(Message::getSenderId).collect(Collectors.toList());
+        // 获取两天内的消息
+        LocalDateTime twoDaysAgo = LocalDateTime.now().minusDays(2);
+        Date twoDaysAgoDate = Date.from(twoDaysAgo.atZone(ZoneId.systemDefault()).toInstant());
+        List<Message> messages = messageDAO.getBaseMapper().selectList(new QueryWrapper<Message>()
+                .eq("room_id", roomId)
+                .ge("timestamp", twoDaysAgoDate)
+                .orderByAsc("timestamp"));   List<Integer> userIds = messages.stream().map(Message::getSenderId).collect(Collectors.toList());
         log.info("userIds: {}", userIds);
         CommonResult<List<UserInfoDTO>> allInfo = userFeign.getBatchInfo(userIds);
         List<UserInfoDTO> data = allInfo.getData();
