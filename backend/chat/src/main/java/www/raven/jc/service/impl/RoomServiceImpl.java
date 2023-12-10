@@ -105,6 +105,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+
     public void applyToJoinRoom(Integer roomId) {
         int userId = Integer.parseInt(request.getHeader("userId"));
         Assert.isNull(userRoomDAO.getBaseMapper().selectOne(new QueryWrapper<UserRoom>().eq("user_id", userId).eq("room_id", roomId)),
