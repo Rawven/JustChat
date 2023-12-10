@@ -32,7 +32,5 @@ RedissonConfiguration {
         singleServerConfig.setPassword(password).setAddress(address);
         return Redisson.create(config);
     }
-
-
 }
 

@@ -19,8 +19,6 @@ import www.raven.jc.service.RoomService;
 public class CommonController {
 
     @Autowired
-    private ChatService chatService;
-    @Autowired
     private RoomService roomService;
 
 
