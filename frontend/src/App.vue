@@ -34,7 +34,7 @@ export default {
       this.gap_time = new Date().getTime() - this.beforeUnload_time;
       //判断是窗口关闭还是刷新 毫秒数判断 网上大部分写的是5
       if (this.gap_time <= 10) {
-         this.realAxios.post('http://'+Host+':7000/user/common/logout',{},{
+         this.realAxios.post('http://'+Host+':7000/auth/logout',{},{
            headers: {
              'token': localStorage.getItem("token")
            }

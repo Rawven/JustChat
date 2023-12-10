@@ -3,6 +3,7 @@ package www.raven.jc.service.impl;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -41,6 +43,7 @@ import java.util.stream.Collectors;
  * @date 2023/11/23
  */
 @Service
+@Slf4j
 public class RoomServiceImpl implements RoomService {
     @Autowired
     private RoomDAO roomDAO;
@@ -76,13 +79,16 @@ public class RoomServiceImpl implements RoomService {
         //分页查询？
         Page<Room> roomsPage = roomDAO.getBaseMapper().selectPage(new Page<>(page, size), new QueryWrapper<Room>().in("room_id", roomIds));
         List<Integer> ids = roomsPage.getRecords().stream().map(Room::getLastMsgId).collect(Collectors.toList());
+        List<Integer> founderIds = roomsPage.getRecords().stream().map(Room::getFounderId).collect(Collectors.toList());
+       ids.addAll(founderIds);
         //获取所有聊天室的最后一条消息
         List<Message> messages = messageDAO.getBaseMapper().selectBatchIds(ids);
         CommonResult<List<UserInfoDTO>> batchInfo = userFeign.getBatchInfo(messages.stream().map(Message::getSenderId).collect(Collectors.toList()));
         Assert.isTrue(batchInfo.getCode() == 200,"userFeign调用失败");
         Map<Integer, UserInfoDTO> map = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
         Map<Integer, Message> messageMap = messages.stream().collect(Collectors.toMap(Message::getMessageId, Function.identity()));
-        List<RoomVO> rooms = roomsPage.getRecords().stream().map(room -> new RoomVO()
+        List<RoomVO> rooms = roomsPage.getRecords().stream().map(room ->
+                new RoomVO()
                 .setRoomId(room.getRoomId())
                 .setRoomName(room.getRoomName())
                 .setLastMsg(JsonUtil.objToJson(messageMap.get(room.getLastMsgId())))
