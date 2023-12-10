@@ -13,6 +13,7 @@ import www.raven.jc.constant.NoticeConstant;
 import www.raven.jc.dao.NoticeDAO;
 import www.raven.jc.dao.UserDAO;
 import www.raven.jc.entity.po.Notification;
+import www.raven.jc.entity.po.User;
 import www.raven.jc.event.Event;
 import www.raven.jc.event.JoinRoomApplyEvent;
 import www.raven.jc.event.RoomMsgEvent;
@@ -86,10 +87,16 @@ public class MessageConsumer {
                 .setTimestamp(System.currentTimeMillis())
                 .setStatus(NoticeConstant.STATUS_UNREAD);
         Assert.isTrue(noticeDAO.save(notice));
-        ArrayList<Integer> ids = new ArrayList<>();
-        ids.add(founderId);
-        //TODO 待修改
-        sendMsgToUser(ids, "有人申请加入你的聊天室");
+        RBucket<String> founderBucket = redissonClient.getBucket("token:" + founderId);
+        User applier = userDAO.getBaseMapper().selectById(payload.getApplyId());
+        HashMap<Object, Object> map = new HashMap<>(2);
+        map.put("roomId", payload.getRoomId());
+        map.put("applier", applier.getUsername());
+        if(founderBucket.isExists()) {
+           notificationHandler.sendOneMessage(founderBucket.get(),JsonUtil.mapToJson(map));
+        }else {
+            log.info("founder不在线");
+        }
     }
     /**
      * 通知在线用户有新消息
@@ -103,13 +110,13 @@ public class MessageConsumer {
         map.put("roomId", payload.getRoomId());
         map.put("username", userDAO.getBaseMapper().selectById(userId).getUsername());
         map.put("msg", payload.getMsg());
-        sendMsgToUser(payload.getIdsFromRoom(), JsonUtil.mapToJson(map));
-    }
-
-
-    private void sendMsgToUser(List<Integer> userId, String msg) {
-        HashMap<Integer, Integer> map = new HashMap<>(userId.size());
-        userId.forEach(id -> map.put(id, 1));
-        notificationHandler.sendMessageToIds(msg, map);
+        List<String> tokens = new ArrayList<>();
+        payload.getIdsFromRoom().forEach(id -> {
+            RBucket<String> bucket = redissonClient.getBucket("token:" + id);
+            if (bucket.isExists()) {
+                tokens.add(bucket.get());
+            }
+        });
+        notificationHandler.sendBatchMessage(JsonUtil.mapToJson(map),tokens);
     }
 }

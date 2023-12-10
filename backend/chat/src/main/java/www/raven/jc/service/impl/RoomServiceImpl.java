@@ -3,6 +3,8 @@ package www.raven.jc.service.impl;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.redisson.api.RBucket;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -51,6 +54,8 @@ public class RoomServiceImpl implements RoomService {
     private MessageDAO messageDAO;
     @Autowired
     private StreamBridge streamBridge;
+    @Autowired
+    private RedissonClient redissonClient;
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
@@ -105,7 +110,6 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-
     public void applyToJoinRoom(Integer roomId) {
         int userId = Integer.parseInt(request.getHeader("userId"));
         Assert.isNull(userRoomDAO.getBaseMapper().selectOne(new QueryWrapper<UserRoom>().eq("user_id", userId).eq("room_id", roomId)),
@@ -115,7 +119,15 @@ public class RoomServiceImpl implements RoomService {
         //通知user模块 插入一条申请记录
         streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new JoinRoomApplyEvent(userId, founderId, roomId)), "APPLY"));
     }
-
+    @Transactional(rollbackFor = IllegalArgumentException.class)
+    @Override
+    public void agreeApply(Integer roomId, Integer userId) {
+        int ownerId = Integer.parseInt(request.getHeader("userId"));
+        Assert.isTrue(roomDAO.getBaseMapper().selectById(roomId).getFounderId().equals(ownerId), "您不是房主");
+        Assert.isTrue(userRoomDAO.getBaseMapper().selectOne(new QueryWrapper<UserRoom>().eq("user_id", userId).eq("room_id", roomId)) == null,
+                "该用户已经在这个聊天室了");
+        Assert.isTrue(userRoomDAO.getBaseMapper().insert(new UserRoom().setRoomId(roomId).setUserId(userId)) > 0);
+    }
 
     private List<RoomVO> buildRoomVO(Page<Room> chatRoomPage, List<UserInfoDTO> data) {
         Assert.isTrue(chatRoomPage.getTotal() > 0);

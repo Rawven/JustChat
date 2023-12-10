@@ -16,6 +16,7 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -65,8 +66,8 @@ public class ChatHandler {
      */
     @OnOpen
     public void onOpen(Session session, @PathParam(value = "token") String token, @PathParam(value = "roomId") String roomId) {
-        log.info("【websocket消息】有新的连接，token为:" + token);
-        session.getUserProperties().put("userDto", JwtUtil.verify(token, "爱你老妈"));
+        TokenDTO dto = JwtUtil.verify(token, "爱你老妈");
+        session.getUserProperties().put("userDto",dto);
         this.session = session;
         this.roomId = roomId;
         Session sessionExisted = SESSION_POOL.get(token);
@@ -79,7 +80,7 @@ public class ChatHandler {
         }
         webSockets.add(this);
         SESSION_POOL.put(token, session);
-        log.info("【websocket消息】有新的连接，总数为:" + webSockets.size());
+        log.info("websocket: 有新的连接,用户id为{},总数为:{}" , dto.getUserId(),webSockets.size());
     }
 
     /**
@@ -103,13 +104,12 @@ public class ChatHandler {
         log.info("【websocket消息】收到客户端发来的消息:" + message);
         MessageDTO messageDTO = JsonUtil.jsonToObj(message, MessageDTO.class);
         TokenDTO tokenDTO = (TokenDTO) (session.getUserProperties().get("userDto"));
-        Assert.notNull(userFeign, "account服务端异常 is null");
         UserInfoDTO data = userFeign.getSingleInfo(tokenDTO.getUserId()).getData();
-        Assert.notNull(chatService, "chatService is null");
         Map<Object, Object> map = new HashMap<>(2);
         map.put("userInfo", data);
         map.put("message", messageDTO);
         try {
+            //这里直接遍历更快
             sendRoomMessage(JsonUtil.mapToJson(map));
         } catch (Exception e) {
             log.error("map转json异常");
@@ -131,19 +131,6 @@ public class ChatHandler {
     }
 
 
-    /**
-     * send all message
-     *
-     * @param message message
-     */
-    public void sendAllMessage(String message) {
-        log.info("【websocket消息】广播消息:" + message);
-        for (ChatHandler chatHandler : webSockets) {
-            if (chatHandler.session.isOpen()) {
-                chatHandler.session.getAsyncRemote().sendText(message);
-            }
-        }
-    }
 
     public void sendRoomMessage(String message) {
         log.info("【websocket消息】广播消息:" + message);
@@ -179,7 +166,7 @@ public class ChatHandler {
      * @param tokens  user ids
      * @param message message
      */
-    public void sendMoreMessage(String[] tokens, String message) {
+    public void sendMoreMessage(List<String> tokens, String message) {
         for (String userId : tokens) {
             Session session = SESSION_POOL.get(userId);
             if (session != null && session.isOpen()) {
@@ -187,7 +174,6 @@ public class ChatHandler {
                 session.getAsyncRemote().sendText(message);
             }
         }
-
     }
 
     @Override

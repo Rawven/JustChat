@@ -59,4 +59,20 @@ public interface RoomService {
      * @param roomId room id
      */
     void applyToJoinRoom(Integer roomId);
+
+    /**
+     * agree apply
+     *
+     * @param roomId room id
+     * @param userId user id
+     */
+    void agreeApply(Integer roomId, Integer userId);
+
+    /**
+     * query room member
+     *
+     * @param roomId room id
+     * @return {@link List}<{@link String}>
+     */
+    List<String> queryRoomMember(Integer roomId);
 }

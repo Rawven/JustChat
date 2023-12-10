@@ -10,6 +10,7 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -47,7 +48,6 @@ public class NotificationHandler {
      */
     @OnOpen
     public void onOpen(Session session, @PathParam(value = "token") String token) {
-        log.info("【websocket消息】有新的连接，token为:" + token);
         TokenDTO verify = JwtUtil.verify(token, "爱你老妈");
         session.getUserProperties().put("userDto", verify);
         this.userId = verify.getUserId();
@@ -62,7 +62,7 @@ public class NotificationHandler {
         }
         webSockets.add(this);
         SESSION_POOL.put(token, session);
-        log.info("【websocket消息】有新的连接，总数为:" + webSockets.size());
+        log.info("websocket: 有新的连接,用户id为{},总数为:{}" , verify.getUserId(),webSockets.size());
     }
 
     /**
@@ -71,8 +71,9 @@ public class NotificationHandler {
      */
     @OnClose
     public void onClose() {
+        Integer userId1 = this.userId;
         webSockets.remove(this);
-        log.info("【websocket消息】连接断开，总数为:" + webSockets.size());
+        log.info("websocket:用户id {} 连接断开，总数为:{}" ,userId1, webSockets.size());
     }
 
     /**
@@ -83,7 +84,7 @@ public class NotificationHandler {
      */
     @OnMessage
     public void onMessage(String message) {
-        log.info("【websocket消息】收到客户端发来的消息:" + message);
+        log.info("websocket:收到客户端发来的消息:" + message);
         try {
 
         } catch (Exception e) {
@@ -99,9 +100,24 @@ public class NotificationHandler {
      */
     @OnError
     public void onError(Session session, Throwable error) {
+        log.error("websocket:发生错误");
         log.error("Error occurred on connection, Session ID: " + session.getId());
         log.error("Details: " + error.getMessage());
         log.error("Stack trace: {}", (Object) error.getStackTrace());
+    }
+
+    /**
+     * send all message
+     * 遍历方法
+     * @param message message
+     */
+    public void sendAllMessag1e(String message) {
+        log.info("【websocket消息】广播消息:" + message);
+        for (NotificationHandler handler : webSockets) {
+            if (handler.session.isOpen()) {
+                handler.session.getAsyncRemote().sendText(message);
+            }
+        }
     }
 
 
@@ -110,11 +126,33 @@ public class NotificationHandler {
      *
      * @param message message
      */
-    public void sendMessageToIds(String message, Map<Integer, Integer> ids) {
-        log.info("【websocket消息】广播消息:" + message);
-        for (NotificationHandler webSocketService : webSockets) {
-            if (webSocketService.session.isOpen() && ids.containsKey(webSocketService.userId)) {
-                webSocketService.session.getAsyncRemote().sendText(message);
+    public void sendBatchMessage(String message, List<String> tokens) {
+        log.info("websocket:广播消息:" + message);
+        for (String token : tokens) {
+            Session session = SESSION_POOL.get(token);
+            if (session != null && session.isOpen()) {
+                try {
+                    session.getAsyncRemote().sendText(message);
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                }
+            }
+        }
+    }
+    /**
+     * send one message
+     *
+     * @param token   user id
+     * @param message message
+     */
+    public void sendOneMessage(String token, String message) {
+        Session session = SESSION_POOL.get(token);
+        if (session != null && session.isOpen()) {
+            try {
+                log.info("【websocket消息】 单点消息:" + message);
+                session.getAsyncRemote().sendText(message);
+            } catch (Exception e) {
+                log.error(e.getMessage());
             }
         }
     }

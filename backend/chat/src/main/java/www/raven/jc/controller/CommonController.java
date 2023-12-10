@@ -34,4 +34,10 @@ public class CommonController {
         return CommonResult.operateSuccess("申请加入房间成功");
     }
 
+    @PostMapping("/agreeApply")
+    public CommonResult<Void> agreeApply(@RequestParam("roomId") Integer roomId, @RequestParam("userId") Integer userId) {
+        roomService.agreeApply(roomId, userId);
+        return CommonResult.operateSuccess("同意申请成功");
+    }
+
 }
