@@ -7,6 +7,7 @@
     <el-header class=" space-y-1.5 flex flex-row items-center justify-between p-6 bg-[#000000] text-[#b3a7df] border-b-2 border-green-500">
       <h3 class="font-semibold tracking-tight text-2xl font-serif text-[#b3a7df]">聊天室大厅</h3>
       <div class="flex space-x-4">
+        <!-- TODO  搜索功能未实现-->
         <input
             class="flex h-10 rounded-md ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full p-3 border border-[#b3a7df] text-lg mb-4 bg-[#000000] text-[#b3a7df]"
             aria-label="Search chat rooms"
@@ -70,7 +71,6 @@
             Apply to Join
           </button>
         </div>
-
         <el-pagination v-model:current-page="currentPage"
                        :page-size="pageSize"
                        :total="totalRooms"
