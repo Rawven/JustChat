@@ -4,7 +4,6 @@ import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
@@ -19,8 +18,9 @@ import www.raven.jc.entity.model.RoomModel;
 import www.raven.jc.entity.po.Message;
 import www.raven.jc.entity.po.Room;
 import www.raven.jc.entity.po.UserRoom;
+import www.raven.jc.entity.vo.DisplayRoomVO;
 import www.raven.jc.entity.vo.RealRoomVO;
-import www.raven.jc.entity.vo.RoomVO;
+import www.raven.jc.entity.vo.UserRoomVO;
 import www.raven.jc.event.JoinRoomApplyEvent;
 import www.raven.jc.feign.UserFeign;
 import www.raven.jc.result.CommonResult;
@@ -29,10 +29,8 @@ import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -71,7 +69,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public RealRoomVO initUserMainPage(Integer page, Integer size) {
+    public List<UserRoomVO> initUserMainPage(Integer page, Integer size) {
         int userId = Integer.parseInt(request.getHeader("userId"));
         //获取用户加入的聊天室id
         List<UserRoom> roomIdList = userRoomDAO.getBaseMapper().selectList(new QueryWrapper<UserRoom>().eq("user_id", userId));
@@ -87,21 +85,20 @@ public class RoomServiceImpl implements RoomService {
         Assert.isTrue(batchInfo.getCode() == 200,"userFeign调用失败");
         Map<Integer, UserInfoDTO> map = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
         Map<Integer, Message> messageMap = messages.stream().collect(Collectors.toMap(Message::getMessageId, Function.identity()));
-        List<RoomVO> rooms = roomsPage.getRecords().stream().map(room ->
-                new RoomVO()
+        return roomsPage.getRecords().stream().map(room ->
+                new UserRoomVO()
                 .setRoomId(room.getRoomId())
                 .setRoomName(room.getRoomName())
                 .setLastMsg(JsonUtil.objToJson(messageMap.get(room.getLastMsgId())))
                 .setLastMsgSender(map.get(messageMap.get(room.getLastMsgId()).getSenderId()).getUsername())
                 .setRoomProfile(map.get(room.getFounderId()).getProfile())).collect(Collectors.toList());
-        return new RealRoomVO().setRooms(rooms).setTotal(roomIds.size());
     }
 
     @Override
     public RealRoomVO queryLikedRoomList(String column, String text, int page) {
         Long total = roomDAO.getBaseMapper().selectCount(null);
         Page<Room> chatRoomPage = roomDAO.getBaseMapper().selectPage(new Page<>(page, 5), new QueryWrapper<Room>().like(column, text));
-        List<RoomVO> rooms = buildRoomVO(chatRoomPage, userFeign.getAllInfo().getData());
+        List<DisplayRoomVO> rooms = buildRoomVO(chatRoomPage, userFeign.getAllInfo().getData());
         return new RealRoomVO().setRooms(rooms).setTotal(Math.toIntExact(total));
     }
 
@@ -111,7 +108,7 @@ public class RoomServiceImpl implements RoomService {
         List<UserInfoDTO> queryList = userFeign.getRelatedInfoList(new QueryUserInfoDTO().setColumn(column).setText(text)).getData();
         List<Integer> userIds = queryList.stream().map(UserInfoDTO::getUserId).collect(Collectors.toList());
         Page<Room> chatRoomPage = roomDAO.getBaseMapper().selectPage(new Page<>(page, 5), new QueryWrapper<Room>().in("founder_id", userIds));
-        List<RoomVO> rooms = buildRoomVO(chatRoomPage, queryList);
+        List<DisplayRoomVO> rooms = buildRoomVO(chatRoomPage, queryList);
         return new RealRoomVO().setRooms(rooms).setTotal(Math.toIntExact(total));
     }
 
@@ -135,17 +132,24 @@ public class RoomServiceImpl implements RoomService {
         Assert.isTrue(userRoomDAO.getBaseMapper().insert(new UserRoom().setRoomId(roomId).setUserId(userId)) > 0);
     }
 
-    private List<RoomVO> buildRoomVO(Page<Room> chatRoomPage, List<UserInfoDTO> data) {
+    @Override
+    public RealRoomVO queryListPage(int page, int size) {
+        Long total = roomDAO.getBaseMapper().selectCount(null);
+        Page<Room> chatRoomPage = roomDAO.getBaseMapper().selectPage(new Page<>(page, size), new QueryWrapper<Room>());
+        List<DisplayRoomVO> rooms = buildRoomVO(chatRoomPage, userFeign.getAllInfo().getData());
+        return new RealRoomVO().setRooms(rooms).setTotal(Math.toIntExact(total));
+    }
+
+    private List<DisplayRoomVO> buildRoomVO(Page<Room> chatRoomPage, List<UserInfoDTO> data) {
         Assert.isTrue(chatRoomPage.getTotal() > 0);
         Map<Integer, UserInfoDTO> map = data.stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
-        List<Integer> ids = chatRoomPage.getRecords().stream().map(Room::getLastMsgId).collect(Collectors.toList());
-        List<Message> messages = messageDAO.getBaseMapper().selectBatchIds(ids);
-        Map<Integer, Message> messageMap = messages.stream().collect(Collectors.toMap(Message::getMessageId, Function.identity()));
-        return chatRoomPage.getRecords().stream().map(room -> new RoomVO()
+        return chatRoomPage.getRecords().stream().map(room -> new DisplayRoomVO()
                 .setRoomId(room.getRoomId())
                 .setRoomName(room.getRoomName())
-                .setLastMsg(JsonUtil.objToJson(messageMap.get(room.getLastMsgId())))
-                .setRoomProfile(map.get(room.getFounderId()).getProfile())).collect(Collectors.toList());
+                .setFounderName(map.get(room.getFounderId()).getUsername())
+                .setRoomDescription(room.getRoomDescription())
+                .setMaxPeople(room.getMaxPeople())
+        ).collect(Collectors.toList());
     }
 
 

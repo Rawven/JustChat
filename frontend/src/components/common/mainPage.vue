@@ -85,13 +85,10 @@ export default {
       messageCount: 0,
       room: {
         roomId: '',
-        lastMsg: '',
-        roomProfile: '',
         roomName: '',
+        roomDescription: '',
         founderName: '',
         maxPeople: 1,
-        lastMsgSender: '',
-        isNew: false,
       },
       userInfo: {
         username: '',
@@ -100,8 +97,6 @@ export default {
       },
       rooms: reactive( []),
       roomIndex: new Map(),
-      currentPage: 1, // 新增属性，用于存储当前的页数
-      totalRooms: 0, // 新增属性，用于存储房间总数
       pageSize: 5,
       nowRoomId: 0,
     };
@@ -161,15 +156,14 @@ export default {
       }
     },
     getRooms(page) {
-      this.realAxios.get(`http://` + Host + `:7000/chat/common/query/queryUserRoomList/${page}/${5}`, {
+      this.realAxios.get(`http://` + Host + `:7000/chat/common/query/initUserMainPage/${page}/${5}`, {
         headers: {
           'token': localStorage.getItem("token")
         }
       }).then(response => {
         // 将获取的房间数组赋值给 rooms
-        this.rooms = response.data.data.rooms;
+        this.rooms = response.data.rooms;
         // 将获取的房间总数赋值给 totalRooms
-        this.totalRooms = parseInt(response.data.data.total);
         this.nowRoomId = this.rooms[0].roomId;
         this.rooms.forEach((room, index) => {
           console.log(room.roomId)

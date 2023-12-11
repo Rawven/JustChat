@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.entity.vo.RealRoomVO;
+import www.raven.jc.entity.vo.UserRoomVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.service.RoomService;
@@ -25,9 +26,13 @@ public class QueryController {
     @Autowired
     private RoomService roomService;
 
-    @GetMapping("/queryUserRoomList/{page}/{size}")
-    public CommonResult<RealRoomVO> initUserMainPage(@PathVariable("page") int page, @PathVariable("size") int size) {
+    @GetMapping("/initUserMainPage/{page}/{size}")
+    public CommonResult<List<UserRoomVO>> initUserMainPage(@PathVariable("page") int page, @PathVariable("size") int size) {
         return CommonResult.operateSuccess("获取房间列表成功", roomService.initUserMainPage(page, size));
+    }
+    @GetMapping("/queryIdRoomList/{page}/{size}")
+    public CommonResult<RealRoomVO> queryRoomList( @PathVariable("page") int page, @PathVariable("size") int size) {
+        return CommonResult.operateSuccess("获取房间列表成功", roomService.queryListPage(page, size));
     }
 
     @GetMapping("/queryRelatedRoomList/{text}/{choice}/{page}")

@@ -16,6 +16,7 @@ import java.util.List;
 @Data
 @Accessors(chain = true)
 public class RealRoomVO {
-    private List<RoomVO> rooms;
+    private List<DisplayRoomVO> rooms;
     private Integer total;
 }
+

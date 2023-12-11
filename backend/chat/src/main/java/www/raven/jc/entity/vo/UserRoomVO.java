@@ -1,6 +1,7 @@
 package www.raven.jc.entity.vo;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
@@ -12,7 +13,7 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class RoomVO {
+public class UserRoomVO  {
     private Integer roomId;
     private String roomName;
     /**
