@@ -4,12 +4,16 @@ import registerView from "@/views/common/RegisterView.vue";
 import AvatarView from "@/views/common/AvatarView.vue";
 import ChatRoomView from "@/views/common/ChatRoomView.vue";
 import MainPageView from "@/views/common/MainPageView.vue";
-import OpenANewRoom from "@/views/common/OpenANewRoomView.vue";
 import UpdateInfoView from "@/views/common/UpdateInfoView.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
+        {
+          path: '/test',
+          name : 'test',
+          component: () => import('@/components/common/roomPage.vue')
+        },
         {
 
             path: '/common',
@@ -42,9 +46,9 @@ const router = createRouter({
                     component: MainPageView
                 },
                 {
-                    path: 'openRoom',
-                    name: "OpenRoomView",
-                    component: OpenANewRoom
+                    path: 'roomPage',
+                    name: 'RoomPageView',
+                    component: () => import('@/components/common/roomPage.vue')
                 },
                 {
                     path: 'updateInfo',
