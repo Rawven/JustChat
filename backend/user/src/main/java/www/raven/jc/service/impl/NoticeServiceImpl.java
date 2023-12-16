@@ -1,5 +1,6 @@
 package www.raven.jc.service.impl;
 
+import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,18 +32,26 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     public List<NoticeVO> loadNotice() {
         Integer userId = Integer.parseInt(request.getHeader("userId"));
-        //TODO
+        //think 通知是否需要被解决后删除 不删除留下来可以做到通知的历史记录
         List<Notification> userId1 = noticeDAO.getBaseMapper().selectList(new QueryWrapper<Notification>().eq("user_id", userId).
                 eq("status", NoticeConstant.STATUS_UNREAD).orderByDesc("timestamp"));
         return userId1.stream().map(
                 notification -> {
                     NoticeVO noticeVO = new NoticeVO();
-                    noticeVO.setType(notification.getType())
+                    noticeVO.setNoticeId(notification.getId())
+                            .setType(notification.getType())
                             .setMessage(notification.getMessage())
                             .setTimestamp(notification.getTimestamp());
                     return noticeVO;
                 }
         ).collect(Collectors.toList());
+    }
+
+    @Override
+    public void doneNotification(Integer id) {
+        Notification notification = noticeDAO.getById(id);
+        notification.setStatus(NoticeConstant.STATUS_DONE);
+        Assert.isTrue(noticeDAO.updateById(notification));
     }
 
     @Override

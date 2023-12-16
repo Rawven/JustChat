@@ -29,6 +29,8 @@
  </el-container>
 </template>
 <script>
+import {Host} from "@/main";
+
 export default {
   inject: {
     realAxios: {
@@ -41,7 +43,13 @@ export default {
     }
   },
   created(){
-      this.realAxios
+      this.realAxios.get('http://'+Host+':7000/notice/getNotice',{
+        headers: {
+          'token': localStorage.getItem("token")
+        }
+      }).then(response => {
+        this.notices = response.data.data;
+      })
   }
 }
 </script>

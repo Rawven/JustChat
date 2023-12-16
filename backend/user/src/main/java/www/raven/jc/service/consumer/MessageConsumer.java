@@ -45,7 +45,6 @@ public class MessageConsumer {
     private UserDAO userDAO;
     @Autowired
     private NotificationHandler notificationHandler;
-
     @Autowired
     private RedissonClient redissonClient;
 

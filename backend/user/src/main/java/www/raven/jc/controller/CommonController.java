@@ -47,11 +47,6 @@ public class CommonController {
     CommonResult<Boolean> checkUserExit(@RequestBody String username) {
         return CommonResult.operateSuccess("查找成功", userService.checkUserExit(username));
     }
-    @PostMapping("/getNotification")
-    CommonResult<List<NoticeVO>> getNotification() {
-        return CommonResult.operateSuccess("查找成功", noticeService.loadNotice());
-    }
-
     /**
      * user logout
      *

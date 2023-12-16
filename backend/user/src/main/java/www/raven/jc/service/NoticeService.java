@@ -19,6 +19,12 @@ public interface NoticeService {
     List<NoticeVO> loadNotice();
 
     /**
+     * done notification
+     *
+     * @param id id
+     */
+    void doneNotification(Integer id);
+    /**
      * delete new room msg notice
      *
      * @param roomId room id

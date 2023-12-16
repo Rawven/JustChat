@@ -13,6 +13,7 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class NoticeVO {
+    private Integer noticeId;
     private String type;
     private String message;
     private Long timestamp;
