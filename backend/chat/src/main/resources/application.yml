@@ -32,3 +32,6 @@ server:
   port: 8081
 Raven:
   key: 爱你老妈
+logging:
+    level:
+      www.raven.jc.feign.*: DEBUG
