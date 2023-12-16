@@ -2,6 +2,8 @@ package www.raven.jc.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import www.raven.jc.entity.model.AgreeModel;
+import www.raven.jc.entity.model.RoomIdModel;
 import www.raven.jc.entity.model.RoomModel;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.ChatService;
@@ -29,14 +31,14 @@ public class CommonController {
     }
 
     @PostMapping("/applyToJoinRoom")
-    public CommonResult<Void> applyToJoinRoom(@RequestParam("roomId") Integer roomId) {
-        roomService.applyToJoinRoom(roomId);
+    public CommonResult<Void> applyToJoinRoom(@RequestBody RoomIdModel roomId) {
+        roomService.applyToJoinRoom(roomId.getRoomId());
         return CommonResult.operateSuccess("申请加入房间成功");
     }
 
     @PostMapping("/agreeApply")
-    public CommonResult<Void> agreeApply(@RequestParam("roomId") Integer roomId, @RequestParam("userId") Integer userId) {
-        roomService.agreeApply(roomId, userId);
+    public CommonResult<Void> agreeApply(@RequestBody AgreeModel agreeModel) {
+        roomService.agreeApply(agreeModel.getRoomId(), agreeModel.getUserId());
         return CommonResult.operateSuccess("同意申请成功");
     }
 
