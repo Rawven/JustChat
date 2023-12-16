@@ -1,38 +1,89 @@
 <template>
   <el-container class="containerM">
-    <aside class="w-64 border-r border-gray-200 overflow-y-auto">
-      <header class="p-4 border-b border-gray-200">
+    <el-aside class="w-48 border-r border-gray-200 overflow-y-auto">
+      <el-header class="p-4 border-b border-gray-200">
+        <h2 class="text-lg font-semibold">Navigation</h2>
+      </el-header>
+      <el-menu class="p-4 space-y-2">
+        <div class="flex items-center space-x-4" @click="turnSearch">
+          <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="w-6 h-6"
+          >
+            <path d="M6 18h8"></path>
+            <path d="M3 22h18"></path>
+            <path d="M14 22a7 7 0 1 0 0-14h-1"></path>
+            <path d="M9 14h2"></path>
+            <path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z"></path>
+            <path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3"></path>
+          </svg>
+          <el-text tag="b">Search</el-text>
+        </div>
+        <div class="flex items-center space-x-4" @click="turnFriends">
+          <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="w-6 h-6"
+          >
+            <path d="M3 7V5c0-1.1.9-2 2-2h2"></path>
+            <path d="M17 3h2c1.1 0 2 .9 2 2v2"></path>
+            <path d="M21 17v2c0 1.1-.9 2-2 2h-2"></path>
+            <path d="M7 21H5c-1.1 0-2-.9-2-2v-2"></path>
+            <rect width="7" height="5" x="7" y="7" rx="1"></rect>
+            <rect width="7" height="5" x="10" y="12" rx="1"></rect>
+          </svg>
+          <el-text tag="b">Friends</el-text>
+        </div>
+      </el-menu>
+    </el-aside>
+    <el-aside class="theAside w-64 border-r border-gray-200 overflow-y-auto">
+      <el-header class="p-4 border-b border-gray-200">
         <el-row>
           <img :src="'http://10.44.59.225:8083/ipfs/'+userInfo.profile" alt="User Avatar" class="avatar">
           <h2 class="logo"> Just Chat </h2>
         </el-row>
-      </header>
-      <section class="p-4 border-b border-gray-200">
+      </el-header>
+      <el-main class="p-4 border-b border-gray-200">
         <div class="flex items-center space-x-4">
-        <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
-          <span class="flex h-full w-full items-center justify-center rounded-full bg-muted">CN</span>
-        </span>
+      <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
+        <span class="flex h-full w-full items-center justify-center rounded-full bg-muted">CN</span>
+      </span>
           <div>
             <h3 class="text-lg font-semibold">{{ userInfo.username }}</h3>
             <p class="text-sm text-gray-400">{{ userInfo.signature }}</p>
           </div>
         </div>
-      </section>
-      <header class="p-4 border-b border-gray-200">
+      </el-main>
+      <el-header class="p-4 border-b border-gray-200">
         <h2 class="text-lg font-semibold">我的群聊</h2>
-      </header>
-      <nav class="p-4 space-y-2">
+      </el-header>
+      <el-menu class="p-4 space-y-2">
         <div
             class="flex items-center space-x-4 border rounded-lg p-2 cursor-pointer bg-white list-room"
             v-for="(room) in rooms"
             :key="room.isNew"
             @click="checkOut(room.roomId)"
         >
-      <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
-        <img :src="'http://10.44.59.225:8083/ipfs/'+room.roomProfile" alt="User Avatar" class="avatar">
-      </span>
+    <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
+      <img :src="'http://10.44.59.225:8083/ipfs/'+room.roomProfile" alt="User Avatar" class="avatar">
+    </span>
           <el-col>
-            <el-col>{{ formatDateOrTime(JSON.parse(room.lastMsg).timestamp) }}</el-col>
+            <el-col v-if="checkNull(room.lastMsgSender)" >{{ formatDateOrTime(JSON.parse(room.lastMsg).timestamp) }}</el-col>
             <el-col>
               <el-tag>{{ room.roomName }}</el-tag>
               <el-row>
@@ -42,13 +93,14 @@
                 <el-icon v-else color="#409EFC">
                   <ChatRound/>
                 </el-icon>
-                <el-col>{{ room.lastMsgSender + "：" + JSON.parse(room.lastMsg).content }}</el-col>
+                <el-col v-if="checkNull(room.lastMsgSender)" class="font-medium text-lg font-serif">{{ room.lastMsgSender + "：" + JSON.parse(room.lastMsg).content }}</el-col>
+                 <el-col v-else class="font-medium text-lg font-serif">暂无消息</el-col>
               </el-row>
             </el-col>
           </el-col>
         </div>
-      </nav>
-    </aside>
+      </el-menu>
+    </el-aside>
     <chat-room v-if="nowRoomId >=1" :key="nowRoomId" :room="JSON.stringify(this.rooms[this.roomIndex.get(nowRoomId)])"
                :user="this.userInfo.username"></chat-room>
   </el-container>
@@ -99,11 +151,10 @@ export default {
       roomIndex: new Map(),
       pageSize: 5,
       nowRoomId: 0,
-      currentPage: 1
     };
   },
   created() {
-    this.getRooms(this.currentPage);
+    this.getRooms();
     //this.updateMessageCount();
     let item = localStorage.getItem("userData");
     if (item) {
@@ -117,6 +168,12 @@ export default {
     ref,
     Host() {
       return Host
+    },
+    turnSearch() {
+      this.$router.push('/common/roomPage');
+    },
+    turnFriends() {
+      this.$router.push('/common/friendsPage');
     },
     checkOut(roomId) {
       this.nowRoomId = roomId;
@@ -156,8 +213,11 @@ export default {
         return messageDate.toLocaleDateString();
       }
     },
-    getRooms(page) {
-      this.realAxios.get(`http://` + Host + `:7000/chat/common/query/initUserMainPage/${page}/${5}`, {
+    checkNull(name){
+      return name !== "";
+    },
+    getRooms() {
+      this.realAxios.get(`http://` + Host + `:7000/chat/common/initUserMainPage`, {
         headers: {
           'token': localStorage.getItem("token")
         }
@@ -178,16 +238,22 @@ export default {
 <style>
 body {
   overflow: hidden; /* 阻止整个页面滚动 */
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+
 }
 
 .list-room {
   overflow: hidden;
+  padding: 10px;
+  margin-bottom: 10px;
 }
 
 .containerM {
-  width: 323%;
+  width: 100%;
   height: 62%;
   margin: 0;
+  padding: 20px;
 }
 
 .avatar {
@@ -195,13 +261,21 @@ body {
   height: 75px;
   border-radius: 50%;
 }
+.theAside{
+  width: 25%;
+  height: 200%;
+  margin: 0;
+  padding: 0;
+
+}
+
 
 .logo {
-  font-size: 24px;
+  font-size: 28px; /* 更大的字体大小 */
   color: #409EFF;
   font-weight: bold;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 30px; /* 更大的边距 */
   animation: fadeIn 2s;
 }
 

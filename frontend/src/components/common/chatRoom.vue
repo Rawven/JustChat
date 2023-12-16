@@ -59,7 +59,7 @@
           <div class="flex flex-col items-end space-y-2">
             <div class="rounded-lg border shadow-sm bg-green-50 text-green-700" data-v0-t="card">
               <div class="p-6">
-                <p>{{message.text}}</p>
+                <p class="font-medium text-lg font-serif">{{message.text}}</p>
               </div>
             </div>
           </div>
@@ -67,11 +67,11 @@
         <div v-else>
           <div class="flex items-end space-x-2">
         <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full mt-2">
-          <span class="flex h-full w-full items-center justify-center rounded-full bg-muted">{{ message.user }}</span>
+          <span class="flex h-full w-full items-center justify-center rounded-full bg-muted font-medium text-lg font-serif" >{{ message.user }}</span>
         </span>
             <div class="rounded-lg border shadow-sm bg-blue-50 text-blue-700" data-v0-t="card">
               <div class="p-6">
-                <p>{{ message.text }}</p>
+                <p class="font-medium text-lg font-serif">{{ message.text }}</p>
               </div>
             </div>
           </div>
@@ -155,7 +155,7 @@ export default {
     this.socket = new WebSocket(`ws://` + Host + `:8081/websocket/${token}/${this.theRoom.roomId}`);
 
     this.socket.onopen = () => {
-      this.realAxios.post(`http://` + Host + `:7000/chat/common/query/restoreHistory/${this.theRoom.roomId}`, {}, {
+      this.realAxios.post(`http://` + Host + `:7000/chat/common/restoreHistory/${this.theRoom.roomId}`, {}, {
         headers: {
           'token': token
         }
@@ -242,7 +242,7 @@ body {
 .useFoot,.main-content,.theH{
   box-sizing: border-box;
 
-  width: 87%;
+  width: 77%;
   position: fixed;
 }
 .theH{

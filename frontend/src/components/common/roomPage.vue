@@ -7,15 +7,20 @@
     <el-header class=" space-y-1.5 flex flex-row items-center justify-between p-6 bg-[#000000] text-[#b3a7df] border-b-2 border-green-500">
       <h3 class="font-semibold tracking-tight text-2xl font-serif text-[#b3a7df]">聊天室大厅</h3>
       <div class="flex space-x-4">
-        <!-- TODO  搜索功能未实现-->
-        <input
+        <el-row>
+        <el-radio-group v-model="radio" class="radio" text>
+          <el-radio-button :label="0" border>根据用户名</el-radio-button>
+          <el-radio-button :label="1" border>根据房间名</el-radio-button>
+        </el-radio-group>
+        </el-row>
+          <input
             class="flex h-10 rounded-md ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full p-3 border border-[#b3a7df] text-lg mb-4 bg-[#000000] text-[#b3a7df]"
             aria-label="Search chat rooms"
             placeholder="Search for a chat room..."
             type="search"
             v-model="searchText"
         />
-        <button @click="submitSearch(searchText)" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-background hover:bg-accent hover:text-accent-foreground border-green-500">
+        <button @click="submitSearch" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-background hover:bg-accent hover:text-accent-foreground border-green-500">
           <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -63,12 +68,13 @@
               :key="index"
         >
           <div class="flex flex-col space-y-4">
-            <h3 class="font-semibold tracking-tight text-xl font-serif text-[#b3a7df]">{{ room.id }}</h3>
+            <h3 class="font-semibold tracking-tight text-xl font-serif text-[#b3a7df]">{{ room.roomId  }} {{room.roomName }}  {{room.roomDescription}}</h3>
             <p class="text-md text-[#4a5568] font-serif">
-              {{room.description}}+ Founded by +{{room.name}}.
+             Founded by +{{room.founderName}}.
             </p>
           </div>
-          <button class="inline-flex items-center justify-center rounded-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 ml-auto border-[#4c51bf] text-[#4c51bf] text-lg font-serif">
+          <button class="inline-flex items-center justify-center rounded-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 ml-auto border-[#4c51bf] text-[#4c51bf] text-lg font-serif"
+          @click="joinRoom(room.roomId)">
             Apply to Join
           </button>
         </div>
@@ -88,7 +94,7 @@
         >
           Create Chat Room
         </button>
-        <div class="mt-6 border rounded-md shadow-sm bg-[#000000] text-[#b3a7df] p-6">
+        <el-card class="mt-6 border rounded-md shadow-sm bg-[#000000] text-[#b3a7df] p-6">
           <input
               v-model="createRoom.name"
               class="flex h-10 rounded-md ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full p-3 border border-[#b3a7df] text-lg mb-4 bg-[#000000] text-[#b3a7df]"
@@ -114,7 +120,7 @@
                   @click="submitForm">
             Submit
           </button>
-        </div>
+        </el-card>
       </div>
     </el-main>
   </el-container>
@@ -130,6 +136,7 @@ export default {
     }
   },
   created() {
+  this.getRooms(this.currentPage)
 
   },
   data() {
@@ -145,6 +152,7 @@ export default {
         roomProfile: '',
         roomName: '',
         founderName: '',
+        roomDescription: '',
         maxPeople: 1,
         lastMsgSender: '',
         isNew: false,
@@ -154,30 +162,27 @@ export default {
       totalRooms: 0, // 新增属性，用于存储房间总数
       pageSize: 5,
       searchText: '',
+      radio: 1,
     };
   },
   methods: {
     submitForm() {
-      this.$refs.form.validate((valid) => {
-        if (valid) {
-          this.realAxios.post('http://' + Host + ':7000/chat/common/createRoom', this.room, {
+          this.realAxios.post('http://' + Host + ':7000/chat/common/createRoom', this.createRoom, {
             headers: {
               'token': localStorage.getItem("token")
             }
           })
               .then(() => {
                 ElMessage.success('创建成功')
-                // 注册成功后可以进行相关的处理，例如跳转到登录页面
-                this.$router.push('/common/mainPage');
+                // 注册成功后清除用户的所有input
+                this.createRoom.name = '';
+                this.createRoom.description = '';
+                this.createRoom.maxPeople = '';
+
               })
-        } else {
-          console.log('error submit!!');
-          return false;
-        }
-      });
     },
     getRooms(page) {
-      this.realAxios.get(`http://` + Host + `:7000/chat/common/query/queryRoomList/${page}/${5}`, {
+      this.realAxios.get(`http://` + Host + `:7000/chat/common/queryIdRoomList/${page}/${5}`, {
         headers: {
           'token': localStorage.getItem("token")
         }
@@ -192,9 +197,19 @@ export default {
       this.currentPage = page;
       this.getRooms(page);
     },
-    submitSearch(value) {
+    joinRoom(id){
+      this.realAxios.post(`http://` + Host + `:7000/chat/common/applyToJoinRoom`, { roomId:id}, {
+        headers: {
+          'token': localStorage.getItem("token")
+        }
+        // eslint-disable-next-line no-unused-vars
+      }).then(response => {
+           ElMessage.success('申请成功')
+      })
+    },
+    submitSearch() {
       // 在这里发送请求到后端
-      this.realAxios.get(`http://` + Host + `:7000/chat/common/query/queryRelatedRoomList/${this.searchInput}/${this.radio}/${value}`, {
+      this.realAxios.get(`http://` + Host + `:7000/chat/common/queryRelatedRoomList/${this.searchText}/${this.radio}/${this.currentPage}`, {
         headers: {
           'token': localStorage.getItem("token")
         }
@@ -208,8 +223,13 @@ export default {
 
 </script>
 <style scoped>
+.avatar {
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+}
 .roomContainer{
-  width: 240%;
+  width: 300%;
  top:0;
   margin: 0;
 }
