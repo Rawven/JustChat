@@ -13,8 +13,9 @@
             aria-label="Search chat rooms"
             placeholder="Search for a chat room..."
             type="search"
+            v-model="searchText"
         />
-        <button class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-background hover:bg-accent hover:text-accent-foreground border-green-500">
+        <button @click="submitSearch(searchText)" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-background hover:bg-accent hover:text-accent-foreground border-green-500">
           <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -152,6 +153,7 @@ export default {
       currentPage: 1, // 新增属性，用于存储当前的页数
       totalRooms: 0, // 新增属性，用于存储房间总数
       pageSize: 5,
+      searchText: '',
     };
   },
   methods: {

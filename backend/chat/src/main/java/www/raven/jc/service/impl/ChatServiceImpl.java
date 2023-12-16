@@ -74,14 +74,10 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public List<MessageVO> restoreHistory(Integer roomId) {
-        // 获取两天内的消息
-        LocalDateTime twoDaysAgo = LocalDateTime.now().minusDays(2);
-        Date twoDaysAgoDate = Date.from(twoDaysAgo.atZone(ZoneId.systemDefault()).toInstant());
         List<Message> messages = messageDAO.getBaseMapper().selectList(new QueryWrapper<Message>()
                 .eq("room_id", roomId)
-                .ge("timestamp", twoDaysAgoDate)
-                .orderByAsc("timestamp"));   List<Integer> userIds = messages.stream().map(Message::getSenderId).collect(Collectors.toList());
-         //查出聊天室内用户的信息
+                .orderByDesc("timestamp")
+                .last("limit 15"));   List<Integer> userIds = messages.stream().map(Message::getSenderId).collect(Collectors.toList());
         CommonResult<List<UserInfoDTO>> allInfo = userFeign.getBatchInfo(userIds);
         Assert.isTrue(allInfo.getCode() == 200, "userFeign调用失败");
         List<UserInfoDTO> data = allInfo.getData();

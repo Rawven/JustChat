@@ -99,6 +99,7 @@ export default {
       roomIndex: new Map(),
       pageSize: 5,
       nowRoomId: 0,
+      currentPage: 1
     };
   },
   created() {
@@ -162,13 +163,12 @@ export default {
         }
       }).then(response => {
         // 将获取的房间数组赋值给 rooms
-        this.rooms = response.data.rooms;
+        this.rooms = response.data.data;
+        console.log(this.rooms)
         // 将获取的房间总数赋值给 totalRooms
         this.nowRoomId = this.rooms[0].roomId;
         this.rooms.forEach((room, index) => {
-          console.log(room.roomId)
           this.roomIndex.set(Number(room.roomId), index);
-          console.log(this.roomIndex.get(room.roomId))
         });
       })
     },
