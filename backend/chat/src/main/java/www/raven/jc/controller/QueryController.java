@@ -19,16 +19,16 @@ import java.util.List;
  */
 @RestController
 @ResponseBody
-@RequestMapping("/common/query")
+@RequestMapping("/common")
 public class QueryController {
     @Autowired
     private ChatService chatService;
     @Autowired
     private RoomService roomService;
 
-    @GetMapping("/initUserMainPage/{page}/{size}")
-    public CommonResult<List<UserRoomVO>> initUserMainPage(@PathVariable("page") int page, @PathVariable("size") int size) {
-        return CommonResult.operateSuccess("获取房间列表成功", roomService.initUserMainPage(page, size));
+    @GetMapping("/initUserMainPage")
+    public CommonResult<List<UserRoomVO>> initUserMainPage() {
+        return CommonResult.operateSuccess("获取房间列表成功", roomService.initUserMainPage());
     }
     @GetMapping("/queryIdRoomList/{page}/{size}")
     public CommonResult<RealRoomVO> queryRoomList( @PathVariable("page") int page, @PathVariable("size") int size) {

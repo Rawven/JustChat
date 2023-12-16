@@ -2,6 +2,7 @@ package www.raven.jc.feign;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
+import www.raven.jc.config.FeignConfig;
 import www.raven.jc.dto.*;
 import www.raven.jc.result.CommonResult;
 
@@ -13,7 +14,7 @@ import java.util.List;
  * @author 刘家辉
  * @date 2023/11/23
  */
-@FeignClient("JC-User")
+@FeignClient(value = "JC-User",configuration = FeignConfig.class)
 public interface UserFeign {
     /**
      * get single info

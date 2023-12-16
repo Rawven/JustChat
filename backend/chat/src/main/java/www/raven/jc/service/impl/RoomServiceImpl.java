@@ -29,8 +29,10 @@ import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -66,32 +68,59 @@ public class RoomServiceImpl implements RoomService {
                 .setMaxPeople(roomModel.getMaxPeople()).
                 setFounderId(Integer.parseInt(request.getHeader("userId")));
         Assert.isTrue(roomDAO.getBaseMapper().insert(room) > 0);
+        Assert.isTrue(userRoomDAO.getBaseMapper().insert(new UserRoom().setRoomId(room.getRoomId()).setUserId(room.getFounderId())) > 0);
     }
 
     @Override
-    public List<UserRoomVO> initUserMainPage(Integer page, Integer size) {
+    public List<UserRoomVO> initUserMainPage() {
         int userId = Integer.parseInt(request.getHeader("userId"));
         //获取用户加入的聊天室id
         List<UserRoom> roomIdList = userRoomDAO.getBaseMapper().selectList(new QueryWrapper<UserRoom>().eq("user_id", userId));
         List<Integer> roomIds = roomIdList.stream().map(UserRoom::getRoomId).collect(Collectors.toList());
-        //分页查询？
-        Page<Room> roomsPage = roomDAO.getBaseMapper().selectPage(new Page<>(page, size), new QueryWrapper<Room>().in("room_id", roomIds));
-        List<Integer> ids = roomsPage.getRecords().stream().map(Room::getLastMsgId).collect(Collectors.toList());
-        List<Integer> founderIds = roomsPage.getRecords().stream().map(Room::getFounderId).collect(Collectors.toList());
-       ids.addAll(founderIds);
+        List<Room> rooms = roomDAO.getBaseMapper().selectList(new QueryWrapper<Room>().in("room_id", roomIds));
+        //获取所有聊天室的最后一条消息id
+        List<Integer> idsMsg = rooms.stream()
+                .map(Room::getLastMsgId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        List<Integer> idsSender = new ArrayList<>();
         //获取所有聊天室的最后一条消息
-        List<Message> messages = messageDAO.getBaseMapper().selectBatchIds(ids);
-        CommonResult<List<UserInfoDTO>> batchInfo = userFeign.getBatchInfo(messages.stream().map(Message::getSenderId).collect(Collectors.toList()));
+        List<Message> messages = messageDAO.getBaseMapper().selectBatchIds(idsMsg);
+        messages.forEach(message -> {
+            if (!idsSender.contains(message.getSenderId())) {
+                idsSender.add(message.getSenderId());
+            }
+        });
+        //获取聊天室发最后一条信息的用户信息
+        CommonResult<List<UserInfoDTO>> batchInfo = userFeign.getBatchInfo(idsSender);
         Assert.isTrue(batchInfo.getCode() == 200,"userFeign调用失败");
-        Map<Integer, UserInfoDTO> map = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
+        List<Integer> founderIds = rooms.stream().map(Room::getFounderId).distinct().collect(Collectors.toList());
+        //获取聊天室创建者的用户信息
+        CommonResult<List<UserInfoDTO>> batchInfoFounder = userFeign.getBatchInfo(founderIds);
+        Assert.isTrue(batchInfoFounder.getCode() == 200,"userFeign调用失败");
+        Map<Integer, UserInfoDTO> mapFounder = batchInfoFounder.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
+        Map<Integer, UserInfoDTO> mapSender = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
+        log.info(mapSender.toString());
         Map<Integer, Message> messageMap = messages.stream().collect(Collectors.toMap(Message::getMessageId, Function.identity()));
-        return roomsPage.getRecords().stream().map(room ->
-                new UserRoomVO()
-                .setRoomId(room.getRoomId())
-                .setRoomName(room.getRoomName())
-                .setLastMsg(JsonUtil.objToJson(messageMap.get(room.getLastMsgId())))
-                .setLastMsgSender(map.get(messageMap.get(room.getLastMsgId()).getSenderId()).getUsername())
-                .setRoomProfile(map.get(room.getFounderId()).getProfile())).collect(Collectors.toList());
+        return rooms.stream().map(room -> {
+            log.info(room.toString());
+            UserRoomVO userRoomVO = new UserRoomVO()
+                    .setRoomId(room.getRoomId())
+                    .setRoomName(room.getRoomName())
+                    .setRoomProfile(mapFounder.get(room.getFounderId()).getProfile());
+            if (room.getLastMsgId() != null) {
+                Message message = messageMap.get(room.getLastMsgId());
+                log.info(message.toString());
+                userRoomVO.setLastMsg(JsonUtil.objToJson(message));
+                UserInfoDTO userInfoDTO = mapSender.get(message.getSenderId());
+                 log.info(userInfoDTO.toString());
+                userRoomVO.setLastMsgSender(userInfoDTO.getUsername());
+            } else {
+                userRoomVO.setLastMsg(""); // 或者一些默认值
+                userRoomVO.setLastMsgSender(""); // 或者一些默认值
+            }
+            return userRoomVO;
+        }).collect(Collectors.toList());
     }
 
     @Override

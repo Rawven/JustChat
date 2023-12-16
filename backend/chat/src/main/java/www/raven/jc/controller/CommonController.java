@@ -15,7 +15,7 @@ import www.raven.jc.service.RoomService;
  */
 @RestController
 @ResponseBody
-@RequestMapping("/common/user")
+@RequestMapping("/common")
 public class CommonController {
 
     @Autowired
