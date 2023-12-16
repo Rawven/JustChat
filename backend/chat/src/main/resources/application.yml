@@ -1,4 +1,7 @@
 spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/jc
   redis:
     address: redis://10.21.32.221:6379
     password: 123456
