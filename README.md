@@ -7,7 +7,7 @@
 | Vue          | spring-cloud-alibaba | mysql  | rocketMq|
 | element-plus | spring-security      | redis  | nacos |
 |              |                      | ipfs   |       |
-
+|              |                      | mongodb|       |
 
 
 ------
