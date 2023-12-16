@@ -8,7 +8,9 @@ import www.raven.jc.client.IpfsClient;
 import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.vo.InfoVO;
+import www.raven.jc.entity.vo.NoticeVO;
 import www.raven.jc.result.CommonResult;
+import www.raven.jc.service.NoticeService;
 import www.raven.jc.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +30,8 @@ public class CommonController {
     @Autowired
     private UserService userService;
     @Autowired
+    private NoticeService noticeService;
+    @Autowired
     private HttpServletRequest request;
     @Autowired
     private IpfsClient ipfsClient;
@@ -42,6 +46,10 @@ public class CommonController {
     @PostMapping("/checkUserExit")
     CommonResult<Boolean> checkUserExit(@RequestBody String username) {
         return CommonResult.operateSuccess("查找成功", userService.checkUserExit(username));
+    }
+    @PostMapping("/getNotification")
+    CommonResult<List<NoticeVO>> getNotification() {
+        return CommonResult.operateSuccess("查找成功", noticeService.loadNotice());
     }
 
     /**

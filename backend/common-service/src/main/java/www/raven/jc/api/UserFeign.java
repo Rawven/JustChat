@@ -1,4 +1,4 @@
-package www.raven.jc.feign;
+package www.raven.jc.api;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,7 +9,7 @@ import www.raven.jc.result.CommonResult;
 import java.util.List;
 
 /**
- * account feign
+ * account api
  *
  * @author 刘家辉
  * @date 2023/11/23

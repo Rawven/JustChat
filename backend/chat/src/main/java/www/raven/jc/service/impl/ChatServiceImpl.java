@@ -17,14 +17,12 @@ import www.raven.jc.entity.po.Room;
 import www.raven.jc.entity.po.UserRoom;
 import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.event.RoomMsgEvent;
-import www.raven.jc.feign.UserFeign;
+import www.raven.jc.api.UserFeign;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;

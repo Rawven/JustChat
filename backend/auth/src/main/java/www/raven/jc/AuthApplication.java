@@ -14,7 +14,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
  */
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableFeignClients(basePackages = {"www.raven.jc.feign"})
+@EnableFeignClients(basePackages = {"www.raven.jc.api"})
 @EnableAspectJAutoProxy
 public class AuthApplication {
 

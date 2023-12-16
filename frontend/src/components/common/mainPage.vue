@@ -49,6 +49,45 @@
           </svg>
           <el-text tag="b">Friends</el-text>
         </div>
+        <div class="flex items-center space-x-4" @click="turnNotifications">
+          <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="w-6 h-6"
+          >
+            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path>
+            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
+          </svg>
+          <span>Notifications</span>
+        </div>
+        <div class="flex items-center space-x-4" @click="logOut">
+          <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="w-6 h-6"
+          >
+            <path d="M13 4h3a2 2 0 0 1 2 2v14"></path>
+            <path d="M2 20h3"></path>
+            <path d="M13 20h9"></path>
+            <path d="M10 12v.01"></path>
+            <path d="M13 4.562v16.157a1 1 0 0 1-1.242.97L5 20V5.562a2 2 0 0 1 1.515-1.94l4-1A2 2 0 0 1 13 4.561Z"></path>
+          </svg>
+          <span>Logout</span>
+        </div>
       </el-menu>
     </el-aside>
     <el-aside class="theAside w-64 border-r border-gray-200 overflow-y-auto">
@@ -111,6 +150,7 @@ import {Host} from "@/main";
 import {reactive, ref} from "vue";
 import ChatRoom from "@/components/common/chatRoom.vue";
 import {ChatLineRound, ChatRound} from "@element-plus/icons-vue";
+import {ElMessage} from "element-plus";
 
 export default {
   watch: {
@@ -169,6 +209,15 @@ export default {
     Host() {
       return Host
     },
+    logOut() {
+      let token = localStorage.getItem("token");
+      this.realAxios.get(`http://` + Host + `:7000/auth/logout/${token}`,  {
+      })
+      localStorage.removeItem("token");
+      localStorage.removeItem("userData");
+      this.$router.push('/common/login');
+      ElMessage.success('登出成功');
+    },
     turnSearch() {
       this.$router.push('/common/roomPage');
     },
@@ -213,6 +262,9 @@ export default {
         return messageDate.toLocaleDateString();
       }
     },
+    turnNotifications(){
+
+    },
     checkNull(name){
       return name !== "";
     },
@@ -237,23 +289,23 @@ export default {
 </script>
 <style>
 body {
-  overflow: hidden; /* 阻止整个页面滚动 */
-    font-family: 'Roboto', sans-serif;
-    font-weight: bold;
-
+  overflow: hidden;
+  font-family: 'Roboto', sans-serif;
+  font-weight: bold;
+  background-color: #f0f0f0; /* 添加背景色 */
 }
 
 .list-room {
   overflow: hidden;
   padding: 10px;
   margin-bottom: 10px;
+  background-color: #f0f0f0; /* 添加背景色 */
 }
 
 .containerM {
-  width: 100%;
-  height: 62%;
+  width: 75%;
+  height: 100%;
   margin: 0;
-  padding: 20px;
 }
 
 .avatar {
@@ -261,21 +313,22 @@ body {
   height: 75px;
   border-radius: 50%;
 }
+
 .theAside{
   width: 25%;
-  height: 200%;
+  height: 210%;
   margin: 0;
   padding: 0;
-
+  top: 0;
+  background-color: #f0f0f0; /* 添加背景色 */
 }
 
-
 .logo {
-  font-size: 28px; /* 更大的字体大小 */
+  font-size: 28px;
   color: #409EFF;
   font-weight: bold;
   text-align: center;
-  margin-bottom: 30px; /* 更大的边距 */
+  margin-bottom: 30px;
   animation: fadeIn 2s;
 }
 

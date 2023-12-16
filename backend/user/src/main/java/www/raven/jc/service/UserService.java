@@ -1,6 +1,5 @@
 package www.raven.jc.service;
 
-import org.springframework.web.multipart.MultipartFile;
 import www.raven.jc.dto.RoleDTO;
 import www.raven.jc.dto.UserAuthDTO;
 import www.raven.jc.dto.UserInfoDTO;
@@ -75,7 +74,7 @@ public interface UserService {
      * @param value  value
      * @return {@link UserAuthDTO}
      */
-    public UserAuthDTO querySingleInfoByColumn(String column,String value) ;
+     UserAuthDTO querySingleInfoByColumn(String column,String value) ;
 
     /**
      * query roles by id

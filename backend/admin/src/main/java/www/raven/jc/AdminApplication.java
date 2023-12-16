@@ -19,7 +19,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @EnableDiscoveryClient
 @EnableAspectJAutoProxy
 @MapperScan("www.raven.jc.dao")
-@EnableFeignClients(basePackages = {"www.raven.jc.feign"})
+@EnableFeignClients(basePackages = {"www.raven.jc.api"})
 public class AdminApplication {
 
     public static void main(String[] args) {

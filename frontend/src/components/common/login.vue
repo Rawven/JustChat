@@ -117,7 +117,6 @@ export default {
 }
 
 .tMain {
-  position: relative; /* 设置定位类型为相对定位 */
   width: 100%; /* 设置宽度为100% */
   height: 100%; /* 设置高度为100% */
 }
@@ -134,4 +133,5 @@ export default {
   margin-top: auto; /* 设置上边距为自动 */
   margin-bottom: auto; /* 设置下边距为自动 */
 }
+
 </style>

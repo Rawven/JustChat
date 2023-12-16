@@ -2,10 +2,7 @@ package www.raven.jc.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import www.raven.jc.entity.model.LoginModel;
 import www.raven.jc.entity.model.RegisterAdminModel;
 import www.raven.jc.entity.model.RegisterModel;
@@ -50,8 +47,8 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/logout")
-    public CommonResult<Void> logout(@RequestBody String token) {
+    @GetMapping("/logout/{token}")
+    public CommonResult<Void> logout(@PathVariable( "token") String token) {
         authService.logout(token);
         return CommonResult.operateSuccess("登出成功");
     }

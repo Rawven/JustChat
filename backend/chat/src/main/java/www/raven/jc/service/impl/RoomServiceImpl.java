@@ -22,7 +22,7 @@ import www.raven.jc.entity.vo.DisplayRoomVO;
 import www.raven.jc.entity.vo.RealRoomVO;
 import www.raven.jc.entity.vo.UserRoomVO;
 import www.raven.jc.event.JoinRoomApplyEvent;
-import www.raven.jc.feign.UserFeign;
+import www.raven.jc.api.UserFeign;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.RoomService;
 import www.raven.jc.util.JsonUtil;

@@ -23,9 +23,6 @@ public interface RoomService {
 
     /**
      * query room page
-     *
-     * @param page   page
-     * @param size   size
      * @return {@link List}<{@link UserRoomVO}>
      */
     List<UserRoomVO> initUserMainPage();

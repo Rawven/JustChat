@@ -111,7 +111,7 @@ public class NotificationHandler {
      * 遍历方法
      * @param message message
      */
-    public void sendAllMessag1e(String message) {
+    public void sendAllMessage(String message) {
         log.info("【websocket消息】广播消息:" + message);
         for (NotificationHandler handler : webSockets) {
             if (handler.session.isOpen()) {

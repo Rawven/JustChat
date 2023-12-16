@@ -8,8 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-import www.raven.jc.client.IpfsClient;
 import www.raven.jc.dao.RolesDAO;
 import www.raven.jc.dao.UserDAO;
 import www.raven.jc.dao.UserRoleDAO;
@@ -25,7 +23,7 @@ import www.raven.jc.entity.vo.InfoVO;
 import www.raven.jc.entity.vo.RealAllInfoVO;
 import www.raven.jc.service.UserService;
 
-import javax.servlet.http.HttpServletRequest;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -174,7 +172,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = IllegalArgumentException.class)
     public void saveTime(Integer userId) {
-        Assert.isTrue(userDAO.getBaseMapper().update(new UpdateWrapper<User>().eq("id", userId).set("last_online_time", System.currentTimeMillis())) > 0, "登出失败");
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        Assert.isTrue(userDAO.getBaseMapper().update(new UpdateWrapper<User>().eq("id", userId).set("last_online_time", timestamp)) > 0, "登出失败");
     }
 
 

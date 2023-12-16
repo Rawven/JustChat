@@ -6,7 +6,6 @@ import www.raven.jc.entity.model.AgreeModel;
 import www.raven.jc.entity.model.RoomIdModel;
 import www.raven.jc.entity.model.RoomModel;
 import www.raven.jc.result.CommonResult;
-import www.raven.jc.service.ChatService;
 import www.raven.jc.service.RoomService;
 
 /**

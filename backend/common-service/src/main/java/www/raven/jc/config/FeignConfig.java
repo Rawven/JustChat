@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * feign config
+ * api config
  *
  * @author 刘家辉
  * @date 2023/12/16

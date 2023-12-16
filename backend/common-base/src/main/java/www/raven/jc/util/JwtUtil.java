@@ -35,5 +35,4 @@ public class JwtUtil {
         NumberWithFormat userId = (NumberWithFormat) payload.getClaim("userId");
         return new TokenDTO().setRole(role).setUserId(userId.intValue()).setExpireTime(expireTime.longValue());
     }
-
 }

@@ -15,7 +15,7 @@ import www.raven.jc.dto.UserAuthDTO;
 import www.raven.jc.dto.UserRegisterDTO;
 import www.raven.jc.entity.model.LoginModel;
 import www.raven.jc.entity.model.RegisterModel;
-import www.raven.jc.feign.UserFeign;
+import www.raven.jc.api.UserFeign;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.AuthService;
 import www.raven.jc.util.JwtUtil;

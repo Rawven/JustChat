@@ -41,4 +41,4 @@ Ipfs:
   api: /ip4/127.0.0.1/tcp/5001
 logging:
   level:
-    www.raven.jc.feign.*: DEBUG
+    www.raven.jc.api.*: DEBUG

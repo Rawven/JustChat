@@ -13,13 +13,11 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
  * @author 刘家辉
  * @date 2023/11/22
  */
-//TODO 分库分表 单独分出一个chat库吧
-
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableAspectJAutoProxy
 @MapperScan("www.raven.jc.dao")
-@EnableFeignClients(basePackages = {"www.raven.jc.feign"})
+@EnableFeignClients(basePackages = {"www.raven.jc.api"})
 public class ChatApplication {
     public static void main(String[] args) {
         SpringApplication.run(ChatApplication.class, args);

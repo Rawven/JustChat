@@ -34,4 +34,4 @@ Raven:
   key: 爱你老妈
 logging:
     level:
-      www.raven.jc.feign.*: DEBUG
+      www.raven.jc.api.*: DEBUG

@@ -1,13 +1,12 @@
 package www.raven.jc.websocket;
 
-import cn.hutool.core.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
-import www.raven.jc.feign.UserFeign;
+import www.raven.jc.api.UserFeign;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.JwtUtil;
