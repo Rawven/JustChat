@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
@@ -79,13 +80,12 @@ public class RoomServiceImpl implements RoomService {
         List<Integer> roomIds = roomIdList.stream().map(UserRoom::getRoomId).collect(Collectors.toList());
         List<Room> rooms = roomDAO.getBaseMapper().selectList(new QueryWrapper<Room>().in("room_id", roomIds));
         //获取所有聊天室的最后一条消息id
-        List<Integer> idsMsg = rooms.stream()
-                .map(Room::getLastMsgId)
-                .filter(Objects::nonNull)
+        List<ObjectId> idsMsg = rooms.stream()
+                .map(room-> new ObjectId(room.getLastMsgId()))
                 .collect(Collectors.toList());
         List<Integer> idsSender = new ArrayList<>();
         //获取所有聊天室的最后一条消息
-        List<Message> messages = messageDAO.getBaseMapper().selectBatchIds(idsMsg);
+        List<Message> messages = messageDAO.getBatchIds(idsMsg);
         messages.forEach(message -> {
             if (!idsSender.contains(message.getSenderId())) {
                 idsSender.add(message.getSenderId());
@@ -100,8 +100,8 @@ public class RoomServiceImpl implements RoomService {
         Assert.isTrue(batchInfoFounder.getCode() == 200,"userFeign调用失败");
         Map<Integer, UserInfoDTO> mapFounder = batchInfoFounder.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
         Map<Integer, UserInfoDTO> mapSender = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
-        log.info(mapSender.toString());
-        Map<Integer, Message> messageMap = messages.stream().collect(Collectors.toMap(Message::getMessageId, Function.identity()));
+
+        Map<String, Message> messageMap = messages.stream().collect(Collectors.toMap(message ->message.getMessageId().toString(), Function.identity()));
         return rooms.stream().map(room -> {
             log.info(room.toString());
             UserRoomVO userRoomVO = new UserRoomVO()

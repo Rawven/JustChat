@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import www.raven.jc.dao.MessageDAO;
 import www.raven.jc.dao.RoomDAO;
 import www.raven.jc.dao.UserRoomDAO;
+import www.raven.jc.dao.MessageDAO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.entity.po.Message;
@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class ChatServiceImpl implements ChatService {
+
     @Autowired
     private MessageDAO messageDAO;
     @Autowired
@@ -60,9 +61,9 @@ public class ChatServiceImpl implements ChatService {
                 .setSenderId(data.getUserId())
                 .setRoomId(Integer.parseInt(roomId));
         //保存消息
-        Assert.isTrue(messageDAO.getBaseMapper().insert(realMsg) > 0, "插入失败");
+        Assert.isTrue(messageDAO.save(realMsg), "插入失败");
         //更新聊天室的最后一条消息
-        Assert.isTrue(roomDAO.getBaseMapper().updateById(new Room().setRoomId(Integer.valueOf(roomId)).setLastMsgId(realMsg.getMessageId())) > 0, "更新失败");
+        Assert.isTrue(roomDAO.getBaseMapper().updateById(new Room().setRoomId(Integer.valueOf(roomId)).setLastMsgId(realMsg.getMessageId().toString())) > 0, "更新失败");
         List<UserRoom> ids = userRoomDAO.getBaseMapper().selectList(new QueryWrapper<UserRoom>().eq("room_id", roomId));
         List<Integer> userIds = ids.stream().map(UserRoom::getUserId).collect(Collectors.toList());
         RoomMsgEvent roomMsgEvent = new RoomMsgEvent(data.getUserId(), Integer.valueOf(roomId), userIds, JsonUtil.objToJson(realMsg));
@@ -72,11 +73,9 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public List<MessageVO> restoreHistory(Integer roomId) {
-        List<Message> messages = messageDAO.getBaseMapper().selectList(new QueryWrapper<Message>()
-                .eq("room_id", roomId)
-                .orderByDesc("timestamp")
-                .last("limit 15"));   List<Integer> userIds = messages.stream().map(Message::getSenderId).collect(Collectors.toList());
-        CommonResult<List<UserInfoDTO>> allInfo = userFeign.getBatchInfo(userIds);
+        List<Message> messages = messageDAO.getByRoomId(roomId);
+        List<Integer> userIds = messages.stream().map(Message::getSenderId).collect(Collectors.toList());
+                CommonResult<List<UserInfoDTO>> allInfo = userFeign.getBatchInfo(userIds);
         Assert.isTrue(allInfo.getCode() == 200, "userFeign调用失败");
         List<UserInfoDTO> data = allInfo.getData();
         Map<Integer, UserInfoDTO> userInfoMap = data.stream()

@@ -5,6 +5,9 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.util.Date;
 
@@ -14,14 +17,17 @@ import java.util.Date;
  * @author 刘家辉
  * @date 2023/11/22
  */
-@TableName
 @Data
 @Accessors(chain = true)
 public class Message {
-    @TableId(value = "message_id", type = IdType.AUTO)
-    private Integer messageId;
+    /**
+     * 注意ObjectId的处理
+     */
+    @MongoId
+    private ObjectId messageId;
     private Integer senderId;
     private String content;
+    @Indexed
     private Integer roomId;
     private Date timestamp;
 }
