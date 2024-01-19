@@ -15,7 +15,7 @@ import www.raven.jc.dto.UserAuthDTO;
 import www.raven.jc.dto.UserRegisterDTO;
 import www.raven.jc.entity.model.LoginModel;
 import www.raven.jc.entity.model.RegisterModel;
-import www.raven.jc.api.UserFeign;
+import www.raven.jc.api.UserDubbo;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.AuthService;
 import www.raven.jc.util.JwtUtil;
@@ -39,17 +39,17 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
-    private UserFeign userFeign;
+    private UserDubbo userDubbo;
     @Value("${Raven.key}")
     private String key;
 
     @Override
     public String login(LoginModel loginModel) {
-        CommonResult<UserAuthDTO> result = userFeign.getUserToAuth(loginModel.getUsername());
+        CommonResult<UserAuthDTO> result = userDubbo.getUserToAuth(loginModel.getUsername());
         Assert.isTrue(result.getCode() == 200);
         UserAuthDTO user = result.getData();
         Assert.isTrue(passwordEncoder.matches(loginModel.getPassword(), user.getPassword()), "密码错误");
-        CommonResult<List<RoleDTO>> rolesById = userFeign.getRolesById(user.getUserId());
+        CommonResult<List<RoleDTO>> rolesById = userDubbo.getRolesById(user.getUserId());
         Assert.isTrue(rolesById.getCode() == 200);
         return getTokenClaims(user.getUserId(), rolesById.getData().stream().map(RoleDTO::getValue).collect(Collectors.toList()));
     }
@@ -81,16 +81,16 @@ public class AuthServiceImpl implements AuthService {
     public void logout(String token) {
         TokenDTO verify = JwtUtil.verify(token, key);
         redissonClient.getBucket("token:" + verify.getUserId()).delete();
-        CommonResult<Void> voidCommonResult = userFeign.saveLogOutTime(verify.getUserId());
+        CommonResult<Void> voidCommonResult = userDubbo.saveLogOutTime(verify.getUserId());
         Assert.isTrue(voidCommonResult.getCode() == 200);
     }
 
     private String register(RegisterModel registerModel, List<Integer> roleIds) {
-        Assert.isFalse(userFeign.checkUserExit(registerModel.getUsername()).getData());
+        Assert.isFalse(userDubbo.checkUserExit(registerModel.getUsername()).getData());
         UserRegisterDTO user = new UserRegisterDTO();
         user.setEmail(registerModel.getEmail()).setPassword(passwordEncoder.encode(registerModel.getPassword()))
                 .setUsername(registerModel.getUsername()).setRoleIds(roleIds);
-        CommonResult<UserAuthDTO> insert = userFeign.insert(user);
+        CommonResult<UserAuthDTO> insert = userDubbo.insert(user);
         Assert.isTrue(insert.getCode() == 200);
         List<RoleDTO> list = new ArrayList<>();
         for (Integer roleId : roleIds) {

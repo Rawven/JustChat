@@ -1,3 +1,10 @@
+dubbo:
+  registry:
+    address: nacos://10.21.32.154:8848
+
+
+
+
 spring:
   redis:
     address: redis://10.21.32.221:6379
