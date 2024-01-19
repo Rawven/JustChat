@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -164,7 +163,7 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public RealRoomVO queryListPage(int page, int size) {
         Long total = roomDAO.getBaseMapper().selectCount(null);
-        Page<Room> chatRoomPage = roomDAO.getBaseMapper().selectPage(new Page<>(page, size), new QueryWrapper<Room>());
+        Page<Room> chatRoomPage = roomDAO.getBaseMapper().selectPage(new Page<>(page, size), new QueryWrapper<>());
         List<DisplayRoomVO> rooms = buildRoomVO(chatRoomPage, userFeign.getAllInfo().getData());
         return new RealRoomVO().setRooms(rooms).setTotal(Math.toIntExact(total));
     }

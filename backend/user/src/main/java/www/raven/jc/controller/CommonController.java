@@ -8,7 +8,6 @@ import www.raven.jc.client.IpfsClient;
 import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.vo.InfoVO;
-import www.raven.jc.entity.vo.NoticeVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.NoticeService;
 import www.raven.jc.service.UserService;

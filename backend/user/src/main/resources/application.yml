@@ -38,7 +38,7 @@ server:
 Raven:
   key: 爱你老妈
 Ipfs:
-  api: /ip4/127.0.0.1/tcp/5001
+  api: /ip4/10.21.32.192/tcp/9501
 logging:
   level:
     www.raven.jc.api.*: DEBUG

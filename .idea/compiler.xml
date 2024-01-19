@@ -12,11 +12,12 @@
         <module name="admin" />
         <module name="user" />
         <module name="account" />
-        <module name="common-base" />
         <module name="gateway" />
+        <module name="common-base" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="backend" target="11" />
       <module name="JustChat" target="11" />
     </bytecodeTargetLevel>
   </component>
