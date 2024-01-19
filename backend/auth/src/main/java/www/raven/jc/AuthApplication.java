@@ -1,5 +1,6 @@
 package www.raven.jc;
 
+import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
  * @date 2023/11/27
  */
 @SpringBootApplication
+@EnableDubbo
 @EnableDiscoveryClient
 @EnableAspectJAutoProxy
 
