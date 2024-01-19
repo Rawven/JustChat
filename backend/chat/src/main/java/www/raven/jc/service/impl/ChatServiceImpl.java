@@ -18,7 +18,7 @@ import www.raven.jc.entity.po.UserRoom;
 import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.event.RoomMsgEvent;
 import www.raven.jc.api.UserDubbo;
-import www.raven.jc.result.CommonResult;
+import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
@@ -75,8 +75,8 @@ public class ChatServiceImpl implements ChatService {
     public List<MessageVO> restoreHistory(Integer roomId) {
         List<Message> messages = messageDAO.getByRoomId(roomId);
         List<Integer> userIds = messages.stream().map(Message::getSenderId).collect(Collectors.toList());
-                CommonResult<List<UserInfoDTO>> allInfo = userDubbo.getBatchInfo(userIds);
-        Assert.isTrue(allInfo.getCode() == 200, "userFeign调用失败");
+                RpcResult<List<UserInfoDTO>> allInfo = userDubbo.getBatchInfo(userIds);
+        Assert.isTrue(allInfo.isSuccess(), "userFeign调用失败");
         List<UserInfoDTO> data = allInfo.getData();
         Map<Integer, UserInfoDTO> userInfoMap = data.stream()
                 .collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));

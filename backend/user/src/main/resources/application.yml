@@ -1,10 +1,6 @@
 dubbo:
   registry:
     address: nacos://10.21.32.154:8848
-
-
-
-
 spring:
   redis:
     address: redis://10.21.32.221:6379
@@ -38,14 +34,11 @@ spring:
         server-addr: 10.21.32.154:8848
   datasource:
     url: jdbc:mysql://10.21.32.154:3306/JC_user?useUnicode=true&characterEncoding=utf-8&useSSL=false
-    username: user
-    password: 123456
+    username: root
+    password: root
 server:
   port: 8080
 Raven:
   key: 爱你老妈
 Ipfs:
-  api: /ip4/10.21.32.192/tcp/9501
-logging:
-  level:
-    www.raven.jc.api.*: DEBUG
+  api: /ip4/127.0.0.1/tcp/5001

@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.bson.types.ObjectId;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ import www.raven.jc.entity.vo.RealRoomVO;
 import www.raven.jc.entity.vo.UserRoomVO;
 import www.raven.jc.event.JoinRoomApplyEvent;
 import www.raven.jc.api.UserDubbo;
-import www.raven.jc.result.CommonResult;
+import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.RoomService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
@@ -51,7 +52,7 @@ public class RoomServiceImpl implements RoomService {
     private UserRoomDAO userRoomDAO;
     @Autowired
     private HttpServletRequest request;
-    @Autowired
+    @DubboReference
     private UserDubbo userDubbo;
     @Autowired
     private MessageDAO messageDAO;
@@ -91,12 +92,12 @@ public class RoomServiceImpl implements RoomService {
             }
         });
         //获取聊天室发最后一条信息的用户信息
-        CommonResult<List<UserInfoDTO>> batchInfo = userDubbo.getBatchInfo(idsSender);
-        Assert.isTrue(batchInfo.getCode() == 200,"userFeign调用失败");
+        RpcResult<List<UserInfoDTO>> batchInfo = userDubbo.getBatchInfo(idsSender);
+        Assert.isTrue(batchInfo.isSuccess(),"userFeign调用失败");
         List<Integer> founderIds = rooms.stream().map(Room::getFounderId).distinct().collect(Collectors.toList());
         //获取聊天室创建者的用户信息
-        CommonResult<List<UserInfoDTO>> batchInfoFounder = userDubbo.getBatchInfo(founderIds);
-        Assert.isTrue(batchInfoFounder.getCode() == 200,"userFeign调用失败");
+        RpcResult<List<UserInfoDTO>> batchInfoFounder = userDubbo.getBatchInfo(founderIds);
+        Assert.isTrue(batchInfoFounder.isSuccess(),"userFeign调用失败");
         Map<Integer, UserInfoDTO> mapFounder = batchInfoFounder.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
         Map<Integer, UserInfoDTO> mapSender = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
 

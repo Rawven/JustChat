@@ -2,6 +2,7 @@ package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +17,7 @@ import www.raven.jc.dto.UserRegisterDTO;
 import www.raven.jc.entity.model.LoginModel;
 import www.raven.jc.entity.model.RegisterModel;
 import www.raven.jc.api.UserDubbo;
-import www.raven.jc.result.CommonResult;
+import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.AuthService;
 import www.raven.jc.util.JwtUtil;
 
@@ -38,19 +39,19 @@ public class AuthServiceImpl implements AuthService {
     private RedissonClient redissonClient;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
+    @DubboReference
     private UserDubbo userDubbo;
     @Value("${Raven.key}")
     private String key;
 
     @Override
     public String login(LoginModel loginModel) {
-        CommonResult<UserAuthDTO> result = userDubbo.getUserToAuth(loginModel.getUsername());
-        Assert.isTrue(result.getCode() == 200);
+        RpcResult<UserAuthDTO> result = userDubbo.getUserToAuth(loginModel.getUsername());
+        Assert.isTrue(result.isSuccess());
         UserAuthDTO user = result.getData();
         Assert.isTrue(passwordEncoder.matches(loginModel.getPassword(), user.getPassword()), "密码错误");
-        CommonResult<List<RoleDTO>> rolesById = userDubbo.getRolesById(user.getUserId());
-        Assert.isTrue(rolesById.getCode() == 200);
+        RpcResult<List<RoleDTO>> rolesById = userDubbo.getRolesById(user.getUserId());
+        Assert.isTrue(rolesById.isSuccess());
         return getTokenClaims(user.getUserId(), rolesById.getData().stream().map(RoleDTO::getValue).collect(Collectors.toList()));
     }
 
@@ -58,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public String registerCommonRole(RegisterModel registerModel) {
         ArrayList<Integer> list = new ArrayList<>();
-        list.add(RoleConstant.COMMON_ROLE);
+        list.add(RoleConstant.COMMON_ROLE_NUMBER);
         return register(registerModel, list);
     }
 
@@ -66,8 +67,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public String registerAdminRole(RegisterModel registerModel) {
         ArrayList<Integer> list = new ArrayList<>();
-        list.add(RoleConstant.ADMIN_ROLE);
-        list.add(RoleConstant.COMMON_ROLE);
+        list.add(RoleConstant.ADMIN_ROLE_NUMBER);
+        list.add(RoleConstant.COMMON_ROLE_NUMBER);
         return register(registerModel, list);
     }
 
@@ -81,8 +82,8 @@ public class AuthServiceImpl implements AuthService {
     public void logout(String token) {
         TokenDTO verify = JwtUtil.verify(token, key);
         redissonClient.getBucket("token:" + verify.getUserId()).delete();
-        CommonResult<Void> voidCommonResult = userDubbo.saveLogOutTime(verify.getUserId());
-        Assert.isTrue(voidCommonResult.getCode() == 200);
+        RpcResult<Void> voidCommonResult = userDubbo.saveLogOutTime(verify.getUserId());
+        Assert.isTrue(voidCommonResult.isSuccess());
     }
 
     private String register(RegisterModel registerModel, List<Integer> roleIds) {
@@ -90,8 +91,8 @@ public class AuthServiceImpl implements AuthService {
         UserRegisterDTO user = new UserRegisterDTO();
         user.setEmail(registerModel.getEmail()).setPassword(passwordEncoder.encode(registerModel.getPassword()))
                 .setUsername(registerModel.getUsername()).setRoleIds(roleIds);
-        CommonResult<UserAuthDTO> insert = userDubbo.insert(user);
-        Assert.isTrue(insert.getCode() == 200);
+        RpcResult<UserAuthDTO> insert = userDubbo.insert(user);
+        Assert.isTrue(insert.isSuccess());
         List<RoleDTO> list = new ArrayList<>();
         for (Integer roleId : roleIds) {
             list.add(new RoleDTO().setValue(RoleConstant.MAP.get(roleId)));
