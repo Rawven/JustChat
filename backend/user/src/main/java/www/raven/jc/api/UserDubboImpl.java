@@ -1,8 +1,7 @@
-package www.raven.jc.rpc;
+package www.raven.jc.api;
 
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
-import www.raven.jc.api.UserDubbo;
 import www.raven.jc.dto.*;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.UserService;

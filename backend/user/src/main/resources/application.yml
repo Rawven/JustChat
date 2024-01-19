@@ -1,3 +1,4 @@
+//TODO 明天做一下配置
 dubbo:
   registry:
     address: nacos://10.21.32.154:8848

@@ -3,7 +3,7 @@ package www.raven.jc.result;
 import lombok.Data;
 
 /**
- * rpc result
+ * api result
  *
  * @author 刘家辉
  * @date 2024/01/19
