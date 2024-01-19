@@ -9,10 +9,12 @@
     <file url="file://$PROJECT_DIR$/backend/auth/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backend/chat/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backend/chat/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/backend/common-base/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/backend/common-base/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/backend/common-service/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/backend/common-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/common/common-base/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/common/common-base/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/common/common-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/common/common-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/backend/common/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backend/gateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backend/gateway/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backend/src/main/java" charset="UTF-8" />

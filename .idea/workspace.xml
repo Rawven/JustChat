@@ -5,14 +5,39 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f0302054-2181-4776-a933-14122761ef71" name="更改" comment="init vue">
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/test/mainPage.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Header.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/common/login.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/common/login.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/common/register.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/common/register.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/router/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/router/index.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/common/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chat/src/main/java/www/raven/jc/entity/po/Message.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/chat/src/main/java/www/raven/jc/entity/po/Message.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-base/ReadMe.md" beforeDir="false" afterPath="$PROJECT_DIR$/backend/common/common-base/ReadMe.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-base/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/common/common-base/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-base/src/main/java/www/raven/jc/constant/JwtConstant.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/common/common-base/src/main/java/www/raven/jc/constant/JwtConstant.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-base/src/main/java/www/raven/jc/dto/TokenDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/common/common-base/src/main/java/www/raven/jc/dto/TokenDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-base/src/main/java/www/raven/jc/exception/IpfsException.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/common/common-base/src/main/java/www/raven/jc/exception/IpfsException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-base/src/main/java/www/raven/jc/model/LogModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/common/common-base/src/main/java/www/raven/jc/model/LogModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-base/src/main/java/www/raven/jc/result/CommonResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/common/common-base/src/main/java/www/raven/jc/result/CommonResult.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-base/src/main/java/www/raven/jc/result/ResultCode.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/common/common-base/src/main/java/www/raven/jc/result/ResultCode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-base/src/main/java/www/raven/jc/util/JsonUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/common/common-base/src/main/java/www/raven/jc/util/JsonUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-base/src/main/java/www/raven/jc/util/JwtUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/common/common-base/src/main/java/www/raven/jc/util/JwtUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-base/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/common/common-base/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-service/ReadMe.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-service/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-service/src/main/java/www/raven/jc/aop/GlobalExceptionHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-service/src/main/java/www/raven/jc/aop/LoggingAspect.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-service/src/main/java/www/raven/jc/api/UserFeign.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-service/src/main/java/www/raven/jc/config/FeignConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-service/src/main/java/www/raven/jc/constant/MqConstant.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-service/src/main/java/www/raven/jc/dto/QueryUserInfoDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-service/src/main/java/www/raven/jc/dto/RoleDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-service/src/main/java/www/raven/jc/dto/UserAuthDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-service/src/main/java/www/raven/jc/dto/UserInfoDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-service/src/main/java/www/raven/jc/dto/UserRegisterDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-service/src/main/java/www/raven/jc/dto/UserRoleInfo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-service/src/main/java/www/raven/jc/event/Event.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-service/src/main/java/www/raven/jc/event/JoinRoomApplyEvent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/common-service/src/main/java/www/raven/jc/event/RoomMsgEvent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/gateway/src/main/java/www/raven/jc/config/RedissonConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/gateway/src/main/java/www/raven/jc/config/RedissonConfiguration.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,6 +68,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Maven. [org.apache.maven.plugins:maven-archetype-plugin:RELEASE:generate].executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
@@ -60,6 +86,7 @@
     "project.structure.last.edited": "模块",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
+    "run.configurations.included.in.services": "true",
     "settings.editor.selected.configurable": "project.scopes",
     "ts.external.directory.path": "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2022.2.3\\plugins\\javascript-impl\\jsLanguageServicesImpl\\external",
     "vue.rearranger.settings.migration": "true"
@@ -75,13 +102,58 @@
       <recent name="D:\AE\1127\JustChat\frontend\public" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\AE\1127\JustChat\backend\common" />
       <recent name="D:\AE\1127\JustChat\frontend\public" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunDashboard">
+    <option name="configurationTypes">
+      <set>
+        <option value="MicronautRunConfigurationType" />
+        <option value="QuarkusRunConfigurationType" />
+        <option value="SpringBootApplicationConfigurationType" />
+      </set>
+    </option>
+  </component>
+  <component name="RunManager" selected="Spring Boot.AccountApplication">
     <configuration name="AccountApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="account" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="org.example.AccountApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AdminApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="admin" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="www.raven.jc.AdminApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AuthApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="auth" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="www.raven.jc.AuthApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ChatApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="chat" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="www.raven.jc.ChatApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GatewayApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="gateway" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="www.raven.jc.GatewayApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="user" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="www.raven.jc.UserApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -91,6 +163,7 @@
     <attachedChunks>
       <set>
         <option value="jdk-11.0.21-corretto-11.0.21-3183f394aec4-d55de845" />
+        <option value="jdk-11.0.22-corretto-11.0.22-f644763e9732-4a89cc43" />
       </set>
     </attachedChunks>
   </component>
@@ -106,6 +179,14 @@
       <workItem from="1700491547279" duration="79000" />
       <workItem from="1700542187727" duration="833000" />
       <workItem from="1702019771528" duration="17000" />
+      <workItem from="1703857550685" duration="22000" />
+      <workItem from="1705294019861" duration="266000" />
+      <workItem from="1705294299151" duration="830000" />
+      <workItem from="1705295444414" duration="27000" />
+      <workItem from="1705336626118" duration="781000" />
+      <workItem from="1705371550868" duration="465000" />
+      <workItem from="1705372360098" duration="6000" />
+      <workItem from="1705629435625" duration="555000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <option name="closed" value="true" />
