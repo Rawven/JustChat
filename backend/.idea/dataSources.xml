@@ -13,15 +13,15 @@
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="@localhost" uuid="cab5b4f3-4ae0-4247-aae8-15dc5c3420c7">
+    <data-source source="LOCAL" name="@10.21.32.192" uuid="1ef88d9b-ca20-4c04-9a34-6a599db4540a">
       <driver-ref>mongo</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.dbschema.MongoJdbcDriver</jdbc-driver>
-      <jdbc-url>mongodb://localhost:27017</jdbc-url>
+      <jdbc-url>mongodb://10.21.32.192:27017</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
-        <property name="EXTERNAL_DATA_PATH" value="D:\mongodb\external-data-localhost.xml" />
+        <property name="EXTERNAL_DATA_PATH" value="D:\AE\1127\JustChat\backend\external-data-10_21_32_192.xml" />
         <property name="com.intellij.clouds.kubernetes.db.container.port" />
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>

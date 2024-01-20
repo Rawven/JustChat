@@ -3,7 +3,7 @@
     <el-row class="row-bg" justify="center" type="flex">
       <el-col v-if="userInfo" :span="8">
         <el-card class="box-card">
-          <img :src="'http://10.44.59.225:8083/ipfs/'+userInfo.profile" alt="User Avatar" class="avatar">
+          <img :src="'http://10.24.3.176:8083/ipfs/'+userInfo.profile" alt="User Avatar" class="avatar">
           <h2 class="username">你好!😘 {{ userInfo.username }}</h2>
           <h2 class="signature">个性签名: {{
               userInfo.signature ? userInfo.signature : '这个用户很懒 什么也没留下'
