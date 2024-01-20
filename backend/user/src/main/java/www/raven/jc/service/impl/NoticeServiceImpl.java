@@ -10,9 +10,12 @@ import www.raven.jc.dao.NoticeDAO;
 import www.raven.jc.entity.po.Notification;
 import www.raven.jc.entity.vo.NoticeVO;
 import www.raven.jc.service.NoticeService;
+import www.raven.jc.util.JsonUtil;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -45,6 +48,28 @@ public class NoticeServiceImpl implements NoticeService {
                     return noticeVO;
                 }
         ).collect(Collectors.toList());
+    }
+    @Override
+    public void addFriendApply(Integer friendId,String message){
+        String applierId = request.getHeader("userId");
+        Map<Object,Object> map = new HashMap<>(2);
+        map.put("applierId",applierId);
+        map.put("message",message);
+        Notification notice = new Notification().setUserId(friendId)
+                .setMessage(JsonUtil.objToJson(map))
+                .setType(NoticeConstant.TYPE_ADD_FRIEND_APPLY)
+                .setTimestamp(System.currentTimeMillis())
+                .setStatus(NoticeConstant.STATUS_UNREAD);
+        Assert.isTrue(noticeDAO.save(notice));
+    }
+    @Override
+    public void addRoomApply(int founderId,Object payload){
+        Notification notice = new Notification().setUserId(founderId)
+                .setMessage(JsonUtil.objToJson(payload))
+                .setType(NoticeConstant.TYPE_JOIN_ROOM_APPLY)
+                .setTimestamp(System.currentTimeMillis())
+                .setStatus(NoticeConstant.STATUS_UNREAD);
+        Assert.isTrue(noticeDAO.save(notice));
     }
 
     @Override

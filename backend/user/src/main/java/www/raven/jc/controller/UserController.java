@@ -28,7 +28,7 @@ import java.util.List;
 @ResponseBody
 @RequestMapping("/common")
 @Slf4j
-public class CommonController {
+public class UserController {
     @Autowired
     private UserService userService;
     @Autowired

@@ -106,6 +106,7 @@ public class NotificationHandler {
         log.error("Stack trace: {}", (Object) error.getStackTrace());
     }
 
+
     /**
      * send all message
      * 遍历方法

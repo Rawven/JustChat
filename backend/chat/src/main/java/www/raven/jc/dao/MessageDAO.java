@@ -18,7 +18,9 @@ import java.util.List;
  * @date 2023/12/17
  */
 @Repository
-public class MessageDAO {
+public class
+
+MessageDAO {
     public static final String COLLECTION_MESSAGE = "message";
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -29,7 +31,7 @@ public class MessageDAO {
     }
 
     public List<Message> getByRoomId(Integer roomId) {
-        Criteria criteria = Criteria.where("roomId").is(roomId);
+        Criteria criteria = Criteria.where("receiverId").is(roomId).and("type").is("room");
         new Query(criteria).limit(15).with(Sort.by(Sort.Direction.DESC, "timestamp"));
         return mongoTemplate.find(new Query(criteria), Message.class, COLLECTION_MESSAGE);
     }

@@ -29,6 +29,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @Slf4j
 @ServerEndpoint("/websocket/{token}/{roomId}")
 public class ChatHandler {
+    //TODO 做个连接池
     /**
      * 用来存在线连接数
      */
@@ -113,7 +114,7 @@ public class ChatHandler {
         } catch (Exception e) {
             log.error("map转json异常");
         }
-        chatService.saveMsg(data, messageDTO, this.roomId);
+        chatService.saveRoomMsg(data, messageDTO, this.roomId);
     }
 
     /**

@@ -54,13 +54,14 @@ public class ChatServiceImpl implements ChatService {
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
-    public void saveMsg(UserInfoDTO data, MessageDTO message, String roomId) {
+    public void saveRoomMsg(UserInfoDTO data, MessageDTO message, String roomId) {
         long timeStamp = message.getTime();
         String text = message.getText();
         Message realMsg = new Message().setContent(text)
                 .setTimestamp(new Date(timeStamp))
                 .setSenderId(data.getUserId())
-                .setRoomId(Integer.parseInt(roomId));
+                .setType("room")
+                .setReceiverId(Integer.parseInt(roomId));
         //保存消息
         Assert.isTrue(messageDAO.save(realMsg), "插入失败");
         //更新聊天室的最后一条消息
@@ -70,6 +71,10 @@ public class ChatServiceImpl implements ChatService {
         RoomMsgEvent roomMsgEvent = new RoomMsgEvent(data.getUserId(), Integer.valueOf(roomId), userIds, JsonUtil.objToJson(realMsg));
         //通知user模块有新消息
         streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(roomMsgEvent), "RECORD"));
+    }
+    //TODO
+    public void saveFriendMsg(){
+
     }
 
     @Override

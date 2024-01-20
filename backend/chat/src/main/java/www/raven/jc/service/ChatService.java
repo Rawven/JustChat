@@ -21,7 +21,7 @@ public interface ChatService {
      * @param message message
      * @param roomId  room id
      */
-    void saveMsg(UserInfoDTO data, MessageDTO message, String roomId);
+    void saveRoomMsg(UserInfoDTO data, MessageDTO message, String roomId);
 
     /**
      * restore history

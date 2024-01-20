@@ -25,7 +25,8 @@ public class Message {
     private ObjectId messageId;
     private Integer senderId;
     private String content;
+    private String type;
     @Indexed
-    private Integer roomId;
+    private Integer receiverId;
     private Date timestamp;
 }

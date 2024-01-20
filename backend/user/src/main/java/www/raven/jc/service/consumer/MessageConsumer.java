@@ -17,6 +17,7 @@ import www.raven.jc.entity.po.User;
 import www.raven.jc.event.Event;
 import www.raven.jc.event.JoinRoomApplyEvent;
 import www.raven.jc.event.RoomMsgEvent;
+import www.raven.jc.service.NoticeService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.websocket.NotificationHandler;
 
@@ -40,7 +41,7 @@ public class MessageConsumer {
     private static final String TAGS_APPLY = "APPLY";
     private static final String TAGS_RECORD = "RECORD";
     @Autowired
-    private NoticeDAO noticeDAO;
+    private NoticeService noticeService;
     @Autowired
     private UserDAO userDAO;
     @Autowired
@@ -80,12 +81,7 @@ public class MessageConsumer {
         JoinRoomApplyEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), JoinRoomApplyEvent.class);
         log.info("receive join room apply event:{}", msg);
         Integer founderId = payload.getFounderId();
-        Notification notice = new Notification().setUserId(founderId)
-                .setMessage(JsonUtil.objToJson(payload))
-                .setType(NoticeConstant.TYPE_JOIN_ROOM_APPLY)
-                .setTimestamp(System.currentTimeMillis())
-                .setStatus(NoticeConstant.STATUS_UNREAD);
-        Assert.isTrue(noticeDAO.save(notice));
+        noticeService.addRoomApply(founderId, payload);
         RBucket<String> founderBucket = redissonClient.getBucket("token:" + founderId);
         User applier = userDAO.getBaseMapper().selectById(payload.getApplyId());
         HashMap<Object, Object> map = new HashMap<>(2);
