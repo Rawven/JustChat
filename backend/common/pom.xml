@@ -18,12 +18,18 @@
         <module>common-util</module>
         <module>common-redis</module>
         <module>common-mp</module>
+        <module>common-ws</module>
     </modules>
 
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>${hutool}</version>
         </dependency>
     </dependencies>
 
