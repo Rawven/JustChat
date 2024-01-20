@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.bson.types.ObjectId;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +24,8 @@ import www.raven.jc.entity.vo.DisplayRoomVO;
 import www.raven.jc.entity.vo.RealRoomVO;
 import www.raven.jc.entity.vo.UserRoomVO;
 import www.raven.jc.event.JoinRoomApplyEvent;
-import www.raven.jc.api.UserFeign;
-import www.raven.jc.result.CommonResult;
+import www.raven.jc.api.UserDubbo;
+import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.RoomService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
@@ -51,8 +52,8 @@ public class RoomServiceImpl implements RoomService {
     private UserRoomDAO userRoomDAO;
     @Autowired
     private HttpServletRequest request;
-    @Autowired
-    private UserFeign userFeign;
+    @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
+    private UserDubbo userDubbo;
     @Autowired
     private MessageDAO messageDAO;
     @Autowired
@@ -91,12 +92,12 @@ public class RoomServiceImpl implements RoomService {
             }
         });
         //获取聊天室发最后一条信息的用户信息
-        CommonResult<List<UserInfoDTO>> batchInfo = userFeign.getBatchInfo(idsSender);
-        Assert.isTrue(batchInfo.getCode() == 200,"userFeign调用失败");
+        RpcResult<List<UserInfoDTO>> batchInfo = userDubbo.getBatchInfo(idsSender);
+        Assert.isTrue(batchInfo.isSuccess(),"user模块调用失败");
         List<Integer> founderIds = rooms.stream().map(Room::getFounderId).distinct().collect(Collectors.toList());
         //获取聊天室创建者的用户信息
-        CommonResult<List<UserInfoDTO>> batchInfoFounder = userFeign.getBatchInfo(founderIds);
-        Assert.isTrue(batchInfoFounder.getCode() == 200,"userFeign调用失败");
+        RpcResult<List<UserInfoDTO>> batchInfoFounder = userDubbo.getBatchInfo(founderIds);
+        Assert.isTrue(batchInfoFounder.isSuccess(),"user模块调用失败");
         Map<Integer, UserInfoDTO> mapFounder = batchInfoFounder.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
         Map<Integer, UserInfoDTO> mapSender = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
 
@@ -126,14 +127,14 @@ public class RoomServiceImpl implements RoomService {
     public RealRoomVO queryLikedRoomList(String column, String text, int page) {
         Long total = roomDAO.getBaseMapper().selectCount(null);
         Page<Room> chatRoomPage = roomDAO.getBaseMapper().selectPage(new Page<>(page, 5), new QueryWrapper<Room>().like(column, text));
-        List<DisplayRoomVO> rooms = buildRoomVO(chatRoomPage, userFeign.getAllInfo().getData());
+        List<DisplayRoomVO> rooms = buildRoomVO(chatRoomPage, userDubbo.getAllInfo().getData());
         return new RealRoomVO().setRooms(rooms).setTotal(Math.toIntExact(total));
     }
 
     @Override
     public RealRoomVO queryUserNameRoomList(String column, String text, int page) {
         Long total = roomDAO.getBaseMapper().selectCount(null);
-        List<UserInfoDTO> queryList = userFeign.getRelatedInfoList(new QueryUserInfoDTO().setColumn(column).setText(text)).getData();
+        List<UserInfoDTO> queryList = userDubbo.getRelatedInfoList(new QueryUserInfoDTO().setColumn(column).setText(text)).getData();
         List<Integer> userIds = queryList.stream().map(UserInfoDTO::getUserId).collect(Collectors.toList());
         Page<Room> chatRoomPage = roomDAO.getBaseMapper().selectPage(new Page<>(page, 5), new QueryWrapper<Room>().in("founder_id", userIds));
         List<DisplayRoomVO> rooms = buildRoomVO(chatRoomPage, queryList);
@@ -164,7 +165,7 @@ public class RoomServiceImpl implements RoomService {
     public RealRoomVO queryListPage(int page, int size) {
         Long total = roomDAO.getBaseMapper().selectCount(null);
         Page<Room> chatRoomPage = roomDAO.getBaseMapper().selectPage(new Page<>(page, size), new QueryWrapper<>());
-        List<DisplayRoomVO> rooms = buildRoomVO(chatRoomPage, userFeign.getAllInfo().getData());
+        List<DisplayRoomVO> rooms = buildRoomVO(chatRoomPage, userDubbo.getAllInfo().getData());
         return new RealRoomVO().setRooms(rooms).setTotal(Math.toIntExact(total));
     }
 

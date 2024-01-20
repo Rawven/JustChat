@@ -1,7 +1,12 @@
+dubbo:
+  protocol:
+    name: dubbo
+  registry:
+    address: nacos://10.21.32.154:8848
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017/jc
+      uri: mongodb://10.21.32.192:27017/jc
       auto-index-creation: true
   redis:
     address: redis://10.21.32.221:6379
@@ -30,8 +35,8 @@ spring:
         server-addr: 10.21.32.154:8848
   datasource:
     url: jdbc:mysql://10.21.32.154:3306/JC_chat?useUnicode=true&characterEncoding=utf-8&useSSL=false
-    username: user
-    password: 123456
+    username: root
+    password: root
 server:
   port: 8081
 Raven:

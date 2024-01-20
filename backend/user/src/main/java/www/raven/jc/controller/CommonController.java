@@ -4,10 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import www.raven.jc.annotions.Auth;
 import www.raven.jc.client.IpfsClient;
+import www.raven.jc.constant.RoleConstant;
 import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.vo.InfoVO;
+import www.raven.jc.entity.vo.RealAllInfoVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.NoticeService;
 import www.raven.jc.service.UserService;
@@ -90,6 +93,12 @@ public class CommonController {
     @PostMapping("/getAllInfo")
     public CommonResult<List<UserInfoDTO>> getAllInfo() {
         return CommonResult.operateSuccess("查找成功", userService.queryAllInfo());
+    }
+
+    @GetMapping("/admin/queryAllUser/{page}")
+    @Auth(value = RoleConstant.ADMIN_ROLE)
+    public CommonResult<RealAllInfoVO> queryAllUser(@PathVariable("page") Integer page) {
+        return CommonResult.operateSuccess("查找成功", userService.queryPageUser(page));
     }
 
     @PostMapping("/getBatchInfo")

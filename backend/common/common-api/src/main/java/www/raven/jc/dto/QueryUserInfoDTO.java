@@ -1,7 +1,9 @@
 package www.raven.jc.dto;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import www.raven.jc.util.CommonSerializable;
 
 /**
  * query user info dto
@@ -9,9 +11,10 @@ import lombok.experimental.Accessors;
  * @author 刘家辉
  * @date 2023/11/25
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Accessors(chain = true)
-public class QueryUserInfoDTO {
+public class QueryUserInfoDTO extends CommonSerializable {
     private String column;
     private String text;
 }

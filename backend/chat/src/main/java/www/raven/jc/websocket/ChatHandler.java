@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
-import www.raven.jc.api.UserFeign;
+import www.raven.jc.api.UserDubbo;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.JwtUtil;
@@ -33,7 +33,7 @@ public class ChatHandler {
      * 用来存在线连接数
      */
     private static final Map<String, Session> SESSION_POOL = new HashMap<>();
-    private static UserFeign userFeign;
+    private static UserDubbo userDubbo;
     private static ChatService chatService;
     /**
      * concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
@@ -51,8 +51,8 @@ public class ChatHandler {
     private Session session;
 
     @Autowired
-    public void setAccountFeign(UserFeign accountFeign) {
-        ChatHandler.userFeign = accountFeign;
+    public void setAccountService(UserDubbo accountDubbo) {
+        ChatHandler.userDubbo = accountDubbo;
     }
 
     @Autowired
@@ -103,7 +103,7 @@ public class ChatHandler {
         log.info("【websocket消息】收到客户端发来的消息:" + message);
         MessageDTO messageDTO = JsonUtil.jsonToObj(message, MessageDTO.class);
         TokenDTO tokenDTO = (TokenDTO) (session.getUserProperties().get("userDto"));
-        UserInfoDTO data = userFeign.getSingleInfo(tokenDTO.getUserId()).getData();
+        UserInfoDTO data = userDubbo.getSingleInfo(tokenDTO.getUserId()).getData();
         Map<Object, Object> map = new HashMap<>(2);
         map.put("userInfo", data);
         map.put("message", messageDTO);

@@ -48,10 +48,16 @@
             <groupId>www.Raven</groupId>
             <artifactId>common-util</artifactId>
             <version>1.0-SNAPSHOT</version>
+
         </dependency>
         <dependency>
             <groupId>www.Raven</groupId>
             <artifactId>common-redis</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>www.Raven</groupId>
+            <artifactId>common-aop</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>

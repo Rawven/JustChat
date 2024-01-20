@@ -3,6 +3,7 @@ package www.raven.jc.service.impl;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
@@ -17,8 +18,8 @@ import www.raven.jc.entity.po.Room;
 import www.raven.jc.entity.po.UserRoom;
 import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.event.RoomMsgEvent;
-import www.raven.jc.api.UserFeign;
-import www.raven.jc.result.CommonResult;
+import www.raven.jc.api.UserDubbo;
+import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
@@ -45,8 +46,8 @@ public class ChatServiceImpl implements ChatService {
     private UserRoomDAO userRoomDAO;
     @Autowired
     private RoomDAO roomDAO;
-    @Autowired
-    private UserFeign userFeign;
+    @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
+    private UserDubbo userDubbo;
     @Autowired
     private StreamBridge streamBridge;
 
@@ -75,8 +76,8 @@ public class ChatServiceImpl implements ChatService {
     public List<MessageVO> restoreHistory(Integer roomId) {
         List<Message> messages = messageDAO.getByRoomId(roomId);
         List<Integer> userIds = messages.stream().map(Message::getSenderId).collect(Collectors.toList());
-                CommonResult<List<UserInfoDTO>> allInfo = userFeign.getBatchInfo(userIds);
-        Assert.isTrue(allInfo.getCode() == 200, "userFeign调用失败");
+                RpcResult<List<UserInfoDTO>> allInfo = userDubbo.getBatchInfo(userIds);
+        Assert.isTrue(allInfo.isSuccess(), "user模块调用失败");
         List<UserInfoDTO> data = allInfo.getData();
         Map<Integer, UserInfoDTO> userInfoMap = data.stream()
                 .collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));

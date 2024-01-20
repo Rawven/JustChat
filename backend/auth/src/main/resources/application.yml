@@ -1,3 +1,8 @@
+dubbo:
+  protocol:
+    name: dubbo
+  registry:
+    address: nacos://10.21.32.154:8848
 spring:
   servlet:
     multipart:
@@ -15,8 +20,8 @@ spring:
         server-addr: 10.21.32.154:8848
   datasource:
     url: jdbc:mysql://10.21.32.154:3306/JustChat?useUnicode=true&characterEncoding=utf-8&useSSL=false&rewriteBatchedStatements=true
-    username: user
-    password: 123456
+    username: root
+    password: root
 server:
   port: 8082
 Raven:
