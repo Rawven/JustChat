@@ -1,4 +1,6 @@
 dubbo:
+  protocol:
+    name: dubbo
   registry:
     address: nacos://10.21.32.154:8848
 spring:

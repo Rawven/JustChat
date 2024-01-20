@@ -1,6 +1,10 @@
 package www.raven.jc.result;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import www.raven.jc.util.CommonSerializable;
+
+import java.io.Serializable;
 
 /**
  * api result
@@ -8,8 +12,10 @@ import lombok.Data;
  * @author 刘家辉
  * @date 2024/01/19
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class RpcResult<T> {
+public class RpcResult<T>   extends CommonSerializable {
+
     private boolean isSuccess;
     private String message;
     private T data;

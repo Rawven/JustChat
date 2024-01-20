@@ -52,7 +52,7 @@ public class RoomServiceImpl implements RoomService {
     private UserRoomDAO userRoomDAO;
     @Autowired
     private HttpServletRequest request;
-    @DubboReference
+    @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
     private UserDubbo userDubbo;
     @Autowired
     private MessageDAO messageDAO;
@@ -93,11 +93,11 @@ public class RoomServiceImpl implements RoomService {
         });
         //获取聊天室发最后一条信息的用户信息
         RpcResult<List<UserInfoDTO>> batchInfo = userDubbo.getBatchInfo(idsSender);
-        Assert.isTrue(batchInfo.isSuccess(),"userFeign调用失败");
+        Assert.isTrue(batchInfo.isSuccess(),"user模块调用失败");
         List<Integer> founderIds = rooms.stream().map(Room::getFounderId).distinct().collect(Collectors.toList());
         //获取聊天室创建者的用户信息
         RpcResult<List<UserInfoDTO>> batchInfoFounder = userDubbo.getBatchInfo(founderIds);
-        Assert.isTrue(batchInfoFounder.isSuccess(),"userFeign调用失败");
+        Assert.isTrue(batchInfoFounder.isSuccess(),"user模块调用失败");
         Map<Integer, UserInfoDTO> mapFounder = batchInfoFounder.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
         Map<Integer, UserInfoDTO> mapSender = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
 

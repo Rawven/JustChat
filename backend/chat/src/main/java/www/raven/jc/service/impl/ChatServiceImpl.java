@@ -3,6 +3,7 @@ package www.raven.jc.service.impl;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
@@ -45,7 +46,7 @@ public class ChatServiceImpl implements ChatService {
     private UserRoomDAO userRoomDAO;
     @Autowired
     private RoomDAO roomDAO;
-    @Autowired
+    @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
     private UserDubbo userDubbo;
     @Autowired
     private StreamBridge streamBridge;
@@ -76,7 +77,7 @@ public class ChatServiceImpl implements ChatService {
         List<Message> messages = messageDAO.getByRoomId(roomId);
         List<Integer> userIds = messages.stream().map(Message::getSenderId).collect(Collectors.toList());
                 RpcResult<List<UserInfoDTO>> allInfo = userDubbo.getBatchInfo(userIds);
-        Assert.isTrue(allInfo.isSuccess(), "userFeign调用失败");
+        Assert.isTrue(allInfo.isSuccess(), "user模块调用失败");
         List<UserInfoDTO> data = allInfo.getData();
         Map<Integer, UserInfoDTO> userInfoMap = data.stream()
                 .collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));

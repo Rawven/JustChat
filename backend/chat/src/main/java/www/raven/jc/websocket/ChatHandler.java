@@ -51,8 +51,8 @@ public class ChatHandler {
     private Session session;
 
     @Autowired
-    public void setAccountFeign(UserDubbo accountFeign) {
-        ChatHandler.userDubbo = accountFeign;
+    public void setAccountService(UserDubbo accountDubbo) {
+        ChatHandler.userDubbo = accountDubbo;
     }
 
     @Autowired

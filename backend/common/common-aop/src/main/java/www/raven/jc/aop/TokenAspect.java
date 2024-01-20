@@ -39,7 +39,7 @@ public class TokenAspect {
 
     @Before("pointcut() && @annotation(auth)")
     public void before(www.raven.jc.annotions.Auth auth) {
-        log.info("收到访问级接口 级别:{}", auth.value());
+        log.info("----Token收到访问级接口 级别:{}", auth.value());
         String token = request.getHeader(JwtConstant.TOKEN);
         if (StrUtil.isEmpty( token)) {
             throw new RuntimeException("权限不足");

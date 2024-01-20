@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import www.raven.jc.model.LogModel;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -34,7 +33,7 @@ import java.util.Map;
 @Aspect
 @Component
 @Slf4j
-public class LoggingAspect {
+public class HttpAspect {
 
     /**
      * 定义切点表达式,指定通知功能被应用的范围
@@ -56,27 +55,14 @@ public class LoggingAspect {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         assert attributes != null;
         HttpServletRequest request = attributes.getRequest();
-        //记录请求信息
-        LogModel webLog = new LogModel();
-
-        //前面是前置通知，后面是后置通知
+        log.info("----HTTP 收到请求 url:{},调用者:{}",request.getRequestURL().toString(),request.getRemoteUser());
         Object result = joinPoint.proceed();
-
         Signature signature = joinPoint.getSignature();
         MethodSignature methodSignature = (MethodSignature) signature;
         Method method = methodSignature.getMethod();
         long endTime = System.currentTimeMillis();
-        String urlStr = request.getRequestURL().toString();
-        webLog.setBasePath(StrUtil.removeSuffix(urlStr, URLUtil.url(urlStr).getPath()));
-        webLog.setIp(request.getRemoteUser());
-        webLog.setMethod(request.getMethod());
-        webLog.setParameter(getParameter(method, joinPoint.getArgs()));
-        webLog.setResult(result);
-        webLog.setSpendTime((int) (endTime - startTime));
-        webLog.setStartTime(startTime);
-        webLog.setUri(request.getRequestURI());
-        webLog.setUrl(request.getRequestURL().toString());
-        log.info("{}", JSONUtil.parse(webLog));
+        log.info("----HTTP 被调用方法 method:{} ,请求参数 parameter:{}",request.getMethod(),getParameter(method, joinPoint.getArgs()));
+        log.info("----HTTP 返回值:{} --总耗时:{}毫秒",result,(int) (endTime - startTime));
         return result;
     }
 

@@ -14,7 +14,7 @@ import java.util.List;
  * @author 刘家辉
  * @date 2024/01/19
  */
-@DubboService
+@DubboService(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
 public class UserDubboImpl implements UserDubbo {
     @Autowired
     private UserService userService;
