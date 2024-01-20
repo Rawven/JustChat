@@ -55,6 +55,7 @@ public class DefaultSecurityContextRepository implements ServerSecurityContextRe
             return Mono.empty();
         }
         TokenDTO dto = JwtUtil.verify(tokens.get(0), key);
+        log.info("访问者信息 {} {} {}", dto.getUserId(),dto.getRole(),dto.getExpireTime());
         Assert.isTrue(Objects.equals(tokens.get(0), redissonClient.getBucket("token:" + dto.getUserId()).get()), "未登录");
         request.mutate().header(JwtUtil.TIME, String.valueOf(dto.getExpireTime())).header("userId", dto.getUserId().toString()).build();
         Authentication auth = new UsernamePasswordAuthenticationToken(dto.getUserId(), null, AuthorityUtils.createAuthorityList(dto.getRole().toArray(new String[0])));

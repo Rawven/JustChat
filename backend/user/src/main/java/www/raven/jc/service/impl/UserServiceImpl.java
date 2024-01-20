@@ -62,6 +62,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserInfoDTO> queryBatchInfo(List<Integer> userIds) {
+        if(userIds.isEmpty()) {
+            return new ArrayList<>();
+        }
         List<User> users = userDAO.getBaseMapper().selectBatchIds(userIds);
         return users.stream().map(
                 user -> {
