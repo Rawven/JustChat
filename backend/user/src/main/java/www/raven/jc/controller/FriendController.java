@@ -22,10 +22,15 @@ import www.raven.jc.service.FriendService;
 public class FriendController {
     @Autowired
     private FriendService friendService;
-
+   //TODO
     @PostMapping("/getFriendList")
     public CommonResult<Void> getFriendList() {
         return CommonResult.operateSuccess("查找成功");
+    }
+
+    @PostMapping("/addFriend")
+    public CommonResult<Void> addFriend() {
+        return CommonResult.operateSuccess("添加成功");
     }
 
 

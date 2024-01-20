@@ -1,6 +1,7 @@
 package www.raven.jc.service.impl;
 
 import org.springframework.stereotype.Service;
+import www.raven.jc.service.FriendService;
 
 /**
  * friend service impl
@@ -9,5 +10,10 @@ import org.springframework.stereotype.Service;
  * @date 2024/01/20
  */
 @Service
-public class FriendServiceImpl {
+public class FriendServiceImpl implements FriendService {
+    //TODO work
+    @Override
+    public void getFriendMsg() {
+
+    }
 }
