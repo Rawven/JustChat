@@ -4,9 +4,9 @@
 
 | 前端         | 后端                 | 数据库 | 中间件 |        
 | ------------ | -------------------- | ------ | ------ |
-| Vue          | spring-cloud-alibaba | mysql  | rocketMq|
-| element-plus | spring-security      | redis  | nacos |
-|              |                      | ipfs   |       |
+| Vue          | spring-gateway       | mysql  | rocketMq|
+| element-plus | spring-boot          | redis  | nacos |
+|              | dubbo                | ipfs   |       |
 |              |                      | mongodb|       |
 
 
@@ -20,5 +20,5 @@
 ------
 2023.12.16  复活一会 ⚰
 ------
-2024.01.19  计划将openfeign替换为dubbo
+2024.01.19  恢复开发
 -
