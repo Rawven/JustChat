@@ -19,11 +19,28 @@ public interface NoticeService {
     List<NoticeVO> loadNotice();
 
     /**
+     * add room apply
+     *
+     * @param founderId founder id
+     * @param payload   payload
+     */
+    void addRoomApply(int founderId, Object payload);
+
+    /**
+     * add friend apply
+     *
+     * @param friendId friend id
+     * @param message  message
+     */
+    void addFriendApply(Integer friendId, String message);
+
+    /**
      * done notification
      *
      * @param id id
      */
     void doneNotification(Integer id);
+
     /**
      * delete new room msg notice
      *

@@ -17,7 +17,7 @@
               <el-table-column label="用户id" prop="userId"></el-table-column>
               <el-table-column class="profile" label="头像" prop="profile">
                 <template v-slot="scope">
-                  <img :src="'http://10.24.3.176:8083/ipfs/'+scope.row.profile" alt="User Avatar"
+                  <img :src="'http://10.44.59.225:8083/ipfs/'+scope.row.profile" alt="User Avatar"
                        class="small-round-avatar">
                 </template>
               </el-table-column>

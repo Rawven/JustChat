@@ -85,4 +85,12 @@ public interface UserDubbo {
      * @return {@link CommonResult}<{@link Void}>
      */
     RpcResult<Void> saveLogOutTime(Integer userId);
+
+    /**
+     * get friend ids
+     *
+     * @param userId user id
+     * @return {@link RpcResult}<{@link List}<{@link Integer}>>
+     */
+    RpcResult<List<UserInfoDTO>> getFriendInfos(int userId);
 }

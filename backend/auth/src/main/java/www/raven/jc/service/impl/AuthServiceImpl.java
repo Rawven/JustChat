@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import www.raven.jc.api.UserDubbo;
 import www.raven.jc.constant.JwtConstant;
 import www.raven.jc.constant.RoleConstant;
 import www.raven.jc.dto.RoleDTO;
@@ -17,7 +18,6 @@ import www.raven.jc.dto.UserAuthDTO;
 import www.raven.jc.dto.UserRegisterDTO;
 import www.raven.jc.entity.model.LoginModel;
 import www.raven.jc.entity.model.RegisterModel;
-import www.raven.jc.api.UserDubbo;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.AuthService;
 import www.raven.jc.util.JwtUtil;
@@ -50,7 +50,7 @@ public class AuthServiceImpl implements AuthService {
         RpcResult<UserAuthDTO> result = userDubbo.getUserToAuth(loginModel.getUsername());
         Assert.isTrue(result.isSuccess());
         UserAuthDTO user = result.getData();
-        if(redissonClient.getBucket(JwtConstant.TOKEN +":" + user.getUserId()).isExists()){
+        if (redissonClient.getBucket(JwtConstant.TOKEN + ":" + user.getUserId()).isExists()) {
             return redissonClient.getBucket(JwtConstant.TOKEN + ":" + user.getUserId()).get().toString();
         }
         Assert.isTrue(passwordEncoder.matches(loginModel.getPassword(), user.getPassword()), "密码错误");
@@ -111,7 +111,7 @@ public class AuthServiceImpl implements AuthService {
         claims.put("role", role);
         claims.put("expireTime", System.currentTimeMillis() + 1000 * 60 * 30);
         String token = JwtUtil.createToken(claims, key);
-        redissonClient.getBucket(JwtConstant.TOKEN+":" + userId).set(token);
+        redissonClient.getBucket(JwtConstant.TOKEN + ":" + userId).set(token);
         return token;
     }
 

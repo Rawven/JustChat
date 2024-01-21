@@ -24,7 +24,7 @@ public interface UserService {
      * @param column column
      * @param value  value
      */
-    void updateByColumn(String column,String value);
+    void updateByColumn(String column, String value);
 
     /**
      * query single info
@@ -74,7 +74,7 @@ public interface UserService {
      * @param value  value
      * @return {@link UserAuthDTO}
      */
-     UserAuthDTO querySingleInfoByColumn(String column,String value) ;
+    UserAuthDTO querySingleInfoByColumn(String column, String value);
 
     /**
      * query roles by id

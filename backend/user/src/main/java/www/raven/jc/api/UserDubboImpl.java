@@ -2,8 +2,10 @@ package www.raven.jc.api;
 
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import www.raven.jc.dao.FriendDAO;
 import www.raven.jc.dto.*;
 import www.raven.jc.result.RpcResult;
+import www.raven.jc.service.FriendService;
 import www.raven.jc.service.UserService;
 
 import java.util.List;
@@ -18,6 +20,9 @@ import java.util.List;
 public class UserDubboImpl implements UserDubbo {
     @Autowired
     private UserService userService;
+    @Autowired
+    private FriendService friendService;
+
     @Override
     public RpcResult<UserInfoDTO> getSingleInfo(Integer userId) {
         return RpcResult.operateSuccess("查找成功", userService.querySingleInfo(userId));
@@ -40,7 +45,7 @@ public class UserDubboImpl implements UserDubbo {
 
     @Override
     public RpcResult<UserAuthDTO> getUserToAuth(String username) {
-        return RpcResult.operateSuccess("查找成功", userService.querySingleInfoByColumn("username",username));
+        return RpcResult.operateSuccess("查找成功", userService.querySingleInfoByColumn("username", username));
     }
 
     @Override
@@ -62,5 +67,10 @@ public class UserDubboImpl implements UserDubbo {
     public RpcResult<Void> saveLogOutTime(Integer userId) {
         userService.saveTime(userId);
         return RpcResult.operateSuccess("登出成功");
+    }
+
+    @Override
+    public RpcResult<List<UserInfoDTO>> getFriendInfos(int userId) {
+        return RpcResult.operateSuccess("查找成功", friendService.getFriendInfos(userId));
     }
 }

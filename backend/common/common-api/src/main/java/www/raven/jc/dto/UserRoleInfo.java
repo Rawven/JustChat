@@ -14,7 +14,7 @@ import www.raven.jc.util.CommonSerializable;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Accessors(chain = true)
-public class UserRoleInfo  extends CommonSerializable {
+public class UserRoleInfo extends CommonSerializable {
     /**
      * user id
      */

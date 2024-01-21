@@ -42,5 +42,5 @@ server:
 Raven:
   key: 爱你老妈
 logging:
-    level:
-      www.raven.jc.api.*: DEBUG
+  level:
+    www.raven.jc.api.*: DEBUG

@@ -152,7 +152,7 @@ export default {
     let token = localStorage.getItem("token");
     this.theRoom = JSON.parse(this.room);
     console.log('WebSocket created:', this.theRoom)
-    this.socket = new WebSocket(`ws://` + Host + `:8081/websocket/${token}/${this.theRoom.roomId}`);
+    this.socket = new WebSocket(`ws://` + Host + `:8081/ws/room/${token}/${this.theRoom.roomId}`);
 
     this.socket.onopen = () => {
       this.realAxios.post(`http://` + Host + `:7000/chat/common/restoreHistory/${this.theRoom.roomId}`, {}, {

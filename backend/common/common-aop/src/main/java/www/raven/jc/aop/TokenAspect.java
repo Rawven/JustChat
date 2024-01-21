@@ -41,10 +41,10 @@ public class TokenAspect {
     public void before(www.raven.jc.annotions.Auth auth) {
         log.info("----Token收到访问级接口 级别:{}", auth.value());
         String token = request.getHeader(JwtConstant.TOKEN);
-        if (StrUtil.isEmpty( token)) {
+        if (StrUtil.isEmpty(token)) {
             throw new RuntimeException("权限不足");
         }
-        TokenDTO dto = JwtUtil.verify(token,key);
+        TokenDTO dto = JwtUtil.verify(token, key);
         List<String> role = dto.getRole();
         if (!role.contains(auth.value())) {
             throw new RuntimeException("权限不足");

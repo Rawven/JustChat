@@ -1,12 +1,14 @@
-package www.raven.jc.websocket;
+package www.raven.jc.ws;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import www.raven.jc.api.UserDubbo;
 import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
-import www.raven.jc.api.UserDubbo;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.JwtUtil;
@@ -15,8 +17,8 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
@@ -27,37 +29,35 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 @Component
 @Slf4j
-@ServerEndpoint("/websocket/{token}/{roomId}")
-public class ChatHandler {
+@Data
+@ServerEndpoint("/ws/room/{token}/{roomId}")
+public class RoomChatHandler extends BaseHandler {
+
     /**
      * 用来存在线连接数
      */
-    private static final Map<String, Session> SESSION_POOL = new HashMap<>();
-    private static UserDubbo userDubbo;
-    private static ChatService chatService;
+    private static final Map<Integer, Map<Integer, Session>> SESSION_POOL = new HashMap<>();
     /**
      * concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
      * 虽然@Component默认是单例模式的，但springboot还是会为每个websocket连接初始化一个bean，所以可以用一个静态set保存起来。
      */
-    private static CopyOnWriteArraySet<ChatHandler> webSockets = new CopyOnWriteArraySet<>();
+    public static CopyOnWriteArraySet<RoomChatHandler> webSockets = new CopyOnWriteArraySet<>();
+
+    private static UserDubbo userDubbo;
+    private static ChatService chatService;
     /**
      * room id
      * 对应是在哪个聊天室
      */
-    private String roomId;
-    /**
-     * 与某个客户端的连接会话，需要通过它来给客户端发送数据
-     **/
-    private Session session;
+    private Integer roomId;
 
-    @Autowired
-    public void setAccountService(UserDubbo accountDubbo) {
-        ChatHandler.userDubbo = accountDubbo;
+    @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
+    public void setUserDubbo(UserDubbo userDubbo) {
+        RoomChatHandler.userDubbo = userDubbo;
     }
-
     @Autowired
     public void setChatService(ChatService chatService) {
-        ChatHandler.chatService = chatService;
+        RoomChatHandler.chatService = chatService;
     }
 
     /**
@@ -66,10 +66,14 @@ public class ChatHandler {
     @OnOpen
     public void onOpen(Session session, @PathParam(value = "token") String token, @PathParam(value = "roomId") String roomId) {
         TokenDTO dto = JwtUtil.verify(token, "爱你老妈");
-        session.getUserProperties().put("userDto",dto);
+        session.getUserProperties().put("userDto", dto);
         this.session = session;
-        this.roomId = roomId;
-        Session sessionExisted = SESSION_POOL.get(token);
+        this.roomId = Integer.valueOf(roomId);
+        this.userId = dto.getUserId();
+        if (!SESSION_POOL.containsKey(this.roomId)) {
+            SESSION_POOL.put(this.roomId, new HashMap<>());
+        }
+        Session sessionExisted = SESSION_POOL.get(this.roomId).get(this.userId);
         if (sessionExisted != null) {
             try {
                 sessionExisted.close();
@@ -78,8 +82,8 @@ public class ChatHandler {
             }
         }
         webSockets.add(this);
-        SESSION_POOL.put(token, session);
-        log.info("websocket: 有新的连接,用户id为{},总数为:{}" , dto.getUserId(),webSockets.size());
+        SESSION_POOL.get(this.roomId).put(dto.getUserId(), session);
+        log.info("----WebSocket  有新的连接,用户id为{},总数为:{}", dto.getUserId(), webSockets.size());
     }
 
     /**
@@ -89,7 +93,7 @@ public class ChatHandler {
     @OnClose
     public void onClose() {
         webSockets.remove(this);
-        log.info("【websocket消息】连接断开，总数为:" + webSockets.size());
+        log.info("----WebSocket 连接断开，总数为:" + webSockets.size());
     }
 
     /**
@@ -100,7 +104,8 @@ public class ChatHandler {
      */
     @OnMessage
     public void onMessage(String message) {
-        log.info("【websocket消息】收到客户端发来的消息:" + message);
+        log.info("----WebSocket收到客户端发来的消息:" + message);
+        lastActivityTime = System.currentTimeMillis();
         MessageDTO messageDTO = JsonUtil.jsonToObj(message, MessageDTO.class);
         TokenDTO tokenDTO = (TokenDTO) (session.getUserProperties().get("userDto"));
         UserInfoDTO data = userDubbo.getSingleInfo(tokenDTO.getUserId()).getData();
@@ -113,7 +118,7 @@ public class ChatHandler {
         } catch (Exception e) {
             log.error("map转json异常");
         }
-        chatService.saveMsg(data, messageDTO, this.roomId);
+        chatService.saveRoomMsg(data.getUserId(), messageDTO, this.roomId);
     }
 
     /**
@@ -124,56 +129,21 @@ public class ChatHandler {
      */
     @OnError
     public void onError(Session session, Throwable error) {
-        log.error("Error occurred on connection, Session ID: " + session.getId());
-        log.error("Details: " + error.getMessage());
-        log.error("Stack trace: {}", (Object) error.getStackTrace());
+        log.error("----WebSocket Error occurred on connection, Session ID: " + session.getId());
+        log.error("----WebSocket Details: " + error.getMessage());
+        log.error("----WebSocket Stack trace: {}", (Object) error.getStackTrace());
     }
-
 
 
     public void sendRoomMessage(String message) {
-        log.info("【websocket消息】广播消息:" + message);
-        for (ChatHandler chatHandler : webSockets) {
-            if (chatHandler.session.isOpen() && chatHandler.roomId.equals(this.roomId)) {
-                chatHandler.session.getAsyncRemote().sendText(message);
+        log.info("----WebSocket 广播消息:" + message);
+        SESSION_POOL.get(this.roomId).forEach((k, v) -> {
+            if ( v.isOpen()) {
+                v.getAsyncRemote().sendText(message);
             }
-        }
+        });
     }
 
-    /**
-     * send one message
-     *
-     * @param token   user id
-     * @param message message
-     */
-    public void sendOneMessage(String token, String message) {
-        Session session = SESSION_POOL.get(token);
-        if (session != null && session.isOpen()) {
-            try {
-                log.info("【websocket消息】 单点消息:" + message);
-                session.getAsyncRemote().sendText(message);
-            } catch (Exception e) {
-                log.error(e.getMessage());
-            }
-        }
-    }
-
-
-    /**
-     * send more message
-     *
-     * @param tokens  user ids
-     * @param message message
-     */
-    public void sendMoreMessage(List<String> tokens, String message) {
-        for (String userId : tokens) {
-            Session session = SESSION_POOL.get(userId);
-            if (session != null && session.isOpen()) {
-                log.info("【websocket消息】 单点消息:" + message);
-                session.getAsyncRemote().sendText(message);
-            }
-        }
-    }
 
     @Override
     public int hashCode() {

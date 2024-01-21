@@ -48,7 +48,7 @@ public class AuthController {
     }
 
     @GetMapping("/logout/{token}")
-    public CommonResult<Void> logout(@PathVariable( "token") String token) {
+    public CommonResult<Void> logout(@PathVariable("token") String token) {
         authService.logout(token);
         return CommonResult.operateSuccess("登出成功");
     }

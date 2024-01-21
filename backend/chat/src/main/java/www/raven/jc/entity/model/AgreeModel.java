@@ -12,6 +12,6 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class AgreeModel {
-  private Integer roomId;
-  private Integer userId;
+    private Integer roomId;
+    private Integer userId;
 }

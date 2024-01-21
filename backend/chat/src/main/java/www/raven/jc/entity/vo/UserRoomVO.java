@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class UserRoomVO  {
+public class UserRoomVO {
     private Integer roomId;
     private String roomName;
     /**

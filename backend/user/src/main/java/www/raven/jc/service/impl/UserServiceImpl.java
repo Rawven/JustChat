@@ -53,8 +53,9 @@ public class UserServiceImpl implements UserService {
         userInfoDTO.setUsername(user.getUsername()).setProfile(user.getProfile()).setUserId(user.getId());
         return userInfoDTO;
     }
+
     @Override
-    public UserAuthDTO querySingleInfoByColumn(String column,String value) {
+    public UserAuthDTO querySingleInfoByColumn(String column, String value) {
         User user = userDAO.getBaseMapper().selectOne(new QueryWrapper<User>().eq(column, value));
         return new UserAuthDTO().setPassword(user.getPassword()).setUserId(user.getId()).setUsername(user.getUsername());
     }
@@ -62,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserInfoDTO> queryBatchInfo(List<Integer> userIds) {
-        if(userIds.isEmpty()) {
+        if (userIds.isEmpty()) {
             return new ArrayList<>();
         }
         List<User> users = userDAO.getBaseMapper().selectBatchIds(userIds);
@@ -87,9 +88,10 @@ public class UserServiceImpl implements UserService {
                 }
         ).collect(Collectors.toList());
     }
+
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
-    public void updateByColumn(String column,String value){
+    public void updateByColumn(String column, String value) {
         Assert.isTrue(userDAO.getBaseMapper().update(new UpdateWrapper<User>().set(column, value)) > 0, "更新失败");
     }
 
@@ -149,7 +151,6 @@ public class UserServiceImpl implements UserService {
         ).collect(Collectors.toList());
         return new RealAllInfoVO().setTotal(Math.toIntExact(total)).setUsers(collect);
     }
-
 
 
     @Override
