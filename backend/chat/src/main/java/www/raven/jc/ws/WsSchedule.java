@@ -33,6 +33,7 @@ public class WsSchedule {
             }
         }
     }
+
     @Scheduled(fixedRate = 60000)
     public void checkFriendWs() {
         long currentTime = System.currentTimeMillis();
@@ -42,6 +43,7 @@ public class WsSchedule {
             }
         }
     }
+
     private void closeFriendExpiredConnection(FriendChatHandler friendChatHandler) {
         Session session = friendChatHandler.getSession();
         if (session != null && session.isOpen()) {
@@ -54,6 +56,7 @@ public class WsSchedule {
         FriendChatHandler.webSockets.remove(friendChatHandler);
         log.info("WebSocket连接过期，用户id为{},总数为:{}", friendChatHandler.getUserId(), FriendChatHandler.webSockets.size());
     }
+
     private void closeRoomExpiredConnection(RoomChatHandler roomChatHandler) {
         Session session = roomChatHandler.getSession();
         if (session != null && session.isOpen()) {

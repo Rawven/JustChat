@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.entity.vo.RealRoomVO;
+import www.raven.jc.entity.vo.UserFriendVO;
 import www.raven.jc.entity.vo.UserRoomVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.ChatService;
+import www.raven.jc.service.FriendService;
 import www.raven.jc.service.RoomService;
 
 import java.util.List;
@@ -25,10 +27,17 @@ public class QueryController {
     private ChatService chatService;
     @Autowired
     private RoomService roomService;
+    @Autowired
+    private FriendService friendService;
 
     @GetMapping("/initUserMainPage")
     public CommonResult<List<UserRoomVO>> initUserMainPage() {
         return CommonResult.operateSuccess("获取房间列表成功", roomService.initUserMainPage());
+    }
+
+    @GetMapping("/initUserFriendPage")
+    public CommonResult<List<UserFriendVO>> initUserFriendPage() {
+        return CommonResult.operateSuccess("获取房间列表成功", friendService.initUserFriendPage());
     }
 
     //TODO work

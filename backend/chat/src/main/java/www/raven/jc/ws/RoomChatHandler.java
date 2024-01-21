@@ -30,12 +30,12 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @Slf4j
 @Data
 @ServerEndpoint("/ws/room/{token}/{roomId}")
-public class RoomChatHandler extends BaseHandler{
+public class RoomChatHandler extends BaseHandler {
 
     /**
      * 用来存在线连接数
      */
-    private static final Map<Integer,Map<Integer,Session>> SESSION_POOL = new HashMap<>();
+    private static final Map<Integer, Map<Integer, Session>> SESSION_POOL = new HashMap<>();
     /**
      * concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
      * 虽然@Component默认是单例模式的，但springboot还是会为每个websocket连接初始化一个bean，所以可以用一个静态set保存起来。
@@ -48,7 +48,6 @@ public class RoomChatHandler extends BaseHandler{
      * 对应是在哪个聊天室
      */
     private Integer roomId;
-
 
 
     @Autowired
@@ -136,12 +135,11 @@ public class RoomChatHandler extends BaseHandler{
     public void sendRoomMessage(String message) {
         log.info("----WebSocket 广播消息:" + message);
         SESSION_POOL.get(this.roomId).forEach((k, v) -> {
-            if (!Objects.equals(k, userId) && v.isOpen() ) {
+            if (!Objects.equals(k, userId) && v.isOpen()) {
                 v.getAsyncRemote().sendText(message);
             }
         });
     }
-
 
 
     @Override

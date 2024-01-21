@@ -30,13 +30,13 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @Slf4j
 @Data
 @ServerEndpoint("/ws/room/{token}/{friendId}")
-public class FriendChatHandler  extends BaseHandler{
+public class FriendChatHandler extends BaseHandler {
 
 
     /**
      * 用来存在线连接数
      */
-    private static final Map<Integer,Map<Integer,Session>> SESSION_POOL = new HashMap<>();
+    private static final Map<Integer, Map<Integer, Session>> SESSION_POOL = new HashMap<>();
     /**
      * concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
      * 虽然@Component默认是单例模式的，但springboot还是会为每个websocket连接初始化一个bean，所以可以用一个静态set保存起来。
@@ -107,7 +107,7 @@ public class FriendChatHandler  extends BaseHandler{
         MessageDTO messageDTO = JsonUtil.jsonToObj(message, MessageDTO.class);
         TokenDTO tokenDTO = (TokenDTO) (session.getUserProperties().get("userDto"));
         sendFriendMessage(message);
-        chatService.saveFriendMsg(messageDTO,tokenDTO.getUserId(),friendId);
+        chatService.saveFriendMsg(messageDTO, tokenDTO.getUserId(), friendId);
     }
 
     /**
@@ -127,7 +127,7 @@ public class FriendChatHandler  extends BaseHandler{
     public void sendFriendMessage(String message) {
         log.info("----WebSocket 广播消息:" + message);
         Session friendSession = SESSION_POOL.get(friendId).get(userId);
-        if(friendSession.isOpen()){
+        if (friendSession.isOpen()) {
             friendSession.getAsyncRemote().sendText(message);
         }
     }

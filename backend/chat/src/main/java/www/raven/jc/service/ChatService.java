@@ -38,5 +38,5 @@ public interface ChatService {
      * @param userId   user id
      * @param friendId friend id
      */
-    void saveFriendMsg(MessageDTO message,Integer userId,Integer friendId);
+    void saveFriendMsg(MessageDTO message, Integer userId, Integer friendId);
 }

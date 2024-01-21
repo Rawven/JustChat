@@ -64,4 +64,10 @@ public class UserDubboImpl implements UserDubbo {
         userService.saveTime(userId);
         return RpcResult.operateSuccess("登出成功");
     }
+
+    //TODO work
+    @Override
+    public RpcResult<List<UserInfoDTO>> getFriendIds(int userId) {
+        return null;
+    }
 }

@@ -1,11 +1,8 @@
 package www.raven.jc.service;
 
-import cn.hutool.core.lang.Assert;
-import org.springframework.transaction.annotation.Transactional;
-import www.raven.jc.entity.dto.MessageDTO;
-import www.raven.jc.entity.po.Message;
+import www.raven.jc.entity.vo.UserFriendVO;
 
-import java.util.Date;
+import java.util.List;
 
 /**
  * friend service
@@ -17,5 +14,12 @@ public interface FriendService {
     //TODO work
     void getFriendMsg();
 
+
+    /**
+     * init user friend page
+     *
+     * @return {@link List}<{@link UserFriendVO}>
+     */
+    List<UserFriendVO> initUserFriendPage();
 
 }

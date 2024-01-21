@@ -1,6 +1,5 @@
 package www.raven.jc.service.consumer;
 
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Service;
 import www.raven.jc.constant.MqConstant;
 import www.raven.jc.dao.FriendDAO;
 import www.raven.jc.dao.UserDAO;
-import www.raven.jc.entity.po.Friend;
 import www.raven.jc.entity.po.User;
 import www.raven.jc.event.Event;
 import www.raven.jc.event.FriendMsgEvent;
@@ -67,23 +65,31 @@ public class MessageConsumer {
             //判断消息类型
             if (TAGS_ROOM_APPLY.equals(tags)) {
                 eventUserJoinRoomApply(msg);
-            }else if(TAGS_FRIEND_APPLY.equals(tags)){
+            } else if (TAGS_FRIEND_APPLY.equals(tags)) {
                 eventUserApplyFriendApply(msg);
-            }else if (TAGS_ROOM_MSG_RECORD.equals(tags)) {
+            } else if (TAGS_ROOM_MSG_RECORD.equals(tags)) {
                 eventRoomSendMsg(msg);
-            }else if(TAGS_FRIEND_MSG_RECORD.equals(tags)){
+            } else if (TAGS_FRIEND_MSG_RECORD.equals(tags)) {
                 eventFriendSendMsg(msg);
-            }else {
+            } else {
                 log.info("非法的消息，不处理");
             }
             redissonClient.getBucket(id.toString()).set(id, MqConstant.EXPIRE_TIME, TimeUnit.MINUTES);
         };
     }
-    //TODO
+
     private void eventFriendSendMsg(Message<Event> msg) {
         FriendMsgEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), FriendMsgEvent.class);
-
-
+        RBucket<String> receiverBucket = redissonClient.getBucket("token:" + payload.getReceiverId());
+        HashMap<Object, Object> map = new HashMap<>(2);
+        map.put("receiverId", payload.getReceiverId());
+        map.put("senderId", payload.getSenderId());
+        map.put("msg", payload.getMsg());
+        if (receiverBucket.isExists()) {
+            notificationHandler.sendOneMessage(receiverBucket.get(), JsonUtil.mapToJson(map));
+        } else {
+            log.info("receiver不在线");
+        }
     }
 
     private void eventUserApplyFriendApply(Message<Event> msg) {
