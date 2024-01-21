@@ -263,7 +263,7 @@ export default {
       }
     },
     turnNotifications(){
-
+      this.$router.push('/common/notice');
     },
     checkNull(name){
       return name !== "";

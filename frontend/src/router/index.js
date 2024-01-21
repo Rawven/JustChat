@@ -54,7 +54,13 @@ const router = createRouter({
                     path: 'updateInfo',
                     name: 'updateInfoView',
                     component: UpdateInfoView
+                },
+                {
+                    path: 'notice',
+                    name: 'NoticeView',
+                    component: () => import('@/views/common/Notice.vue')
                 }
+
             ]
         },
         {
