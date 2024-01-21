@@ -92,5 +92,5 @@ public interface UserDubbo {
      * @param userId user id
      * @return {@link RpcResult}<{@link List}<{@link Integer}>>
      */
-    RpcResult<List<UserInfoDTO>> getFriendIds(int userId);
+    RpcResult<List<UserInfoDTO>> getFriendInfos(int userId);
 }

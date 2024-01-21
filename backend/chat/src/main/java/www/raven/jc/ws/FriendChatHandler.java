@@ -3,6 +3,7 @@ package www.raven.jc.ws;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import www.raven.jc.api.UserDubbo;
@@ -42,7 +43,8 @@ public class FriendChatHandler extends BaseHandler {
      * 虽然@Component默认是单例模式的，但springboot还是会为每个websocket连接初始化一个bean，所以可以用一个静态set保存起来。
      */
     public static CopyOnWriteArraySet<FriendChatHandler> webSockets = new CopyOnWriteArraySet<>();
-
+    //TODO 待解决
+    @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
     private static UserDubbo userDubbo;
 
     private static ChatService chatService;
@@ -51,10 +53,6 @@ public class FriendChatHandler extends BaseHandler {
      */
     private Integer friendId;
 
-    @Autowired
-    public void setAccountService(UserDubbo accountDubbo) {
-        FriendChatHandler.userDubbo = accountDubbo;
-    }
 
     @Autowired
     public void setChatService(ChatService chatService) {

@@ -2,6 +2,7 @@ package www.raven.jc.ws;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import www.raven.jc.api.UserDubbo;
@@ -49,8 +50,8 @@ public class RoomChatHandler extends BaseHandler {
      */
     private Integer roomId;
 
-
-    @Autowired
+    //TODO 待解决
+    @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
     public void setAccountService(UserDubbo accountDubbo) {
         RoomChatHandler.userDubbo = accountDubbo;
     }

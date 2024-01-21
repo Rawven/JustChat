@@ -2,6 +2,7 @@ package www.raven.jc.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,7 +38,7 @@ public class FriendServiceImpl implements FriendService {
     private FriendChatDAO friendChatDAO;
     @Autowired
     private MessageDAO messageDAO;
-    @Autowired
+    @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
     private UserDubbo userDubbo;
 
     //TODO work
@@ -50,7 +51,7 @@ public class FriendServiceImpl implements FriendService {
     public List<UserFriendVO> initUserFriendPage() {
         int userId = Integer.parseInt(request.getHeader("userId"));
         //获得好友id
-        List<UserInfoDTO> friends = userDubbo.getFriendIds(userId).getData();
+        List<UserInfoDTO> friends = userDubbo.getFriendInfos(userId).getData();
         if (friends.isEmpty()) {
             return new ArrayList<>();
         }

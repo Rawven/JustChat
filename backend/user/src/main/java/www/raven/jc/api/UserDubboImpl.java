@@ -2,8 +2,10 @@ package www.raven.jc.api;
 
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import www.raven.jc.dao.FriendDAO;
 import www.raven.jc.dto.*;
 import www.raven.jc.result.RpcResult;
+import www.raven.jc.service.FriendService;
 import www.raven.jc.service.UserService;
 
 import java.util.List;
@@ -18,6 +20,8 @@ import java.util.List;
 public class UserDubboImpl implements UserDubbo {
     @Autowired
     private UserService userService;
+    @Autowired
+    private FriendService friendService;
 
     @Override
     public RpcResult<UserInfoDTO> getSingleInfo(Integer userId) {
@@ -65,9 +69,8 @@ public class UserDubboImpl implements UserDubbo {
         return RpcResult.operateSuccess("登出成功");
     }
 
-    //TODO work
     @Override
-    public RpcResult<List<UserInfoDTO>> getFriendIds(int userId) {
-        return null;
+    public RpcResult<List<UserInfoDTO>> getFriendInfos(int userId) {
+        return RpcResult.operateSuccess("查找成功", friendService.getFriendInfos(userId));
     }
 }
