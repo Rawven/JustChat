@@ -1,8 +1,6 @@
 package www.raven.jc.aop;
 
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.core.util.URLUtil;
-import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
@@ -55,14 +53,14 @@ public class HttpAspect {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         assert attributes != null;
         HttpServletRequest request = attributes.getRequest();
-        log.info("----HTTP 收到请求 url:{},调用者:{}",request.getRequestURL().toString(),request.getRemoteUser());
+        log.info("----HTTP 收到请求 url:{},调用者:{}", request.getRequestURL().toString(), request.getRemoteUser());
         Object result = joinPoint.proceed();
         Signature signature = joinPoint.getSignature();
         MethodSignature methodSignature = (MethodSignature) signature;
         Method method = methodSignature.getMethod();
         long endTime = System.currentTimeMillis();
-        log.info("----HTTP 被调用方法 method:{} ,请求参数 parameter:{}",request.getMethod(),getParameter(method, joinPoint.getArgs()));
-        log.info("----HTTP 返回值:{} --总耗时:{}毫秒",result,(int) (endTime - startTime));
+        log.info("----HTTP 被调用方法 method:{} ,请求参数 parameter:{}", request.getMethod(), getParameter(method, joinPoint.getArgs()));
+        log.info("----HTTP 返回值:{} --总耗时:{}毫秒", result, (int) (endTime - startTime));
         return result;
     }
 

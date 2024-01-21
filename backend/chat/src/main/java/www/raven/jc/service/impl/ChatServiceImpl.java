@@ -6,11 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import www.raven.jc.api.UserDubbo;
+import www.raven.jc.dao.MessageDAO;
 import www.raven.jc.dao.RoomDAO;
 import www.raven.jc.dao.UserRoomDAO;
-import www.raven.jc.dao.MessageDAO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.entity.po.Message;
@@ -18,7 +20,6 @@ import www.raven.jc.entity.po.Room;
 import www.raven.jc.entity.po.UserRoom;
 import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.event.RoomMsgEvent;
-import www.raven.jc.api.UserDubbo;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
@@ -54,14 +55,14 @@ public class ChatServiceImpl implements ChatService {
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
-    public void saveRoomMsg(UserInfoDTO data, MessageDTO message, String roomId) {
+        public void saveRoomMsg(UserInfoDTO data, MessageDTO message, Integer roomId) {
         long timeStamp = message.getTime();
         String text = message.getText();
         Message realMsg = new Message().setContent(text)
                 .setTimestamp(new Date(timeStamp))
                 .setSenderId(data.getUserId())
                 .setType("room")
-                .setReceiverId(Integer.parseInt(roomId));
+                .setReceiverId(roomId);
         //保存消息
         Assert.isTrue(messageDAO.save(realMsg), "插入失败");
         //更新聊天室的最后一条消息
@@ -72,8 +73,9 @@ public class ChatServiceImpl implements ChatService {
         //通知user模块有新消息
         streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(roomMsgEvent), "RECORD"));
     }
+
     //TODO
-    public void saveFriendMsg(){
+    public void saveFriendMsg() {
 
     }
 
@@ -81,7 +83,7 @@ public class ChatServiceImpl implements ChatService {
     public List<MessageVO> restoreHistory(Integer roomId) {
         List<Message> messages = messageDAO.getByRoomId(roomId);
         List<Integer> userIds = messages.stream().map(Message::getSenderId).collect(Collectors.toList());
-                RpcResult<List<UserInfoDTO>> allInfo = userDubbo.getBatchInfo(userIds);
+        RpcResult<List<UserInfoDTO>> allInfo = userDubbo.getBatchInfo(userIds);
         Assert.isTrue(allInfo.isSuccess(), "user模块调用失败");
         List<UserInfoDTO> data = allInfo.getData();
         Map<Integer, UserInfoDTO> userInfoMap = data.stream()

@@ -18,6 +18,7 @@ import java.util.List;
 public class UserDubboImpl implements UserDubbo {
     @Autowired
     private UserService userService;
+
     @Override
     public RpcResult<UserInfoDTO> getSingleInfo(Integer userId) {
         return RpcResult.operateSuccess("查找成功", userService.querySingleInfo(userId));
@@ -40,7 +41,7 @@ public class UserDubboImpl implements UserDubbo {
 
     @Override
     public RpcResult<UserAuthDTO> getUserToAuth(String username) {
-        return RpcResult.operateSuccess("查找成功", userService.querySingleInfoByColumn("username",username));
+        return RpcResult.operateSuccess("查找成功", userService.querySingleInfoByColumn("username", username));
     }
 
     @Override

@@ -23,6 +23,7 @@ public interface RoomService {
 
     /**
      * query room page
+     *
      * @return {@link List}<{@link UserRoomVO}>
      */
     List<UserRoomVO> initUserMainPage();

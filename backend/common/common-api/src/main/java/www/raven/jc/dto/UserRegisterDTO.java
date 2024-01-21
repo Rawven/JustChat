@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import www.raven.jc.util.CommonSerializable;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**

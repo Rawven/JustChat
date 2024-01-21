@@ -1,6 +1,7 @@
-package www.raven.jc.websocket;
+package www.raven.jc.ws;
 
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import www.raven.jc.dto.TokenDTO;
@@ -22,8 +23,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 @Component
 @Slf4j
-@ServerEndpoint("/websocket/{token}")
-public class NotificationHandler {
+@ServerEndpoint("/ws/{token}")
+@Data
+public class NotificationHandler extends BaseHandler {
     /**
      * 用来存在线连接数
      */
@@ -33,14 +35,6 @@ public class NotificationHandler {
      * 虽然@Component默认是单例模式的，但springboot还是会为每个websocket连接初始化一个bean，所以可以用一个静态set保存起来。
      */
     private static CopyOnWriteArraySet<NotificationHandler> webSockets = new CopyOnWriteArraySet<>();
-    /**
-     * 与某个客户端的连接会话，需要通过它来给客户端发送数据
-     **/
-    private Session session;
-    /**
-     * user id
-     */
-    private Integer userId;
 
 
     /**
@@ -62,7 +56,7 @@ public class NotificationHandler {
         }
         webSockets.add(this);
         SESSION_POOL.put(token, session);
-        log.info("websocket: 有新的连接,用户id为{},总数为:{}" , verify.getUserId(),webSockets.size());
+        log.info("ws: 有新的连接,用户id为{},总数为:{}", verify.getUserId(), webSockets.size());
     }
 
     /**
@@ -73,7 +67,7 @@ public class NotificationHandler {
     public void onClose() {
         Integer userId1 = this.userId;
         webSockets.remove(this);
-        log.info("websocket:用户id {} 连接断开，总数为:{}" ,userId1, webSockets.size());
+        log.info("ws:用户id {} 连接断开，总数为:{}", userId1, webSockets.size());
     }
 
     /**
@@ -84,7 +78,7 @@ public class NotificationHandler {
      */
     @OnMessage
     public void onMessage(String message) {
-        log.info("websocket:收到客户端发来的消息:" + message);
+        log.info("ws:收到客户端发来的消息:" + message);
         try {
 
         } catch (Exception e) {
@@ -100,7 +94,7 @@ public class NotificationHandler {
      */
     @OnError
     public void onError(Session session, Throwable error) {
-        log.error("websocket:发生错误");
+        log.error("ws:发生错误");
         log.error("Error occurred on connection, Session ID: " + session.getId());
         log.error("Details: " + error.getMessage());
         log.error("Stack trace: {}", (Object) error.getStackTrace());
@@ -110,6 +104,7 @@ public class NotificationHandler {
     /**
      * send all message
      * 遍历方法
+     *
      * @param message message
      */
     public void sendAllMessage(String message) {
@@ -128,7 +123,7 @@ public class NotificationHandler {
      * @param message message
      */
     public void sendBatchMessage(String message, List<String> tokens) {
-        log.info("websocket:广播消息:" + message);
+        log.info("ws:广播消息:" + message);
         for (String token : tokens) {
             Session session = SESSION_POOL.get(token);
             if (session != null && session.isOpen()) {
@@ -140,6 +135,7 @@ public class NotificationHandler {
             }
         }
     }
+
     /**
      * send one message
      *

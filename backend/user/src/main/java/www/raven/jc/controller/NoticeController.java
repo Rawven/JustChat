@@ -23,18 +23,21 @@ import java.util.List;
 public class NoticeController {
     @Autowired
     private NoticeService noticeService;
-        @GetMapping("/getNotice")
-        public CommonResult<List<NoticeVO>> getNotice() {
-                return CommonResult.operateSuccess("查找成功", noticeService.loadNotice());
-        }
-        @GetMapping("/doneNotice/{id}")
-        public CommonResult<Void> doneNotice(@PathVariable("id") Integer id) {
-                noticeService.doneNotification(id);
-                return CommonResult.operateSuccess("处理通知成功");
-        }
-        @GetMapping ("/addFriendApply")
-        public CommonResult<Void> addFriendApply(@RequestBody FriendApplyModel friendApplyModel) {
-                noticeService.addFriendApply(friendApplyModel.getFriendId().intValue(),friendApplyModel.getMessage());
-                return CommonResult.operateSuccess("添加好友申请成功");
-        }
+
+    @GetMapping("/getNotice")
+    public CommonResult<List<NoticeVO>> getNotice() {
+        return CommonResult.operateSuccess("查找成功", noticeService.loadNotice());
+    }
+
+    @GetMapping("/doneNotice/{id}")
+    public CommonResult<Void> doneNotice(@PathVariable("id") Integer id) {
+        noticeService.doneNotification(id);
+        return CommonResult.operateSuccess("处理通知成功");
+    }
+
+    @GetMapping("/addFriendApply")
+    public CommonResult<Void> addFriendApply(@RequestBody FriendApplyModel friendApplyModel) {
+        noticeService.addFriendApply(friendApplyModel.getFriendId().intValue(), friendApplyModel.getMessage());
+        return CommonResult.operateSuccess("添加好友申请成功");
+    }
 }

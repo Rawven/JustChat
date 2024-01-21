@@ -14,6 +14,6 @@ import www.raven.jc.util.CommonSerializable;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Accessors(chain = true)
-public class RoleDTO  extends CommonSerializable {
+public class RoleDTO extends CommonSerializable {
     private String value;
 }

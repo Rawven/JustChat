@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import www.raven.jc.api.UserDubbo;
 import www.raven.jc.dao.MessageDAO;
 import www.raven.jc.dao.RoomDAO;
 import www.raven.jc.dao.UserRoomDAO;
@@ -24,7 +25,6 @@ import www.raven.jc.entity.vo.DisplayRoomVO;
 import www.raven.jc.entity.vo.RealRoomVO;
 import www.raven.jc.entity.vo.UserRoomVO;
 import www.raven.jc.event.JoinRoomApplyEvent;
-import www.raven.jc.api.UserDubbo;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.RoomService;
 import www.raven.jc.util.JsonUtil;
@@ -77,14 +77,14 @@ public class RoomServiceImpl implements RoomService {
         int userId = Integer.parseInt(request.getHeader("userId"));
         //获取用户加入的聊天室id
         List<UserRoom> roomIdList = userRoomDAO.getBaseMapper().selectList(new QueryWrapper<UserRoom>().eq("user_id", userId));
-        if(roomIdList.isEmpty()){
+        if (roomIdList.isEmpty()) {
             return new ArrayList<>();
         }
         List<Integer> roomIds = roomIdList.stream().map(UserRoom::getRoomId).collect(Collectors.toList());
         List<Room> rooms = roomDAO.getBaseMapper().selectList(new QueryWrapper<Room>().in("room_id", roomIds));
         //获取所有聊天室的最后一条消息id
         List<ObjectId> idsMsg = rooms.stream()
-                .map(room-> new ObjectId(room.getLastMsgId()))
+                .map(room -> new ObjectId(room.getLastMsgId()))
                 .collect(Collectors.toList());
         List<Integer> idsSender = new ArrayList<>();
         //获取所有聊天室的最后一条消息
@@ -96,15 +96,15 @@ public class RoomServiceImpl implements RoomService {
         });
         //获取聊天室发最后一条信息的用户信息
         RpcResult<List<UserInfoDTO>> batchInfo = userDubbo.getBatchInfo(idsSender);
-        Assert.isTrue(batchInfo.isSuccess(),"user模块调用失败");
+        Assert.isTrue(batchInfo.isSuccess(), "user模块调用失败");
         List<Integer> founderIds = rooms.stream().map(Room::getFounderId).distinct().collect(Collectors.toList());
         //获取聊天室创建者的用户信息
         RpcResult<List<UserInfoDTO>> batchInfoFounder = userDubbo.getBatchInfo(founderIds);
-        Assert.isTrue(batchInfoFounder.isSuccess(),"user模块调用失败");
+        Assert.isTrue(batchInfoFounder.isSuccess(), "user模块调用失败");
         Map<Integer, UserInfoDTO> mapFounder = batchInfoFounder.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
         Map<Integer, UserInfoDTO> mapSender = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
 
-        Map<String, Message> messageMap = messages.stream().collect(Collectors.toMap(message ->message.getMessageId().toString(), Function.identity()));
+        Map<String, Message> messageMap = messages.stream().collect(Collectors.toMap(message -> message.getMessageId().toString(), Function.identity()));
         return rooms.stream().map(room -> {
             log.info(room.toString());
             UserRoomVO userRoomVO = new UserRoomVO()
@@ -116,7 +116,7 @@ public class RoomServiceImpl implements RoomService {
                 log.info(message.toString());
                 userRoomVO.setLastMsg(JsonUtil.objToJson(message));
                 UserInfoDTO userInfoDTO = mapSender.get(message.getSenderId());
-                 log.info(userInfoDTO.toString());
+                log.info(userInfoDTO.toString());
                 userRoomVO.setLastMsgSender(userInfoDTO.getUsername());
             } else {
                 userRoomVO.setLastMsg(""); // 或者一些默认值
@@ -154,6 +154,7 @@ public class RoomServiceImpl implements RoomService {
         //通知user模块 插入一条申请记录
         streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new JoinRoomApplyEvent(userId, founderId, roomId)), "APPLY"));
     }
+
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void agreeApply(Integer roomId, Integer userId) {

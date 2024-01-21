@@ -30,13 +30,15 @@ public class QueryController {
     public CommonResult<List<UserRoomVO>> initUserMainPage() {
         return CommonResult.operateSuccess("获取房间列表成功", roomService.initUserMainPage());
     }
+
     //TODO work
     @GetMapping("/queryFriendMsg")
     public CommonResult<Void> queryFriendMsg() {
         return CommonResult.operateSuccess("获取好友消息成功");
     }
+
     @GetMapping("/queryIdRoomList/{page}/{size}")
-    public CommonResult<RealRoomVO> queryRoomList( @PathVariable("page") int page, @PathVariable("size") int size) {
+    public CommonResult<RealRoomVO> queryRoomList(@PathVariable("page") int page, @PathVariable("size") int size) {
         return CommonResult.operateSuccess("获取房间列表成功", roomService.queryListPage(page, size));
     }
 

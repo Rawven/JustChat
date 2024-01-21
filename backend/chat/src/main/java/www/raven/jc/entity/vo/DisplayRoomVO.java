@@ -12,10 +12,10 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class DisplayRoomVO  {
-  private Integer  roomId;
-  private String  roomName;
-  private String  roomDescription;
-  private String  founderName;
-  private Integer  maxPeople;
+public class DisplayRoomVO {
+    private Integer roomId;
+    private String roomName;
+    private String roomDescription;
+    private String founderName;
+    private Integer maxPeople;
 }

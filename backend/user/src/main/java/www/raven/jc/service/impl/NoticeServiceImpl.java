@@ -49,12 +49,13 @@ public class NoticeServiceImpl implements NoticeService {
                 }
         ).collect(Collectors.toList());
     }
+
     @Override
-    public void addFriendApply(Integer friendId,String message){
+    public void addFriendApply(Integer friendId, String message) {
         String applierId = request.getHeader("userId");
-        Map<Object,Object> map = new HashMap<>(2);
-        map.put("applierId",applierId);
-        map.put("message",message);
+        Map<Object, Object> map = new HashMap<>(2);
+        map.put("applierId", applierId);
+        map.put("message", message);
         Notification notice = new Notification().setUserId(friendId)
                 .setMessage(JsonUtil.objToJson(map))
                 .setType(NoticeConstant.TYPE_ADD_FRIEND_APPLY)
@@ -62,8 +63,9 @@ public class NoticeServiceImpl implements NoticeService {
                 .setStatus(NoticeConstant.STATUS_UNREAD);
         Assert.isTrue(noticeDAO.save(notice));
     }
+
     @Override
-    public void addRoomApply(int founderId,Object payload){
+    public void addRoomApply(int founderId, Object payload) {
         Notification notice = new Notification().setUserId(founderId)
                 .setMessage(JsonUtil.objToJson(payload))
                 .setType(NoticeConstant.TYPE_JOIN_ROOM_APPLY)

@@ -8,8 +8,8 @@ package www.raven.jc.constant;
  */
 public class MqConstant {
 
-    public static  final  String HEADER_KEYS = "ROCKET_KEYS";
-    public static  final  String HEADER_TAGS = "ROCKET_TAGS";
+    public static final String HEADER_KEYS = "ROCKET_KEYS";
+    public static final String HEADER_TAGS = "ROCKET_TAGS";
 
     public final static long EXPIRE_TIME = 10;
 }

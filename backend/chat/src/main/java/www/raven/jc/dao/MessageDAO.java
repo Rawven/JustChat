@@ -25,7 +25,7 @@ MessageDAO {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    public  Boolean save(Message message) {
+    public Boolean save(Message message) {
         mongoTemplate.save(message, COLLECTION_MESSAGE);
         return true;
     }
@@ -35,8 +35,9 @@ MessageDAO {
         new Query(criteria).limit(15).with(Sort.by(Sort.Direction.DESC, "timestamp"));
         return mongoTemplate.find(new Query(criteria), Message.class, COLLECTION_MESSAGE);
     }
-    public List<Message> getBatchIds(List<ObjectId> ids){
-        return mongoTemplate.find(new Query(Criteria.where("_id").in(ids)),Message.class,COLLECTION_MESSAGE);
+
+    public List<Message> getBatchIds(List<ObjectId> ids) {
+        return mongoTemplate.find(new Query(Criteria.where("_id").in(ids)), Message.class, COLLECTION_MESSAGE);
     }
 
 }

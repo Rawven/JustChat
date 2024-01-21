@@ -49,6 +49,7 @@ public class UserController {
     CommonResult<Boolean> checkUserExit(@RequestBody String username) {
         return CommonResult.operateSuccess("查找成功", userService.checkUserExit(username));
     }
+
     /**
      * user logout
      *
@@ -63,19 +64,19 @@ public class UserController {
 
     @PostMapping("/setProfile")
     public CommonResult<Void> setProfile(@RequestParam("file") MultipartFile profile) {
-        userService.updateByColumn("profile",ipfsClient.upload(profile));
+        userService.updateByColumn("profile", ipfsClient.upload(profile));
         return CommonResult.operateSuccess("设置头像成功");
     }
 
     @PostMapping("/setSignature")
     public CommonResult<Void> setSignature(@RequestParam("signature") String signature) {
-        userService.updateByColumn("signature",signature);
+        userService.updateByColumn("signature", signature);
         return CommonResult.operateSuccess("设置签名成功");
     }
 
     @PostMapping("/setUsername")
     public CommonResult<Void> setUsername(@RequestParam("username") String username) {
-        userService.updateByColumn("username",username);
+        userService.updateByColumn("username", username);
         return CommonResult.operateSuccess("重命名成功");
     }
 

@@ -21,7 +21,7 @@ public interface ChatService {
      * @param message message
      * @param roomId  room id
      */
-    void saveRoomMsg(UserInfoDTO data, MessageDTO message, String roomId);
+    void saveRoomMsg(UserInfoDTO data, MessageDTO message, Integer roomId);
 
     /**
      * restore history
@@ -30,4 +30,6 @@ public interface ChatService {
      * @return {@link List}<{@link MessageVO}>
      */
     List<MessageVO> restoreHistory(Integer roomId);
+
+    void saveFriendMsg();
 }

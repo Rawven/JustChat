@@ -24,7 +24,7 @@ public interface NoticeService {
      * @param founderId founder id
      * @param payload   payload
      */
-     void addRoomApply(int founderId,Object payload);
+    void addRoomApply(int founderId, Object payload);
 
     /**
      * add friend apply
@@ -32,7 +32,7 @@ public interface NoticeService {
      * @param friendId friend id
      * @param message  message
      */
-    void addFriendApply(Integer friendId,String message);
+    void addFriendApply(Integer friendId, String message);
 
     /**
      * done notification
@@ -40,6 +40,7 @@ public interface NoticeService {
      * @param id id
      */
     void doneNotification(Integer id);
+
     /**
      * delete new room msg notice
      *

@@ -1,6 +1,5 @@
 package www.raven.jc.service.consumer;
 
-import cn.hutool.core.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
@@ -9,17 +8,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
 import www.raven.jc.constant.MqConstant;
-import www.raven.jc.constant.NoticeConstant;
-import www.raven.jc.dao.NoticeDAO;
 import www.raven.jc.dao.UserDAO;
-import www.raven.jc.entity.po.Notification;
 import www.raven.jc.entity.po.User;
 import www.raven.jc.event.Event;
 import www.raven.jc.event.JoinRoomApplyEvent;
 import www.raven.jc.event.RoomMsgEvent;
 import www.raven.jc.service.NoticeService;
 import www.raven.jc.util.JsonUtil;
-import www.raven.jc.websocket.NotificationHandler;
+import www.raven.jc.ws.NotificationHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -87,12 +83,13 @@ public class MessageConsumer {
         HashMap<Object, Object> map = new HashMap<>(2);
         map.put("roomId", payload.getRoomId());
         map.put("applier", applier.getUsername());
-        if(founderBucket.isExists()) {
-           notificationHandler.sendOneMessage(founderBucket.get(),JsonUtil.mapToJson(map));
-        }else {
+        if (founderBucket.isExists()) {
+            notificationHandler.sendOneMessage(founderBucket.get(), JsonUtil.mapToJson(map));
+        } else {
             log.info("founder不在线");
         }
     }
+
     /**
      * 通知在线用户有新消息
      *
@@ -112,6 +109,6 @@ public class MessageConsumer {
                 tokens.add(bucket.get());
             }
         });
-        notificationHandler.sendBatchMessage(JsonUtil.mapToJson(map),tokens);
+        notificationHandler.sendBatchMessage(JsonUtil.mapToJson(map), tokens);
     }
 }
