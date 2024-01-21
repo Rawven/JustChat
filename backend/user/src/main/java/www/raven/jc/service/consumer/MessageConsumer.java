@@ -37,7 +37,6 @@ import java.util.function.Consumer;
 public class MessageConsumer {
 
     private static final String TAGS_ROOM_APPLY = "ROOM_APPLY";
-    private static final String TAGS_FRIEND_APPLY = "FRIEND_APPLY";
     private static final String TAGS_ROOM_MSG_RECORD = "ROOM_MSG_RECORD";
     private static final String TAGS_FRIEND_MSG_RECORD = "FRIEND_MSG_RECORD";
     @Autowired
@@ -65,8 +64,6 @@ public class MessageConsumer {
             //判断消息类型
             if (TAGS_ROOM_APPLY.equals(tags)) {
                 eventUserJoinRoomApply(msg);
-            } else if (TAGS_FRIEND_APPLY.equals(tags)) {
-                eventUserApplyFriendApply(msg);
             } else if (TAGS_ROOM_MSG_RECORD.equals(tags)) {
                 eventRoomSendMsg(msg);
             } else if (TAGS_FRIEND_MSG_RECORD.equals(tags)) {
@@ -86,13 +83,10 @@ public class MessageConsumer {
         map.put("senderId", payload.getSenderId());
         map.put("msg", payload.getMsg());
         if (receiverBucket.isExists()) {
-            notificationHandler.sendOneMessage(receiverBucket.get(), JsonUtil.mapToJson(map));
+            notificationHandler.sendOneMessage(payload.getReceiverId(), JsonUtil.mapToJson(map));
         } else {
             log.info("receiver不在线");
         }
-    }
-
-    private void eventUserApplyFriendApply(Message<Event> msg) {
     }
 
     /**
@@ -111,7 +105,7 @@ public class MessageConsumer {
         map.put("roomId", payload.getRoomId());
         map.put("applier", applier.getUsername());
         if (founderBucket.isExists()) {
-            notificationHandler.sendOneMessage(founderBucket.get(), JsonUtil.mapToJson(map));
+            notificationHandler.sendOneMessage(founderId, JsonUtil.mapToJson(map));
         } else {
             log.info("founder不在线");
         }
@@ -130,12 +124,7 @@ public class MessageConsumer {
         map.put("username", userDAO.getBaseMapper().selectById(userId).getUsername());
         map.put("msg", payload.getMsg());
         List<String> tokens = new ArrayList<>();
-        payload.getIdsFromRoom().forEach(id -> {
-            RBucket<String> bucket = redissonClient.getBucket("token:" + id);
-            if (bucket.isExists()) {
-                tokens.add(bucket.get());
-            }
-        });
-        notificationHandler.sendBatchMessage(JsonUtil.mapToJson(map), tokens);
+        List<Integer> idsFromRoom = payload.getIdsFromRoom();
+        notificationHandler.sendBatchMessage(JsonUtil.mapToJson(map), idsFromRoom);
     }
 }

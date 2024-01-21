@@ -11,10 +11,6 @@ import java.util.List;
  * @date 2024/01/21
  */
 public interface FriendService {
-    //TODO work
-    void getFriendMsg();
-
-
     /**
      * init user friend page
      *

@@ -1,7 +1,6 @@
 package www.raven.jc.service;
 
 import www.raven.jc.dto.UserInfoDTO;
-import www.raven.jc.result.RpcResult;
 
 import java.util.List;
 
@@ -22,4 +21,10 @@ public interface FriendService {
     List<UserInfoDTO> getFriendInfos(int userId);
 
 
+    /**
+     * add apply friend
+     *
+     * @param friendId friend id
+     */
+    void agreeApplyFromFriend(int friendId);
 }

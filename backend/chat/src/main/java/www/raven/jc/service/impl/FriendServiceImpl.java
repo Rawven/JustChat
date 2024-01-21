@@ -41,11 +41,6 @@ public class FriendServiceImpl implements FriendService {
     @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
     private UserDubbo userDubbo;
 
-    //TODO work
-    @Override
-    public void getFriendMsg() {
-
-    }
 
     @Override
     public List<UserFriendVO> initUserFriendPage() {

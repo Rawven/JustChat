@@ -2,10 +2,7 @@ package www.raven.jc.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.FriendService;
 
@@ -23,15 +20,10 @@ public class FriendController {
     @Autowired
     private FriendService friendService;
 
-    //TODO
-    @PostMapping("/getFriendList")
-    public CommonResult<Void> getFriendList() {
-        return CommonResult.operateSuccess("查找成功");
-    }
-
-    @PostMapping("/addFriend")
-    public CommonResult<Void> addFriend() {
-        return CommonResult.operateSuccess("添加成功");
+    @GetMapping("/agreeToBeFriend/{friendId}")
+    public CommonResult<Void> agreeApplyFriend(@PathVariable("friendId") int friendId) {
+        friendService.agreeApplyFromFriend(friendId);
+        return CommonResult.operateSuccess("成为好友成功");
     }
 
 

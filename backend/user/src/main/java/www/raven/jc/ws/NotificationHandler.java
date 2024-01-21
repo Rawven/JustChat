@@ -29,7 +29,7 @@ public class NotificationHandler extends BaseHandler {
     /**
      * 用来存在线连接数
      */
-    private static final Map<String, Session> SESSION_POOL = new HashMap<>();
+    private static final Map<Integer, Session> SESSION_POOL = new HashMap<>();
     /**
      * concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
      * 虽然@Component默认是单例模式的，但springboot还是会为每个websocket连接初始化一个bean，所以可以用一个静态set保存起来。
@@ -46,7 +46,7 @@ public class NotificationHandler extends BaseHandler {
         session.getUserProperties().put("userDto", verify);
         this.userId = verify.getUserId();
         this.session = session;
-        Session sessionExisted = SESSION_POOL.get(token);
+        Session sessionExisted = SESSION_POOL.get(verify.getUserId());
         if (sessionExisted != null) {
             try {
                 sessionExisted.close();
@@ -55,7 +55,7 @@ public class NotificationHandler extends BaseHandler {
             }
         }
         webSockets.add(this);
-        SESSION_POOL.put(token, session);
+        SESSION_POOL.put(verify.getUserId(), session);
         log.info("ws: 有新的连接,用户id为{},总数为:{}", verify.getUserId(), webSockets.size());
     }
 
@@ -122,10 +122,10 @@ public class NotificationHandler extends BaseHandler {
      *
      * @param message message
      */
-    public void sendBatchMessage(String message, List<String> tokens) {
+    public void sendBatchMessage(String message, List<Integer> ids) {
         log.info("ws:广播消息:" + message);
-        for (String token : tokens) {
-            Session session = SESSION_POOL.get(token);
+        for (Integer id : ids) {
+            Session session = SESSION_POOL.get(id);
             if (session != null && session.isOpen()) {
                 try {
                     session.getAsyncRemote().sendText(message);
@@ -138,12 +138,13 @@ public class NotificationHandler extends BaseHandler {
 
     /**
      * send one message
+     * send one message
      *
-     * @param token   user id
      * @param message message
+     * @param id      id
      */
-    public void sendOneMessage(String token, String message) {
-        Session session = SESSION_POOL.get(token);
+    public void sendOneMessage(Integer id, String message) {
+        Session session = SESSION_POOL.get(id);
         if (session != null && session.isOpen()) {
             try {
                 log.info("【websocket消息】 单点消息:" + message);
