@@ -31,7 +31,7 @@ MessageDAO {
     }
 
     public List<Message> getByRoomId(Integer roomId) {
-        Criteria criteria = Criteria.where("receiverId").is(roomId).and("type").is("room");
+        Criteria criteria = Criteria.where("receiverId").is(roomId.toString()).and("type").is("room");
         new Query(criteria).limit(15).with(Sort.by(Sort.Direction.DESC, "timestamp"));
         return mongoTemplate.find(new Query(criteria), Message.class, COLLECTION_MESSAGE);
     }

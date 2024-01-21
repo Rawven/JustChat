@@ -30,7 +30,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @Component
 @Slf4j
 @Data
-@ServerEndpoint("/ws/room/{token}/{friendId}")
+@ServerEndpoint("/ws/friend/{token}/{friendId}")
 public class FriendChatHandler extends BaseHandler {
 
 
@@ -43,8 +43,7 @@ public class FriendChatHandler extends BaseHandler {
      * 虽然@Component默认是单例模式的，但springboot还是会为每个websocket连接初始化一个bean，所以可以用一个静态set保存起来。
      */
     public static CopyOnWriteArraySet<FriendChatHandler> webSockets = new CopyOnWriteArraySet<>();
-    //TODO 待解决
-    @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
+
     private static UserDubbo userDubbo;
 
     private static ChatService chatService;
@@ -52,6 +51,11 @@ public class FriendChatHandler extends BaseHandler {
      * friend id
      */
     private Integer friendId;
+
+    @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
+    public void setUserDubbo(UserDubbo userDubbo) {
+        FriendChatHandler.userDubbo = userDubbo;
+    }
 
 
     @Autowired
@@ -69,6 +73,9 @@ public class FriendChatHandler extends BaseHandler {
         session.getUserProperties().put("userDto", dto);
         this.session = session;
         this.friendId = Integer.valueOf(friendId);
+        if (!SESSION_POOL.containsKey(this.userId)) {
+            SESSION_POOL.put(this.userId, new HashMap<>());
+        }
         Session sessionExisted = SESSION_POOL.get(userId).get(this.friendId);
         if (sessionExisted != null) {
             try {

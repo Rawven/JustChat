@@ -93,7 +93,7 @@
     <el-aside class="theAside w-64 border-r border-gray-200 overflow-y-auto">
       <el-header class="p-4 border-b border-gray-200">
         <el-row>
-          <img :src="'http://10.24.3.176:8083/ipfs/'+userInfo.profile" alt="User Avatar" class="avatar">
+          <img :src="'http://10.44.59.225:8083/ipfs/'+userInfo.profile" alt="User Avatar" class="avatar">
           <h2 class="logo"> Just Chat </h2>
         </el-row>
       </el-header>
@@ -119,7 +119,7 @@
             @click="checkOut(room.roomId)"
         >
     <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
-      <img :src="'http://10.24.3.176:8083/ipfs/'+room.roomProfile" alt="User Avatar" class="avatar">
+      <img :src="'http://10.44.59.225:8083/ipfs/'+room.roomProfile" alt="User Avatar" class="avatar">
     </span>
           <el-col>
             <el-col v-if="checkNull(room.lastMsgSender)" >{{ formatDateOrTime(JSON.parse(room.lastMsg).timestamp) }}</el-col>

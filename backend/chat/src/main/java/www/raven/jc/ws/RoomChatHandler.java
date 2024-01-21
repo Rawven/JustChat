@@ -42,6 +42,7 @@ public class RoomChatHandler extends BaseHandler {
      * 虽然@Component默认是单例模式的，但springboot还是会为每个websocket连接初始化一个bean，所以可以用一个静态set保存起来。
      */
     public static CopyOnWriteArraySet<RoomChatHandler> webSockets = new CopyOnWriteArraySet<>();
+
     private static UserDubbo userDubbo;
     private static ChatService chatService;
     /**
@@ -50,12 +51,10 @@ public class RoomChatHandler extends BaseHandler {
      */
     private Integer roomId;
 
-    //TODO 待解决
     @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
-    public void setAccountService(UserDubbo accountDubbo) {
-        RoomChatHandler.userDubbo = accountDubbo;
+    public void setUserDubbo(UserDubbo userDubbo) {
+        RoomChatHandler.userDubbo = userDubbo;
     }
-
     @Autowired
     public void setChatService(ChatService chatService) {
         RoomChatHandler.chatService = chatService;
@@ -71,6 +70,9 @@ public class RoomChatHandler extends BaseHandler {
         this.session = session;
         this.roomId = Integer.valueOf(roomId);
         this.userId = dto.getUserId();
+        if (!SESSION_POOL.containsKey(this.roomId)) {
+            SESSION_POOL.put(this.roomId, new HashMap<>());
+        }
         Session sessionExisted = SESSION_POOL.get(this.roomId).get(this.userId);
         if (sessionExisted != null) {
             try {
@@ -102,7 +104,7 @@ public class RoomChatHandler extends BaseHandler {
      */
     @OnMessage
     public void onMessage(String message) {
-        log.info("【websocket消息】收到客户端发来的消息:" + message);
+        log.info("----WebSocket收到客户端发来的消息:" + message);
         lastActivityTime = System.currentTimeMillis();
         MessageDTO messageDTO = JsonUtil.jsonToObj(message, MessageDTO.class);
         TokenDTO tokenDTO = (TokenDTO) (session.getUserProperties().get("userDto"));
@@ -136,7 +138,7 @@ public class RoomChatHandler extends BaseHandler {
     public void sendRoomMessage(String message) {
         log.info("----WebSocket 广播消息:" + message);
         SESSION_POOL.get(this.roomId).forEach((k, v) -> {
-            if (!Objects.equals(k, userId) && v.isOpen()) {
+            if ( v.isOpen()) {
                 v.getAsyncRemote().sendText(message);
             }
         });
