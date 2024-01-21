@@ -58,6 +58,6 @@ public class QueryController {
 
     @PostMapping("/restoreHistory/{roomId}")
     public CommonResult<List<MessageVO>> restoreHistory(@PathVariable("roomId") Integer roomId) {
-        return CommonResult.operateSuccess("获取历史记录成功", chatService.restoreHistory(roomId));
+        return CommonResult.operateSuccess("获取历史记录成功", chatService.restoreRoomHistory(roomId));
     }
 }

@@ -106,13 +106,8 @@ public class FriendChatHandler  extends BaseHandler{
         lastActivityTime = System.currentTimeMillis();
         MessageDTO messageDTO = JsonUtil.jsonToObj(message, MessageDTO.class);
         TokenDTO tokenDTO = (TokenDTO) (session.getUserProperties().get("userDto"));
-        try {
-            //这里直接遍历更快
-            sendFriendMessage(message);
-        } catch (Exception e) {
-            log.error("map转json异常");
-        }
-        chatService.saveFriendMsg();
+        sendFriendMessage(message);
+        chatService.saveFriendMsg(messageDTO,tokenDTO.getUserId(),friendId);
     }
 
     /**
@@ -134,8 +129,6 @@ public class FriendChatHandler  extends BaseHandler{
         Session friendSession = SESSION_POOL.get(friendId).get(userId);
         if(friendSession.isOpen()){
             friendSession.getAsyncRemote().sendText(message);
-        }else {
-            //TODO 存入Notice
         }
     }
 

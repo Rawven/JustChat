@@ -1,5 +1,12 @@
 package www.raven.jc.service;
 
+import cn.hutool.core.lang.Assert;
+import org.springframework.transaction.annotation.Transactional;
+import www.raven.jc.entity.dto.MessageDTO;
+import www.raven.jc.entity.po.Message;
+
+import java.util.Date;
+
 /**
  * friend service
  *
@@ -9,4 +16,6 @@ package www.raven.jc.service;
 public interface FriendService {
     //TODO work
     void getFriendMsg();
+
+
 }

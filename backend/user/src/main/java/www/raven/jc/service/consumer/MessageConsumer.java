@@ -1,5 +1,6 @@
 package www.raven.jc.service.consumer;
 
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
@@ -8,9 +9,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
 import www.raven.jc.constant.MqConstant;
+import www.raven.jc.dao.FriendDAO;
 import www.raven.jc.dao.UserDAO;
+import www.raven.jc.entity.po.Friend;
 import www.raven.jc.entity.po.User;
 import www.raven.jc.event.Event;
+import www.raven.jc.event.FriendMsgEvent;
 import www.raven.jc.event.JoinRoomApplyEvent;
 import www.raven.jc.event.RoomMsgEvent;
 import www.raven.jc.service.NoticeService;
@@ -34,8 +38,10 @@ import java.util.function.Consumer;
 @Slf4j
 public class MessageConsumer {
 
-    private static final String TAGS_APPLY = "APPLY";
-    private static final String TAGS_RECORD = "RECORD";
+    private static final String TAGS_ROOM_APPLY = "ROOM_APPLY";
+    private static final String TAGS_FRIEND_APPLY = "FRIEND_APPLY";
+    private static final String TAGS_ROOM_MSG_RECORD = "ROOM_MSG_RECORD";
+    private static final String TAGS_FRIEND_MSG_RECORD = "FRIEND_MSG_RECORD";
     @Autowired
     private NoticeService noticeService;
     @Autowired
@@ -44,6 +50,8 @@ public class MessageConsumer {
     private NotificationHandler notificationHandler;
     @Autowired
     private RedissonClient redissonClient;
+    @Autowired
+    private FriendDAO friendDAO;
 
 
     @Bean
@@ -57,15 +65,28 @@ public class MessageConsumer {
             }
             String tags = Objects.requireNonNull(msg.getHeaders().get(MqConstant.HEADER_TAGS)).toString();
             //判断消息类型
-            if (TAGS_APPLY.equals(tags)) {
+            if (TAGS_ROOM_APPLY.equals(tags)) {
                 eventUserJoinRoomApply(msg);
-            } else if (TAGS_RECORD.equals(tags)) {
-                eventUserSendMsg(msg);
-            } else {
+            }else if(TAGS_FRIEND_APPLY.equals(tags)){
+                eventUserApplyFriendApply(msg);
+            }else if (TAGS_ROOM_MSG_RECORD.equals(tags)) {
+                eventRoomSendMsg(msg);
+            }else if(TAGS_FRIEND_MSG_RECORD.equals(tags)){
+                eventFriendSendMsg(msg);
+            }else {
                 log.info("非法的消息，不处理");
             }
             redissonClient.getBucket(id.toString()).set(id, MqConstant.EXPIRE_TIME, TimeUnit.MINUTES);
         };
+    }
+    //TODO
+    private void eventFriendSendMsg(Message<Event> msg) {
+        FriendMsgEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), FriendMsgEvent.class);
+
+
+    }
+
+    private void eventUserApplyFriendApply(Message<Event> msg) {
     }
 
     /**
@@ -95,7 +116,7 @@ public class MessageConsumer {
      *
      * @param msg msg
      */
-    public void eventUserSendMsg(Message<Event> msg) {
+    public void eventRoomSendMsg(Message<Event> msg) {
         RoomMsgEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), RoomMsgEvent.class);
         Integer userId = payload.getUserId();
         HashMap<Object, Object> map = new HashMap<>(3);

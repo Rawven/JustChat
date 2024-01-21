@@ -1,6 +1,5 @@
 package www.raven.jc.service;
 
-import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.entity.vo.MessageVO;
 
@@ -15,13 +14,14 @@ import java.util.List;
 public interface ChatService {
 
     /**
+     * save room msg
      * save msg
      *
-     * @param data    data
      * @param message message
      * @param roomId  room id
+     * @param userId  user id
      */
-    void saveRoomMsg(UserInfoDTO data, MessageDTO message, Integer roomId);
+    void saveRoomMsg(Integer userId, MessageDTO message, Integer roomId);
 
     /**
      * restore history
@@ -29,7 +29,14 @@ public interface ChatService {
      * @param roomId room id
      * @return {@link List}<{@link MessageVO}>
      */
-    List<MessageVO> restoreHistory(Integer roomId);
+    List<MessageVO> restoreRoomHistory(Integer roomId);
 
-    void saveFriendMsg();
+    /**
+     * save friend msg
+     *
+     * @param message  message
+     * @param userId   user id
+     * @param friendId friend id
+     */
+    void saveFriendMsg(MessageDTO message,Integer userId,Integer friendId);
 }

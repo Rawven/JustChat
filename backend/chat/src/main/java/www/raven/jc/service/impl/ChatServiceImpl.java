@@ -19,6 +19,7 @@ import www.raven.jc.entity.po.Message;
 import www.raven.jc.entity.po.Room;
 import www.raven.jc.entity.po.UserRoom;
 import www.raven.jc.entity.vo.MessageVO;
+import www.raven.jc.event.FriendMsgEvent;
 import www.raven.jc.event.RoomMsgEvent;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.ChatService;
@@ -55,32 +56,41 @@ public class ChatServiceImpl implements ChatService {
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
-        public void saveRoomMsg(UserInfoDTO data, MessageDTO message, Integer roomId) {
+        public void saveRoomMsg(Integer userId, MessageDTO message, Integer roomId) {
         long timeStamp = message.getTime();
         String text = message.getText();
         Message realMsg = new Message().setContent(text)
                 .setTimestamp(new Date(timeStamp))
-                .setSenderId(data.getUserId())
+                .setSenderId(userId)
                 .setType("room")
-                .setReceiverId(roomId);
+                .setReceiverId(String.valueOf(roomId));
         //保存消息
         Assert.isTrue(messageDAO.save(realMsg), "插入失败");
         //更新聊天室的最后一条消息
-        Assert.isTrue(roomDAO.getBaseMapper().updateById(new Room().setRoomId(Integer.valueOf(roomId)).setLastMsgId(realMsg.getMessageId().toString())) > 0, "更新失败");
+        Assert.isTrue(roomDAO.getBaseMapper().updateById(new Room().setRoomId(roomId).setLastMsgId(realMsg.getMessageId().toString())) > 0, "更新失败");
         List<UserRoom> ids = userRoomDAO.getBaseMapper().selectList(new QueryWrapper<UserRoom>().eq("room_id", roomId));
         List<Integer> userIds = ids.stream().map(UserRoom::getUserId).collect(Collectors.toList());
-        RoomMsgEvent roomMsgEvent = new RoomMsgEvent(data.getUserId(), Integer.valueOf(roomId), userIds, JsonUtil.objToJson(realMsg));
+        RoomMsgEvent roomMsgEvent = new RoomMsgEvent(userId, roomId, userIds, JsonUtil.objToJson(realMsg));
         //通知user模块有新消息
         streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(roomMsgEvent), "RECORD"));
     }
 
-    //TODO
-    public void saveFriendMsg() {
-
+    @Transactional(rollbackFor = IllegalArgumentException.class)
+    @Override
+    public void saveFriendMsg(MessageDTO message,Integer userId,Integer friendId) {
+        Message realMsg = new Message().setContent(message.getText())
+                .setTimestamp(new Date(message.getTime()))
+                .setSenderId(userId)
+                .setType("friend")
+                .setReceiverId(concatenateIds(userId, friendId));
+        Assert.isTrue(messageDAO.save(realMsg), "插入失败");
+        FriendMsgEvent friendMsgEvent = new FriendMsgEvent(userId, friendId, JsonUtil.objToJson(realMsg));
+        //TODO 保存lastmsgid
+        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(friendMsgEvent), "RECORD"));
     }
 
     @Override
-    public List<MessageVO> restoreHistory(Integer roomId) {
+    public List<MessageVO> restoreRoomHistory(Integer roomId) {
         List<Message> messages = messageDAO.getByRoomId(roomId);
         List<Integer> userIds = messages.stream().map(Message::getSenderId).collect(Collectors.toList());
         RpcResult<List<UserInfoDTO>> allInfo = userDubbo.getBatchInfo(userIds);
@@ -102,5 +112,11 @@ public class ChatServiceImpl implements ChatService {
                     return messageVO;
                 }
         ).collect(Collectors.toList());
+    }
+
+    public String concatenateIds(Integer userId, Integer friendId) {
+        Integer maxId = Math.max(userId, friendId);
+        Integer minId = Math.min(userId, friendId);
+        return String.format("%d&%d", minId, maxId);
     }
 }

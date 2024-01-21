@@ -16,4 +16,6 @@ public class FriendServiceImpl implements FriendService {
     public void getFriendMsg() {
 
     }
+
+
 }

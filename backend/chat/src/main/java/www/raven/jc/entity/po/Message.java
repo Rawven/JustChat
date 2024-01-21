@@ -27,6 +27,6 @@ public class Message {
     private String content;
     private String type;
     @Indexed
-    private Integer receiverId;
+    private String receiverId;
     private Date timestamp;
 }

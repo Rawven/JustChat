@@ -6,20 +6,18 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDateTime;
-
 /**
- * friend entity
+ * friend chat
  *
  * @author 刘家辉
- * @date 2023/12/16
+ * @date 2024/01/21
  */
+@TableName("friend_chat")
 @Data
 @Accessors(chain = true)
-@TableName("friend")
-public class Friend {
+public class FriendChat {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
-    private Long userId;
-    private Long friendId;
+    private String fixId;
+    private String lastMsgId;
 }

@@ -116,7 +116,7 @@ public class RoomChatHandler extends BaseHandler{
         } catch (Exception e) {
             log.error("map转json异常");
         }
-        chatService.saveRoomMsg(data, messageDTO, this.roomId);
+        chatService.saveRoomMsg(data.getUserId(), messageDTO, this.roomId);
     }
 
     /**
