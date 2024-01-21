@@ -1,7 +1,9 @@
 package www.raven.jc.websocket;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.dto.UserInfoDTO;
@@ -27,9 +29,10 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 @Component
 @Slf4j
+@Data
 @ServerEndpoint("/websocket/{token}/{roomId}")
 public class ChatHandler {
-    //TODO 做个连接池
+
     /**
      * 用来存在线连接数
      */
@@ -40,16 +43,25 @@ public class ChatHandler {
      * concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
      * 虽然@Component默认是单例模式的，但springboot还是会为每个websocket连接初始化一个bean，所以可以用一个静态set保存起来。
      */
-    private static CopyOnWriteArraySet<ChatHandler> webSockets = new CopyOnWriteArraySet<>();
+    public static CopyOnWriteArraySet<ChatHandler> webSockets = new CopyOnWriteArraySet<>();
     /**
      * room id
      * 对应是在哪个聊天室
      */
     private String roomId;
+
+    /**
+     * user id
+     * 对应是哪个用户
+     */
+    private Integer userId;
+
     /**
      * 与某个客户端的连接会话，需要通过它来给客户端发送数据
      **/
     private Session session;
+
+    private long lastActivityTime = System.currentTimeMillis();
 
     @Autowired
     public void setAccountService(UserDubbo accountDubbo) {
@@ -102,6 +114,7 @@ public class ChatHandler {
     @OnMessage
     public void onMessage(String message) {
         log.info("【websocket消息】收到客户端发来的消息:" + message);
+        lastActivityTime = System.currentTimeMillis();
         MessageDTO messageDTO = JsonUtil.jsonToObj(message, MessageDTO.class);
         TokenDTO tokenDTO = (TokenDTO) (session.getUserProperties().get("userDto"));
         UserInfoDTO data = userDubbo.getSingleInfo(tokenDTO.getUserId()).getData();
@@ -129,6 +142,8 @@ public class ChatHandler {
         log.error("Details: " + error.getMessage());
         log.error("Stack trace: {}", (Object) error.getStackTrace());
     }
+
+
 
 
 
