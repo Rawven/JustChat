@@ -40,4 +40,9 @@ MessageDAO {
         return mongoTemplate.find(new Query(Criteria.where("_id").in(ids)), Message.class, COLLECTION_MESSAGE);
     }
 
+    public List<Message> getByFriendChatId(String fixId) {
+        Criteria criteria = Criteria.where("receiverId").is(fixId);
+        new Query(criteria).limit(15).with(Sort.by(Sort.Direction.DESC, "timestamp"));
+        return mongoTemplate.find(new Query(criteria), Message.class, COLLECTION_MESSAGE);
+    }
 }

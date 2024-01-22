@@ -27,7 +27,7 @@
           </svg>
           <el-text tag="b">Search</el-text>
         </div>
-        <div class="flex items-center space-x-4" @click="turnFriends">
+        <div class="flex items-center space-x-4" @click="turnRooms">
           <svg
               class="w-6 h-6"
               fill="none"
@@ -47,7 +47,7 @@
             <rect height="5" rx="1" width="7" x="7" y="7"></rect>
             <rect height="5" rx="1" width="7" x="10" y="12"></rect>
           </svg>
-          <el-text tag="b">Friends</el-text>
+          <el-text tag="b">Rooms</el-text>
         </div>
         <div class="flex items-center space-x-4" @click="turnNotifications">
           <svg
@@ -91,7 +91,7 @@
         </div>
       </el-menu>
     </el-aside>
-    <el-aside class="theAside w-64 border-r border-gray-200 overflow-y-auto">
+    <el-aside class="theAside w-64 border-r border-gray-200 overflow-y-auto assside">
       <el-header class="p-4 border-b border-gray-200">
         <el-row>
           <img :src="'http://10.24.3.176:8083/ipfs/'+userInfo.profile" alt="User Avatar" class="avatar">
@@ -110,34 +110,34 @@
         </div>
       </el-main>
       <el-header class="p-4 border-b border-gray-200">
-        <h2 class="text-lg font-semibold">我的群聊</h2>
+        <h2 class="text-lg font-semibold">我的好友</h2>
       </el-header>
       <el-menu class="p-4 space-y-2">
         <div
-            v-for="(room) in rooms"
-            :key="room.isNew"
+            v-for="(friend) in friends"
+            :key="friend.isNew"
             class="flex items-center space-x-4 border rounded-lg p-2 cursor-pointer bg-white list-room"
-            @click="checkOut(room.roomId)"
+            @click="checkOut(friend.friendId)"
         >
     <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
-      <img :src="'http://10.24.3.176:8083/ipfs/'+room.roomProfile" alt="User Avatar" class="avatar">
+      <img :src="'http://10.24.3.176:8083/ipfs/'+friend.friendProfile" alt="User Avatar" class="avatar">
     </span>
           <el-col>
-            <el-col v-if="checkNull(room.lastMsgSender)">{{
-                formatDateOrTime(JSON.parse(room.lastMsg).timestamp)
+            <el-col v-if="checkNull(friend.lastMsgSender)">{{
+                formatDateOrTime(JSON.parse(friend.lastMsg).timestamp)
               }}
             </el-col>
             <el-col>
-              <el-tag>{{ room.roomName }}</el-tag>
+              <el-tag>{{ friend.friendName }}</el-tag>
               <el-row>
-                <el-icon v-if="room.isNew" color="#FF0000">
+                <el-icon v-if="friend.isNew" color="#FF0000">
                   <ChatLineRound/>
                 </el-icon>
                 <el-icon v-else color="#409EFC">
                   <ChatRound/>
                 </el-icon>
-                <el-col v-if="checkNull(room.lastMsgSender)" class="font-medium text-lg font-serif">
-                  {{ room.lastMsgSender + "：" + JSON.parse(room.lastMsg).content }}
+                <el-col v-if="checkNull(friend.lastMsgSender)" class="font-medium text-lg font-serif">
+                  {{ friend.lastMsgSender + "：" + JSON.parse(friend.lastMsg).content }}
                 </el-col>
                 <el-col v-else class="font-medium text-lg font-serif">暂无消息</el-col>
               </el-row>
@@ -146,15 +146,15 @@
         </div>
       </el-menu>
     </el-aside>
-    <chat-room v-if="nowRoomId >=1" :key="nowRoomId" :room="JSON.stringify(this.rooms[this.roomIndex.get(nowRoomId)])"
-               :user="this.userInfo.username"></chat-room>
+    <chat-Friend v-if="nowFriendId >=1" :key="nowFriendId" :friend="JSON.stringify(this.friends[this.friendIndex.get(nowFriendId)])"
+               :user="this.userInfo.username"></chat-Friend>
   </el-container>
 </template>
 
 <script>
 import {Host} from "@/main";
 import {reactive, ref} from "vue";
-import ChatRoom from "@/components/common/chatRoom.vue";
+import ChatFriend from "@/components/common/chatFriend.vue";
 import {ChatLineRound, ChatRound} from "@element-plus/icons-vue";
 import {ElMessage} from "element-plus";
 
@@ -167,9 +167,8 @@ export default {
       }
     },
   },
-
   name: 'MainPage',
-  components: {ChatLineRound, ChatRound, ChatRoom},
+  components: {ChatFriend, ChatLineRound, ChatRound},
   inject: {
     realAxios: {
       from: 'axiosFilter'
@@ -181,26 +180,26 @@ export default {
       searchInput: '',
       websocket: null,
       messageCount: 0,
-      room: {
-        roomId: '',
-        roomName: '',
-        roomDescription: '',
-        founderName: '',
-        maxPeople: 1,
+      friend: {
+       friendId: 0,
+        friendName:"",
+        friendProfile:"",
+        lastMsg:"",
+        lastMsgSender:""
       },
       userInfo: {
         username: '',
         profile: '',
         signature: '',
       },
-      rooms: reactive([]),
-      roomIndex: new Map(),
+      friends: reactive([]),
+      friendIndex: new Map(),
       pageSize: 5,
-      nowRoomId: 0,
+      nowFriendId: 0,
     };
   },
   created() {
-    this.getRooms();
+    this.getFriends();
     //this.updateMessageCount();
     let item = localStorage.getItem("userData");
     if (item) {
@@ -226,12 +225,12 @@ export default {
     turnSearch() {
       this.$router.push('/common/roomPage');
     },
-    turnFriends() {
-      this.$router.push('/common/friend');
+    turnRooms() {
+      this.$router.push('/common/mainPage');
     },
-    checkOut(roomId) {
-      this.nowRoomId = roomId;
-      this.rooms[this.roomIndex.get(roomId)].isNew = false;
+    checkOut(friendId) {
+      this.nowFriendId = friendId;
+      this.friends[this.friendIndex.get(friendId)].isNew = false;
     },
     initWebSocket() {
       let token = localStorage.getItem("token");
@@ -273,19 +272,19 @@ export default {
     checkNull(name) {
       return name !== "";
     },
-    getRooms() {
-      this.realAxios.get(`http://` + Host + `:7000/chat/common/initUserMainPage`, {
+    getFriends() {
+      this.realAxios.get(`http://` + Host + `:7000/chat/common/initUserFriendPage`, {
         headers: {
           'token': localStorage.getItem("token")
         }
       }).then(response => {
         // 将获取的房间数组赋值给 rooms
-        this.rooms = response.data.data;
-        console.log(this.rooms)
+        this.friends = response.data.data;
+        console.log(this.friends)
         // 将获取的房间总数赋值给 totalRooms
-        this.nowRoomId = this.rooms[0].roomId;
-        this.rooms.forEach((room, index) => {
-          this.roomIndex.set(Number(room.roomId), index);
+        this.nowFriendId = this.friends[0].friendId;
+        this.friends.forEach((friend, index) => {
+          this.friendIndex.set(Number(friend.friendId), index);
         });
       })
     },
@@ -306,9 +305,12 @@ body {
   margin-bottom: 10px;
   background-color: #f0f0f0; /* 添加背景色 */
 }
+.assside{
+  width:1000px
+}
 
 .containerM {
-  width: 75%;
+  width: 150%;
   height: 100%;
   margin: 0;
 }

@@ -2,7 +2,6 @@ import {createRouter, createWebHistory} from 'vue-router'
 import loginView from "@/views/common/LoginView.vue";
 import registerView from "@/views/common/RegisterView.vue";
 import AvatarView from "@/views/common/AvatarView.vue";
-import ChatRoomView from "@/views/common/ChatRoomView.vue";
 import MainPageView from "@/views/common/MainPageView.vue";
 import UpdateInfoView from "@/views/common/UpdateInfoView.vue";
 
@@ -35,12 +34,6 @@ const router = createRouter({
                     component: AvatarView
                 },
                 {
-                    path: 'chatRoom/:roomId',
-                    name: "RoomView",
-                    component: ChatRoomView,
-                    props: true
-                },
-                {
                     path: 'mainPage',
                     name: "MainPageView",
                     component: MainPageView
@@ -59,8 +52,12 @@ const router = createRouter({
                     path: 'notice',
                     name: 'NoticeView',
                     component: () => import('@/views/common/Notice.vue')
+                },
+                {
+                    path: 'friend',
+                    name: 'FriendView',
+                    component: () => import('@/views/common/FriendPageView.vue'),
                 }
-
             ]
         },
         {
