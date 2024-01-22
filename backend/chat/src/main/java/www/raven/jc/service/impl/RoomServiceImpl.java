@@ -157,12 +157,14 @@ public class RoomServiceImpl implements RoomService {
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
-    public void agreeApply(Integer roomId, Integer userId) {
+    public void agreeApply(Integer roomId, Integer userId, int noticeId) {
         int ownerId = Integer.parseInt(request.getHeader("userId"));
         Assert.isTrue(roomDAO.getBaseMapper().selectById(roomId).getFounderId().equals(ownerId), "您不是房主");
         Assert.isTrue(userRoomDAO.getBaseMapper().selectOne(new QueryWrapper<UserRoom>().eq("user_id", userId).eq("room_id", roomId)) == null,
                 "该用户已经在这个聊天室了");
         Assert.isTrue(userRoomDAO.getBaseMapper().insert(new UserRoom().setRoomId(roomId).setUserId(userId)) > 0);
+        RpcResult<Void> voidRpcResult = userDubbo.deleteNotice(noticeId);
+        Assert.isTrue(voidRpcResult.isSuccess(), "user模块调用失败");
     }
 
     @Override
@@ -172,6 +174,7 @@ public class RoomServiceImpl implements RoomService {
         List<DisplayRoomVO> rooms = buildRoomVO(chatRoomPage, userDubbo.getAllInfo().getData());
         return new RealRoomVO().setRooms(rooms).setTotal(Math.toIntExact(total));
     }
+
 
     private List<DisplayRoomVO> buildRoomVO(Page<Room> chatRoomPage, List<UserInfoDTO> data) {
         Assert.isTrue(chatRoomPage.getTotal() > 0);

@@ -2,13 +2,13 @@
 //tailwind.config.js
 // eslint-disable-next-line no-undef
 module.exports = {
-  content: [
-    "./src/components/**/*.vue",
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
+    content: [
+        "./src/components/**/*.vue",
+    ],
+    theme: {
+        extend: {},
+    },
+    plugins: [],
 }
 
 

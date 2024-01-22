@@ -61,10 +61,11 @@ public interface RoomService {
     /**
      * agree apply
      *
-     * @param roomId room id
-     * @param userId user id
+     * @param roomId   room id
+     * @param userId   user id
+     * @param noticeId
      */
-    void agreeApply(Integer roomId, Integer userId);
+    void agreeApply(Integer roomId, Integer userId, int noticeId);
 
 
     /**
@@ -76,5 +77,6 @@ public interface RoomService {
      * @return {@link RealRoomVO}
      */
     RealRoomVO queryListPage(int page, int size);
+
 
 }

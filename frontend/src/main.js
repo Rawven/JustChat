@@ -8,11 +8,10 @@ import App from './App.vue'
 import router from './router'
 import VueParticles from 'vue-particles'
 import {axiosFilter} from "@/axios";
-import  "@/tailcss.css";
+import "@/tailcss.css";
 // eslint-disable-next-line no-unused-vars
-import Proton from "proton-engine";
 // eslint-disable-next-line no-unused-vars
-import RAFManager from "raf-manager";
+
 const app = createApp(App)
 app.use(VueParticles)
 export const Host = "10.24.3.176"

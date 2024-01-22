@@ -7,16 +7,16 @@
       <el-menu class="p-4 space-y-2">
         <div class="flex items-center space-x-4" @click="turnSearch">
           <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
+              class="w-6 h-6"
               fill="none"
+              height="24"
               stroke="currentColor"
-              stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="w-6 h-6"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="24"
+              xmlns="http://www.w3.org/2000/svg"
           >
             <path d="M6 18h8"></path>
             <path d="M3 22h18"></path>
@@ -29,38 +29,38 @@
         </div>
         <div class="flex items-center space-x-4" @click="turnFriends">
           <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
+              class="w-6 h-6"
               fill="none"
+              height="24"
               stroke="currentColor"
-              stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="w-6 h-6"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="24"
+              xmlns="http://www.w3.org/2000/svg"
           >
             <path d="M3 7V5c0-1.1.9-2 2-2h2"></path>
             <path d="M17 3h2c1.1 0 2 .9 2 2v2"></path>
             <path d="M21 17v2c0 1.1-.9 2-2 2h-2"></path>
             <path d="M7 21H5c-1.1 0-2-.9-2-2v-2"></path>
-            <rect width="7" height="5" x="7" y="7" rx="1"></rect>
-            <rect width="7" height="5" x="10" y="12" rx="1"></rect>
+            <rect height="5" rx="1" width="7" x="7" y="7"></rect>
+            <rect height="5" rx="1" width="7" x="10" y="12"></rect>
           </svg>
           <el-text tag="b">Friends</el-text>
         </div>
         <div class="flex items-center space-x-4" @click="turnNotifications">
           <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
+              class="w-6 h-6"
               fill="none"
+              height="24"
               stroke="currentColor"
-              stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="w-6 h-6"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="24"
+              xmlns="http://www.w3.org/2000/svg"
           >
             <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path>
             <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
@@ -69,22 +69,23 @@
         </div>
         <div class="flex items-center space-x-4" @click="logOut">
           <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
+              class="w-6 h-6"
               fill="none"
+              height="24"
               stroke="currentColor"
-              stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="w-6 h-6"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="24"
+              xmlns="http://www.w3.org/2000/svg"
           >
             <path d="M13 4h3a2 2 0 0 1 2 2v14"></path>
             <path d="M2 20h3"></path>
             <path d="M13 20h9"></path>
             <path d="M10 12v.01"></path>
-            <path d="M13 4.562v16.157a1 1 0 0 1-1.242.97L5 20V5.562a2 2 0 0 1 1.515-1.94l4-1A2 2 0 0 1 13 4.561Z"></path>
+            <path
+                d="M13 4.562v16.157a1 1 0 0 1-1.242.97L5 20V5.562a2 2 0 0 1 1.515-1.94l4-1A2 2 0 0 1 13 4.561Z"></path>
           </svg>
           <span>Logout</span>
         </div>
@@ -113,16 +114,19 @@
       </el-header>
       <el-menu class="p-4 space-y-2">
         <div
-            class="flex items-center space-x-4 border rounded-lg p-2 cursor-pointer bg-white list-room"
             v-for="(room) in rooms"
             :key="room.isNew"
+            class="flex items-center space-x-4 border rounded-lg p-2 cursor-pointer bg-white list-room"
             @click="checkOut(room.roomId)"
         >
     <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
       <img :src="'http://10.24.3.176:8083/ipfs/'+room.roomProfile" alt="User Avatar" class="avatar">
     </span>
           <el-col>
-            <el-col v-if="checkNull(room.lastMsgSender)" >{{ formatDateOrTime(JSON.parse(room.lastMsg).timestamp) }}</el-col>
+            <el-col v-if="checkNull(room.lastMsgSender)">{{
+                formatDateOrTime(JSON.parse(room.lastMsg).timestamp)
+              }}
+            </el-col>
             <el-col>
               <el-tag>{{ room.roomName }}</el-tag>
               <el-row>
@@ -132,8 +136,10 @@
                 <el-icon v-else color="#409EFC">
                   <ChatRound/>
                 </el-icon>
-                <el-col v-if="checkNull(room.lastMsgSender)" class="font-medium text-lg font-serif">{{ room.lastMsgSender + "：" + JSON.parse(room.lastMsg).content }}</el-col>
-                 <el-col v-else class="font-medium text-lg font-serif">暂无消息</el-col>
+                <el-col v-if="checkNull(room.lastMsgSender)" class="font-medium text-lg font-serif">
+                  {{ room.lastMsgSender + "：" + JSON.parse(room.lastMsg).content }}
+                </el-col>
+                <el-col v-else class="font-medium text-lg font-serif">暂无消息</el-col>
               </el-row>
             </el-col>
           </el-col>
@@ -187,7 +193,7 @@ export default {
         profile: '',
         signature: '',
       },
-      rooms: reactive( []),
+      rooms: reactive([]),
       roomIndex: new Map(),
       pageSize: 5,
       nowRoomId: 0,
@@ -211,8 +217,7 @@ export default {
     },
     logOut() {
       let token = localStorage.getItem("token");
-      this.realAxios.get(`http://` + Host + `:7000/auth/logout/${token}`,  {
-      })
+      this.realAxios.get(`http://` + Host + `:7000/auth/logout/${token}`, {})
       localStorage.removeItem("token");
       localStorage.removeItem("userData");
       this.$router.push('/common/login');
@@ -239,7 +244,7 @@ export default {
         let data = JSON.parse(event.data)
         console.log(this.roomIndex.get(data.roomId))
         let index = this.roomIndex.get(Number(data.roomId));
-        this.rooms[index] ={
+        this.rooms[index] = {
           ...this.rooms[index],
 
           lastMsg: data.msg,
@@ -262,10 +267,10 @@ export default {
         return messageDate.toLocaleDateString();
       }
     },
-    turnNotifications(){
+    turnNotifications() {
       this.$router.push('/common/notice');
     },
-    checkNull(name){
+    checkNull(name) {
       return name !== "";
     },
     getRooms() {
@@ -314,7 +319,7 @@ body {
   border-radius: 50%;
 }
 
-.theAside{
+.theAside {
   width: 25%;
   height: 210%;
   margin: 0;

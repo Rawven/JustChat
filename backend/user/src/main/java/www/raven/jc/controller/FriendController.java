@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.FriendService;
+import www.raven.jc.service.NoticeService;
 
 /**
  * friend controller
@@ -19,12 +20,20 @@ import www.raven.jc.service.FriendService;
 public class FriendController {
     @Autowired
     private FriendService friendService;
-
-    @GetMapping("/agreeToBeFriend/{friendId}")
-    public CommonResult<Void> agreeApplyFriend(@PathVariable("friendId") int friendId) {
+    @Autowired
+    private NoticeService noticeService;
+     //TODO 可用mq推送结果    看时间充不充裕
+    @GetMapping("/agreeToBeFriend/{friendId}/{noticeId}")
+    public CommonResult<Void> agreeApplyFriend(@PathVariable("friendId") int friendId, @PathVariable("noticeId") int noticeId) {
         friendService.agreeApplyFromFriend(friendId);
+        noticeService.deleteNotification(noticeId);
         return CommonResult.operateSuccess("成为好友成功");
     }
 
+    @GetMapping("/refuseToBeFriend/{friendId}/{noticeId}")
+    public CommonResult<Void> refuseApplyFriend(@PathVariable("friendId") int friendId, @PathVariable("noticeId") int noticeId) {
+        noticeService.deleteNotification(noticeId);
+        return CommonResult.operateSuccess("拒绝好友成功");
+    }
 
 }

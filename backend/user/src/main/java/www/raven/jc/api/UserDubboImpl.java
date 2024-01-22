@@ -6,6 +6,7 @@ import www.raven.jc.dao.FriendDAO;
 import www.raven.jc.dto.*;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.FriendService;
+import www.raven.jc.service.NoticeService;
 import www.raven.jc.service.UserService;
 
 import java.util.List;
@@ -22,6 +23,8 @@ public class UserDubboImpl implements UserDubbo {
     private UserService userService;
     @Autowired
     private FriendService friendService;
+    @Autowired
+    private NoticeService noticeService;
 
     @Override
     public RpcResult<UserInfoDTO> getSingleInfo(Integer userId) {
@@ -72,5 +75,11 @@ public class UserDubboImpl implements UserDubbo {
     @Override
     public RpcResult<List<UserInfoDTO>> getFriendInfos(int userId) {
         return RpcResult.operateSuccess("查找成功", friendService.getFriendInfos(userId));
+    }
+
+    @Override
+    public RpcResult<Void> deleteNotice(int noticeId) {
+        noticeService.deleteNotification(noticeId);
+        return RpcResult.operateSuccess("删除成功");
     }
 }

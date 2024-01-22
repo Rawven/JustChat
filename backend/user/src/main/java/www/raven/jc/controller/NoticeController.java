@@ -29,11 +29,6 @@ public class NoticeController {
         return CommonResult.operateSuccess("查找成功", noticeService.loadNotice());
     }
 
-    @GetMapping("/doneNotice/{id}")
-    public CommonResult<Void> doneNotice(@PathVariable("id") Integer id) {
-        noticeService.doneNotification(id);
-        return CommonResult.operateSuccess("处理通知成功");
-    }
 
     @GetMapping("/addFriendApply")
     public CommonResult<Void> addFriendApply(@RequestBody FriendApplyModel friendApplyModel) {

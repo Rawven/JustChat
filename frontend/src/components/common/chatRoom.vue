@@ -4,37 +4,37 @@
       <div class="flex items-center space-x-4">
         <a class="text-gray-500 hover:text-gray-900" href="#">
           <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="50"
-              height="24"
-              viewBox="0 0 24 24"
+              class="w-6 h-6"
               fill="none"
+              height="24"
               stroke="currentColor"
-              stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="w-6 h-6"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="50"
+              xmlns="http://www.w3.org/2000/svg"
           >
             <path d="m12 19-7-7 7-7"></path>
             <path d="M19 12H5"></path>
           </svg>
         </a>
         <div>
-          <h2 class="text-lg font-semibold">{{this.theRoom.roomName}}</h2>
+          <h2 class="text-lg font-semibold">{{ this.theRoom.roomName }}</h2>
         </div>
       </div>
       <a class="text-gray-500 hover:text-gray-900" href="#">
         <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="50"
-            height="24"
-            viewBox="0 0 24 24"
+            class="w-6 h-6"
             fill="none"
+            height="24"
             stroke="currentColor"
-            stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="w-6 h-6"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="50"
+            xmlns="http://www.w3.org/2000/svg"
         >
           <path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"></path>
           <path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path>
@@ -59,7 +59,7 @@
           <div class="flex flex-col items-end space-y-2">
             <div class="rounded-lg border shadow-sm bg-green-50 text-green-700" data-v0-t="card">
               <div class="p-6">
-                <p class="font-medium text-lg font-serif">{{message.text}}</p>
+                <p class="font-medium text-lg font-serif">{{ message.text }}</p>
               </div>
             </div>
           </div>
@@ -67,7 +67,10 @@
         <div v-else>
           <div class="flex items-end space-x-2">
         <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full mt-2">
-          <span class="flex h-full w-full items-center justify-center rounded-full bg-muted font-medium text-lg font-serif" >{{ message.user }}</span>
+          <span
+              class="flex h-full w-full items-center justify-center rounded-full bg-muted font-medium text-lg font-serif">{{
+              message.user
+            }}</span>
         </span>
             <div class="rounded-lg border shadow-sm bg-blue-50 text-blue-700" data-v0-t="card">
               <div class="p-6">
@@ -76,23 +79,23 @@
             </div>
           </div>
         </div>
-        </div>
+      </div>
     </main>
     <footer class="p-4 bg-white border-t border-gray-200 useFoot">
       <div class="flex items-center space-x-4 this">
         <button
             class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10">
           <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="50"
-              height="24"
-              viewBox="0 0 24 24"
+              class="w-6 h-6"
               fill="none"
+              height="24"
               stroke="currentColor"
-              stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="w-6 h-6"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="50"
+              xmlns="http://www.w3.org/2000/svg"
           >
             <path d="M5 12h14"></path>
             <path d="M12 5v14"></path>
@@ -104,8 +107,8 @@
             placeholder="Type a message"
         />
         <button
-            @click="sendMessage"
-            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+            @click="sendMessage">
           Send
         </button>
       </div>
@@ -193,7 +196,7 @@ export default {
   },
 
   methods: {
-    isMe(message){
+    isMe(message) {
       return message.user === this.user;
     },
     Host() {
@@ -220,7 +223,8 @@ export default {
 body {
   overflow: hidden; /* 阻止整个页面滚动 */
 }
-.this{
+
+.this {
   overflow: hidden;
 }
 
@@ -239,20 +243,22 @@ body {
     opacity: 1;
   }
 }
-.useFoot,.main-content,.theH{
+
+.useFoot, .main-content, .theH {
   box-sizing: border-box;
 
   width: 77%;
   position: fixed;
 }
-.theH{
+
+.theH {
   top: 0;
 }
-.useFoot{
+
+.useFoot {
   animation: fadeIn 1s;
   bottom: 0;
 }
-
 
 
 </style>

@@ -19,11 +19,11 @@
                 <el-dropdown-menu>
                   <el-dropdown-item class="clearfix">
                     群聊消息
-                    <el-badge class="mark" :value="12"/>
+                    <el-badge :value="12" class="mark"/>
                   </el-dropdown-item>
                   <el-dropdown-item class="clearfix">
                     申请
-                    <el-badge class="mark" :value="3"/>
+                    <el-badge :value="3" class="mark"/>
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </template>

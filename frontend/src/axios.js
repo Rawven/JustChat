@@ -1,4 +1,3 @@
-
 // 创建一个axios实例
 import axios from "axios";
 import {ElMessage} from "element-plus";
@@ -38,4 +37,4 @@ axiosFilter.interceptors.response.use(function (response) {
 });
 // 提供axiosFilter
 provide('axiosFilter', axiosFilter);
-export { axiosFilter };
+export {axiosFilter};

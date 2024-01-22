@@ -10,9 +10,9 @@ const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
         {
-          path: '/test',
-          name : 'test',
-          component: () => import('@/components/common/roomPage.vue')
+            path: '/test',
+            name: 'test',
+            component: () => import('@/components/common/roomPage.vue')
         },
         {
 
