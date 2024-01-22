@@ -20,7 +20,7 @@
           </svg>
         </a>
         <div>
-          <h2 class="text-lg font-semibold">{{ this.theRoom.roomName }}</h2>
+          <h2 class="text-lg font-semibold">{{ this.theFriend.friendName }}</h2>
         </div>
       </div>
       <a class="text-gray-500 hover:text-gray-900" href="#">
@@ -72,7 +72,7 @@
                 cancel-button-text="No, Thanks"
                 :icon="InfoFilled"
                 icon-color="#626AEF"
-                title="是否向该群员发送好友申请?"
+                title="是否拍一拍?"
                 @confirm = "addApplyFriend(message.user)"
             >
               <template #reference>
@@ -81,7 +81,7 @@
             </el-popconfirm>
 
 
-        <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full mt-2">
+            <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full mt-2">
           <span
               class="flex h-full w-full items-center justify-center rounded-full bg-muted font-medium text-lg font-serif">{{
               message.user
@@ -136,7 +136,7 @@ import {Host} from "@/main";
 import {InfoFilled} from "@element-plus/icons-vue";
 
 export default {
-  name: 'ChatRoom',
+  name: 'ChatFriend',
   computed: {
     InfoFilled() {
       return InfoFilled
@@ -148,7 +148,7 @@ export default {
     }
   },
   props: {
-    room: {
+    friend: {
       type: String,
       required: true
     },
@@ -159,12 +159,11 @@ export default {
   },
   data() {
     return {
-      theRoom: {
-        roomId: '',
+      theFriend: {
+        friendId: '',
         lastMsg: '',
-        roomProfile: '',
-        roomName: '',
-        founderName: '',
+        friendProfile: '',
+        friendName: '',
         maxPeople: 1,
       },
       message: '',
@@ -174,12 +173,12 @@ export default {
   },
   created() {
     let token = localStorage.getItem("token");
-    this.theRoom = JSON.parse(this.room);
-    console.log('WebSocket created:', this.theRoom)
-    this.socket = new WebSocket(`ws://` + Host + `:8081/ws/room/${token}/${this.theRoom.roomId}`);
+    this.theFriend = JSON.parse(this.friend);
+    console.log('WebSocket created:', this.theFriend)
+    this.socket = new WebSocket(`ws://` + Host + `:8081/ws/friend/${token}/${this.theFriend.friendId}`);
 
     this.socket.onopen = () => {
-      this.realAxios.post(`http://` + Host + `:7000/chat/common/restoreHistory/${this.theRoom.roomId}`, {}, {
+      this.realAxios.post(`http://` + Host + `:7000/chat/common/restoreFriendHistory/${this.theFriend.friendId}`, {}, {
         headers: {
           'token': token
         }
@@ -230,32 +229,20 @@ export default {
         this.message = '';
       }
     },
-    addApplyFriend(username){
-       this.realAxios.get(`http://` + Host + `:7000/user/notice/addFriendApply/${username}`, {
-        headers: {
-          'token': localStorage.getItem("token")
-        },
-       }).then(() => {
-         this.$message({
-           message: '好友申请已发送',
-           type: 'success'
-         });
-       })
-    },
-    beforeUnmount() {
-      if (this.socket) {
-        this.socket.close();
-      }
-    },
 
   },
 };
 </script>
 
 <style scoped>
-body {
-  overflow: hidden; /* 阻止整个页面滚动 */
+.mainDiv{
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin: 20px; /* 添加这一行 */
 }
+
 
 .this {
   overflow: hidden;

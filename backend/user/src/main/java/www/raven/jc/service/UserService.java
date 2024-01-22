@@ -20,11 +20,13 @@ public interface UserService {
 
     /**
      * update by column
+     * update by column
      *
      * @param column column
      * @param value  value
+     * @param id     id
      */
-    void updateByColumn(String column, String value);
+    void updateByColumn(Integer id,String column, String value);
 
     /**
      * query single info

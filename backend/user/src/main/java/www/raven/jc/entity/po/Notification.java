@@ -20,7 +20,7 @@ public class Notification {
     private Integer id;
     private Integer userId;
     private String type;
-    private String message;
-    private String status;
+    private String data;
+    private Integer senderId;
     private Long timestamp;
 }

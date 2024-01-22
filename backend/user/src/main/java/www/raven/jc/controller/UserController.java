@@ -64,19 +64,22 @@ public class UserController {
 
     @PostMapping("/setProfile")
     public CommonResult<Void> setProfile(@RequestParam("file") MultipartFile profile) {
-        userService.updateByColumn("profile", ipfsClient.upload(profile));
+        String userId = request.getHeader("userId");
+        userService.updateByColumn(Integer.valueOf(userId),"profile", ipfsClient.upload(profile));
         return CommonResult.operateSuccess("设置头像成功");
     }
 
     @PostMapping("/setSignature")
     public CommonResult<Void> setSignature(@RequestParam("signature") String signature) {
-        userService.updateByColumn("signature", signature);
+        String userId = request.getHeader("userId");
+        userService.updateByColumn(Integer.valueOf(userId),"signature", signature);
         return CommonResult.operateSuccess("设置签名成功");
     }
 
     @PostMapping("/setUsername")
     public CommonResult<Void> setUsername(@RequestParam("username") String username) {
-        userService.updateByColumn("username", username);
+        String userId = request.getHeader("userId");
+        userService.updateByColumn(Integer.valueOf(userId),"username", username);
         return CommonResult.operateSuccess("重命名成功");
     }
 

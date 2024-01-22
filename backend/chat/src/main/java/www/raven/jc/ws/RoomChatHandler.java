@@ -18,7 +18,6 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
@@ -109,12 +108,9 @@ public class RoomChatHandler extends BaseHandler {
         MessageDTO messageDTO = JsonUtil.jsonToObj(message, MessageDTO.class);
         TokenDTO tokenDTO = (TokenDTO) (session.getUserProperties().get("userDto"));
         UserInfoDTO data = userDubbo.getSingleInfo(tokenDTO.getUserId()).getData();
-        Map<Object, Object> map = new HashMap<>(2);
-        map.put("userInfo", data);
-        map.put("message", messageDTO);
         try {
             //这里直接遍历更快
-            sendRoomMessage(JsonUtil.mapToJson(map));
+            sendRoomMessage(HandlerUtil.combineMessage(messageDTO, data));
         } catch (Exception e) {
             log.error("map转json异常");
         }

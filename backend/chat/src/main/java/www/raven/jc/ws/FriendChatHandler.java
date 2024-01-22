@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import www.raven.jc.api.UserDubbo;
 import www.raven.jc.dto.TokenDTO;
+import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
@@ -111,7 +112,8 @@ public class FriendChatHandler extends BaseHandler {
         lastActivityTime = System.currentTimeMillis();
         MessageDTO messageDTO = JsonUtil.jsonToObj(message, MessageDTO.class);
         TokenDTO tokenDTO = (TokenDTO) (session.getUserProperties().get("userDto"));
-        sendFriendMessage(message);
+        UserInfoDTO data = userDubbo.getSingleInfo(tokenDTO.getUserId()).getData();
+        sendFriendMessage(HandlerUtil.combineMessage(messageDTO, data));
         chatService.saveFriendMsg(messageDTO, tokenDTO.getUserId(), friendId);
     }
 
@@ -131,10 +133,18 @@ public class FriendChatHandler extends BaseHandler {
 
     public void sendFriendMessage(String message) {
         log.info("----WebSocket 广播消息:" + message);
-        Session friendSession = SESSION_POOL.get(friendId).get(userId);
-        if (friendSession.isOpen()) {
-            friendSession.getAsyncRemote().sendText(message);
+        Session mySession = SESSION_POOL.get(userId).get(friendId);
+        if (mySession != null && mySession.isOpen()) {
+            mySession.getAsyncRemote().sendText(message);
+        }
+        Map<Integer, Session> integerSessionMap = SESSION_POOL.get(friendId);
+        if(SESSION_POOL.containsKey(friendId)){
+              if(integerSessionMap.containsKey(userId)){
+                  Session session = integerSessionMap.get(userId);
+                  if(session.isOpen()){
+                      session.getAsyncRemote().sendText(message);
+                  }
+              }
         }
     }
-
 }

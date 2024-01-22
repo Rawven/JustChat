@@ -3,7 +3,7 @@
     <el-row class="row-bg" justify="center" type="flex">
       <el-col v-if="userInfo" :span="8">
         <el-card class="box-card">
-          <img :src="'http://10.44.59.225:8083/ipfs/'+userInfo.profile" alt="User Avatar" class="avatar">
+          <img :src="'http://10.24.3.176:8083/ipfs/'+userInfo.profile" alt="User Avatar" class="avatar">
           <h2 class="username">你好!😘 {{ userInfo.username }}</h2>
           <h2 class="signature">个性签名: {{
               userInfo.signature ? userInfo.signature : '这个用户很懒 什么也没留下'
@@ -19,11 +19,11 @@
                 <el-dropdown-menu>
                   <el-dropdown-item class="clearfix">
                     群聊消息
-                    <el-badge class="mark" :value="12"/>
+                    <el-badge :value="12" class="mark"/>
                   </el-dropdown-item>
                   <el-dropdown-item class="clearfix">
                     申请
-                    <el-badge class="mark" :value="3"/>
+                    <el-badge :value="3" class="mark"/>
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </template>

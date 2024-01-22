@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.dao.FriendDAO;
 import www.raven.jc.dao.UserDAO;
 import www.raven.jc.dto.UserInfoDTO;
@@ -43,11 +44,13 @@ public class FriendServiceImpl implements FriendService {
         ).collect(Collectors.toList());
     }
 
+    @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void agreeApplyFromFriend(int friendId) {
         int userId = Integer.parseInt(request.getHeader("userId"));
         Friend friend = new Friend().setUserId((long) userId).setFriendId((long) friendId);
-        int insert = friendDAO.getBaseMapper().insert(friend);
-        Assert.isTrue(insert == 1, "成为好友失败");
+        Friend friend1 = new Friend().setUserId((long) friendId).setFriendId((long) userId);
+        boolean b = friendDAO.saveBatch(List.of(friend, friend1));
+        Assert.isTrue(b,"添加好友失败");
     }
 }

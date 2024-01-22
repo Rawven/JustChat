@@ -25,6 +25,7 @@ import www.raven.jc.util.JwtUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -111,7 +112,7 @@ public class AuthServiceImpl implements AuthService {
         claims.put("role", role);
         claims.put("expireTime", System.currentTimeMillis() + 1000 * 60 * 30);
         String token = JwtUtil.createToken(claims, key);
-        redissonClient.getBucket(JwtConstant.TOKEN + ":" + userId).set(token);
+        redissonClient.getBucket(JwtConstant.TOKEN + ":" + userId).set(token,60, TimeUnit.MINUTES);
         return token;
     }
 

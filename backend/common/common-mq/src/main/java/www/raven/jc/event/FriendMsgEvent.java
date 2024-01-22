@@ -5,6 +5,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+/**
+ * friend msg event
+ *
+ * @author 刘家辉
+ * @date 2024/01/22
+ */
 @Data
 @Accessors
 @AllArgsConstructor

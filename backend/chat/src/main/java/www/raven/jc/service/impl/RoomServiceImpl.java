@@ -12,6 +12,7 @@ import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.api.UserDubbo;
+import www.raven.jc.constant.MqConstant;
 import www.raven.jc.dao.MessageDAO;
 import www.raven.jc.dao.RoomDAO;
 import www.raven.jc.dao.UserRoomDAO;
@@ -84,6 +85,7 @@ public class RoomServiceImpl implements RoomService {
         List<Room> rooms = roomDAO.getBaseMapper().selectList(new QueryWrapper<Room>().in("room_id", roomIds));
         //获取所有聊天室的最后一条消息id
         List<ObjectId> idsMsg = rooms.stream()
+                .filter(room -> room.getLastMsgId() != null)
                 .map(room -> new ObjectId(room.getLastMsgId()))
                 .collect(Collectors.toList());
         List<Integer> idsSender = new ArrayList<>();
@@ -152,17 +154,19 @@ public class RoomServiceImpl implements RoomService {
         Room room = roomDAO.getBaseMapper().selectById(roomId);
         Integer founderId = room.getFounderId();
         //通知user模块 插入一条申请记录
-        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new JoinRoomApplyEvent(userId, founderId, roomId)), "APPLY"));
+        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new JoinRoomApplyEvent(userId, founderId, roomId)), MqConstant.TAGS_ROOM_APPLY));
     }
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
-    public void agreeApply(Integer roomId, Integer userId) {
+    public void agreeApply(Integer roomId, Integer userId, int noticeId) {
         int ownerId = Integer.parseInt(request.getHeader("userId"));
         Assert.isTrue(roomDAO.getBaseMapper().selectById(roomId).getFounderId().equals(ownerId), "您不是房主");
         Assert.isTrue(userRoomDAO.getBaseMapper().selectOne(new QueryWrapper<UserRoom>().eq("user_id", userId).eq("room_id", roomId)) == null,
                 "该用户已经在这个聊天室了");
         Assert.isTrue(userRoomDAO.getBaseMapper().insert(new UserRoom().setRoomId(roomId).setUserId(userId)) > 0);
+        RpcResult<Void> voidRpcResult = userDubbo.deleteNotice(noticeId);
+        Assert.isTrue(voidRpcResult.isSuccess(), "user模块调用失败");
     }
 
     @Override
@@ -172,6 +176,7 @@ public class RoomServiceImpl implements RoomService {
         List<DisplayRoomVO> rooms = buildRoomVO(chatRoomPage, userDubbo.getAllInfo().getData());
         return new RealRoomVO().setRooms(rooms).setTotal(Math.toIntExact(total));
     }
+
 
     private List<DisplayRoomVO> buildRoomVO(Page<Room> chatRoomPage, List<UserInfoDTO> data) {
         Assert.isTrue(chatRoomPage.getTotal() > 0);

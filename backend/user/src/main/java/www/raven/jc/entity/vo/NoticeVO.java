@@ -2,6 +2,7 @@ package www.raven.jc.entity.vo;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+import www.raven.jc.dto.UserInfoDTO;
 
 /**
  * notice vo
@@ -15,6 +16,7 @@ import lombok.experimental.Accessors;
 public class NoticeVO {
     private Integer noticeId;
     private String type;
-    private String message;
+    private String data;
     private Long timestamp;
+    private UserInfoDTO sender;
 }

@@ -1,6 +1,7 @@
 package www.raven.jc.service;
 
 import www.raven.jc.entity.vo.NoticeVO;
+import www.raven.jc.event.JoinRoomApplyEvent;
 
 import java.util.List;
 
@@ -24,27 +25,21 @@ public interface NoticeService {
      * @param founderId founder id
      * @param payload   payload
      */
-    void addRoomApply(int founderId, Object payload);
+    void addRoomApply(int founderId, JoinRoomApplyEvent payload);
+
 
     /**
      * add friend apply
      *
-     * @param friendId friend id
-     * @param message  message
+     * @param friendName friend name
      */
-    void addFriendApply(Integer friendId, String message);
+    void addFriendApply(String friendName);
 
     /**
      * done notification
      *
      * @param id id
      */
-    void doneNotification(Integer id);
+    void deleteNotification(Integer id);
 
-    /**
-     * delete new room msg notice
-     *
-     * @param roomId room id
-     */
-    void deleteNewRoomMsgNotice(Integer roomId);
 }

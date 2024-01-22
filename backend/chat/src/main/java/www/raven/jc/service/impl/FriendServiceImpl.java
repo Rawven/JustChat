@@ -12,7 +12,9 @@ import www.raven.jc.dao.MessageDAO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.FriendChat;
 import www.raven.jc.entity.po.Message;
+import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.entity.vo.UserFriendVO;
+import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.FriendService;
 import www.raven.jc.util.MongoUtil;
 
@@ -78,6 +80,25 @@ public class FriendServiceImpl implements FriendService {
                     .setLastMsg(message == null ? "" : message.getContent())
                     .setLastMsgSender(message == null ? "" : message.getSenderId().equals(userId) ? "我" : friend.getUsername());
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<MessageVO> restoreFriendHistory(Integer friendId) {
+        int userId = Integer.parseInt(request.getHeader("userId"));
+        String fixId = MongoUtil.concatenateIds(userId, friendId);
+        List<Message> byFriendChatId = messageDAO.getByFriendChatId(fixId);
+        ArrayList<Integer> ids = new ArrayList<>() {{
+            add(userId);
+            add(friendId);
+        }};
+        RpcResult<List<UserInfoDTO>> batchInfo = userDubbo.getBatchInfo(ids);
+        Map<Integer, UserInfoDTO> userInfoMap = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
+        return byFriendChatId.stream().map(message -> new MessageVO()
+                .setTime(message.getTimestamp())
+                .setText(message.getContent())
+                .setUser(userInfoMap.get(message.getSenderId()).getUsername())
+                .setProfile(userInfoMap.get(message.getSenderId()).getProfile())
+        ).collect(Collectors.toList());
     }
 
 
