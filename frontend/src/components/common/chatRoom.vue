@@ -66,6 +66,20 @@
         </div>
         <div v-else>
           <div class="flex items-end space-x-2">
+            <el-popconfirm
+                width="220"
+                confirm-button-text="OK"
+                cancel-button-text="No, Thanks"
+                :icon="InfoFilled"
+                icon-color="#626AEF"
+                title="是否向该群员发送好友申请?"
+            >
+              <template #reference>
+                <img :src="'http://10.24.3.176:8083/ipfs/'+message.profile" alt="User Avatar" class="avatar">
+              </template>
+            </el-popconfirm>
+
+
         <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full mt-2">
           <span
               class="flex h-full w-full items-center justify-center rounded-full bg-muted font-medium text-lg font-serif">{{
@@ -118,9 +132,15 @@
 
 <script>
 import {Host} from "@/main";
+import {InfoFilled} from "@element-plus/icons-vue";
 
 export default {
   name: 'ChatRoom',
+  computed: {
+    InfoFilled() {
+      return InfoFilled
+    }
+  },
   inject: {
     realAxios: {
       from: 'axiosFilter'

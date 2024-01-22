@@ -235,7 +235,7 @@ export default {
     },
     initWebSocket() {
       let token = localStorage.getItem("token");
-      this.websocket = new WebSocket(`ws://` + Host + `:8080/websocket/${token}`);
+      this.websocket = new WebSocket(`ws://` + Host + `:8080/ws/${token}`);
       this.websocket.onopen = () => {
         console.log('WebSocket is open now.');
       };
