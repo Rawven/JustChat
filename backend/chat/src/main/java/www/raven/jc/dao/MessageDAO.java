@@ -26,8 +26,8 @@ MessageDAO {
     private MongoTemplate mongoTemplate;
 
     public Boolean save(Message message) {
-        mongoTemplate.save(message, COLLECTION_MESSAGE);
-        return true;
+        Message save = mongoTemplate.save(message, COLLECTION_MESSAGE);
+        return save.getMessageId() != null;
     }
 
     public List<Message> getByRoomId(Integer roomId) {

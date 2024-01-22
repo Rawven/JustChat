@@ -113,10 +113,7 @@ public class FriendChatHandler extends BaseHandler {
         MessageDTO messageDTO = JsonUtil.jsonToObj(message, MessageDTO.class);
         TokenDTO tokenDTO = (TokenDTO) (session.getUserProperties().get("userDto"));
         UserInfoDTO data = userDubbo.getSingleInfo(tokenDTO.getUserId()).getData();
-        Map<Object, Object> map = new HashMap<>(2);
-        map.put("userInfo", data);
-        map.put("message", messageDTO);
-        sendFriendMessage(JsonUtil.mapToJson(map));
+        sendFriendMessage(HandlerUtil.combineMessage(messageDTO, data));
         chatService.saveFriendMsg(messageDTO, tokenDTO.getUserId(), friendId);
     }
 

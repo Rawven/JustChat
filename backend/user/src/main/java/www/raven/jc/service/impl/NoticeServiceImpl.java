@@ -17,11 +17,9 @@ import www.raven.jc.entity.po.User;
 import www.raven.jc.entity.vo.NoticeVO;
 import www.raven.jc.event.JoinRoomApplyEvent;
 import www.raven.jc.service.NoticeService;
-import www.raven.jc.util.JsonUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;

@@ -2,7 +2,6 @@ package www.raven.jc.api;
 
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
-import www.raven.jc.dao.FriendDAO;
 import www.raven.jc.dto.*;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.FriendService;

@@ -27,9 +27,8 @@ public interface NoticeService {
      */
     void addRoomApply(int founderId, JoinRoomApplyEvent payload);
 
+
     /**
-     * add friend apply
-     * add friend apply
      * add friend apply
      *
      * @param friendName friend name

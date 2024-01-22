@@ -19,7 +19,6 @@ import www.raven.jc.event.Event;
 import www.raven.jc.event.FriendMsgEvent;
 import www.raven.jc.event.JoinRoomApplyEvent;
 import www.raven.jc.event.RoomMsgEvent;
-import www.raven.jc.service.NoticeService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.ws.NotificationHandler;
 

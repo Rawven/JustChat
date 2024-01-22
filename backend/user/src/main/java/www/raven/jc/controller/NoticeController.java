@@ -3,7 +3,6 @@ package www.raven.jc.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import www.raven.jc.entity.model.FriendApplyModel;
 import www.raven.jc.entity.vo.NoticeVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.NoticeService;

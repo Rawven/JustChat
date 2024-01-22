@@ -60,10 +60,11 @@ public interface RoomService {
 
     /**
      * agree apply
+     * agree apply
      *
      * @param roomId   room id
      * @param userId   user id
-     * @param noticeId
+     * @param noticeId notice id
      */
     void agreeApply(Integer roomId, Integer userId, int noticeId);
 

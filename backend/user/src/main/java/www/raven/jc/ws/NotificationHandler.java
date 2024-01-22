@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import www.raven.jc.dto.TokenDTO;
+import www.raven.jc.exception.WsAttackException;
 import www.raven.jc.util.JwtUtil;
 
 import javax.websocket.*;
@@ -78,12 +79,8 @@ public class NotificationHandler extends BaseHandler {
      */
     @OnMessage
     public void onMessage(String message) {
-        log.info("ws:收到客户端发来的消息:" + message);
-        try {
-
-        } catch (Exception e) {
-            log.error("map转json异常");
-        }
+        log.info("ws:收到不应该收到的消息:" + message);
+        throw new WsAttackException("收到异常消息");
     }
 
     /**
