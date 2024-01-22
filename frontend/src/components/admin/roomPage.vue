@@ -98,12 +98,6 @@ export default {
       this.currentPage = page;
       this.getRooms(page);
     },
-    handleEdit(index, row) {
-      // 这里是你的编辑逻辑
-    },
-    handleDelete(index, row) {
-      // 这里是你的删除逻辑
-    }
   }
 }
 </script>
