@@ -84,6 +84,7 @@ public class RoomServiceImpl implements RoomService {
         List<Room> rooms = roomDAO.getBaseMapper().selectList(new QueryWrapper<Room>().in("room_id", roomIds));
         //获取所有聊天室的最后一条消息id
         List<ObjectId> idsMsg = rooms.stream()
+                .filter(room -> room.getLastMsgId() != null)
                 .map(room -> new ObjectId(room.getLastMsgId()))
                 .collect(Collectors.toList());
         List<Integer> idsSender = new ArrayList<>();

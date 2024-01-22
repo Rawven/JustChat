@@ -17,7 +17,7 @@
           <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
           <polyline points="9 22 9 12 15 12 15 22"></polyline>
         </svg>
-        <span>My Website</span>
+        <el-link  href="/common/mainPage">My Website</el-link>
       </a>
       <el-menu active-text-color="hover:underline" background-color="transparent" class="flex gap-4" mode="horizontal"
                text-color="text-gray-900">
