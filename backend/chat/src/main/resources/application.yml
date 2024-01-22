@@ -3,6 +3,9 @@ dubbo:
     name: dubbo
   registry:
     address: nacos://10.21.32.154:8848
+    group: dubbo
+    parameters:
+      namespace: d7a1b125-8d08-47f5-bb6c-2020abe9f6f8
 spring:
   data:
     mongodb:

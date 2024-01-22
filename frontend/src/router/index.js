@@ -120,3 +120,12 @@ const router = createRouter({
 })
 
 export default router
+
+router.beforeEach((to, from, next) => {
+    const token = localStorage.getItem('token');
+    if (!token && to.path !== '/common/login') {
+        next('/common/login');
+    } else {
+        next();
+    }
+});

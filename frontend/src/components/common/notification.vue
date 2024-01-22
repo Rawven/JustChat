@@ -29,12 +29,12 @@
         <el-col :span="24">
           <el-card shadow="hover" class="h-full">
             <el-row class="text-2xl font-semibold text-gray-900 dark:text-gray-100">Friend Requests</el-row>
-            <el-table :data="tableData" style="width: 100%">
+            <el-table :data="tableDatas" style="width: 100%">
               <el-table-column label="Date" width="180">
                 <template #default="scope">
                   <div style="display: flex; align-items: center">
                     <el-icon><timer /></el-icon>
-                    <span style="margin-left: 10px">{{ scope.row.date }}</span>
+                    <span style="margin-left: 10px">{{ scope.row.timestamp }}</span>
                   </div>
                 </template>
               </el-table-column>
@@ -42,11 +42,11 @@
                 <template #default="scope">
                   <el-popover effect="light" trigger="hover" placement="top" width="auto">
                     <template #default>
-                      <div>name: {{ scope.row.name }}</div>
-                      <div>address: {{ scope.row.address }}</div>
+                      <div>message: {{ scope.row.message }}</div>
+                      <div>type: {{ scope.row.type }}</div>
                     </template>
                     <template #reference>
-                      <el-tag>{{ scope.row.name }}</el-tag>
+                      <el-tag>{{ scope.row.message }}</el-tag>
                     </template>
                   </el-popover>
                 </template>
@@ -70,12 +70,12 @@
         <el-col :span="24">
           <el-card shadow="hover" class="h-full">
             <el-row class="text-2xl font-semibold text-gray-900 dark:text-gray-100">Friend Requests</el-row>
-            <el-table :data="tableData" style="width: 100%">
+            <el-table :data="tableDatas" style="width: 100%">
               <el-table-column label="Date" width="180">
                 <template #default="scope">
                   <div style="display: flex; align-items: center">
                     <el-icon><timer /></el-icon>
-                    <span style="margin-left: 10px">{{ scope.row.date }}</span>
+                    <span style="margin-left: 10px">{{ scope.row.timestamp }}</span>
                   </div>
                 </template>
               </el-table-column>
@@ -83,11 +83,11 @@
                 <template #default="scope">
                   <el-popover effect="light" trigger="hover" placement="top" width="auto">
                     <template #default>
-                      <div>name: {{ scope.row.name }}</div>
-                      <div>address: {{ scope.row.address }}</div>
+                      <div>message: {{ scope.row.message }}</div>
+                      <div>type: {{ scope.row.type }}</div>
                     </template>
                     <template #reference>
-                      <el-tag>{{ scope.row.name }}</el-tag>
+                      <el-tag>{{ scope.row.message }}</el-tag>
                     </template>
                   </el-popover>
                 </template>
@@ -168,30 +168,36 @@
   </el-container>
 </template>
 <script>
+import {Timer} from "@element-plus/icons-vue";
+import {Host} from "@/main";
+
 export default {
   name: 'MainPage',
+  components: {Timer},
+  inject: {
+    realAxios: {
+      from: 'axiosFilter'
+    }
+  },
   data() {
     return {
       search: '',
-      tableData: [
-        {
-          date: '2016-05-02',
-          name: 'Tom',
-        },
-        {
-          date: '2016-05-04',
-          name: 'Tom',
-        },
-        {
-          date: '2016-05-01',
-          name: 'Tom',
-        },
-        {
-          date: '2016-05-03',
-          name: 'Tom',
-        },
-      ],
+      tableData: {
+      "noticeId": 0,
+        "type": "string",
+        "message": "string",
+        "timestamp": 0
+    },
     };
+  },
+  created() {
+    this.realAxios.get(`http://`+Host+`:7000/user/notice/getNotice`,{
+      headers: {
+        'token': localStorage.getItem("token")
+      }
+    }).then(response => {
+      this.tableDatas = response.data.data;
+        })
   },
 };
 </script>

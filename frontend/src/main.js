@@ -15,7 +15,7 @@ import Proton from "proton-engine";
 import RAFManager from "raf-manager";
 const app = createApp(App)
 app.use(VueParticles)
-export const Host = "10.44.59.225"
+export const Host = "10.24.3.176"
 app.use(createPinia())
 app.use(router)
 app.use(ElementPlus)
