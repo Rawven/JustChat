@@ -7,13 +7,9 @@
 </template>
 <script>
 import {Host} from "@/main";
-import {ParticlesBg} from "particles-bg-vue";
 
 export default {
   name: 'App',
-  components: {
-    ParticlesBg
-  },
   inject: {
     realAxios: {
       from: 'axiosFilter'
