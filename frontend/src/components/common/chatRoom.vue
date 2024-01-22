@@ -73,6 +73,7 @@
                 :icon="InfoFilled"
                 icon-color="#626AEF"
                 title="是否向该群员发送好友申请?"
+                @confirm = "addApplyFriend(message.user)"
             >
               <template #reference>
                 <img :src="'http://10.24.3.176:8083/ipfs/'+message.profile" alt="User Avatar" class="avatar">
@@ -228,6 +229,18 @@ export default {
         this.socket.send(JSON.stringify(msg));
         this.message = '';
       }
+    },
+    addApplyFriend(username){
+       this.realAxios.get(`http://` + Host + `:7000/user/addFriendApply/${username}`, {
+        headers: {
+          'token': localStorage.getItem("token")
+        },
+       }).then(() => {
+         this.$message({
+           message: '好友申请已发送',
+           type: 'success'
+         });
+       })
     },
     beforeUnmount() {
       if (this.socket) {

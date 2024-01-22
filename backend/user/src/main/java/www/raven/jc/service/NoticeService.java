@@ -29,11 +29,12 @@ public interface NoticeService {
 
     /**
      * add friend apply
+     * add friend apply
+     * add friend apply
      *
-     * @param friendId friend id
-     * @param message  message
+     * @param friendName friend name
      */
-    void addFriendApply(Integer friendId, String message);
+    void addFriendApply(String friendName);
 
     /**
      * done notification

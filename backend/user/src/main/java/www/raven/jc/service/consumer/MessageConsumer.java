@@ -26,6 +26,8 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import static www.raven.jc.constant.MqConstant.*;
+
 /**
  * message consumer
  *
@@ -36,9 +38,6 @@ import java.util.function.Consumer;
 @Slf4j
 public class MessageConsumer {
 
-    private static final String TAGS_ROOM_APPLY = "ROOM_APPLY";
-    private static final String TAGS_ROOM_MSG_RECORD = "ROOM_MSG_RECORD";
-    private static final String TAGS_FRIEND_MSG_RECORD = "FRIEND_MSG_RECORD";
     @Autowired
     private NoticeService noticeService;
     @Autowired
@@ -64,9 +63,9 @@ public class MessageConsumer {
             //判断消息类型
             if (TAGS_ROOM_APPLY.equals(tags)) {
                 eventUserJoinRoomApply(msg);
-            } else if (TAGS_ROOM_MSG_RECORD.equals(tags)) {
+            } else if (MqConstant.TAGS_ROOM_MSG_RECORD.equals(tags)) {
                 eventRoomSendMsg(msg);
-            } else if (TAGS_FRIEND_MSG_RECORD.equals(tags)) {
+            } else if (MqConstant.TAGS_FRIEND_MSG_RECORD.equals(tags)) {
                 eventFriendSendMsg(msg);
             } else {
                 log.info("非法的消息，不处理");

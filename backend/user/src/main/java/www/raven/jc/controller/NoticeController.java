@@ -30,9 +30,9 @@ public class NoticeController {
     }
 
 
-    @GetMapping("/addFriendApply")
-    public CommonResult<Void> addFriendApply(@RequestBody FriendApplyModel friendApplyModel) {
-        noticeService.addFriendApply(friendApplyModel.getFriendId().intValue(), friendApplyModel.getMessage());
+    @GetMapping("/addFriendApply/{friendName}")
+    public CommonResult<Void> addFriendApply(@PathVariable("friendName") String friendName) {
+        noticeService.addFriendApply(friendName);
         return CommonResult.operateSuccess("添加好友申请成功");
     }
 }

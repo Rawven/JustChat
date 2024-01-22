@@ -91,8 +91,8 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
-    public void updateByColumn(String column, String value) {
-        Assert.isTrue(userDAO.getBaseMapper().update(new UpdateWrapper<User>().set(column, value)) > 0, "更新失败");
+    public void updateByColumn(Integer id,String column, String value) {
+        Assert.isTrue(userDAO.getBaseMapper().update(new UpdateWrapper<User>().eq("id",id).set(column, value)) > 0, "更新失败");
     }
 
     @Override

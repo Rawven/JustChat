@@ -69,13 +69,13 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
-    public void addFriendApply(Integer friendId, String message) {
+    public void addFriendApply(String friendName) {
         String applierId = request.getHeader("userId");
-        Map<Object, Object> map = new HashMap<>(2);
-        map.put("applierId", applierId);
-        map.put("message", message);
+        User user = userDAO.getBaseMapper().selectOne(new QueryWrapper<User>().eq("username", friendName));
+        Assert.notNull(user,"用户不存在");
+        Integer friendId = user.getId();
         Notification notice = new Notification().setUserId(friendId)
-                .setData(JsonUtil.objToJson(map))
+                .setData("暂无")
                 .setType(NoticeConstant.TYPE_ADD_FRIEND_APPLY)
                 .setTimestamp(System.currentTimeMillis())
                 .setSenderId(Integer.parseInt(applierId));

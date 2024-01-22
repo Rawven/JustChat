@@ -24,7 +24,7 @@ public interface UserService {
      * @param column column
      * @param value  value
      */
-    void updateByColumn(String column, String value);
+    void updateByColumn(Integer id,String column, String value);
 
     /**
      * query single info
