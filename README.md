@@ -7,10 +7,11 @@
 | Vue          | spring-gateway       | mysql  | rocketMq|
 | element-plus | spring-boot          | redis  | nacos |
 |              | dubbo                | ipfs   |       |
-|              |                      | mongodb|       |
+|              | websocket            | mongodb|       |
 
 前端启动 npm run dev
-后端 先启动user模块 不然会报找不到dubbo服务错误   
+后端 先启动user模块 不然会报找不到dubbo服务错误 
+--------
 目前功能： 
   1. 登录注册
   2. 群聊功能
