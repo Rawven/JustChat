@@ -1,6 +1,5 @@
 <template>
   <el-container class="container">
-    <particles-bg :bg="true" :canvas="{backgroundColor:'#888'}" type="random"/>
     <el-main class="tMain">
       <el-row>
         <el-col :span="12">
@@ -33,12 +32,8 @@
 <script>
 import {Host} from "@/main";
 import {ref} from "vue";
-import {ParticlesBg} from "particles-bg-vue";
 
 export default {
-  components: {
-    ParticlesBg
-  },
 
   name: 'accountName',
   // eslint-disable-next-line vue/no-unused-components
