@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.constant.NoticeConstant;
+import www.raven.jc.dao.FriendDAO;
 import www.raven.jc.dao.NoticeDAO;
 import www.raven.jc.dao.UserDAO;
 import www.raven.jc.dto.UserInfoDTO;
+import www.raven.jc.entity.po.Friend;
 import www.raven.jc.entity.po.Notification;
 import www.raven.jc.entity.po.User;
 import www.raven.jc.entity.vo.NoticeVO;
@@ -40,6 +42,8 @@ public class NoticeServiceImpl implements NoticeService {
     private NoticeDAO noticeDAO;
     @Autowired
     private UserDAO userDAO;
+    @Autowired
+    private FriendDAO friendDAO;
 
     @Override
     public List<NoticeVO> loadNotice() {
@@ -73,6 +77,7 @@ public class NoticeServiceImpl implements NoticeService {
         String applierId = request.getHeader("userId");
         User user = userDAO.getBaseMapper().selectOne(new QueryWrapper<User>().eq("username", friendName));
         Assert.notNull(user,"用户不存在");
+        Assert.isNull(friendDAO.getBaseMapper().selectOne(new QueryWrapper<Friend>().eq("user_id", applierId).eq("friend_id", user.getId())), "已经是好友了");
         Integer friendId = user.getId();
         Notification notice = new Notification().setUserId(friendId)
                 .setData("暂无")

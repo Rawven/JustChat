@@ -30,7 +30,7 @@
         <el-col :span="24">
           <el-card class="h-full" shadow="hover">
             <el-row class="text-2xl font-semibold text-gray-900 dark:text-gray-100">Friend Requests</el-row>
-            <el-table :data="tableDatas.filter (item => item.type === 'friend')" style="width: 100%">
+            <el-table :data="tableDatas.filter (item => item.type === 'add_friend_apply')" style="width: 100%">
               <el-table-column label="Date" width="180">
                 <template #default="scope">
                   <div style="display: flex; align-items: center">
@@ -71,7 +71,7 @@
         <el-col :span="24">
           <el-card class="h-full" shadow="hover">
             <el-row class="text-2xl font-semibold text-gray-900 dark:text-gray-100">Room Requests</el-row>
-            <el-table :data="tableDatas.filter (item => item.type === 'room')" style="width: 100%">
+            <el-table :data="tableDatas.filter (item => item.type === 'join_room_apply')" style="width: 100%">
               <el-table-column style="margin-right: 10px;" label="Date" width="180">
                 <template #default="scope">
                   <div style="display: flex; align-items: center">
@@ -308,7 +308,7 @@ export default {
 
     timestampToTime(timestamp) {
       // 将时间戳转换为毫秒
-      const date = new Date(timestamp * 1000);
+      const date = new Date(timestamp);
       // 获取年份
       const year = date.getFullYear();
       // 获取月份

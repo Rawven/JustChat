@@ -27,9 +27,11 @@ spring:
         bindings:
           producer-out-1:
             producer:
+              sync: false
               group: output-1
           producer-out-0:
             producer:
+              sync: false
               group: output-0
         binder:
           name-server: 10.21.32.221:9876

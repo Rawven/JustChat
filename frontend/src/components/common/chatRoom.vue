@@ -231,7 +231,7 @@ export default {
       }
     },
     addApplyFriend(username){
-       this.realAxios.get(`http://` + Host + `:7000/user/addFriendApply/${username}`, {
+       this.realAxios.get(`http://` + Host + `:7000/user/notice/addFriendApply/${username}`, {
         headers: {
           'token': localStorage.getItem("token")
         },

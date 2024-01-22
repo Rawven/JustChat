@@ -207,7 +207,6 @@ export default {
         headers: {
           'token': localStorage.getItem("token")
         }
-        // eslint-disable-next-line no-unused-vars
       }).then(response => {
         ElMessage.success('申请成功')
       })
