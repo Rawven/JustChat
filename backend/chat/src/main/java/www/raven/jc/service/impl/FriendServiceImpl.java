@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import www.raven.jc.api.UserDubbo;
 import www.raven.jc.dao.FriendChatDAO;
@@ -84,6 +85,7 @@ public class FriendServiceImpl implements FriendService {
     }
 
     @Override
+    @Cacheable(value = "friendHistory", key = "#friendId")
     public List<MessageVO> restoreFriendHistory(Integer friendId) {
         int userId = Integer.parseInt(request.getHeader("userId"));
         String fixId = MongoUtil.concatenateIds(userId, friendId);
@@ -94,6 +96,7 @@ public class FriendServiceImpl implements FriendService {
         }};
         RpcResult<List<UserInfoDTO>> batchInfo = userDubbo.getBatchInfo(ids);
         Map<Integer, UserInfoDTO> userInfoMap = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
+
         return byFriendChatId.stream().map(message -> new MessageVO()
                 .setTime(message.getTimestamp())
                 .setText(message.getContent())

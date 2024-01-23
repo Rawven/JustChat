@@ -17,9 +17,9 @@ import javax.websocket.Session;
 @Component
 public class WsSchedule {
     /**
-     * 设置过期时间5分钟
+     * 设置过期时间20分钟
      */
-    private static final long EXPIRATION_TIME = 5 * 60 * 1000;
+    private static final long EXPIRATION_TIME = 20 * 60 * 1000;
 
     /**
      * 每隔1分钟执行一次检查
