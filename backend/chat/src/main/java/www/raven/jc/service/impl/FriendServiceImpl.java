@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import www.raven.jc.api.UserDubbo;
 import www.raven.jc.dao.FriendChatDAO;
@@ -16,6 +17,7 @@ import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.entity.vo.UserFriendVO;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.FriendService;
+import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MongoUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -77,12 +79,13 @@ public class FriendServiceImpl implements FriendService {
                     .setFriendId(friend.getUserId())
                     .setFriendName(friend.getUsername())
                     .setFriendProfile(friend.getProfile())
-                    .setLastMsg(message == null ? "" : message.getContent())
+                    .setLastMsg(message == null ? "" : JsonUtil.objToJson(message))
                     .setLastMsgSender(message == null ? "" : message.getSenderId().equals(userId) ? "我" : friend.getUsername());
         }).collect(Collectors.toList());
     }
 
     @Override
+    @Cacheable(value = "friendHistory", key = "#friendId")
     public List<MessageVO> restoreFriendHistory(Integer friendId) {
         int userId = Integer.parseInt(request.getHeader("userId"));
         String fixId = MongoUtil.concatenateIds(userId, friendId);
@@ -93,6 +96,7 @@ public class FriendServiceImpl implements FriendService {
         }};
         RpcResult<List<UserInfoDTO>> batchInfo = userDubbo.getBatchInfo(ids);
         Map<Integer, UserInfoDTO> userInfoMap = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
+
         return byFriendChatId.stream().map(message -> new MessageVO()
                 .setTime(message.getTimestamp())
                 .setText(message.getContent())

@@ -61,7 +61,7 @@ public class MessageConsumer {
                 log.info("--RocketMq 重复或非法的消息，不处理");
                 return;
             }
-            String tags = Objects.requireNonNull(msg.getHeaders().get(MqConstant.HEADER_TAGS)).toString();
+            String tags = Objects.requireNonNull(id).toString();
             //判断消息类型
             if (TAGS_ROOM_APPLY.equals(tags)) {
                 eventUserJoinRoomApply(msg);
@@ -72,7 +72,7 @@ public class MessageConsumer {
             } else {
                 log.info("--RocketMq 非法的消息，不处理");
             }
-            redissonClient.getBucket(id.toString()).set(id, MqConstant.EXPIRE_TIME, TimeUnit.MINUTES);
+            redissonClient.getBucket("rocketMq_msg_"+ id).set(id, MqConstant.EXPIRE_TIME, TimeUnit.MINUTES);
         };
     }
 

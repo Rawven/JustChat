@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,6 +63,7 @@ public class ChatServiceImpl implements ChatService {
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
+    @CacheEvict(value = "roomHistory", key = "#roomId")
     public void saveRoomMsg(Integer userId, MessageDTO message, Integer roomId) {
         long timeStamp = message.getTime();
         String text = message.getText();
@@ -82,6 +85,7 @@ public class ChatServiceImpl implements ChatService {
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
+    @CacheEvict(value = "friendHistory", key = "#friendId")
     public void saveFriendMsg(MessageDTO message, Integer userId, Integer friendId) {
         String fixId = MongoUtil.concatenateIds(userId, friendId);
         Message realMsg = new Message().setContent(message.getText())
@@ -101,6 +105,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    @Cacheable(value = "roomHistory", key = "#roomId")
     public List<MessageVO> restoreRoomHistory(Integer roomId) {
         List<Message> messages = messageDAO.getByRoomId(roomId);
         List<Integer> userIds = messages.stream().map(Message::getSenderId).collect(Collectors.toList());
