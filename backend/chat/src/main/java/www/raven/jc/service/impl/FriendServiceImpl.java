@@ -16,6 +16,7 @@ import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.entity.vo.UserFriendVO;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.FriendService;
+import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MongoUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -77,7 +78,7 @@ public class FriendServiceImpl implements FriendService {
                     .setFriendId(friend.getUserId())
                     .setFriendName(friend.getUsername())
                     .setFriendProfile(friend.getProfile())
-                    .setLastMsg(message == null ? "" : message.getContent())
+                    .setLastMsg(message == null ? "" : JsonUtil.objToJson(message))
                     .setLastMsgSender(message == null ? "" : message.getSenderId().equals(userId) ? "我" : friend.getUsername());
         }).collect(Collectors.toList());
     }

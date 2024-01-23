@@ -108,17 +108,14 @@ public class RoomServiceImpl implements RoomService {
 
         Map<String, Message> messageMap = messages.stream().collect(Collectors.toMap(message -> message.getMessageId().toString(), Function.identity()));
         return rooms.stream().map(room -> {
-            log.info(room.toString());
             UserRoomVO userRoomVO = new UserRoomVO()
                     .setRoomId(room.getRoomId())
                     .setRoomName(room.getRoomName())
                     .setRoomProfile(mapFounder.get(room.getFounderId()).getProfile());
             if (room.getLastMsgId() != null) {
                 Message message = messageMap.get(room.getLastMsgId());
-                log.info(message.toString());
                 userRoomVO.setLastMsg(JsonUtil.objToJson(message));
                 UserInfoDTO userInfoDTO = mapSender.get(message.getSenderId());
-                log.info(userInfoDTO.toString());
                 userRoomVO.setLastMsgSender(userInfoDTO.getUsername());
             } else {
                 userRoomVO.setLastMsg(""); // 或者一些默认值

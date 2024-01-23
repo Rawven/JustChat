@@ -109,6 +109,8 @@ export default {
   right: 0; /* 设置距离右侧为 0 */
   bottom: 0; /* 设置距离底部为 0 */
   background-color: #f5f5f5; /* 设置背景颜色为灰色 */
+  width: 700cm; /* 设置宽度为100% */
+  height: 100%; /* 设置高度为100% */
 }
 
 .tMain {
@@ -119,9 +121,10 @@ export default {
 .box-card {
   position: absolute; /* 设置定位类型为绝对定位 */
   top: 50%; /* 设置距离顶部为50% */
-  left: 50%; /* 设置距离左侧为50% */
+  left: 70%; /* 设置距离左侧为50% */
   transform: translate(-50%, 25%); /* 向左和向上移动50% */
-  width: 400px;
+  width: 500px;
+  height: 500px;
 }
 
 .login-form {
