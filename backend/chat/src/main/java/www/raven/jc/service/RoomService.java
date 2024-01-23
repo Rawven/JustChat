@@ -60,7 +60,6 @@ public interface RoomService {
 
     /**
      * agree apply
-     * agree apply
      *
      * @param roomId   room id
      * @param userId   user id
