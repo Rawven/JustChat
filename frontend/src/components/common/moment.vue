@@ -2,43 +2,43 @@
   <el-container class="CC">
     <div class="CC bg-gray-100">
       <el-header class="flex items-center p-4 border-b border-gray-200 bg-white shadow-sm">
-        <svg @click="turnBack"
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="text-gray-600"
+        <svg class="text-gray-600"
+             fill="none"
+             height="24"
+             stroke="currentColor"
+             stroke-linecap="round"
+             stroke-linejoin="round"
+             stroke-width="2"
+             viewBox="0 0 24 24"
+             width="24"
+             xmlns="http://www.w3.org/2000/svg"
+             @click="turnBack"
         >
           <path d="m12 19-7-7 7-7"></path>
           <path d="M19 12H5"></path>
         </svg>
         <div class="flex-grow text-center font-semibold text-gray-700">朋友圈</div>
         <svg
-            @click="create = true"
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
+            class="text-gray-600"
             fill="none"
+            height="24"
             stroke="currentColor"
-            stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="text-gray-600"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+            @click="create = true"
         >
           <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path>
           <circle cx="12" cy="13" r="3"></circle>
         </svg>
         <el-drawer
             v-model="create"
-            title="I have a nested table inside!"
             direction="rtl"
             size="50%"
+            title="I have a nested table inside!"
         >
           <el-card class="box-card">
             <el-header>
@@ -50,9 +50,9 @@
               </el-form-item>
               <el-text>上传图片</el-text>
               <el-upload
-                  class="upload-demo"
+                  :http-request="uploadFile"
                   action=""
-                  :http-request="uploadFile">
+                  class="upload-demo">
                 <el-button size="small" type="primary">点击上传</el-button>
                 <template #tip>
                   <div class="el-upload__tip">
@@ -61,7 +61,7 @@
                 </template>
               </el-upload>
               <el-form-item>
-                <el-button  @click="release">发布</el-button>
+                <el-button @click="release">发布</el-button>
               </el-form-item>
             </el-form>
 
@@ -73,77 +73,82 @@
         <div v-for="moment in feedData" :key="moment.momentId">
           <div class="flex items-center space-x-3">
       <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
-        <img class="aspect-square h-full w-full" alt="user profile" :src="'http://10.24.3.176:8083/ipfs/'+moment.userInfo.profile"/>
+        <img :src="ipfsHost()+moment.userInfo.profile" alt="user profile" class="aspect-square h-full w-full"/>
       </span>
             <div>
-              <div class="font-semibold text-gray-700">{{moment.userInfo.username}}</div>
-              <div class="text-sm text-gray-500">{{timestampToTime(moment.timestamp)}}</div>
+              <div class="font-semibold text-gray-700">{{ moment.userInfo.username }}</div>
+              <div class="text-sm text-gray-500">{{ timestampToTime(moment.timestamp) }}</div>
             </div>
           </div>
           <div class="mt-3">
             <p class="text-gray-700">{{ moment.content }}</p>
-            <img class="img-size"
-            alt="user profile" :src="'http://10.24.3.176:8083/ipfs/'+moment.img">
+            <img :src="ipfsHost()+moment.img"
+                 alt="user profile" class="img-size">
+
+            <!-- Likes -->
+            <div v-for="like in moment.likes" :key="like.userInfo.username">
+              <el-text type="primary">{{ like.userInfo.username }} - 点赞过</el-text>
+            </div>
             <div v-for="comment in moment.comments" :key="comment.userInfo.username">
-            <div class="mt-2 rounded-md border p-2 bg-gray-100">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-2">
+              <div class="mt-2 rounded-md border p-2 bg-gray-100">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-2">
             <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
               <img
-                  class="aspect-square h-full w-full"
+                  :src="ipfsHost()+comment.userInfo.profile"
                   alt="user profile"
-                  :src="'http://10.24.3.176:8083/ipfs/'+comment.userInfo.profile"
+                  class="aspect-square h-full w-full"
               />
             </span>
-                  <div class="text-xs text-gray-500">{{comment.userInfo.username}} - 评论</div>
+                    <div class="text-xs text-gray-500">{{ comment.userInfo.username }} - 评论</div>
+                  </div>
+                  <div class="text-xs text-gray-500">{{ comment.userInfo.timestamp }}</div>
                 </div>
-                <div class="text-xs text-gray-500">{{comment.userInfo.timestamp}}</div>
+                <p class="mt-2 text-sm text-gray-700">{{ comment.content }}</p>
               </div>
-              <p class="mt-2 text-sm text-gray-700">{{comment.content}}</p>
-            </div>
             </div>
           </div>
           <div class="mt-3 flex justify-between text-gray-500">
             <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
+                class="text-gray-500"
                 fill="none"
+                height="24"
                 stroke="currentColor"
-                stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                class="text-gray-500"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
             >
               <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
             </svg>
             <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
+                class="text-gray-500"
                 fill="none"
+                height="24"
                 stroke="currentColor"
-                stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                class="text-gray-500"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
             >
               <polyline points="9 17 4 12 9 7"></polyline>
               <path d="M20 18v-2a4 4 0 0 0-4-4H4"></path>
             </svg>
             <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
+                class="text-gray-500"
                 fill="none"
+                height="24"
                 stroke="currentColor"
-                stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                class="text-gray-500"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
             >
               <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
               <polyline points="16 6 12 2 8 6"></polyline>
@@ -152,10 +157,12 @@
           </div>
           <div class="mt-3 flex justify-between text-gray-500">
             <el-button @click="tolike(moment.momentId)">
-              <i class="el-icon-thumb"></i>
-              {{ getLen(moment.likes) }}
+              <el-icon>
+                <Star/>
+              </el-icon>
             </el-button>
-            <el-input v-model="moment.input" placeholder="要评论吗" @keyup.enter="submitComment(moment.momentId,moment.input)"/>
+            <el-input v-model="moment.input" placeholder="要评论吗"
+                      @keyup.enter="submitComment(moment.momentId,moment.input)"/>
           </div>
         </div>
       </el-main>
@@ -166,10 +173,12 @@
 
 <script>
 import {ref} from "vue";
-import {Host} from "@/main";
+import {Host, ipfsHost} from "@/main";
+import {Star} from "@element-plus/icons-vue";
 
 export default {
   name: 'Moment-Fuck',
+  components: {Star},
   // 在你的Vue组件中使用的数据结构
   inject: {
     realAxios: {
@@ -179,21 +188,22 @@ export default {
   data() {
 
     return {
-      input:"",
-      file:"",
-      token:"",
-      upload:ref(),
-      create:ref(false),
-      comment:{
+      host: Host,
+      input: "",
+      file: "",
+      token: "",
+      upload: ref(),
+      create: ref(false),
+      comment: {
         userInfo: "",
         timestamp: "",
         content: "",
       },
-      like:{
+      like: {
         userInfo: "",
         timestamp: "",
       },
-      moment:{
+      moment: {
         momentId: "",
         userInfo: "",
         timestamp: "",
@@ -209,31 +219,34 @@ export default {
       },
       rules: {
         username: [
-          { required: true, message: '请输入用户名', trigger: 'blur' },
+          {required: true, message: '请输入用户名', trigger: 'blur'},
           // 可以根据需要添加其他验证规则
         ],
         text: [
-          { required: true, message: '请输入朋友圈文本内容', trigger: 'blur' },
+          {required: true, message: '请输入朋友圈文本内容', trigger: 'blur'},
           // 可以根据需要添加其他验证规则
         ],
         document: [
-          { required: true, message: '请输入朋友圈附加文档内容', trigger: 'blur' },
+          {required: true, message: '请输入朋友圈附加文档内容', trigger: 'blur'},
           // 可以根据需要添加其他验证规则
         ],
       },
     };
   },
   created() {
-    this.realAxios.get(`http://` + Host + `:7000/social/queryMoment`,{
+    this.realAxios.get(`http://` + Host + `:7000/social/queryMoment`, {
       headers: {
         'token': localStorage.getItem("token")
       }
     }).then(response => {
-          this.feedData = response.data.data;
-        })
+      this.feedData = response.data.data;
+    })
     this.token = localStorage.getItem("token");
   },
   methods: {
+    ipfsHost() {
+      return ipfsHost
+    },
     Host() {
       return Host
     },
@@ -258,10 +271,10 @@ export default {
       // 返回格式化的日期
       return year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
     },
-    uploadFile(param){
+    uploadFile(param) {
       const formData = new FormData()
       formData.append('file', param.file)
-      const url = 'http://'+Host+':7000/user/upload'
+      const url = 'http://' + Host + ':7000/user/upload'
       this.realAxios.post(url, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -272,23 +285,17 @@ export default {
         this.$message.success('文件上传成功');
       })
     },
-    getLen(arr) {
-      if(arr === null){
-        return 0;
-      }
-      return arr.length;
-    },
     tolike(momentId) {
       this.realAxios.get(`http://` + Host + `:7000/social/likeMoment/${momentId}`,
           {
-        headers: {
-          'token': localStorage.getItem("token")
-        }
-      })
+            headers: {
+              'token': localStorage.getItem("token")
+            }
+          })
           .then(() => {
             this.$message.success('点赞成功');
           })
-      this.realAxios.get(`http://` + Host + `:7000/social/queryMoment`,{
+      this.realAxios.get(`http://` + Host + `:7000/social/queryMoment`, {
         headers: {
           'token': localStorage.getItem("token")
         }
@@ -296,21 +303,21 @@ export default {
         this.feedData = response.data.data;
       })
     },
-    submitComment(momentId,text) {
-      this.realAxios.post(`http://` + Host + `:7000/social/commentMoment`,{
-        momentId: momentId,
-        text: text
-      },
+    submitComment(momentId, text) {
+      this.realAxios.post(`http://` + Host + `:7000/social/commentMoment`, {
+            momentId: momentId,
+            text: text
+          },
           {
-        headers: {
-          'token': localStorage.getItem("token")
-        }
-      })
+            headers: {
+              'token': localStorage.getItem("token")
+            }
+          })
           .then(() => {
             this.$message.success('评论成功');
             this.input = "";
           })
-      this.realAxios.get(`http://` + Host + `:7000/social/queryMoment`,{
+      this.realAxios.get(`http://` + Host + `:7000/social/queryMoment`, {
         headers: {
           'token': localStorage.getItem("token")
         }
@@ -328,7 +335,7 @@ export default {
             this.$message.success('发布成功');
             this.create = false;
           })
-      this.realAxios.get(`http://` + Host + `:7000/social/queryMoment`,{
+      this.realAxios.get(`http://` + Host + `:7000/social/queryMoment`, {
         headers: {
           'token': localStorage.getItem("token")
         }
@@ -349,10 +356,12 @@ export default {
   margin: 0;
   padding: 0;
 }
- .img-size{
+
+.img-size {
   width: 200px;
   height: 200px;
 }
+
 .ccc {
   height: 50%; /* 设置高度为视口的100% */
   overflow-y: auto; /* 当内容溢出时显示滚动条 */

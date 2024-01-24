@@ -17,7 +17,7 @@
           <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
           <polyline points="9 22 9 12 15 12 15 22"></polyline>
         </svg>
-        <el-link  href="/common/mainPage">My Website</el-link>
+        <el-link href="/common/mainPage">My Website</el-link>
       </a>
       <el-menu active-text-color="hover:underline" background-color="transparent" class="flex gap-4" mode="horizontal"
                text-color="text-gray-900">
@@ -43,7 +43,7 @@
               </el-table-column>
               <el-table-column label="Message" width="300">
                 <template #default="scope">
-                  <el-popover  placement="top" trigger="hover" width="auto">
+                  <el-popover placement="top" trigger="hover" width="auto">
                     <template #reference>
                       <el-tag>{{ scope.row.sender.username }} 申请成为你的好友</el-tag>
                     </template>
@@ -72,7 +72,7 @@
           <el-card class="h-full" shadow="hover">
             <el-row class="text-2xl font-semibold text-gray-900 dark:text-gray-100">Room Requests</el-row>
             <el-table :data="tableDatas.filter (item => item.type === 'join_room_apply')" style="width: 100%">
-              <el-table-column style="margin-right: 10px;" label="Date" width="180">
+              <el-table-column label="Date" style="margin-right: 10px;" width="180">
                 <template #default="scope">
                   <div style="display: flex; align-items: center">
                     <el-icon>
@@ -82,11 +82,11 @@
                   </div>
                 </template>
               </el-table-column>
-              <el-table-column style="margin-right: 10px;" label="Message" width="300">
+              <el-table-column label="Message" style="margin-right: 10px;" width="300">
                 <template #default="scope">
-                  <el-popover  placement="top" trigger="hover" width="auto">
+                  <el-popover placement="top" trigger="hover" width="auto">
                     <template #reference>
-                      <el-tag>{{ scope.row.sender.username }} 申请成为加入你的群聊 {{scope.row.data}}</el-tag>
+                      <el-tag>{{ scope.row.sender.username }} 申请成为加入你的群聊 {{ scope.row.data }}</el-tag>
                     </template>
                   </el-popover>
                 </template>
@@ -192,9 +192,9 @@ export default {
         "data": "string",
         "timestamp": 0,
         "sender": {
-           "userId":0,
-           "username":"test" ,
-           "profile": "ddd"
+          "userId": 0,
+          "username": "test",
+          "profile": "ddd"
         }
       },
     };
@@ -212,35 +212,33 @@ export default {
     Host() {
       return Host
     },
-    handleFriendAgree( data) {
-       this.realAxios({
-         method: 'get',
-         url: `http://` + Host + `:7000/user/friend/agreeToBeFriend/${data.sender.userId}/${data.noticeId}`,
-         data: {
-         },
-         headers: {
-           'token': localStorage.getItem("token")
-         }
-       }).then(() => {
-         this.$message({
-           message: 'Agree Success',
-           type: 'success'
-         });
-         this.realAxios.get(`http://` + Host + `:7000/user/notice/getNotice`, {
-           headers: {
-             'token': localStorage.getItem("token")
-           }
-         }).then(response => {
-           this.tableDatas = response.data.data;
-         })
-       })
+    handleFriendAgree(data) {
+      this.realAxios({
+        method: 'get',
+        url: `http://` + Host + `:7000/user/friend/agreeToBeFriend/${data.sender.userId}/${data.noticeId}`,
+        data: {},
+        headers: {
+          'token': localStorage.getItem("token")
+        }
+      }).then(() => {
+        this.$message({
+          message: 'Agree Success',
+          type: 'success'
+        });
+        this.realAxios.get(`http://` + Host + `:7000/user/notice/getNotice`, {
+          headers: {
+            'token': localStorage.getItem("token")
+          }
+        }).then(response => {
+          this.tableDatas = response.data.data;
+        })
+      })
     },
     handleFriendReject(data) {
       this.realAxios({
         method: 'get',
         url: `http://` + Host + `:7000/user/friend/refuseToBeFriend/${data.sender.userId}/${data.noticeId}`,
-        data: {
-        },
+        data: {},
         headers: {
           'token': localStorage.getItem("token")
         }
@@ -262,9 +260,7 @@ export default {
       this.realAxios({
         method: 'get',
         url: `http://` + Host + `:7000/chat/common/agreeToJoinRoom/${data.data}/${data.sender.userId}/${data.noticeId}`,
-        data: {
-
-        },
+        data: {},
         headers: {
           'token': localStorage.getItem("token")
         }
@@ -286,8 +282,7 @@ export default {
       this.realAxios({
         method: 'get',
         url: `http://` + Host + `:7000/chat/common/refuseToJoinRoom/${data.data}/${data.sender.userId}/${data.noticeId}`,
-        data: {
-        },
+        data: {},
         headers: {
           'token': localStorage.getItem("token")
         }

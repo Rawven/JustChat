@@ -59,7 +59,9 @@
           <el-text tag="b">Notifications</el-text>
         </div>
         <div class="flex items-center space-x-4" @click="turnMoment">
-            <el-icon><PictureFilled /></el-icon>
+          <el-icon>
+            <PictureFilled/>
+          </el-icon>
           <el-text tag="b">Moment</el-text>
         </div>
         <div class="flex items-center space-x-4" @click="logOut">
@@ -89,7 +91,7 @@
     <el-aside class="theAside w-64 border-r border-gray-200 overflow-y-auto">
       <el-header class="p-4 border-b border-gray-200">
         <el-row>
-          <img :src="'http://10.24.3.176:8083/ipfs/'+userInfo.profile" alt="User Avatar" class="avatar">
+          <img :src="ipfsHost()+userInfo.profile" alt="User Avatar" class="avatar">
           <h2 class="logo"> Just Chat </h2>
         </el-row>
       </el-header>
@@ -115,7 +117,7 @@
             @click="checkOut(room.roomId)"
         >
     <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
-      <img :src="'http://10.24.3.176:8083/ipfs/'+room.roomProfile" alt="User Avatar" class="avatar">
+      <img :src="ipfsHost()+room.roomProfile" alt="User Avatar" class="avatar">
     </span>
           <el-col>
             <el-col v-if="checkNull(room.lastMsgSender)">{{
@@ -147,7 +149,7 @@
 </template>
 
 <script>
-import {Host} from "@/main";
+import {Host, ipfsHost} from "@/main";
 import {reactive, ref} from "vue";
 import ChatRoom from "@/components/common/chatRoom.vue";
 import {ChatLineRound, ChatRound, Message, PictureFilled} from "@element-plus/icons-vue";
@@ -178,6 +180,7 @@ export default {
   },
   data() {
     return {
+      host: Host,
       radio: ref(0),
       searchInput: '',
       websocket: null,
@@ -213,6 +216,9 @@ export default {
   },
 
   methods: {
+    ipfsHost() {
+      return ipfsHost
+    },
     ref,
     Host() {
       return Host
@@ -244,13 +250,13 @@ export default {
       this.websocket.onmessage = (event) => {
         console.log('WebSocket message received:', event.data);
         let data = JSON.parse(event.data)
-        if(data.type === "FRIEND_APPLY"){
+        if (data.type === "FRIEND_APPLY") {
           this.noticeIsNew = true;
           ElMessage.success('您有新的好友申请');
-        }else if(data.type === "ROOM_APPLY"){
+        } else if (data.type === "ROOM_APPLY") {
           this.noticeIsNew = true;
           ElMessage.success('您有新的群聊申请');
-        }else {
+        } else {
           let index = this.roomIndex.get(Number(data.roomId));
           this.rooms[index] = {
             ...this.rooms[index],

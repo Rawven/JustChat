@@ -67,16 +67,16 @@
         <div v-else>
           <div class="flex items-end space-x-2">
             <el-popconfirm
-                width="220"
-                confirm-button-text="OK"
-                cancel-button-text="No, Thanks"
                 :icon="InfoFilled"
+                cancel-button-text="No, Thanks"
+                confirm-button-text="OK"
                 icon-color="#626AEF"
                 title="是否拍一拍?"
-                @confirm = "addApplyFriend(message.user)"
+                width="220"
+                @confirm="addApplyFriend(message.user)"
             >
               <template #reference>
-                <img :src="'http://10.24.3.176:8083/ipfs/'+message.profile" alt="User Avatar" class="avatar">
+                <img :src="ipfsHost()+message.profile" alt="User Avatar" class="avatar">
               </template>
             </el-popconfirm>
 
@@ -132,7 +132,7 @@
 </template>
 
 <script>
-import {Host} from "@/main";
+import {Host, ipfsHost} from "@/main";
 import {InfoFilled} from "@element-plus/icons-vue";
 
 export default {
@@ -159,6 +159,7 @@ export default {
   },
   data() {
     return {
+
       theFriend: {
         friendId: '',
         lastMsg: '',
@@ -216,6 +217,9 @@ export default {
   },
 
   methods: {
+    ipfsHost() {
+      return ipfsHost
+    },
     isMe(message) {
       return message.user === this.user;
     },
@@ -235,7 +239,7 @@ export default {
 </script>
 
 <style scoped>
-.mainDiv{
+.mainDiv {
   height: 100%;
   width: 100%;
   display: flex;

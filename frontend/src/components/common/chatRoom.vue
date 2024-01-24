@@ -67,21 +67,21 @@
         <div v-else>
           <div class="flex items-end space-x-2">
             <el-popconfirm
-                width="220"
-                confirm-button-text="OK"
-                cancel-button-text="No, Thanks"
                 :icon="InfoFilled"
+                cancel-button-text="No, Thanks"
+                confirm-button-text="OK"
                 icon-color="#626AEF"
                 title="是否向该群员发送好友申请?"
-                @confirm = "addApplyFriend(message.user)"
+                width="220"
+                @confirm="addApplyFriend(message.user)"
             >
               <template #reference>
-                <img :src="'http://10.24.3.176:8083/ipfs/'+message.profile" alt="User Avatar" class="avatar">
+                <img :src="ipfsHost()+message.profile" alt="User Avatar" class="avatar">
               </template>
             </el-popconfirm>
 
 
-        <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full mt-2">
+            <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full mt-2">
           <span
               class="flex h-full w-full items-center justify-center rounded-full bg-muted font-medium text-lg font-serif">{{
               message.user
@@ -132,7 +132,7 @@
 </template>
 
 <script>
-import {Host} from "@/main";
+import {Host, ipfsHost} from "@/main";
 import {InfoFilled} from "@element-plus/icons-vue";
 
 export default {
@@ -217,6 +217,9 @@ export default {
   },
 
   methods: {
+    ipfsHost() {
+      return ipfsHost
+    },
     isMe(message) {
       return message.user === this.user;
     },
@@ -230,17 +233,17 @@ export default {
         this.message = '';
       }
     },
-    addApplyFriend(username){
-       this.realAxios.get(`http://` + Host + `:7000/user/notice/addFriendApply/${username}`, {
+    addApplyFriend(username) {
+      this.realAxios.get(`http://` + Host + `:7000/user/notice/addFriendApply/${username}`, {
         headers: {
           'token': localStorage.getItem("token")
         },
-       }).then(() => {
-         this.$message({
-           message: '好友申请已发送',
-           type: 'success'
-         });
-       })
+      }).then(() => {
+        this.$message({
+          message: '好友申请已发送',
+          type: 'success'
+        });
+      })
     },
 
   },

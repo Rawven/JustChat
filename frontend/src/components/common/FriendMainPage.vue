@@ -68,7 +68,9 @@
           <span>Notifications</span>
         </div>
         <div class="flex items-center space-x-4" @click="turnMoment">
-          <el-icon><PictureFilled /></el-icon>
+          <el-icon>
+            <PictureFilled/>
+          </el-icon>
           <el-text tag="b">Moment</el-text>
         </div>
         <div class="flex items-center space-x-4" @click="logOut">
@@ -98,7 +100,7 @@
     <el-aside class="theAside w-64 border-r border-gray-200 overflow-y-auto assside">
       <el-header class="p-4 border-b border-gray-200">
         <el-row>
-          <img :src="'http://10.24.3.176:8083/ipfs/'+userInfo.profile" alt="User Avatar" class="avatar">
+          <img :src="ipfsHost()+userInfo.profile" alt="User Avatar" class="avatar">
           <h2 class="logo"> Just Chat </h2>
         </el-row>
       </el-header>
@@ -124,7 +126,7 @@
             @click="checkOut(friend.friendId)"
         >
     <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
-      <img :src="'http://10.24.3.176:8083/ipfs/'+friend.friendProfile" alt="User Avatar" class="avatar">
+      <img :src="ipfsHost()+friend.friendProfile" alt="User Avatar" class="avatar">
     </span>
           <el-col>
             <el-col v-if="checkNull(friend.lastMsgSender)">{{
@@ -150,13 +152,14 @@
         </div>
       </el-menu>
     </el-aside>
-    <chat-Friend v-if="nowFriendId >=1" :key="nowFriendId" :friend="JSON.stringify(this.friends[this.friendIndex.get(nowFriendId)])"
-               :user="this.userInfo.username"></chat-Friend>
+    <chat-Friend v-if="nowFriendId >=1" :key="nowFriendId"
+                 :friend="JSON.stringify(this.friends[this.friendIndex.get(nowFriendId)])"
+                 :user="this.userInfo.username"></chat-Friend>
   </el-container>
 </template>
 
 <script>
-import {Host} from "@/main";
+import {Host, ipfsHost} from "@/main";
 import {reactive, ref} from "vue";
 import ChatFriend from "@/components/common/chatFriend.vue";
 import {ChatLineRound, ChatRound, PictureFilled} from "@element-plus/icons-vue";
@@ -185,11 +188,11 @@ export default {
       websocket: null,
       messageCount: 0,
       friend: {
-       friendId: 0,
-        friendName:"",
-        friendProfile:"",
-        lastMsg:"",
-        lastMsgSender:""
+        friendId: 0,
+        friendName: "",
+        friendProfile: "",
+        lastMsg: "",
+        lastMsgSender: ""
       },
       userInfo: {
         username: '',
@@ -214,6 +217,9 @@ export default {
   },
 
   methods: {
+    ipfsHost() {
+      return ipfsHost
+    },
     ref,
     Host() {
       return Host
@@ -248,13 +254,13 @@ export default {
       this.websocket.onmessage = (event) => {
 
         let data = JSON.parse(event.data)
-        if(data.type === "FRIEND_APPLY"){
+        if (data.type === "FRIEND_APPLY") {
           this.noticeIsNew = true;
           ElMessage.success('您有新的好友申请');
-        }else if(data.type === "ROOM_APPLY"){
+        } else if (data.type === "ROOM_APPLY") {
           this.noticeIsNew = true;
           ElMessage.success('您有新的群聊申请');
-        }else {
+        } else {
           let index = this.friendIndex.get(Number(data.friendId));
           this.friends[index] = {
             ...this.friends[index],
@@ -317,8 +323,9 @@ body {
   margin-bottom: 10px;
   background-color: #f0f0f0; /* 添加背景色 */
 }
-.assside{
-  width:1000px
+
+.assside {
+  width: 1000px
 }
 
 .containerM {
