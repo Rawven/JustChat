@@ -67,6 +67,12 @@
           </svg>
           <span>Notifications</span>
         </div>
+        <div class="flex items-center space-x-4" @click="turnMoment">
+          <el-icon>
+            <PictureFilled/>
+          </el-icon>
+          <el-text tag="b">Moment</el-text>
+        </div>
         <div class="flex items-center space-x-4" @click="logOut">
           <svg
               class="w-6 h-6"
@@ -94,7 +100,7 @@
     <el-aside class="theAside w-64 border-r border-gray-200 overflow-y-auto assside">
       <el-header class="p-4 border-b border-gray-200">
         <el-row>
-          <img :src="'http://10.24.3.176:8083/ipfs/'+userInfo.profile" alt="User Avatar" class="avatar">
+          <img :src="ipfsHost()+userInfo.profile" alt="User Avatar" class="avatar">
           <h2 class="logo"> Just Chat </h2>
         </el-row>
       </el-header>
@@ -120,7 +126,7 @@
             @click="checkOut(friend.friendId)"
         >
     <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
-      <img :src="'http://10.24.3.176:8083/ipfs/'+friend.friendProfile" alt="User Avatar" class="avatar">
+      <img :src="ipfsHost()+friend.friendProfile" alt="User Avatar" class="avatar">
     </span>
           <el-col>
             <el-col v-if="checkNull(friend.lastMsgSender)">{{
@@ -146,16 +152,17 @@
         </div>
       </el-menu>
     </el-aside>
-    <chat-Friend v-if="nowFriendId >=1" :key="nowFriendId" :friend="JSON.stringify(this.friends[this.friendIndex.get(nowFriendId)])"
-               :user="this.userInfo.username"></chat-Friend>
+    <chat-Friend v-if="nowFriendId >=1" :key="nowFriendId"
+                 :friend="JSON.stringify(this.friends[this.friendIndex.get(nowFriendId)])"
+                 :user="this.userInfo.username"></chat-Friend>
   </el-container>
 </template>
 
 <script>
-import {Host} from "@/main";
+import {Host, ipfsHost} from "@/main";
 import {reactive, ref} from "vue";
 import ChatFriend from "@/components/common/chatFriend.vue";
-import {ChatLineRound, ChatRound} from "@element-plus/icons-vue";
+import {ChatLineRound, ChatRound, PictureFilled} from "@element-plus/icons-vue";
 import {ElMessage} from "element-plus";
 
 export default {
@@ -168,7 +175,7 @@ export default {
     },
   },
   name: 'MainPage',
-  components: {ChatFriend, ChatLineRound, ChatRound},
+  components: {PictureFilled, ChatFriend, ChatLineRound, ChatRound},
   inject: {
     realAxios: {
       from: 'axiosFilter'
@@ -181,11 +188,11 @@ export default {
       websocket: null,
       messageCount: 0,
       friend: {
-       friendId: 0,
-        friendName:"",
-        friendProfile:"",
-        lastMsg:"",
-        lastMsgSender:""
+        friendId: 0,
+        friendName: "",
+        friendProfile: "",
+        lastMsg: "",
+        lastMsgSender: ""
       },
       userInfo: {
         username: '',
@@ -210,6 +217,9 @@ export default {
   },
 
   methods: {
+    ipfsHost() {
+      return ipfsHost
+    },
     ref,
     Host() {
       return Host
@@ -232,6 +242,9 @@ export default {
       this.nowFriendId = friendId;
       this.friends[this.friendIndex.get(friendId)].isNew = false;
     },
+    turnMoment() {
+      this.$router.push('/common/moment');
+    },
     initWebSocket() {
       let token = localStorage.getItem("token");
       this.websocket = new WebSocket(`ws://` + Host + `:8080/ws/${token}`);
@@ -239,18 +252,23 @@ export default {
         console.log('WebSocket is open now.');
       };
       this.websocket.onmessage = (event) => {
-        console.log('WebSocket message received:', event.data);
-        let data = JSON.parse(event.data)
-        console.log(this.roomIndex.get(data.roomId))
-        let index = this.roomIndex.get(Number(data.roomId));
-        this.rooms[index] = {
-          ...this.rooms[index],
 
-          lastMsg: data.msg,
-          lastMsgSender: data.username,
-          isNew: true
-        };
-        console.log(this.rooms[index])
+        let data = JSON.parse(event.data)
+        if (data.type === "FRIEND_APPLY") {
+          this.noticeIsNew = true;
+          ElMessage.success('您有新的好友申请');
+        } else if (data.type === "ROOM_APPLY") {
+          this.noticeIsNew = true;
+          ElMessage.success('您有新的群聊申请');
+        } else {
+          let index = this.friendIndex.get(Number(data.friendId));
+          this.friends[index] = {
+            ...this.friends[index],
+            lastMsg: data.msg,
+            lastMsgSender: data.username,
+            isNew: true
+          };
+        }
       };
       this.websocket.onclose = () => {
         console.log('WebSocket is closed now.');
@@ -305,8 +323,9 @@ body {
   margin-bottom: 10px;
   background-color: #f0f0f0; /* 添加背景色 */
 }
-.assside{
-  width:1000px
+
+.assside {
+  width: 1000px
 }
 
 .containerM {

@@ -22,6 +22,10 @@
     </repositories>
     <dependencies>
         <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.github.ipfs</groupId>
             <artifactId>java-ipfs-api</artifactId>
             <version>${ipfs}</version>
@@ -30,10 +34,6 @@
             <groupId>www.Raven</groupId>
             <artifactId>common-ws</artifactId>
             <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
         </dependency>
         <dependency>
             <groupId>www.Raven</groupId>

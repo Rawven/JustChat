@@ -69,6 +69,8 @@ public class UserController {
         return CommonResult.operateSuccess("设置头像成功");
     }
 
+
+
     @PostMapping("/setSignature")
     public CommonResult<Void> setSignature(@RequestParam("signature") String signature) {
         String userId = request.getHeader("userId");

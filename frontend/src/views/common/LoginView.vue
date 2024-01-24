@@ -12,9 +12,9 @@ export default {
 };
 </script>
 <style>
-  .dddd {
-    background-color: #f5f5f5;
-    width: 100%;
-    height: 100%;
-  }
+.dddd {
+  background-color: #f5f5f5;
+  width: 100%;
+  height: 100%;
+}
 </style>

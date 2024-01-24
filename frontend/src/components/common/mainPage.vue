@@ -50,22 +50,19 @@
           <el-text tag="b">Friends</el-text>
         </div>
         <div class="flex items-center space-x-4" @click="turnNotifications">
-          <svg
-              class="w-6 h-6"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-          >
-            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path>
-            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
-          </svg>
-          <span>Notifications</span>
+          <el-icon v-if="noticeIsNew" color="#FF0000">
+            <Message/>
+          </el-icon>
+          <el-icon v-else color="#409EFC">
+            <Message/>
+          </el-icon>
+          <el-text tag="b">Notifications</el-text>
+        </div>
+        <div class="flex items-center space-x-4" @click="turnMoment">
+          <el-icon>
+            <PictureFilled/>
+          </el-icon>
+          <el-text tag="b">Moment</el-text>
         </div>
         <div class="flex items-center space-x-4" @click="logOut">
           <svg
@@ -87,14 +84,14 @@
             <path
                 d="M13 4.562v16.157a1 1 0 0 1-1.242.97L5 20V5.562a2 2 0 0 1 1.515-1.94l4-1A2 2 0 0 1 13 4.561Z"></path>
           </svg>
-          <span>Logout</span>
+          <el-text tag="b">Logout</el-text>
         </div>
       </el-menu>
     </el-aside>
     <el-aside class="theAside w-64 border-r border-gray-200 overflow-y-auto">
       <el-header class="p-4 border-b border-gray-200">
         <el-row>
-          <img :src="'http://10.24.3.176:8083/ipfs/'+userInfo.profile" alt="User Avatar" class="avatar">
+          <img :src="ipfsHost()+userInfo.profile" alt="User Avatar" class="avatar">
           <h2 class="logo"> Just Chat </h2>
         </el-row>
       </el-header>
@@ -120,7 +117,7 @@
             @click="checkOut(room.roomId)"
         >
     <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
-      <img :src="'http://10.24.3.176:8083/ipfs/'+room.roomProfile" alt="User Avatar" class="avatar">
+      <img :src="ipfsHost()+room.roomProfile" alt="User Avatar" class="avatar">
     </span>
           <el-col>
             <el-col v-if="checkNull(room.lastMsgSender)">{{
@@ -152,10 +149,10 @@
 </template>
 
 <script>
-import {Host} from "@/main";
+import {Host, ipfsHost} from "@/main";
 import {reactive, ref} from "vue";
 import ChatRoom from "@/components/common/chatRoom.vue";
-import {ChatLineRound, ChatRound} from "@element-plus/icons-vue";
+import {ChatLineRound, ChatRound, Message, PictureFilled} from "@element-plus/icons-vue";
 import {ElMessage} from "element-plus";
 
 export default {
@@ -166,10 +163,16 @@ export default {
         this.nowRoomId = newVal;
       }
     },
+    noticeIsNew(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        // nowRoomId has changed. You can add your logic here to re-render the chat-room component
+        this.noticeIsNew = newVal;
+      }
+    },
   },
 
   name: 'MainPage',
-  components: {ChatLineRound, ChatRound, ChatRoom},
+  components: {PictureFilled, Message, ChatLineRound, ChatRound, ChatRoom},
   inject: {
     realAxios: {
       from: 'axiosFilter'
@@ -177,6 +180,7 @@ export default {
   },
   data() {
     return {
+      host: Host,
       radio: ref(0),
       searchInput: '',
       websocket: null,
@@ -197,6 +201,7 @@ export default {
       roomIndex: new Map(),
       pageSize: 5,
       nowRoomId: 0,
+      noticeIsNew: false,
     };
   },
   created() {
@@ -211,6 +216,9 @@ export default {
   },
 
   methods: {
+    ipfsHost() {
+      return ipfsHost
+    },
     ref,
     Host() {
       return Host
@@ -242,16 +250,22 @@ export default {
       this.websocket.onmessage = (event) => {
         console.log('WebSocket message received:', event.data);
         let data = JSON.parse(event.data)
-        console.log(this.roomIndex.get(data.roomId))
-        let index = this.roomIndex.get(Number(data.roomId));
-        this.rooms[index] = {
-          ...this.rooms[index],
-
-          lastMsg: data.msg,
-          lastMsgSender: data.username,
-          isNew: true
-        };
-        console.log(this.rooms[index])
+        if (data.type === "FRIEND_APPLY") {
+          this.noticeIsNew = true;
+          ElMessage.success('您有新的好友申请');
+        } else if (data.type === "ROOM_APPLY") {
+          this.noticeIsNew = true;
+          ElMessage.success('您有新的群聊申请');
+        } else {
+          let index = this.roomIndex.get(Number(data.roomId));
+          this.rooms[index] = {
+            ...this.rooms[index],
+            lastMsg: data.msg,
+            lastMsgSender: data.username,
+            isNew: true
+          };
+          console.log(this.rooms[index])
+        }
       };
       this.websocket.onclose = () => {
         console.log('WebSocket is closed now.');
@@ -268,10 +282,14 @@ export default {
       }
     },
     turnNotifications() {
+      this.noticeIsNew = false;
       this.$router.push('/common/notice');
     },
     checkNull(name) {
       return name !== "";
+    },
+    turnMoment() {
+      this.$router.push('/common/moment');
     },
     getRooms() {
       this.realAxios.get(`http://` + Host + `:7000/chat/common/initUserMainPage`, {

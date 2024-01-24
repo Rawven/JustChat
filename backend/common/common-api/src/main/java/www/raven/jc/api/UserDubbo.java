@@ -101,4 +101,13 @@ public interface UserDubbo {
      * @return {@link RpcResult}<{@link Boolean}>
      */
     RpcResult<Void> deleteNotice(int noticeId);
+
+    /**
+     * get friend and me infos
+     *
+     * @param i i
+     * @return {@link RpcResult}<{@link List}<{@link UserInfoDTO}>>
+     */
+    RpcResult<List<UserInfoDTO>> getFriendAndMeInfos(int i);
+
 }

@@ -27,4 +27,12 @@ public interface FriendService {
      * @param friendId friend id
      */
     void agreeApplyFromFriend(int friendId);
+
+    /**
+     * get friend and me infos
+     *
+     * @param i i
+     * @return {@link List}<{@link UserInfoDTO}>
+     */
+    List<UserInfoDTO> getFriendAndMeInfos(int i);
 }

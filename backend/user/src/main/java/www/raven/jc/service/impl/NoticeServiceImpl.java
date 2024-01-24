@@ -3,9 +3,13 @@ package www.raven.jc.service.impl;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RBucket;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import www.raven.jc.constant.MqConstant;
 import www.raven.jc.constant.NoticeConstant;
 import www.raven.jc.dao.FriendDAO;
 import www.raven.jc.dao.NoticeDAO;
@@ -17,9 +21,12 @@ import www.raven.jc.entity.po.User;
 import www.raven.jc.entity.vo.NoticeVO;
 import www.raven.jc.event.JoinRoomApplyEvent;
 import www.raven.jc.service.NoticeService;
+import www.raven.jc.util.JsonUtil;
+import www.raven.jc.ws.NotificationHandler;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -42,7 +49,10 @@ public class NoticeServiceImpl implements NoticeService {
     private UserDAO userDAO;
     @Autowired
     private FriendDAO friendDAO;
-
+    @Autowired
+    private NotificationHandler handler;
+    @Autowired
+    private RedissonClient redissonClient;
     @Override
     public List<NoticeVO> loadNotice() {
         Integer userId = Integer.parseInt(request.getHeader("userId"));
@@ -83,6 +93,14 @@ public class NoticeServiceImpl implements NoticeService {
                 .setTimestamp(System.currentTimeMillis())
                 .setSenderId(Integer.parseInt(applierId));
         Assert.isTrue(noticeDAO.save(notice));
+        RBucket<String> friendBucket = redissonClient.getBucket("token:" + friendId);
+        HashMap<Object, Object> map = new HashMap<>(1);
+        map.put("type", MqConstant.TAGS_FRIEND_APPLY);
+        if (friendBucket.isExists()) {
+            handler.sendOneMessage(friendId, JsonUtil.mapToJson(map));
+        } else {
+            log.info("--RocketMq receiver不在线");
+        }
     }
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
