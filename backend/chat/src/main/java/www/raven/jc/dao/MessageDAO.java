@@ -18,9 +18,7 @@ import java.util.List;
  * @date 2023/12/17
  */
 @Repository
-public class
-
-MessageDAO {
+public class MessageDAO {
     public static final String COLLECTION_MESSAGE = "message";
     @Autowired
     private MongoTemplate mongoTemplate;

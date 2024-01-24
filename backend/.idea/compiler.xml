@@ -16,6 +16,7 @@
         <module name="common-ws" />
         <module name="common-util" />
         <module name="auth" />
+        <module name="social" />
         <module name="chat" />
         <module name="common-aop" />
         <module name="common-mq" />
