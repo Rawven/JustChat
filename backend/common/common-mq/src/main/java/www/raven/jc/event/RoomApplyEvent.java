@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
 @Accessors
 @AllArgsConstructor
 @NoArgsConstructor
-public class JoinRoomApplyEvent {
+public class RoomApplyEvent {
     private Integer applyId;
     private Integer founderId;
     private Integer roomId;

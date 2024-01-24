@@ -25,7 +25,7 @@ import www.raven.jc.entity.po.UserRoom;
 import www.raven.jc.entity.vo.DisplayRoomVO;
 import www.raven.jc.entity.vo.RealRoomVO;
 import www.raven.jc.entity.vo.UserRoomVO;
-import www.raven.jc.event.JoinRoomApplyEvent;
+import www.raven.jc.event.RoomApplyEvent;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.RoomService;
 import www.raven.jc.util.JsonUtil;
@@ -151,7 +151,7 @@ public class RoomServiceImpl implements RoomService {
         Room room = roomDAO.getBaseMapper().selectById(roomId);
         Integer founderId = room.getFounderId();
         //通知user模块 插入一条申请记录
-        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new JoinRoomApplyEvent(userId, founderId, roomId)), MqConstant.TAGS_ROOM_APPLY));
+        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new RoomApplyEvent(userId, founderId, roomId)), MqConstant.TAGS_ROOM_APPLY));
     }
 
     @Transactional(rollbackFor = IllegalArgumentException.class)

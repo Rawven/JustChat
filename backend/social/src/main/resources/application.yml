@@ -21,6 +21,24 @@ spring:
     #是否缓存空值，可以防止缓存穿透
     redis.cache-null-values: true
   cloud:
+    stream:
+      bindings:
+        producer-out-1:
+          destination: eventSocialToUser
+        producer-out-0:
+          destination: eventSocialToUser
+      rocketmq:
+        bindings:
+          producer-out-1:
+            producer:
+              sync: false
+              group: output-1
+          producer-out-0:
+            producer:
+              sync: false
+              group: output-0
+        binder:
+          name-server: 10.21.32.221:9876
     nacos:
       discovery:
         server-addr: 10.21.32.154:8848

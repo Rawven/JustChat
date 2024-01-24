@@ -3,9 +3,11 @@ package www.raven.jc.service.impl;
 import cn.hutool.core.lang.Assert;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
 import org.springframework.stereotype.Service;
 import www.raven.jc.api.UserDubbo;
+import www.raven.jc.constant.MqConstant;
 import www.raven.jc.dao.MomentDAO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.model.CommentModel;
@@ -14,8 +16,11 @@ import www.raven.jc.entity.po.Comment;
 import www.raven.jc.entity.po.Like;
 import www.raven.jc.entity.po.Moment;
 import www.raven.jc.entity.vo.MomentVO;
+import www.raven.jc.event.MomentReleaseEvent;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.SocialService;
+import www.raven.jc.util.JsonUtil;
+import www.raven.jc.util.MqUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -35,7 +40,8 @@ public class SocialServiceImpl implements SocialService {
     private MomentDAO momentDAO;
     @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
     private UserDubbo userDubbo;
-
+    @Autowired
+    private StreamBridge streamBridge;
     @Override
     public void releaseMoment(MomentModel model) {
         String userId = request.getHeader("userId");
@@ -48,6 +54,8 @@ public class SocialServiceImpl implements SocialService {
                 .setContent(model.getText())
                 .setTimestamp(System.currentTimeMillis());
         Assert.isTrue(momentDAO.save(moment), "发布失败");
+        MomentReleaseEvent momentReleaseEvent = new MomentReleaseEvent();
+        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(momentReleaseEvent), MqConstant.TAGS_MOMENT_RELEASE_RECORD));
     }
 
     @Override
