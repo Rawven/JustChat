@@ -57,13 +57,14 @@ public class MessageConsumer {
         return msg -> {
             //判断是否重复消息
             Object id = msg.getHeaders().get(MqConstant.HEADER_KEYS);
-            if (id == null || redissonClient.getBucket(id.toString()).isExists()) {
+            if (id == null || redissonClient.getBucket(HEAD+ id).isExists()) {
                 log.info("--RocketMq 重复或非法的消息，不处理");
                 return;
             }
-            String tags = Objects.requireNonNull(id).toString();
+
+            String tags = Objects.requireNonNull(msg.getHeaders().get(HEADER_TAGS)).toString();
             //判断消息类型
-            if (TAGS_ROOM_APPLY.equals(tags)) {
+            if (MqConstant.TAGS_ROOM_APPLY.equals(tags)) {
                 eventUserJoinRoomApply(msg);
             } else if (MqConstant.TAGS_ROOM_MSG_RECORD.equals(tags)) {
                 eventRoomSendMsg(msg);
@@ -72,7 +73,7 @@ public class MessageConsumer {
             } else {
                 log.info("--RocketMq 非法的消息，不处理");
             }
-            redissonClient.getBucket("rocketMq_msg_"+ id).set(id, MqConstant.EXPIRE_TIME, TimeUnit.MINUTES);
+            redissonClient.getBucket(HEAD+ id).set(id, MqConstant.EXPIRE_TIME, TimeUnit.MINUTES);
         };
     }
 
@@ -83,6 +84,7 @@ public class MessageConsumer {
         map.put("receiverId", payload.getReceiverId());
         map.put("senderId", payload.getSenderId());
         map.put("msg", payload.getMsg());
+        map.put("type",MqConstant.TAGS_FRIEND_MSG_RECORD);
         if (receiverBucket.isExists()) {
             notificationHandler.sendOneMessage(payload.getReceiverId(), JsonUtil.mapToJson(map));
         } else {
@@ -106,14 +108,14 @@ public class MessageConsumer {
                 .setSenderId(payload.getApplyId());
         Assert.isTrue(noticeDAO.save(notice));
         RBucket<String> founderBucket = redissonClient.getBucket("token:" + founderId);
-        User applier = userDAO.getBaseMapper().selectById(payload.getApplyId());
-        HashMap<Object, Object> map = new HashMap<>(2);
-        map.put("roomId", payload.getRoomId());
-        map.put("applier", applier.getUsername());
         if (founderBucket.isExists()) {
+            User applier = userDAO.getBaseMapper().selectById(payload.getApplyId());
+            HashMap<Object, Object> map = new HashMap<>(2);
+            map.put("roomId", payload.getRoomId());
+            map.put("applier", applier.getUsername());
+            map.put("type",MqConstant.TAGS_ROOM_APPLY);
             notificationHandler.sendOneMessage(founderId, JsonUtil.mapToJson(map));
-        } else {
-            log.info("--RocketMq founder不在线");
+            log.info("--RocketMq 已推送通知给founder");
         }
     }
 
@@ -129,7 +131,7 @@ public class MessageConsumer {
         map.put("roomId", payload.getRoomId());
         map.put("username", userDAO.getBaseMapper().selectById(userId).getUsername());
         map.put("msg", payload.getMsg());
-        List<String> tokens = new ArrayList<>();
+        map.put("type",MqConstant.TAGS_ROOM_MSG_RECORD);
         List<Integer> idsFromRoom = payload.getIdsFromRoom();
         notificationHandler.sendBatchMessage(JsonUtil.mapToJson(map), idsFromRoom);
     }

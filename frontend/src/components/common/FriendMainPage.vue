@@ -239,18 +239,23 @@ export default {
         console.log('WebSocket is open now.');
       };
       this.websocket.onmessage = (event) => {
-        console.log('WebSocket message received:', event.data);
-        let data = JSON.parse(event.data)
-        console.log(this.roomIndex.get(data.roomId))
-        let index = this.roomIndex.get(Number(data.roomId));
-        this.rooms[index] = {
-          ...this.rooms[index],
 
-          lastMsg: data.msg,
-          lastMsgSender: data.username,
-          isNew: true
-        };
-        console.log(this.rooms[index])
+        let data = JSON.parse(event.data)
+        if(data.type === "FRIEND_APPLY"){
+          this.noticeIsNew = true;
+          ElMessage.success('您有新的好友申请');
+        }else if(data.type === "ROOM_APPLY"){
+          this.noticeIsNew = true;
+          ElMessage.success('您有新的群聊申请');
+        }else {
+          let index = this.friendIndex.get(Number(data.friendId));
+          this.friends[index] = {
+            ...this.friends[index],
+            lastMsg: data.msg,
+            lastMsgSender: data.username,
+            isNew: true
+          };
+        }
       };
       this.websocket.onclose = () => {
         console.log('WebSocket is closed now.');
