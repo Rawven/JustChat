@@ -26,7 +26,7 @@ public class SocialController {
 
     @GetMapping("/queryMoment")
     public CommonResult<List<MomentVO>> queryMoment() {
-        return CommonResult.operateSuccess("发布成功", socialService.queryMoment());
+        return CommonResult.operateSuccess("查询成功", socialService.queryMoment());
     }
 
     @PostMapping("/releaseMoment")

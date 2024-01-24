@@ -11,7 +11,7 @@ const router = createRouter({
         {
             path: '/test',
             name: 'test',
-            component: () => import('@/components/common/CircleFriends.vue')
+            component: () => import('@/components/common/moment.vue')
         },
         {
 
@@ -57,6 +57,11 @@ const router = createRouter({
                     path: 'friend',
                     name: 'FriendView',
                     component: () => import('@/views/common/FriendPageView.vue'),
+                },
+                {
+                    path: 'moment',
+                    name: 'MomentView',
+                    component: () => import('@/views/common/MomentView.vue')
                 }
             ]
         },

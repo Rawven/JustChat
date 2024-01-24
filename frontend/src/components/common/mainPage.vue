@@ -58,6 +58,10 @@
           </el-icon>
           <el-text tag="b">Notifications</el-text>
         </div>
+        <div class="flex items-center space-x-4" @click="turnMoment">
+            <el-icon><PictureFilled /></el-icon>
+          <el-text tag="b">Moment</el-text>
+        </div>
         <div class="flex items-center space-x-4" @click="logOut">
           <svg
               class="w-6 h-6"
@@ -146,7 +150,7 @@
 import {Host} from "@/main";
 import {reactive, ref} from "vue";
 import ChatRoom from "@/components/common/chatRoom.vue";
-import {ChatLineRound, ChatRound, Message} from "@element-plus/icons-vue";
+import {ChatLineRound, ChatRound, Message, PictureFilled} from "@element-plus/icons-vue";
 import {ElMessage} from "element-plus";
 
 export default {
@@ -166,7 +170,7 @@ export default {
   },
 
   name: 'MainPage',
-  components: {Message, ChatLineRound, ChatRound, ChatRoom},
+  components: {PictureFilled, Message, ChatLineRound, ChatRound, ChatRoom},
   inject: {
     realAxios: {
       from: 'axiosFilter'
@@ -277,6 +281,9 @@ export default {
     },
     checkNull(name) {
       return name !== "";
+    },
+    turnMoment() {
+      this.$router.push('/common/moment');
     },
     getRooms() {
       this.realAxios.get(`http://` + Host + `:7000/chat/common/initUserMainPage`, {

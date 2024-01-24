@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.MongoId;
+import www.raven.jc.dto.UserInfoDTO;
 
 import java.util.Date;
 import java.util.List;
@@ -22,7 +23,7 @@ public class Moment {
      */
     @MongoId
     private ObjectId momentId;
-    private Integer userId;
+    private UserInfoDTO userInfo;
     private String content;
     private String img;
     private List<Like> likes;

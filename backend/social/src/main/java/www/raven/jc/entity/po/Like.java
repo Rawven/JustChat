@@ -2,6 +2,7 @@ package www.raven.jc.entity.po;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+import www.raven.jc.dto.UserInfoDTO;
 
 import java.util.Date;
 
@@ -14,7 +15,6 @@ import java.util.Date;
 @Data
 @Accessors(chain = true)
 public class Like {
-    private Integer userId;
-    private String username;
+    private UserInfoDTO userInfo;
     private Long timestamp;
 }

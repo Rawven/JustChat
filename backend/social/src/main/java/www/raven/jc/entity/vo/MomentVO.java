@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.MongoId;
+import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.Comment;
 import www.raven.jc.entity.po.Like;
 
@@ -19,7 +20,7 @@ import java.util.List;
 @Accessors(chain = true)
 public class MomentVO {
     private String momentId;
-    private Integer userId;
+    private UserInfoDTO userInfo;
     private String content;
     private String img;
     private List<Like> likes;

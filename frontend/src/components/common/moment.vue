@@ -1,7 +1,7 @@
 <template>
   <el-container class="CC">
     <div class="CC bg-gray-100">
-      <div class="flex items-center p-4 border-b border-gray-200 bg-white shadow-sm">
+      <el-header class="flex items-center p-4 border-b border-gray-200 bg-white shadow-sm">
         <svg @click="turnBack"
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -50,14 +50,14 @@
               </el-form-item>
               <el-text>上传图片</el-text>
               <el-upload
-                  v-model="data.document"
-                  :action="`http://` + Host + `:7000/user/upload`"
-                  :auto-upload="false"
-                  :on-success="handleAvatarSuccess"
-                  ref="upload"
-              >
-                <template #trigger>
-                  <el-button >select file</el-button>
+                  class="upload-demo"
+                  action=""
+                  :http-request="uploadFile">
+                <el-button size="small" type="primary">点击上传</el-button>
+                <template #tip>
+                  <div class="el-upload__tip">
+                    jpg/png files with a size less than 500KB.
+                  </div>
                 </template>
               </el-upload>
               <el-form-item>
@@ -67,24 +67,24 @@
 
           </el-card>
         </el-drawer>
-
-      </div>
-
-      <div class="p-4 bg-white mt-4 rounded-lg shadow-sm">
+      </el-header>
+      <el-main class="p-4 bg-white mt-4 rounded-lg shadow-sm ccc">
         <!--      -->
-        <div v-for="feedItem in feedData" :key="feedItem.username">
+        <div v-for="moment in feedData" :key="moment.momentId">
           <div class="flex items-center space-x-3">
       <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
-        <img class="aspect-square h-full w-full" alt="user profile" :src="'http://10.24.3.176:8083/ipfs/'+feedItem.avatar"/>
+        <img class="aspect-square h-full w-full" alt="user profile" :src="'http://10.24.3.176:8083/ipfs/'+moment.userInfo.profile"/>
       </span>
             <div>
-              <div class="font-semibold text-gray-700">{{feedItem.username}}</div>
-              <div class="text-sm text-gray-500">{{feedItem.timestamp}}</div>
+              <div class="font-semibold text-gray-700">{{moment.userInfo.username}}</div>
+              <div class="text-sm text-gray-500">{{timestampToTime(moment.timestamp)}}</div>
             </div>
           </div>
           <div class="mt-3">
-            <p class="text-gray-700">{{ feedItem.content }}</p>
-            <div v-for="comment in feedItem.comments" :key="comment.commentUsername">
+            <p class="text-gray-700">{{ moment.content }}</p>
+            <img class="img-size"
+            alt="user profile" :src="'http://10.24.3.176:8083/ipfs/'+moment.img">
+            <div v-for="comment in moment.comments" :key="comment.userInfo.username">
             <div class="mt-2 rounded-md border p-2 bg-gray-100">
               <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-2">
@@ -92,14 +92,14 @@
               <img
                   class="aspect-square h-full w-full"
                   alt="user profile"
-                  :src="'http://10.24.3.176:8083/ipfs/'+feedItem.avatar"
+                  :src="'http://10.24.3.176:8083/ipfs/'+comment.userInfo.profile"
               />
             </span>
-                  <div class="text-xs text-gray-500">{{comment.commentUsername}} - 评论</div>
+                  <div class="text-xs text-gray-500">{{comment.userInfo.username}} - 评论</div>
                 </div>
-                <div class="text-xs text-gray-500">{{comment.commentTimestamp}}</div>
+                <div class="text-xs text-gray-500">{{comment.userInfo.timestamp}}</div>
               </div>
-              <p class="mt-2 text-sm text-gray-700">{{comment.commentContent}}</p>
+              <p class="mt-2 text-sm text-gray-700">{{comment.content}}</p>
             </div>
             </div>
           </div>
@@ -150,30 +150,15 @@
               <line x1="12" x2="12" y1="2" y2="15"></line>
             </svg>
           </div>
-        </div>
-        <div class="px-4 py-2 border-t border-gray-200 bg-white mt-4 rounded-lg shadow-sm">
-          <div class="flex items-center justify-between">
-            <div class="text-sm text-gray-500">查看全部12条评论</div>
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="text-gray-500"
-            >
-              <circle cx="12" cy="12" r="10"></circle>
-              <path d="M17 12h.01"></path>
-              <path d="M12 12h.01"></path>
-              <path d="M7 12h.01"></path>
-            </svg>
+          <div class="mt-3 flex justify-between text-gray-500">
+            <el-button @click="tolike(moment.momentId)">
+              <i class="el-icon-thumb"></i>
+              {{ getLen(moment.likes) }}
+            </el-button>
+            <el-input v-model="moment.input" placeholder="要评论吗" @keyup.enter="submitComment(moment.momentId,moment.input)"/>
           </div>
         </div>
-      </div>
+      </el-main>
     </div>
     <!---->
   </el-container>
@@ -184,70 +169,43 @@ import {ref} from "vue";
 import {Host} from "@/main";
 
 export default {
+  name: 'Moment-Fuck',
   // 在你的Vue组件中使用的数据结构
+  inject: {
+    realAxios: {
+      from: 'axiosFilter'
+    }
+  },
   data() {
 
     return {
+      input:"",
+      file:"",
+      token:"",
       upload:ref(),
       create:ref(false),
-      feedData: [
-        {
-          username: "用户A",
-          timestamp: "5分钟前",
-          content: "新年，终于有空🎉",
-          avatar: "bafkreihbkvemmrzyecfoyktfqlaiqp3bzz6xsohhqkr2ryl7er56xjksia",
-          comments: [
-            {
-              commentUsername: "用户名",
-              commentTimestamp: "00:25",
-              commentContent: "@[用户名] 恭喜发财 工作也不要太累喔",
-              commentAvatar: "bafkreihbkvemmrzyecfoyktfqlaiqp3bzz6xsohhqkr2ryl7er56xjksia"
-            },
-            {
-              commentUsername: "另一个用户",
-              commentTimestamp: "01:30",
-              commentContent: "祝好运，一切顺利！",
-              commentAvatar:"bafkreihbkvemmrzyecfoyktfqlaiqp3bzz6xsohhqkr2ryl7er56xjksia"
-            }
-            // 可能还有其他评论
-          ],
-          likes: 12 // 点赞数
-        },
-        {
-          username: "学生桑",
-          timestamp: "13分钟前",
-          content: "假期结束了",
-          location: "广州市 · 广东工业大学 · 本科生区",
-          avatar: "bafkreihbkvemmrzyecfoyktfqlaiqp3bzz6xsohhqkr2ryl7er56xjksia",
-          likes: 8 // 点赞数
-        },
-        {
-          username: "A.",
-          timestamp: "21分钟前",
-          content: "两全一年一得！文文照顾人健康吧",
-          avatar: "bafkreihbkvemmrzyecfoyktfqlaiqp3bzz6xsohhqkr2ryl7er56xjksia",
-          likes: 5 // 点赞数
-        },
-        // 可以添加更多测试数据
-        {
-          username: "测试用户1",
-          timestamp: "30分钟前",
-          content: "这是一个测试动态",
-          avatar: "bafkreihbkvemmrzyecfoyktfqlaiqp3bzz6xsohhqkr2ryl7er56xjksia",
-          likes: 3,
-          comments: [
-            {
-              commentUsername: "测试用户2",
-              commentTimestamp: "31分钟前",
-              commentContent: "这是一个测试评论",
-              commentAvatar: "bafkreihbkvemmrzyecfoyktfqlaiqp3bzz6xsohhqkr2ryl7er56xjksia"
-            }
-          ]
-        }
-      ],
+      comment:{
+        userInfo: "",
+        timestamp: "",
+        content: "",
+      },
+      like:{
+        userInfo: "",
+        timestamp: "",
+      },
+      moment:{
+        momentId: "",
+        userInfo: "",
+        timestamp: "",
+        content: "",
+        img: "",
+        likes: [],
+        comments: []
+      },
+      feedData: [],
       data: {
         text: '',      // 朋友圈文本内容
-        document: '',  // 朋友圈附加文档内容（例如图片、链接等）
+        img: '',  // 朋友圈附加文档内容（例如图片、链接等）
       },
       rules: {
         username: [
@@ -266,14 +224,14 @@ export default {
     };
   },
   created() {
-    // this.realAxios.post(`http://` + Host + `:7000/feed/common/getFeed`, {}, {
-    //   headers: {
-    //     'token': localStorage.getItem("token")
-    //   }
-    // })
-    //     .then(response => {
-    //       this.feedData = response.data.data;
-    //     })
+    this.realAxios.get(`http://` + Host + `:7000/social/queryMoment`,{
+      headers: {
+        'token': localStorage.getItem("token")
+      }
+    }).then(response => {
+          this.feedData = response.data.data;
+        })
+    this.token = localStorage.getItem("token");
   },
   methods: {
     Host() {
@@ -282,9 +240,86 @@ export default {
     turnBack() {
       this.$router.push('/common/mainPage');
     },
+    timestampToTime(timestamp) {
+      // 将时间戳转换为毫秒
+      const date = new Date(timestamp);
+      // 获取年份
+      const year = date.getFullYear();
+      // 获取月份
+      const month = ("0" + (date.getMonth() + 1)).slice(-2);
+      // 获取日期
+      const day = ("0" + date.getDate()).slice(-2);
+      // 获取小时
+      const hours = ("0" + date.getHours()).slice(-2);
+      // 获取分钟
+      const minutes = ("0" + date.getMinutes()).slice(-2);
+      // 获取秒
+      const seconds = ("0" + date.getSeconds()).slice(-2);
+      // 返回格式化的日期
+      return year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
+    },
+    uploadFile(param){
+      const formData = new FormData()
+      formData.append('file', param.file)
+      const url = 'http://'+Host+':7000/user/upload'
+      this.realAxios.post(url, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'token': localStorage.getItem("token")
+        }
+      }).then(response => {
+        this.data.img = response.data.data;
+        this.$message.success('文件上传成功');
+      })
+    },
+    getLen(arr) {
+      if(arr === null){
+        return 0;
+      }
+      return arr.length;
+    },
+    tolike(momentId) {
+      this.realAxios.get(`http://` + Host + `:7000/social/likeMoment/${momentId}`,
+          {
+        headers: {
+          'token': localStorage.getItem("token")
+        }
+      })
+          .then(() => {
+            this.$message.success('点赞成功');
+          })
+      this.realAxios.get(`http://` + Host + `:7000/social/queryMoment`,{
+        headers: {
+          'token': localStorage.getItem("token")
+        }
+      }).then(response => {
+        this.feedData = response.data.data;
+      })
+    },
+    submitComment(momentId,text) {
+      this.realAxios.post(`http://` + Host + `:7000/social/commentMoment`,{
+        momentId: momentId,
+        text: text
+      },
+          {
+        headers: {
+          'token': localStorage.getItem("token")
+        }
+      })
+          .then(() => {
+            this.$message.success('评论成功');
+            this.input = "";
+          })
+      this.realAxios.get(`http://` + Host + `:7000/social/queryMoment`,{
+        headers: {
+          'token': localStorage.getItem("token")
+        }
+      }).then(response => {
+        this.feedData = response.data.data;
+      })
+    },
     release() {
-      this.upload.value.submit();
-      this.realAxios.post(`http://` + Host + `:7000/feed/common/releaseFeed`, this.data, {
+      this.realAxios.post(`http://` + Host + `:7000/social/releaseMoment`, this.data, {
         headers: {
           'token': localStorage.getItem("token")
         }
@@ -293,9 +328,13 @@ export default {
             this.$message.success('发布成功');
             this.create = false;
           })
-    },
-    handleAvatarSuccess (res) {
-      this.data.document = res.data.data;
+      this.realAxios.get(`http://` + Host + `:7000/social/queryMoment`,{
+        headers: {
+          'token': localStorage.getItem("token")
+        }
+      }).then(response => {
+        this.feedData = response.data.data;
+      })
     },
   }
 
@@ -306,8 +345,17 @@ export default {
 <style scoped>
 .CC {
   height: 100%;
-  width: 50cm;
+  width: 56cm;
   margin: 0;
   padding: 0;
+}
+ .img-size{
+  width: 200px;
+  height: 200px;
+}
+.ccc {
+  height: 50%; /* 设置高度为视口的100% */
+  overflow-y: auto; /* 当内容溢出时显示滚动条 */
+  padding-top: 30px;
 }
 </style>

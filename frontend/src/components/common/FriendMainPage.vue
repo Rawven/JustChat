@@ -67,6 +67,10 @@
           </svg>
           <span>Notifications</span>
         </div>
+        <div class="flex items-center space-x-4" @click="turnMoment">
+          <el-icon><PictureFilled /></el-icon>
+          <el-text tag="b">Moment</el-text>
+        </div>
         <div class="flex items-center space-x-4" @click="logOut">
           <svg
               class="w-6 h-6"
@@ -155,7 +159,7 @@
 import {Host} from "@/main";
 import {reactive, ref} from "vue";
 import ChatFriend from "@/components/common/chatFriend.vue";
-import {ChatLineRound, ChatRound} from "@element-plus/icons-vue";
+import {ChatLineRound, ChatRound, PictureFilled} from "@element-plus/icons-vue";
 import {ElMessage} from "element-plus";
 
 export default {
@@ -168,7 +172,7 @@ export default {
     },
   },
   name: 'MainPage',
-  components: {ChatFriend, ChatLineRound, ChatRound},
+  components: {PictureFilled, ChatFriend, ChatLineRound, ChatRound},
   inject: {
     realAxios: {
       from: 'axiosFilter'
@@ -231,6 +235,9 @@ export default {
     checkOut(friendId) {
       this.nowFriendId = friendId;
       this.friends[this.friendIndex.get(friendId)].isNew = false;
+    },
+    turnMoment() {
+      this.$router.push('/common/moment');
     },
     initWebSocket() {
       let token = localStorage.getItem("token");

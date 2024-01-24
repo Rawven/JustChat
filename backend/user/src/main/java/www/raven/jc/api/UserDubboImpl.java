@@ -81,4 +81,9 @@ public class UserDubboImpl implements UserDubbo {
         noticeService.deleteNotification(noticeId);
         return RpcResult.operateSuccess("删除成功");
     }
+
+    @Override
+    public RpcResult<List<UserInfoDTO>> getFriendAndMeInfos(int i) {
+        return RpcResult.operateSuccess("查找成功", friendService.getFriendAndMeInfos(i));
+    }
 }

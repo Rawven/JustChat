@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
+import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.Comment;
 import www.raven.jc.entity.po.Like;
 import www.raven.jc.entity.po.Moment;
@@ -45,9 +46,9 @@ public class MomentDAO {
                 new Update().push("comments", comment), COLLECTION_MOMENT).getModifiedCount() > 0;
     }
 
-    public List<Moment> queryMoment(List<Integer> ids) {
+    public List<Moment> queryMoment(List<UserInfoDTO> infos) {
          //查找 ids 中的用户的动态 按照时间排序 只查7条
-        Query with = new Query(Criteria.where("userId").in(ids)).limit(7).with(Sort.by(Sort.Direction.DESC, "timestamp"));
+        Query with = new Query(Criteria.where("userInfo").in(infos)).limit(7).with(Sort.by(Sort.Direction.DESC, "timestamp"));
         return mongoTemplate.find(with, Moment.class, COLLECTION_MOMENT);
 
     }

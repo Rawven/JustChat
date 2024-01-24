@@ -42,11 +42,7 @@ public class FriendServiceImpl implements FriendService {
 
     @Override
     public List<UserInfoDTO> getFriendInfos(int userId) {
-        List<Friend> userId1 = friendDAO.getBaseMapper().selectList(new QueryWrapper<Friend>().eq("user_id", userId));
-        if(userId1.isEmpty()){
-            return new ArrayList<>();
-        }
-        List<Long> collect = userId1.stream().map(Friend::getFriendId).collect(Collectors.toList());
+        List<Long> collect = getFriendIds(userId);
         return userDAO.getBaseMapper().selectList(new QueryWrapper<User>().in("id", collect)).stream().map(
                 user -> new UserInfoDTO()
                         .setUserId(user.getId()).setUsername(user.getUsername()).setProfile(user.getProfile())
@@ -61,5 +57,22 @@ public class FriendServiceImpl implements FriendService {
         Friend friend1 = new Friend().setUserId((long) friendId).setFriendId((long) userId);
         boolean b = friendDAO.saveBatch(List.of(friend, friend1));
         Assert.isTrue(b,"成为好友失败");
+    }
+
+    @Override
+    public List<UserInfoDTO> getFriendAndMeInfos(int userId) {
+        List<Long> collect = getFriendIds(userId);
+        collect.add((long) userId);
+        return userDAO.getBaseMapper().selectList(new QueryWrapper<User>().in("id", collect)).stream().map(
+                user -> new UserInfoDTO()
+                        .setUserId(user.getId()).setUsername(user.getUsername()).setProfile(user.getProfile())
+        ).collect(Collectors.toList());
+    }
+    private List<Long> getFriendIds(int userId){
+        List<Friend> userId1 = friendDAO.getBaseMapper().selectList(new QueryWrapper<Friend>().eq("user_id", userId));
+        if(userId1.isEmpty()){
+            return new ArrayList<>();
+        }
+        return userId1.stream().map(Friend::getFriendId).collect(Collectors.toList());
     }
 }

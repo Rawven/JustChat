@@ -39,8 +39,11 @@ public class SocialServiceImpl implements SocialService {
     @Override
     public void releaseMoment(MomentModel model) {
         String userId = request.getHeader("userId");
+        RpcResult<UserInfoDTO> singleInfo = userDubbo.getSingleInfo(Integer.valueOf(userId));
+        Assert.isTrue(singleInfo.isSuccess(), "获取用户信息失败");
+        UserInfoDTO data = singleInfo.getData();
         Moment moment = new Moment()
-                .setUserId(Integer.valueOf(userId))
+                .setUserInfo(data)
                 .setImg(model.getImg())
                 .setContent(model.getText())
                 .setTimestamp(System.currentTimeMillis());
@@ -58,8 +61,8 @@ public class SocialServiceImpl implements SocialService {
         RpcResult<UserInfoDTO> singleInfo = userDubbo.getSingleInfo(Integer.valueOf(userId));
         Assert.isTrue(singleInfo.isSuccess(), "获取用户信息失败");
         UserInfoDTO data = singleInfo.getData();
-        Like like = new Like().setTimestamp(System.currentTimeMillis()).setUserId(data.getUserId())
-                .setUsername(data.getUsername()).setTimestamp(System.currentTimeMillis());
+        Like like = new Like().setTimestamp(System.currentTimeMillis()).setUserInfo(data)
+                .setTimestamp(System.currentTimeMillis());
         Assert.isTrue(momentDAO.like(momentId, like), "点赞失败");
     }
 
@@ -70,7 +73,7 @@ public class SocialServiceImpl implements SocialService {
         Assert.isTrue(singleInfo.isSuccess(), "获取用户信息失败");
         UserInfoDTO data = singleInfo.getData();
         Comment comment = new Comment().setTimestamp(System.currentTimeMillis())
-                .setUserId(data.getUserId()).setUsername(data.getUsername())
+                .setUserInfo(data)
                 .setContent(model.getText());
         Assert.isTrue(momentDAO.comment(model.getMomentId(), comment), "评论失败");
 
@@ -79,14 +82,13 @@ public class SocialServiceImpl implements SocialService {
     @Override
     public List<MomentVO> queryMoment() {
         String userId = request.getHeader("userId");
-        RpcResult<List<UserInfoDTO>> friendInfos = userDubbo.getFriendInfos(Integer.parseInt(userId));
+        RpcResult<List<UserInfoDTO>> friendInfos = userDubbo.getFriendAndMeInfos(Integer.parseInt(userId));
         Assert.isTrue(friendInfos.isSuccess(), "获取好友信息失败");
-        List<Integer> list= friendInfos.getData().stream().map(UserInfoDTO::getUserId).collect(Collectors.toList());
-        List<Moment> moments = momentDAO.queryMoment(list);
+        List<Moment> moments = momentDAO.queryMoment(friendInfos.getData());
         return moments.stream().map(moment -> {
             MomentVO vo = new MomentVO();
             vo.setMomentId(moment.getMomentId().toHexString());
-            vo.setUserId(moment.getUserId());
+            vo.setUserInfo(moment.getUserInfo());
             vo.setContent(moment.getContent());
             vo.setImg(moment.getImg());
             vo.setTimestamp(moment.getTimestamp());
