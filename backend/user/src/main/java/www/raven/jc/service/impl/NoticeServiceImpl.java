@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.constant.MqConstant;
@@ -19,7 +18,7 @@ import www.raven.jc.entity.po.Friend;
 import www.raven.jc.entity.po.Notification;
 import www.raven.jc.entity.po.User;
 import www.raven.jc.entity.vo.NoticeVO;
-import www.raven.jc.event.JoinRoomApplyEvent;
+import www.raven.jc.event.RoomApplyEvent;
 import www.raven.jc.service.NoticeService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.ws.NotificationHandler;
@@ -105,7 +104,7 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
-    public void addRoomApply(int founderId, JoinRoomApplyEvent payload) {
+    public void addRoomApply(int founderId, RoomApplyEvent payload) {
         Notification notice = new Notification().setUserId(founderId)
                 .setData(String.valueOf(payload.getRoomId()))
                 .setType(NoticeConstant.TYPE_JOIN_ROOM_APPLY)

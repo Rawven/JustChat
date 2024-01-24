@@ -25,7 +25,7 @@ spring:
   cloud:
     stream:
       function:
-        definition: eventChatToUser;
+        definition: eventChatToUser,eventSocialToUser;
       rocketmq:
         binder:
           name-server: 10.21.32.221:9876
@@ -38,6 +38,11 @@ spring:
           consumer:
             max-attempts: 3
           destination: eventChatToUser
+          group: user-module
+        eventSocialToUser-in-0:
+          consumer:
+                max-attempts: 3
+          destination: eventSocialToUser
           group: user-module
     nacos:
       discovery:

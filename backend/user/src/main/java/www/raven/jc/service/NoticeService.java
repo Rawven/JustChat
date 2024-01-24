@@ -1,7 +1,7 @@
 package www.raven.jc.service;
 
 import www.raven.jc.entity.vo.NoticeVO;
-import www.raven.jc.event.JoinRoomApplyEvent;
+import www.raven.jc.event.RoomApplyEvent;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ public interface NoticeService {
      * @param founderId founder id
      * @param payload   payload
      */
-    void addRoomApply(int founderId, JoinRoomApplyEvent payload);
+    void addRoomApply(int founderId, RoomApplyEvent payload);
 
 
     /**

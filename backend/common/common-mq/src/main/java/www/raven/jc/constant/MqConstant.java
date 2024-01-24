@@ -17,5 +17,7 @@ public class MqConstant {
     public static final String TAGS_ROOM_MSG_RECORD = "ROOM_MSG_RECORD";
     public static final String TAGS_FRIEND_MSG_RECORD = "FRIEND_MSG_RECORD";
 
+    public static final String TAGS_MOMENT_RELEASE_RECORD = "MOMENT_RELEASE_RECORD";
+
     public final static long EXPIRE_TIME = 10;
 }

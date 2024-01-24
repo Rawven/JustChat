@@ -17,12 +17,12 @@ import www.raven.jc.entity.po.Notification;
 import www.raven.jc.entity.po.User;
 import www.raven.jc.event.Event;
 import www.raven.jc.event.FriendMsgEvent;
-import www.raven.jc.event.JoinRoomApplyEvent;
+import www.raven.jc.event.RoomApplyEvent;
 import www.raven.jc.event.RoomMsgEvent;
 import www.raven.jc.util.JsonUtil;
+import www.raven.jc.util.MqUtil;
 import www.raven.jc.ws.NotificationHandler;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -39,7 +39,7 @@ import static www.raven.jc.constant.MqConstant.*;
  */
 @Service
 @Slf4j
-public class MessageConsumer {
+public class ChatMqConsumer {
 
     @Autowired
     private UserDAO userDAO;
@@ -56,12 +56,9 @@ public class MessageConsumer {
     public Consumer<Message<Event>> eventChatToUser() {
         return msg -> {
             //判断是否重复消息
-            Object id = msg.getHeaders().get(MqConstant.HEADER_KEYS);
-            if (id == null || redissonClient.getBucket(HEAD+ id).isExists()) {
-                log.info("--RocketMq 重复或非法的消息，不处理");
+            if(MqUtil.checkMsgIsvalid(msg, redissonClient)){
                 return;
             }
-
             String tags = Objects.requireNonNull(msg.getHeaders().get(HEADER_TAGS)).toString();
             //判断消息类型
             if (MqConstant.TAGS_ROOM_APPLY.equals(tags)) {
@@ -73,7 +70,7 @@ public class MessageConsumer {
             } else {
                 log.info("--RocketMq 非法的消息，不处理");
             }
-            redissonClient.getBucket(HEAD+ id).set(id, MqConstant.EXPIRE_TIME, TimeUnit.MINUTES);
+            MqUtil.protectMsg(msg, redissonClient);
         };
     }
 
@@ -98,7 +95,7 @@ public class MessageConsumer {
      * @param msg msg
      */
     public void eventUserJoinRoomApply(Message<Event> msg) {
-        JoinRoomApplyEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), JoinRoomApplyEvent.class);
+        RoomApplyEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), RoomApplyEvent.class);
         log.info("--RocketMq receive join room apply event:{}", msg);
         Integer founderId = payload.getFounderId();
         Notification notice = new Notification().setUserId(founderId)
