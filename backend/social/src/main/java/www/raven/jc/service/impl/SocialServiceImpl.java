@@ -2,9 +2,11 @@ package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.redisson.api.RScoredSortedSet;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.stream.function.StreamBridge;
-import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
 import org.springframework.stereotype.Service;
 import www.raven.jc.api.UserDubbo;
 import www.raven.jc.constant.MqConstant;
@@ -23,6 +25,8 @@ import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,6 +46,9 @@ public class SocialServiceImpl implements SocialService {
     private UserDubbo userDubbo;
     @Autowired
     private StreamBridge streamBridge;
+    @Autowired
+    private RedissonClient redissonClient;
+    public static final String PREFIX = "moment_";
     @Override
     public void releaseMoment(MomentModel model) {
         String userId = request.getHeader("userId");
@@ -53,11 +60,11 @@ public class SocialServiceImpl implements SocialService {
                 .setImg(model.getImg())
                 .setContent(model.getText())
                 .setTimestamp(System.currentTimeMillis());
-        Assert.isTrue(momentDAO.save(moment), "发布失败");
-        MomentReleaseEvent momentReleaseEvent = new MomentReleaseEvent();
+        Moment save = momentDAO.save(moment);
+        Assert.isTrue(save.getMomentId() != null, "发布失败");
+        MomentReleaseEvent momentReleaseEvent = new MomentReleaseEvent().setReleaseId(Integer.valueOf(userId)).setMoment(JsonUtil.objToJson(save));
         streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(momentReleaseEvent), MqConstant.TAGS_MOMENT_RELEASE_RECORD));
     }
-
     @Override
     public void deleteMoment(String momentId) {
         Assert.isTrue(momentDAO.delete(momentId));
@@ -72,6 +79,7 @@ public class SocialServiceImpl implements SocialService {
         Like like = new Like().setTimestamp(System.currentTimeMillis()).setUserInfo(data)
                 .setTimestamp(System.currentTimeMillis());
         Assert.isTrue(momentDAO.like(momentId, like), "点赞失败");
+
     }
 
     @Override
@@ -84,16 +92,23 @@ public class SocialServiceImpl implements SocialService {
                 .setUserInfo(data)
                 .setContent(model.getText());
         Assert.isTrue(momentDAO.comment(model.getMomentId(), comment), "评论失败");
-
     }
 
     @Override
-    public List<MomentVO> queryMoment() {
-        String userId = request.getHeader("userId");
-        RpcResult<List<UserInfoDTO>> friendInfos = userDubbo.getFriendAndMeInfos(Integer.parseInt(userId));
+    public List<MomentVO> queryMoment(int userId) {
+        if (redissonClient.getScoredSortedSet(PREFIX + userId).isExists()) {
+            // 获取有序集合
+            RScoredSortedSet<MomentVO> scoredSortedSet = redissonClient.getScoredSortedSet(PREFIX + userId);
+            // 获取最近3天时间里的10条朋友圈
+            long currentTime = System.currentTimeMillis();
+            return new ArrayList<>(
+                    scoredSortedSet.valueRangeReversed(currentTime - 1000 * 60 * 60 * 24 * 3, true, currentTime, true, 0, 10)
+            );
+        }
+        RpcResult<List<UserInfoDTO>> friendInfos = userDubbo.getFriendAndMeInfos(userId);
         Assert.isTrue(friendInfos.isSuccess(), "获取好友信息失败");
         List<Moment> moments = momentDAO.queryMoment(friendInfos.getData());
-        return moments.stream().map(moment -> {
+        List<MomentVO> collect = moments.stream().map(moment -> {
             MomentVO vo = new MomentVO();
             vo.setMomentId(moment.getMomentId().toHexString());
             vo.setUserInfo(moment.getUserInfo());
@@ -104,5 +119,10 @@ public class SocialServiceImpl implements SocialService {
             vo.setLikes(moment.getLikes());
             return vo;
         }).collect(Collectors.toList());
+        RScoredSortedSet<MomentVO> scoredSortedSet = redissonClient.getScoredSortedSet(PREFIX+ userId);
+        collect.forEach(momentVO -> {
+            scoredSortedSet.add(momentVO.getTimestamp(), momentVO);
+        });
+        return collect;
     }
 }

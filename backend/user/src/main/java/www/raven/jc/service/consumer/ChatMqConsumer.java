@@ -67,7 +67,7 @@ public class ChatMqConsumer {
                 eventRoomSendMsg(msg);
             } else if (MqConstant.TAGS_FRIEND_MSG_RECORD.equals(tags)) {
                 eventFriendSendMsg(msg);
-            } else {
+            }else {
                 log.info("--RocketMq 非法的消息，不处理");
             }
             MqUtil.protectMsg(msg, redissonClient);

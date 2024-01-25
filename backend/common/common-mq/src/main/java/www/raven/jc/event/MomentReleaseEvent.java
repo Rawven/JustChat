@@ -12,11 +12,11 @@ import lombok.experimental.Accessors;
  * @date 2024/01/25
  */
 @Data
-@Accessors
+@Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class MomentReleaseEvent {
-    //TODO
-    private Integer releaseId;
 
+    private Integer releaseId;
+    private String  moment;
 }

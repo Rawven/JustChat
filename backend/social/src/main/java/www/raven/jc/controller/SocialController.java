@@ -23,10 +23,13 @@ import java.util.List;
 public class SocialController {
     @Autowired
     private SocialService socialService;
+    @Autowired
+    private HttpServletRequest request;
 
     @GetMapping("/queryMoment")
     public CommonResult<List<MomentVO>> queryMoment() {
-        return CommonResult.operateSuccess("查询成功", socialService.queryMoment());
+        String userId = request.getHeader("userId");
+        return CommonResult.operateSuccess("查询成功", socialService.queryMoment(Integer.parseInt(userId)));
     }
 
     @PostMapping("/releaseMoment")
