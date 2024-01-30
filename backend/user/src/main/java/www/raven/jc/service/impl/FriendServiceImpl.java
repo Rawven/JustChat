@@ -3,24 +3,18 @@ package www.raven.jc.service.impl;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RBucket;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import www.raven.jc.constant.MqConstant;
 import www.raven.jc.dao.FriendDAO;
 import www.raven.jc.dao.UserDAO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.Friend;
 import www.raven.jc.entity.po.User;
 import www.raven.jc.service.FriendService;
-import www.raven.jc.util.JsonUtil;
-import www.raven.jc.ws.NotificationHandler;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 

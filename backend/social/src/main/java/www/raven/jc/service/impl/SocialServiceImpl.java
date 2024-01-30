@@ -5,7 +5,6 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import www.raven.jc.api.UserDubbo;
@@ -18,6 +17,8 @@ import www.raven.jc.entity.po.Comment;
 import www.raven.jc.entity.po.Like;
 import www.raven.jc.entity.po.Moment;
 import www.raven.jc.entity.vo.MomentVO;
+import www.raven.jc.event.MomentCommentEvent;
+import www.raven.jc.event.MomentLikeEvent;
 import www.raven.jc.event.MomentReleaseEvent;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.SocialService;
@@ -26,7 +27,6 @@ import www.raven.jc.util.MqUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -79,7 +79,8 @@ public class SocialServiceImpl implements SocialService {
         Like like = new Like().setTimestamp(System.currentTimeMillis()).setUserInfo(data)
                 .setTimestamp(System.currentTimeMillis());
         Assert.isTrue(momentDAO.like(momentId, like), "点赞失败");
-
+        MomentLikeEvent momentReleaseEvent = new MomentLikeEvent().setMomentId(momentId).setLike(JsonUtil.objToJson(like));
+        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(momentReleaseEvent), MqConstant.TAGS_MOMENT_LIKE_RECORD));
     }
 
     @Override
@@ -92,6 +93,8 @@ public class SocialServiceImpl implements SocialService {
                 .setUserInfo(data)
                 .setContent(model.getText());
         Assert.isTrue(momentDAO.comment(model.getMomentId(), comment), "评论失败");
+        MomentCommentEvent momentReleaseEvent = new MomentCommentEvent().setMomentId(model.getMomentId()).setComment(JsonUtil.objToJson(comment));
+        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(momentReleaseEvent), MqConstant.TAGS_MOMENT_COMMENT_RECORD));
     }
 
     @Override
@@ -120,9 +123,7 @@ public class SocialServiceImpl implements SocialService {
             return vo;
         }).collect(Collectors.toList());
         RScoredSortedSet<MomentVO> scoredSortedSet = redissonClient.getScoredSortedSet(PREFIX+ userId);
-        collect.forEach(momentVO -> {
-            scoredSortedSet.add(momentVO.getTimestamp(), momentVO);
-        });
+        collect.forEach(momentVO -> scoredSortedSet.add(momentVO.getTimestamp(), momentVO));
         return collect;
     }
 }

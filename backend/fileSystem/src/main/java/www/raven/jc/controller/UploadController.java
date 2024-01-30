@@ -6,8 +6,6 @@ import org.springframework.web.multipart.MultipartFile;
 import www.raven.jc.client.IpfsClient;
 import www.raven.jc.result.CommonResult;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * upload controller
  *

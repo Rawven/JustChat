@@ -16,7 +16,6 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MomentReleaseEvent {
-
     private Integer releaseId;
     private String  moment;
 }

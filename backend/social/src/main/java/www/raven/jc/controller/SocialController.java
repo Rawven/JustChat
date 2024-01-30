@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import www.raven.jc.entity.model.CommentModel;
 import www.raven.jc.entity.model.MomentModel;
-import www.raven.jc.entity.po.Moment;
 import www.raven.jc.entity.vo.MomentVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.SocialService;

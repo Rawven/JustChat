@@ -20,4 +20,6 @@ public class MqConstant {
     public static final String TAGS_MOMENT_RELEASE_RECORD = "MOMENT_RELEASE_RECORD";
 
     public final static long EXPIRE_TIME = 10;
+    public static final String TAGS_MOMENT_COMMENT_RECORD = "MOMENT_COMMENT_RECORD";
+    public static final String TAGS_MOMENT_LIKE_RECORD = "MOMENT_LIKE_RECORD";
 }

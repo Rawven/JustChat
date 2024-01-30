@@ -12,6 +12,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="fileSystem" />
         <module name="common-util" />
         <module name="auth" />
         <module name="social" />

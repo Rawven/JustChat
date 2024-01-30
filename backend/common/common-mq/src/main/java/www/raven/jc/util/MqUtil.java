@@ -11,11 +11,9 @@ import www.raven.jc.event.Event;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static www.raven.jc.constant.MqConstant.HEAD;
-import static www.raven.jc.constant.MqConstant.HEADER_TAGS;
 
 /**
  * mq util

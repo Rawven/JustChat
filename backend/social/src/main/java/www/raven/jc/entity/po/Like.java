@@ -4,8 +4,6 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import www.raven.jc.dto.UserInfoDTO;
 
-import java.util.Date;
-
 /**
  * like
  *
