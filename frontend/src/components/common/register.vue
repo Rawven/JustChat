@@ -14,6 +14,18 @@
         <el-form-item label="Password" prop="password">
           <el-input v-model="user.password" required type="password"></el-input>
         </el-form-item>
+        <el-text>上传图片</el-text>
+        <el-upload
+            :http-request="uploadFile"
+            action=""
+            class="upload-demo">
+          <el-button size="small" type="primary">点击上传</el-button>
+          <template #tip>
+            <div class="el-upload__tip">
+              jpg/png files with a size less than 500KB.
+            </div>
+          </template>
+        </el-upload>
         <el-form-item>
           <el-button type="primary" @click="register">Register</el-button>
         </el-form-item>
@@ -39,6 +51,7 @@ export default {
         username: '',
         email: '',
         password: '',
+        profile: '',
       },
       rules: {
         // Add validation rules if needed
@@ -51,6 +64,20 @@ export default {
     };
   },
   methods: {
+    uploadFile(param) {
+      const formData = new FormData()
+      formData.append('file', param.file)
+      const url = 'http://' + Host + ':7000/file/upload'
+      this.realAxios.post(url, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'token': localStorage.getItem("token")
+        }
+      }).then(response => {
+        this.user.profile = response.data.data;
+        this.$message.success('文件上传成功');
+      })
+    },
     register() {
       // 表单校验
       this.$refs.registerForm.validate((valid) => {

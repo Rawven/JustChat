@@ -2,8 +2,6 @@ package www.raven.jc.entity.vo;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.bson.types.ObjectId;
-import org.springframework.data.mongodb.core.mapping.MongoId;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.Comment;
 import www.raven.jc.entity.po.Like;

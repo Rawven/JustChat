@@ -274,7 +274,7 @@ export default {
     uploadFile(param) {
       const formData = new FormData()
       formData.append('file', param.file)
-      const url = 'http://' + Host + ':7000/user/upload'
+      const url = 'http://' + Host + ':7000/file/upload'
       this.realAxios.post(url, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',

@@ -29,11 +29,6 @@ const router = createRouter({
                     component: registerView
                 },
                 {
-                    path: 'setAvatar',
-                    name: 'AvatarView',
-                    component: AvatarView
-                },
-                {
                     path: 'mainPage',
                     name: "MainPageView",
                     component: MainPageView

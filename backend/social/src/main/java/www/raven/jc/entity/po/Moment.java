@@ -6,7 +6,6 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 import www.raven.jc.dto.UserInfoDTO;
 
-import java.util.Date;
 import java.util.List;
 
 /**

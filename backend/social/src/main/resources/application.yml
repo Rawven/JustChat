@@ -22,11 +22,18 @@ spring:
     redis.cache-null-values: true
   cloud:
     stream:
+      function:
+        definition: eventToPull;
       bindings:
         producer-out-1:
-          destination: eventSocialToUser
+          destination: eventToPull
         producer-out-0:
-          destination: eventSocialToUser
+          destination: eventToPull
+        eventToPull-in-0:
+          consumer:
+            max-attempts: 3
+          destination: eventChatToUser
+          group: social-module
       rocketmq:
         bindings:
           producer-out-1:

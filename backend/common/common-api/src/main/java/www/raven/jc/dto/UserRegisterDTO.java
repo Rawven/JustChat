@@ -22,5 +22,6 @@ public class UserRegisterDTO extends CommonSerializable {
     private String username;
     private String password;
     private String email;
+    private String profile;
     private List<Integer> roleIds;
 }

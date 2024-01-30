@@ -33,6 +33,8 @@
     <file url="file://$PROJECT_DIR$/common/common-ws/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/common/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/fileSystem/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/fileSystem/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gateway/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/social/src/main/java" charset="UTF-8" />

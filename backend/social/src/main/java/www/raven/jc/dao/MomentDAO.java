@@ -27,9 +27,8 @@ public class MomentDAO {
 
     private static final String COLLECTION_MOMENT = "moment";
 
-    public boolean save(Moment moment) {
-        Moment save = mongoTemplate.save(moment, COLLECTION_MOMENT);
-        return  save.getMomentId() != null;
+    public Moment save(Moment moment) {
+        return mongoTemplate.save(moment, COLLECTION_MOMENT);
     }
 
     public boolean delete(String momentId) {

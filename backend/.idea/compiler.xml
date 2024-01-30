@@ -12,17 +12,18 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="common-api" />
-        <module name="common-ws" />
+        <module name="fileSystem" />
         <module name="common-util" />
         <module name="auth" />
         <module name="social" />
-        <module name="chat" />
         <module name="common-aop" />
         <module name="common-mq" />
         <module name="common-mp" />
-        <module name="user" />
         <module name="common-redis" />
+        <module name="common-api" />
+        <module name="common-ws" />
+        <module name="chat" />
+        <module name="user" />
         <module name="gateway" />
       </profile>
     </annotationProcessing>

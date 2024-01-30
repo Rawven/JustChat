@@ -15,17 +15,12 @@ spring:
   redis:
     address: redis://10.21.32.221:6379
     password: 123456
-  servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
-      enabled: true
   application:
     name: JC-User
   cloud:
     stream:
       function:
-        definition: eventChatToUser,eventSocialToUser;
+        definition: eventChatToUser;
       rocketmq:
         binder:
           name-server: 10.21.32.221:9876
@@ -39,11 +34,6 @@ spring:
             max-attempts: 3
           destination: eventChatToUser
           group: user-module
-        eventSocialToUser-in-0:
-          consumer:
-                max-attempts: 3
-          destination: eventSocialToUser
-          group: user-module
     nacos:
       discovery:
         server-addr: 10.21.32.154:8848
@@ -55,5 +45,3 @@ server:
   port: 8080
 Raven:
   key: 爱你老妈
-Ipfs:
-  api: /ip4/127.0.0.1/tcp/5001

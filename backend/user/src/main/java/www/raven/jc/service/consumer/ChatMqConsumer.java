@@ -26,7 +26,6 @@ import www.raven.jc.ws.NotificationHandler;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import static www.raven.jc.constant.MqConstant.*;
@@ -67,7 +66,7 @@ public class ChatMqConsumer {
                 eventRoomSendMsg(msg);
             } else if (MqConstant.TAGS_FRIEND_MSG_RECORD.equals(tags)) {
                 eventFriendSendMsg(msg);
-            } else {
+            }else {
                 log.info("--RocketMq 非法的消息，不处理");
             }
             MqUtil.protectMsg(msg, redissonClient);

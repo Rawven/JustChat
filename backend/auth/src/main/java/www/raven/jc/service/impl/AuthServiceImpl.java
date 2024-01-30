@@ -95,7 +95,7 @@ public class AuthServiceImpl implements AuthService {
         Assert.isFalse(userDubbo.checkUserExit(registerModel.getUsername()).getData());
         UserRegisterDTO user = new UserRegisterDTO();
         user.setEmail(registerModel.getEmail()).setPassword(passwordEncoder.encode(registerModel.getPassword()))
-                .setUsername(registerModel.getUsername()).setRoleIds(roleIds);
+                .setUsername(registerModel.getUsername()).setRoleIds(roleIds).setProfile(registerModel.getProfile());
         RpcResult<UserAuthDTO> insert = userDubbo.insert(user);
         Assert.isTrue(insert.isSuccess());
         List<RoleDTO> list = new ArrayList<>();
