@@ -50,7 +50,7 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/auth/**", "/ws/**", "/webSocket/**").permitAll()
-                        .pathMatchers("/chat/**", "/user/**").hasAnyRole("USER","ADMIN")
+                        .pathMatchers("/chat/**", "/user/**","/file/**","/social/**").hasAnyRole("USER","ADMIN")
                         .pathMatchers("/admin/**").hasRole("ADMIN")
                         .anyExchange().authenticated()
                 )

@@ -38,6 +38,12 @@ spring:
             - Path=/social/**
           filters: # 过滤器
             - StripPrefix=1 # 去掉路径中的第一级
+        - id: file
+          uri: lb://JC-File
+          predicates:
+            - Path=/file/**
+          filters: # 过滤器
+            - StripPrefix=1 # 去掉路径中的第一级
     nacos:
       discovery:
         server-addr: 10.21.32.154:8848

@@ -15,6 +15,7 @@
         <module>chat</module>
         <module>auth</module>
         <module>social</module>
+        <module>fileSystem</module>
     </modules>
     <properties>
         <maven.compiler.source>11</maven.compiler.source>

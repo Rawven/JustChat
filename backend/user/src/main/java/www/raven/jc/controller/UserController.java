@@ -3,9 +3,7 @@ package www.raven.jc.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import www.raven.jc.annotions.Auth;
-import www.raven.jc.client.IpfsClient;
 import www.raven.jc.constant.RoleConstant;
 import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
@@ -35,8 +33,6 @@ public class UserController {
     private NoticeService noticeService;
     @Autowired
     private HttpServletRequest request;
-    @Autowired
-    private IpfsClient ipfsClient;
 
 
     /**
@@ -63,9 +59,9 @@ public class UserController {
     }
 
     @PostMapping("/setProfile")
-    public CommonResult<Void> setProfile(@RequestParam("file") MultipartFile profile) {
+    public CommonResult<Void> setProfile(@RequestParam("profile") String profile) {
         String userId = request.getHeader("userId");
-        userService.updateByColumn(Integer.valueOf(userId),"profile", ipfsClient.upload(profile));
+        userService.updateByColumn(Integer.valueOf(userId),"profile",profile);
         return CommonResult.operateSuccess("设置头像成功");
     }
 

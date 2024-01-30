@@ -1,6 +1,5 @@
 package www.raven.jc.client;
-
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import cn.hutool.core.util.StrUtil;
 import io.ipfs.api.IPFS;
 import io.ipfs.api.MerkleNode;
 import io.ipfs.api.NamedStreamable;
@@ -39,7 +38,7 @@ public class IpfsClient {
             throw new IpfsException("文件为空");
         }
         String fileName = file.getOriginalFilename();
-        if (StringUtils.isEmpty(fileName)) {
+        if (StrUtil.isEmpty(fileName)) {
             throw new IpfsException("文件名为空");
         }
         // 添加标识
@@ -47,7 +46,7 @@ public class IpfsClient {
         File realFile = addIdentification(file, fileName.substring(0, index), fileName.substring(index));
 
         String cid = upload(realFile);
-        if (StringUtils.isEmpty(cid)) {
+        if (StrUtil.isEmpty(cid)) {
             throw new IpfsException("cid为空,上传失败");
         }
         return cid;

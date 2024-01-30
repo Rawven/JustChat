@@ -1,0 +1,16 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+      enabled: true
+  application:
+    name: JC-File
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 10.21.32.154:8848
+server:
+  port: 8888
+Ipfs:
+  api: /ip4/127.0.0.1/tcp/5001
