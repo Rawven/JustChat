@@ -44,7 +44,7 @@ public class SocialServiceImpl implements SocialService {
     private HttpServletRequest request;
     @Autowired
     private MomentDAO momentDAO;
-    @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
+    @Autowired
     private UserDubbo userDubbo;
     @Autowired
     private StreamBridge streamBridge;

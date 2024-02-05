@@ -50,7 +50,7 @@ public class RoomChatHandler extends BaseHandler {
      */
     private Integer roomId;
 
-    @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
+    @Autowired
     public void setUserDubbo(UserDubbo userDubbo) {
         RoomChatHandler.userDubbo = userDubbo;
     }

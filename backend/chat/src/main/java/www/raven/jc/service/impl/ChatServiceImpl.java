@@ -55,7 +55,7 @@ public class ChatServiceImpl implements ChatService {
     private RoomDAO roomDAO;
     @Autowired
     private FriendChatDAO friendChatDAO;
-    @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
+    @Autowired
     private UserDubbo userDubbo;
     @Autowired
     private StreamBridge streamBridge;

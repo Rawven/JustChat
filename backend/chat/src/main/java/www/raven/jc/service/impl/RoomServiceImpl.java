@@ -53,7 +53,7 @@ public class RoomServiceImpl implements RoomService {
     private UserRoomDAO userRoomDAO;
     @Autowired
     private HttpServletRequest request;
-    @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
+    @Autowired
     private UserDubbo userDubbo;
     @Autowired
     private MessageDAO messageDAO;

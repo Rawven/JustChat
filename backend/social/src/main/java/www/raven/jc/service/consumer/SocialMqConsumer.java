@@ -6,12 +6,13 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.Message;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import www.raven.jc.api.UserDubbo;
 import www.raven.jc.constant.MqConstant;
 import www.raven.jc.dto.UserInfoDTO;
@@ -35,13 +36,11 @@ import static www.raven.jc.service.impl.SocialServiceImpl.PREFIX;
  * @author 刘家辉
  * @date 2024/01/25
  */
-@Component
+@Service
 @Slf4j
 public class SocialMqConsumer {
     @Autowired
     private RedissonClient redissonClient;
-    @Autowired
-    private UserDubbo userDubbo;
 
     /**
      * 接收信息来用于更新 朋友圈timeline
@@ -51,16 +50,18 @@ public class SocialMqConsumer {
     @Bean
     public Consumer<Message<Event>> eventToPull() {
         return msg -> {
-
             //判断是否重复消息
-            if (MqUtil.checkMsgIsvalid(msg, redissonClient)) {
+            log.info("能否收到信息");
+            if (!MqUtil.checkMsgIsvalid(msg, redissonClient)) {
                 return;
             }
             String tags = Objects.requireNonNull(msg.getHeaders().get(HEADER_TAGS)).toString();
+            log.info(tags);
             //判断消息类型
             if (MqConstant.TAGS_MOMENT_RELEASE_RECORD.equals(tags)) {
                 eventReleaseMoment(msg);
             } else if (MqConstant.TAGS_MOMENT_LIKE_RECORD.equals(tags)) {
+                log.info("更新点赞缓存");
                 eventLikeMoment(msg);
             } else if (MqConstant.TAGS_MOMENT_COMMENT_RECORD.equals(tags)) {
                 eventCommentMoment(msg);
@@ -136,6 +137,7 @@ public class SocialMqConsumer {
     }
 
     private List<RScoredSortedSet<Object>> getMomentCache(Integer userId) {
+        Assert.isTrue(userDubbo == null,"userDubbo Null");
         RpcResult<List<UserInfoDTO>> friendAndMeInfos = userDubbo.getFriendAndMeInfos(userId);
         Assert.isTrue(friendAndMeInfos.isSuccess(), "获取好友信息失败");
         List<Integer> collect = friendAndMeInfos.getData().stream().map(UserInfoDTO::getUserId).collect(Collectors.toList());

@@ -41,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
     private RedissonClient redissonClient;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
+    @Autowired
     private UserDubbo userDubbo;
     @Value("${Raven.key}")
     private String key;

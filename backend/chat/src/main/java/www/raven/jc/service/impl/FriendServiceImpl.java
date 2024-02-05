@@ -42,7 +42,7 @@ public class FriendServiceImpl implements FriendService {
     private FriendChatDAO friendChatDAO;
     @Autowired
     private MessageDAO messageDAO;
-    @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
+    @Autowired
     private UserDubbo userDubbo;
 
 

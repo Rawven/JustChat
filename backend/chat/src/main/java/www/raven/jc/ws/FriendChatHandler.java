@@ -53,7 +53,7 @@ public class FriendChatHandler extends BaseHandler {
      */
     private Integer friendId;
 
-    @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
+    @Autowired
     public void setUserDubbo(UserDubbo userDubbo) {
         FriendChatHandler.userDubbo = userDubbo;
     }
