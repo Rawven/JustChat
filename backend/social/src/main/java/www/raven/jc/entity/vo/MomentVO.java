@@ -1,5 +1,6 @@
 package www.raven.jc.entity.vo;
 
+import java.io.Serializable;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import www.raven.jc.dto.UserInfoDTO;
@@ -16,7 +17,7 @@ import java.util.List;
  */
 @Data
 @Accessors(chain = true)
-public class MomentVO {
+public class MomentVO implements Serializable {
     private String momentId;
     private UserInfoDTO userInfo;
     private String content;

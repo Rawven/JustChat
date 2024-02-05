@@ -1,6 +1,7 @@
 package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
  * @date 2024/01/24
  */
 @Service
+@Slf4j
 public class SocialServiceImpl implements SocialService {
     @Autowired
     private HttpServletRequest request;
@@ -102,10 +104,9 @@ public class SocialServiceImpl implements SocialService {
         if (redissonClient.getScoredSortedSet(PREFIX + userId).isExists()) {
             // 获取有序集合
             RScoredSortedSet<MomentVO> scoredSortedSet = redissonClient.getScoredSortedSet(PREFIX + userId);
-            // 获取最近3天时间里的10条朋友圈
-            long currentTime = System.currentTimeMillis();
+            // 获取最近时间里的10条朋友圈
             return new ArrayList<>(
-                    scoredSortedSet.valueRangeReversed(currentTime - 1000 * 60 * 60 * 24 * 3, true, currentTime, true, 0, 10)
+                    scoredSortedSet.valueRangeReversed(0,false,Double.POSITIVE_INFINITY,true, 0, 10)
             );
         }
         RpcResult<List<UserInfoDTO>> friendInfos = userDubbo.getFriendAndMeInfos(userId);
