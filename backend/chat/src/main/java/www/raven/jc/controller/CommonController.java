@@ -23,7 +23,7 @@ public class CommonController {
 
     @Autowired
     private RoomService roomService;
-    @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
+    @Autowired
     private UserDubbo userDubbo;
 
 

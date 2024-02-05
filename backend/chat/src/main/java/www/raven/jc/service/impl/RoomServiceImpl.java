@@ -3,6 +3,13 @@ package www.raven.jc.service.impl;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.bson.types.ObjectId;
@@ -31,13 +38,6 @@ import www.raven.jc.service.RoomService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 /**
  * room service impl
  *
@@ -53,7 +53,7 @@ public class RoomServiceImpl implements RoomService {
     private UserRoomDAO userRoomDAO;
     @Autowired
     private HttpServletRequest request;
-    @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
+    @Autowired
     private UserDubbo userDubbo;
     @Autowired
     private MessageDAO messageDAO;
@@ -88,34 +88,26 @@ public class RoomServiceImpl implements RoomService {
                 .filter(room -> room.getLastMsgId() != null)
                 .map(room -> new ObjectId(room.getLastMsgId()))
                 .collect(Collectors.toList());
-        List<Integer> idsSender = new ArrayList<>();
         //获取所有聊天室的最后一条消息
         List<Message> messages = messageDAO.getBatchIds(idsMsg);
-        messages.forEach(message -> {
-            if (!idsSender.contains(message.getSenderId())) {
-                idsSender.add(message.getSenderId());
-            }
-        });
-        //获取聊天室发最后一条信息的用户信息
-        RpcResult<List<UserInfoDTO>> batchInfo = userDubbo.getBatchInfo(idsSender);
-        Assert.isTrue(batchInfo.isSuccess(), "user模块调用失败");
-        List<Integer> founderIds = rooms.stream().map(Room::getFounderId).distinct().collect(Collectors.toList());
+        //获取聊天室发最后一条信息的用户信息和聊天室创建者的用户信息
+        Set<Integer> idsSender = messages.stream().map(Message::getSenderId).collect(Collectors.toSet());
+        Set<Integer> founderIds = rooms.stream().map(Room::getFounderId).collect(Collectors.toSet());
+        idsSender.addAll(founderIds);
         //获取聊天室创建者的用户信息
-        RpcResult<List<UserInfoDTO>> batchInfoFounder = userDubbo.getBatchInfo(founderIds);
-        Assert.isTrue(batchInfoFounder.isSuccess(), "user模块调用失败");
-        Map<Integer, UserInfoDTO> mapFounder = batchInfoFounder.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
-        Map<Integer, UserInfoDTO> mapSender = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
-
+        RpcResult<List<UserInfoDTO>> batchInfo = userDubbo.getBatchInfo(new ArrayList<>(idsSender));
+        Assert.isTrue(batchInfo.isSuccess(), "user模块调用失败");
+        Map<Integer, UserInfoDTO> map = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
         Map<String, Message> messageMap = messages.stream().collect(Collectors.toMap(message -> message.getMessageId().toString(), Function.identity()));
         return rooms.stream().map(room -> {
             UserRoomVO userRoomVO = new UserRoomVO()
                     .setRoomId(room.getRoomId())
                     .setRoomName(room.getRoomName())
-                    .setRoomProfile(mapFounder.get(room.getFounderId()).getProfile());
+                    .setRoomProfile(map.get(room.getFounderId()).getProfile());
             if (room.getLastMsgId() != null) {
                 Message message = messageMap.get(room.getLastMsgId());
                 userRoomVO.setLastMsg(JsonUtil.objToJson(message));
-                UserInfoDTO userInfoDTO = mapSender.get(message.getSenderId());
+                UserInfoDTO userInfoDTO = map.get(message.getSenderId());
                 userRoomVO.setLastMsgSender(userInfoDTO.getUsername());
             } else {
                 userRoomVO.setLastMsg(""); // 或者一些默认值

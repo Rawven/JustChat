@@ -14,3 +14,5 @@ server:
   port: 8888
 Ipfs:
   api: /ip4/127.0.0.1/tcp/5001
+Raven:
+  key: 爱你老妈

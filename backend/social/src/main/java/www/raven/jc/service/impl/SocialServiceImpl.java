@@ -1,11 +1,12 @@
 package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
-import org.apache.dubbo.config.annotation.DubboReference;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import www.raven.jc.api.UserDubbo;
 import www.raven.jc.constant.MqConstant;
@@ -17,9 +18,9 @@ import www.raven.jc.entity.po.Comment;
 import www.raven.jc.entity.po.Like;
 import www.raven.jc.entity.po.Moment;
 import www.raven.jc.entity.vo.MomentVO;
-import www.raven.jc.event.MomentCommentEvent;
-import www.raven.jc.event.MomentLikeEvent;
-import www.raven.jc.event.MomentReleaseEvent;
+import www.raven.jc.event.model.MomentCommentEvent;
+import www.raven.jc.event.model.MomentLikeEvent;
+import www.raven.jc.event.model.MomentReleaseEvent;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.SocialService;
 import www.raven.jc.util.JsonUtil;
@@ -37,15 +38,16 @@ import java.util.stream.Collectors;
  * @date 2024/01/24
  */
 @Service
+@Slf4j
 public class SocialServiceImpl implements SocialService {
     @Autowired
     private HttpServletRequest request;
     @Autowired
     private MomentDAO momentDAO;
-    @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
+    @Autowired
     private UserDubbo userDubbo;
     @Autowired
-    private StreamBridge streamBridge;
+    private ApplicationContext applicationContext;
     @Autowired
     private RedissonClient redissonClient;
     public static final String PREFIX = "moment_";
@@ -62,8 +64,8 @@ public class SocialServiceImpl implements SocialService {
                 .setTimestamp(System.currentTimeMillis());
         Moment save = momentDAO.save(moment);
         Assert.isTrue(save.getMomentId() != null, "发布失败");
-        MomentReleaseEvent momentReleaseEvent = new MomentReleaseEvent().setReleaseId(Integer.valueOf(userId)).setMoment(JsonUtil.objToJson(save));
-        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(momentReleaseEvent), MqConstant.TAGS_MOMENT_RELEASE_RECORD));
+        //发布更新事件
+        applicationContext.publishEvent(new MomentReleaseEvent(this).setReleaseId(Integer.valueOf(userId)).setMoment(save));
     }
     @Override
     public void deleteMoment(String momentId) {
@@ -79,8 +81,7 @@ public class SocialServiceImpl implements SocialService {
         Like like = new Like().setTimestamp(System.currentTimeMillis()).setUserInfo(data)
                 .setTimestamp(System.currentTimeMillis());
         Assert.isTrue(momentDAO.like(momentId, like), "点赞失败");
-        MomentLikeEvent momentReleaseEvent = new MomentLikeEvent().setMomentId(momentId).setLike(JsonUtil.objToJson(like));
-        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(momentReleaseEvent), MqConstant.TAGS_MOMENT_LIKE_RECORD));
+         applicationContext.publishEvent(new MomentLikeEvent(this).setMomentId(momentId).setMomentUserId(Integer.valueOf(userId)).setLike(like));
     }
 
     @Override
@@ -93,8 +94,7 @@ public class SocialServiceImpl implements SocialService {
                 .setUserInfo(data)
                 .setContent(model.getText());
         Assert.isTrue(momentDAO.comment(model.getMomentId(), comment), "评论失败");
-        MomentCommentEvent momentReleaseEvent = new MomentCommentEvent().setMomentId(model.getMomentId()).setComment(JsonUtil.objToJson(comment));
-        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(momentReleaseEvent), MqConstant.TAGS_MOMENT_COMMENT_RECORD));
+        applicationContext.publishEvent(new MomentCommentEvent(this).setMomentId(model.getMomentId()).setMomentUserId(Integer.valueOf(userId)).setComment(comment));
     }
 
     @Override
@@ -102,26 +102,16 @@ public class SocialServiceImpl implements SocialService {
         if (redissonClient.getScoredSortedSet(PREFIX + userId).isExists()) {
             // 获取有序集合
             RScoredSortedSet<MomentVO> scoredSortedSet = redissonClient.getScoredSortedSet(PREFIX + userId);
-            // 获取最近3天时间里的10条朋友圈
-            long currentTime = System.currentTimeMillis();
+            // 获取最近时间里的10条朋友圈
+            log.info("获取缓存");
             return new ArrayList<>(
-                    scoredSortedSet.valueRangeReversed(currentTime - 1000 * 60 * 60 * 24 * 3, true, currentTime, true, 0, 10)
+                    scoredSortedSet.valueRangeReversed(0,false,Double.POSITIVE_INFINITY,true, 0, 10)
             );
         }
         RpcResult<List<UserInfoDTO>> friendInfos = userDubbo.getFriendAndMeInfos(userId);
         Assert.isTrue(friendInfos.isSuccess(), "获取好友信息失败");
         List<Moment> moments = momentDAO.queryMoment(friendInfos.getData());
-        List<MomentVO> collect = moments.stream().map(moment -> {
-            MomentVO vo = new MomentVO();
-            vo.setMomentId(moment.getMomentId().toHexString());
-            vo.setUserInfo(moment.getUserInfo());
-            vo.setContent(moment.getContent());
-            vo.setImg(moment.getImg());
-            vo.setTimestamp(moment.getTimestamp());
-            vo.setComments(moment.getComments());
-            vo.setLikes(moment.getLikes());
-            return vo;
-        }).collect(Collectors.toList());
+        List<MomentVO> collect = moments.stream().map(MomentVO::new).collect(Collectors.toList());
         RScoredSortedSet<MomentVO> scoredSortedSet = redissonClient.getScoredSortedSet(PREFIX+ userId);
         collect.forEach(momentVO -> scoredSortedSet.add(momentVO.getTimestamp(), momentVO));
         return collect;

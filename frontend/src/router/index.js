@@ -1,7 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import loginView from "@/views/common/LoginView.vue";
 import registerView from "@/views/common/RegisterView.vue";
-import AvatarView from "@/views/common/AvatarView.vue";
 import MainPageView from "@/views/common/MainPageView.vue";
 import UpdateInfoView from "@/views/common/UpdateInfoView.vue";
 

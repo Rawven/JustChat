@@ -1,12 +1,16 @@
 package www.raven.jc.entity.po;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.io.Serializable;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 import www.raven.jc.dto.UserInfoDTO;
 
 import java.util.List;
+import www.raven.jc.util.CommonSerializable;
 
 /**
  * moment
@@ -14,9 +18,10 @@ import java.util.List;
  * @author 刘家辉
  * @date 2024/01/24
  */
-@Data
+@EqualsAndHashCode(callSuper = true) @Data
 @Accessors(chain = true)
-public class Moment {
+@JsonSerialize
+public class Moment extends CommonSerializable {
     /**
      * 注意ObjectId的处理
      */
