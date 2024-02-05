@@ -8,6 +8,7 @@ import www.raven.jc.entity.po.Comment;
 import www.raven.jc.entity.po.Like;
 
 import java.util.List;
+import www.raven.jc.entity.po.Moment;
 
 /**
  * moment vo
@@ -25,4 +26,13 @@ public class MomentVO implements Serializable {
     private List<Like> likes;
     private List<Comment> comments;
     private Long timestamp;
+    public MomentVO(Moment moment) {
+        this.momentId = moment.getMomentId().toHexString();
+        this.userInfo = moment.getUserInfo();
+        this.content = moment.getContent();
+        this.img = moment.getImg();
+        this.likes = moment.getLikes();
+        this.comments = moment.getComments();
+        this.timestamp = moment.getTimestamp();
+    }
 }
