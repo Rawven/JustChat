@@ -17,16 +17,9 @@ import www.raven.jc.entity.po.Comment;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class MomentCommentEvent extends ApplicationEvent {
+public class MomentCommentEvent  {
     private Comment comment;
     private String momentId;
     private Integer momentUserId;
 
-    public MomentCommentEvent(Object source) {
-        super(source);
-    }
-
-    public MomentCommentEvent(Object source, Clock clock) {
-        super(source, clock);
-    }
 }

@@ -17,16 +17,9 @@ import www.raven.jc.entity.po.Like;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class MomentLikeEvent extends ApplicationEvent {
+public class MomentLikeEvent {
     private Like like;
     private String momentId;
     private Integer momentUserId;
 
-    public MomentLikeEvent(Object source) {
-        super(source);
-    }
-
-    public MomentLikeEvent(Object source, Clock clock) {
-        super(source, clock);
-    }
 }

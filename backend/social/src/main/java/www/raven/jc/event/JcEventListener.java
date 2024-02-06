@@ -3,14 +3,20 @@ package www.raven.jc.event;
 import cn.hutool.core.lang.Assert;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
+import org.springframework.messaging.Message;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import www.raven.jc.api.UserDubbo;
+import www.raven.jc.constant.MqConstant;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.Comment;
 import www.raven.jc.entity.po.Like;
@@ -21,7 +27,9 @@ import www.raven.jc.event.model.MomentLikeEvent;
 import www.raven.jc.event.model.MomentReleaseEvent;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.util.JsonUtil;
+import www.raven.jc.util.MqUtil;
 
+import static www.raven.jc.constant.MqConstant.HEADER_TAGS;
 import static www.raven.jc.service.impl.SocialServiceImpl.PREFIX;
 
 /**
@@ -32,30 +40,46 @@ import static www.raven.jc.service.impl.SocialServiceImpl.PREFIX;
  * @date 2024/02/06
  */
 @Component
+@Slf4j
 public class JcEventListener {
     @Autowired
     private UserDubbo userDubbo;
     @Autowired
     private RedissonClient redissonClient;
-    /**
-     * handle like event
-     *  线程默认同步 所以要调成异步
-     * @param event event
-     */
-    @Async
-    @EventListener
+
+    @Bean
+    public Consumer<Message<Event>> eventToPull() {
+        return msg -> {
+            //判断是否重复消息
+            if (!MqUtil.checkMsgIsvalid(msg, redissonClient)) {
+                return;
+            }
+            String tags = Objects.requireNonNull(msg.getHeaders().get(HEADER_TAGS)).toString();
+            log.info("--RocketMq 收到消息的类型tag为：{}",tags);
+            //判断消息类型
+            if (MqConstant.TAGS_MOMENT_RELEASE_RECORD.equals(tags)) {
+                handleReleaseEvent(JsonUtil.jsonToObj(msg.getPayload().getData(), MomentReleaseEvent.class));
+            } else if (MqConstant.TAGS_MOMENT_LIKE_RECORD.equals(tags)) {
+                handleLikeEvent(JsonUtil.jsonToObj(msg.getPayload().getData(), MomentLikeEvent.class));
+            } else if (MqConstant.TAGS_MOMENT_COMMENT_RECORD.equals(tags)) {
+                handleCommentEvent(JsonUtil.jsonToObj(msg.getPayload().getData(), MomentCommentEvent.class));
+            } else {
+                log.info("--RocketMq 非法的消息，不处理");
+            }
+            MqUtil.protectMsg(msg, redissonClient);
+        };
+    }
+
     public void handleLikeEvent(MomentLikeEvent event) {
         addLikeCache(event.getMomentUserId(), event.getMomentId(), event.getLike());
     }
-    @Async
-    @EventListener
+
     public void handleCommentEvent(MomentCommentEvent event) {
         Comment comment = event.getComment();
         addCommentCache(event.getMomentUserId(), event.getMomentId(), comment);
 
     }
-    @Async
-    @EventListener
+
     public void handleReleaseEvent(MomentReleaseEvent event) {
         Moment moment = event.getMoment();
         addMomentCache(event.getReleaseId(),new MomentVO(moment));

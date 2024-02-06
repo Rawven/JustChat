@@ -22,6 +22,31 @@ spring:
     redis.cache-null-values: true
   cloud:
     stream:
+      function:
+        definition: eventToPull;
+      bindings:
+        producer-out-1:
+          destination: eventToPull
+        producer-out-0:
+          destination: eventToPull
+        eventToPull-in-0:
+          consumer:
+            max-attempts: 3
+          destination: eventToPull
+          group: social-module
+      rocketmq:
+        bindings:
+          eventToPull-in-0:
+            consumer:
+              messageModel: BROADCASTING
+          producer-out-1:
+            producer:
+              sync: false
+              group: output-1
+          producer-out-0:
+            producer:
+              sync: false
+              group: output-0
         binder:
           name-server: 10.21.32.221:9876
     nacos:

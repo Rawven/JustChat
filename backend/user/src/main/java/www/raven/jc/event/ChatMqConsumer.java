@@ -1,4 +1,4 @@
-package www.raven.jc.service.consumer;
+package www.raven.jc.event;
 
 import cn.hutool.core.lang.Assert;
 import lombok.extern.slf4j.Slf4j;

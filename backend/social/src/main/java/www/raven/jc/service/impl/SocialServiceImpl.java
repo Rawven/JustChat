@@ -47,9 +47,9 @@ public class SocialServiceImpl implements SocialService {
     @Autowired
     private UserDubbo userDubbo;
     @Autowired
-    private ApplicationContext applicationContext;
-    @Autowired
     private RedissonClient redissonClient;
+    @Autowired
+    private StreamBridge streamBridge;
     public static final String PREFIX = "moment_";
     @Override
     public void releaseMoment(MomentModel model) {
@@ -65,7 +65,7 @@ public class SocialServiceImpl implements SocialService {
         Moment save = momentDAO.save(moment);
         Assert.isTrue(save.getMomentId() != null, "发布失败");
         //发布更新事件
-        applicationContext.publishEvent(new MomentReleaseEvent(this).setReleaseId(Integer.valueOf(userId)).setMoment(save));
+          streamBridge.send ("producer-out-0",MqUtil.createMsg(JsonUtil.objToJson(new MomentReleaseEvent().setReleaseId(Integer.valueOf(userId)).setMoment(save)), MqConstant.TAGS_MOMENT_RELEASE_RECORD));
     }
     @Override
     public void deleteMoment(String momentId) {
@@ -81,7 +81,8 @@ public class SocialServiceImpl implements SocialService {
         Like like = new Like().setTimestamp(System.currentTimeMillis()).setUserInfo(data)
                 .setTimestamp(System.currentTimeMillis());
         Assert.isTrue(momentDAO.like(momentId, like), "点赞失败");
-         applicationContext.publishEvent(new MomentLikeEvent(this).setMomentId(momentId).setMomentUserId(Integer.valueOf(userId)).setLike(like));
+        //发布更新事件
+         streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(new MomentLikeEvent().setMomentId(momentId).setMomentUserId(Integer.valueOf(userId)).setLike(like)), MqConstant.TAGS_MOMENT_LIKE_RECORD));
     }
 
     @Override
@@ -94,7 +95,8 @@ public class SocialServiceImpl implements SocialService {
                 .setUserInfo(data)
                 .setContent(model.getText());
         Assert.isTrue(momentDAO.comment(model.getMomentId(), comment), "评论失败");
-        applicationContext.publishEvent(new MomentCommentEvent(this).setMomentId(model.getMomentId()).setMomentUserId(Integer.valueOf(userId)).setComment(comment));
+        //发布更新事件
+        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(new MomentCommentEvent().setMomentId(model.getMomentId()).setMomentUserId(Integer.valueOf(userId)).setComment(comment)), MqConstant.TAGS_MOMENT_COMMENT_RECORD));
     }
 
     @Override

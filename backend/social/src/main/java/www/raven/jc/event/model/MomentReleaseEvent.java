@@ -19,15 +19,9 @@ import www.raven.jc.entity.po.Moment;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class MomentReleaseEvent extends ApplicationEvent {
+public class MomentReleaseEvent {
     private Integer releaseId;
     private Moment moment;
 
-    public MomentReleaseEvent(Object source) {
-        super(source);
-    }
 
-    public MomentReleaseEvent(Object source, Clock clock) {
-        super(source, clock);
-    }
 }
