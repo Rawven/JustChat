@@ -13,51 +13,44 @@ const router = createRouter({
             component: () => import('@/components/common/moment.vue')
         },
         {
-
-            path: '/common',
-            children: [
-
-                {
-                    path: 'login',
-                    name: 'LoginView.vue',
-                    component: loginView
-                },
-                {
-                    path: 'register',
-                    name: 'RegisterView',
-                    component: registerView
-                },
-                {
-                    path: 'mainPage',
-                    name: "MainPageView",
-                    component: MainPageView
-                },
-                {
-                    path: 'roomPage',
-                    name: 'RoomPageView',
-                    component: () => import('@/components/common/roomPage.vue')
-                },
-                {
-                    path: 'updateInfo',
-                    name: 'updateInfoView',
-                    component: UpdateInfoView
-                },
-                {
-                    path: 'notice',
-                    name: 'NoticeView',
-                    component: () => import('@/views/common/Notice.vue')
-                },
-                {
-                    path: 'friend',
-                    name: 'FriendView',
-                    component: () => import('@/views/common/FriendPageView.vue'),
-                },
-                {
-                    path: 'moment',
-                    name: 'MomentView',
-                    component: () => import('@/views/common/MomentView.vue')
-                }
-            ]
+            path: 'login',
+            name: 'LoginView.vue',
+            component: loginView
+        },
+        {
+            path: 'register',
+            name: 'RegisterView',
+            component: registerView
+        },
+        {
+            path: 'mainPage',
+            name: "MainPageView",
+            component: MainPageView
+        },
+        {
+            path: 'roomPage',
+            name: 'RoomPageView',
+            component: () => import('@/components/common/roomPage.vue')
+        },
+        {
+            path: 'updateInfo',
+            name: 'updateInfoView',
+            component: UpdateInfoView
+        },
+        {
+            path: 'notice',
+            name: 'NoticeView',
+            component: () => import('@/views/common/Notice.vue')
+        },
+        {
+            path: 'friend',
+            name: 'FriendView',
+            component: () => import('@/views/common/FriendPageView.vue'),
+        },
+        {
+            path: 'moment',
+            name: 'MomentView',
+            component: () => import('@/views/common/MomentView.vue')
         },
         {
             path: '/admin',
