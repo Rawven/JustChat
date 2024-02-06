@@ -36,6 +36,7 @@ import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.RoomService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
+import www.raven.jc.util.RequestUtil;
 
 /**
  * room service impl
@@ -74,7 +75,7 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public List<UserRoomVO> initUserMainPage() {
-        int userId = Integer.parseInt(request.getHeader("userId"));
+        int userId = RequestUtil.getUserId(request);
         //获取用户加入的聊天室id
         List<UserRoom> roomIdList = userRoomDAO.getBaseMapper().selectList(new QueryWrapper<UserRoom>().eq("user_id", userId));
         if (roomIdList.isEmpty()) {
@@ -136,7 +137,7 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public void applyToJoinRoom(Integer roomId) {
-        int userId = Integer.parseInt(request.getHeader("userId"));
+        int userId = RequestUtil.getUserId(request);
         Assert.isNull(userRoomDAO.getBaseMapper().selectOne(new QueryWrapper<UserRoom>().eq("user_id", userId).eq("room_id", roomId)),
             "您已经在这个聊天室了");
         Room room = roomDAO.getBaseMapper().selectById(roomId);
@@ -148,7 +149,7 @@ public class RoomServiceImpl implements RoomService {
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void agreeApply(Integer roomId, Integer userId, int noticeId) {
-        int ownerId = Integer.parseInt(request.getHeader("userId"));
+        int ownerId = RequestUtil.getUserId(request);
         Assert.isTrue(roomDAO.getBaseMapper().selectById(roomId).getFounderId().equals(ownerId), "您不是房主");
         Assert.isTrue(userRoomDAO.getBaseMapper().selectOne(new QueryWrapper<UserRoom>().eq("user_id", userId).eq("room_id", roomId)) == null,
             "该用户已经在这个聊天室了");

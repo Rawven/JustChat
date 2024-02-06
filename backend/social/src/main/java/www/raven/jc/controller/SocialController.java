@@ -14,6 +14,7 @@ import www.raven.jc.entity.model.MomentModel;
 import www.raven.jc.entity.vo.MomentVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.SocialService;
+import www.raven.jc.util.RequestUtil;
 
 /**
  * social controller
@@ -31,8 +32,7 @@ public class SocialController {
 
     @GetMapping("/queryMoment")
     public CommonResult<List<MomentVO>> queryMoment() {
-        String userId = request.getHeader("userId");
-        return CommonResult.operateSuccess("查询成功", socialService.queryMoment(Integer.parseInt(userId)));
+        return CommonResult.operateSuccess("查询成功", socialService.queryMoment(RequestUtil.getUserId(request)));
     }
 
     @PostMapping("/releaseMoment")

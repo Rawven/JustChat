@@ -50,7 +50,7 @@ spring:
     password: root
 server:
   port: 8081
-Raven:
+raven:
   key: 爱你老妈
 logging:
   level:

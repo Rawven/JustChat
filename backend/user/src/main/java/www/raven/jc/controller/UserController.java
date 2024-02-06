@@ -21,6 +21,7 @@ import www.raven.jc.entity.vo.RealAllInfoVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.NoticeService;
 import www.raven.jc.service.UserService;
+import www.raven.jc.util.RequestUtil;
 
 /**
  * info controller
@@ -65,29 +66,29 @@ public class UserController {
 
     @PostMapping("/setProfile")
     public CommonResult<Void> setProfile(@RequestParam("profile") String profile) {
-        String userId = request.getHeader("userId");
-        userService.updateByColumn(Integer.valueOf(userId), "profile", profile);
+        int userId = RequestUtil.getUserId(request);
+        userService.updateByColumn(userId, "profile", profile);
         return CommonResult.operateSuccess("设置头像成功");
     }
 
     @PostMapping("/setSignature")
     public CommonResult<Void> setSignature(@RequestParam("signature") String signature) {
-        String userId = request.getHeader("userId");
-        userService.updateByColumn(Integer.valueOf(userId), "signature", signature);
+        int userId = RequestUtil.getUserId(request);
+        userService.updateByColumn(userId, "signature", signature);
         return CommonResult.operateSuccess("设置签名成功");
     }
 
     @PostMapping("/setUsername")
     public CommonResult<Void> setUsername(@RequestParam("username") String username) {
-        String userId = request.getHeader("userId");
-        userService.updateByColumn(Integer.valueOf(userId), "username", username);
+        int userId = RequestUtil.getUserId(request);
+        userService.updateByColumn(userId, "username", username);
         return CommonResult.operateSuccess("重命名成功");
     }
 
     @PostMapping("/defaultInfo")
     public CommonResult<InfoVO> defaultInfo() {
-        String userId = request.getHeader("userId");
-        return CommonResult.operateSuccess("查找成功", userService.defaultInfo(Integer.parseInt(userId)));
+        int userId = RequestUtil.getUserId(request);
+        return CommonResult.operateSuccess("查找成功", userService.queryInfoWithSignature(userId));
     }
 
     @PostMapping("/getSingleInfo")
