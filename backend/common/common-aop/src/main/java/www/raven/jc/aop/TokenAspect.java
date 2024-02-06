@@ -29,7 +29,7 @@ public class TokenAspect {
 
     @Autowired
     private HttpServletRequest request;
-    @Value("${Raven.key}")
+    @Value("${raven.key}")
     private String key;
 
     @Pointcut("@annotation(www.raven.jc.annotions.Auth)")
