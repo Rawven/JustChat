@@ -27,7 +27,6 @@ public class FriendController {
     @Autowired
     private NoticeService noticeService;
 
-    //TODO 可用mq推送结果    看时间充不充裕
     @GetMapping("/agreeToBeFriend/{friendId}/{noticeId}")
     public CommonResult<Void> agreeApplyFriend(@PathVariable("friendId") int friendId,
         @PathVariable("noticeId") int noticeId) {

@@ -2,7 +2,6 @@ package www.raven.jc.entity.model;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
 
 /**
  * comment model

@@ -10,7 +10,6 @@ import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
-import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
 import org.springframework.stereotype.Service;
 import www.raven.jc.api.UserDubbo;
 import www.raven.jc.constant.MqConstant;
@@ -31,7 +30,7 @@ import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 
 /**
- * social serivce impl
+ * social service impl
  *
  * @author 刘家辉
  * @date 2024/01/24

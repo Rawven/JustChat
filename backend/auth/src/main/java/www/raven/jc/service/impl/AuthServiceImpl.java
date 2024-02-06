@@ -49,8 +49,8 @@ public class AuthServiceImpl implements AuthService {
         RpcResult<UserAuthDTO> result = userDubbo.getUserToAuth(loginModel.getUsername());
         Assert.isTrue(result.isSuccess());
         UserAuthDTO user = result.getData();
-        if (redissonClient.getBucket(JwtConstant.TOKEN + ":" + user.getUserId()).isExists()) {
-            return redissonClient.getBucket(JwtConstant.TOKEN + ":" + user.getUserId()).get().toString();
+        if (redissonClient.getBucket(JwtConstant.TOKEN  + user.getUserId()).isExists()) {
+            return redissonClient.getBucket(JwtConstant.TOKEN + user.getUserId()).get().toString();
         }
         Assert.isTrue(passwordEncoder.matches(loginModel.getPassword(), user.getPassword()), "密码错误");
         RpcResult<List<RoleDTO>> rolesById = userDubbo.getRolesById(user.getUserId());
@@ -109,7 +109,7 @@ public class AuthServiceImpl implements AuthService {
         claims.put("role", role);
         claims.put("expireTime", System.currentTimeMillis() + 1000 * 60 * 30);
         String token = JwtUtil.createToken(claims, key);
-        redissonClient.getBucket(JwtConstant.TOKEN + ":" + userId).set(token, 60, TimeUnit.MINUTES);
+        redissonClient.getBucket(JwtConstant.TOKEN + userId).set(token, 60, TimeUnit.MINUTES);
         return token;
     }
 

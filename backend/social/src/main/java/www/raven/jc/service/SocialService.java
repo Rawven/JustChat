@@ -3,7 +3,6 @@ package www.raven.jc.service;
 import java.util.List;
 import www.raven.jc.entity.model.CommentModel;
 import www.raven.jc.entity.model.MomentModel;
-import www.raven.jc.entity.po.Moment;
 import www.raven.jc.entity.vo.MomentVO;
 
 /**
@@ -30,7 +29,8 @@ public interface SocialService {
     /**
      * like moment
      *
-     * @param momentId moment id
+     * @param momentId     moment id
+     * @param momentUserId moment user id
      */
     void likeMoment(String momentId,Integer momentUserId);
 
