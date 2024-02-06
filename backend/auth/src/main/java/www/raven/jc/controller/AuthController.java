@@ -26,7 +26,7 @@ import www.raven.jc.service.AuthService;
 public class AuthController {
     @Autowired
     private AuthService authService;
-    @Value("${Raven.key}")
+    @Value("${raven.key}")
     private String key;
 
     @PostMapping("/login")

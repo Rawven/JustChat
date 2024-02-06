@@ -20,8 +20,8 @@ public class JwtUtil {
     public static final String TIME = "expireTime";
     public static final String LOGOUT = "LOGOUT";
 
-    public static String createToken(Map<String, Object> map, String key) {
-        map.put("expireTime", System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7);
+    public static String createToken(Map<String, Object> map, String key,Long expireTime) {
+        map.put("expireTime", System.currentTimeMillis() +expireTime);
         return JWTUtil.createToken(map, key.getBytes());
     }
 

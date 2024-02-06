@@ -41,8 +41,14 @@ public class AuthServiceImpl implements AuthService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private UserDubbo userDubbo;
-    @Value("${Raven.key}")
+    @Value("${raven.key}")
     private String key;
+    /**
+     * 默认7天
+     * expire time
+     */
+    @Value("${jwt.expire}")
+    private Long expireTime;
 
     @Override
     public String login(LoginModel loginModel) {
@@ -84,9 +90,9 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout(String token) {
         TokenDTO verify = JwtUtil.verify(token, key);
-        redissonClient.getBucket("token:" + verify.getUserId()).delete();
+        redissonClient.getBucket(JwtConstant.TOKEN+ verify.getUserId()).delete();
         RpcResult<Void> voidCommonResult = userDubbo.saveLogOutTime(verify.getUserId());
-        Assert.isTrue(voidCommonResult.isSuccess());
+        Assert.isTrue(voidCommonResult.isSuccess(), "登出失败");
     }
 
     private String register(RegisterModel registerModel, List<Integer> roleIds) {
@@ -95,11 +101,8 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(registerModel.getEmail()).setPassword(passwordEncoder.encode(registerModel.getPassword()))
             .setUsername(registerModel.getUsername()).setRoleIds(roleIds).setProfile(registerModel.getProfile());
         RpcResult<UserAuthDTO> insert = userDubbo.insert(user);
-        Assert.isTrue(insert.isSuccess());
-        List<RoleDTO> list = new ArrayList<>();
-        for (Integer roleId : roleIds) {
-            list.add(new RoleDTO().setValue(RoleConstant.MAP.get(roleId)));
-        }
+        Assert.isTrue(insert.isSuccess(), "注册失败");
+        List<RoleDTO> list = roleIds.stream(). map(roleId -> new RoleDTO().setValue( RoleConstant.MAP.get(roleId))).collect(Collectors.toList());
         return getTokenClaims(insert.getData().getUserId(), list.stream().map(RoleDTO::getValue).collect(Collectors.toList()));
     }
 
@@ -107,9 +110,9 @@ public class AuthServiceImpl implements AuthService {
         HashMap<String, Object> claims = new HashMap<>(3);
         claims.put("userId", userId);
         claims.put("role", role);
-        claims.put("expireTime", System.currentTimeMillis() + 1000 * 60 * 30);
-        String token = JwtUtil.createToken(claims, key);
-        redissonClient.getBucket(JwtConstant.TOKEN + userId).set(token, 60, TimeUnit.MINUTES);
+        claims.put("expireTime", System.currentTimeMillis() + expireTime);
+        String token = JwtUtil.createToken(claims, key,expireTime);
+        redissonClient.getBucket(JwtConstant.TOKEN + userId).set(token, expireTime, TimeUnit.MILLISECONDS);
         return token;
     }
 
