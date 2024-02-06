@@ -8,7 +8,8 @@
 | element-plus | spring-boot          | redis  | nacos |
 |              | dubbo                | ipfs   |       |
 |              | websocket            | mongodb|       |
-
+--------
+暂时启动策略（后续写为docker-compose脚本）
 前端启动 npm run dev
 后端 先启动user模块 不然会报找不到dubbo服务错误 
 --------
