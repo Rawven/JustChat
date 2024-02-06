@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public InfoVO defaultInfo(Integer userId) {
+    public InfoVO queryInfoWithSignature(Integer userId) {
         User user = userDAO.getById(userId);
         Assert.notNull(user, "用户不存在");
         return new InfoVO().setSignature(user.getSignature())

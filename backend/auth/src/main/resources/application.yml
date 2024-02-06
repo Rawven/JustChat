@@ -27,8 +27,10 @@ spring:
     password: root
 server:
   port: 8082
-Raven:
+raven:
   key: 爱你老妈
+jwt:
+  expire: 604800000
 logging:
   level:
     www.raven.jc.api.*: DEBUG

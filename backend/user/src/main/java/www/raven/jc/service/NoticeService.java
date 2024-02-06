@@ -18,13 +18,6 @@ public interface NoticeService {
      */
     List<NoticeVO> loadNotice();
 
-    /**
-     * add room apply
-     *
-     * @param founderId founder id
-     * @param payload   payload
-     */
-    void addRoomApply(int founderId, RoomApplyEvent payload);
 
     /**
      * add friend apply

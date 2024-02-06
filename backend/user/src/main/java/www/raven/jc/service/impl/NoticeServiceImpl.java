@@ -25,9 +25,9 @@ import www.raven.jc.entity.po.Friend;
 import www.raven.jc.entity.po.Notification;
 import www.raven.jc.entity.po.User;
 import www.raven.jc.entity.vo.NoticeVO;
-import www.raven.jc.event.RoomApplyEvent;
 import www.raven.jc.service.NoticeService;
 import www.raven.jc.util.JsonUtil;
+import www.raven.jc.util.RequestUtil;
 import www.raven.jc.ws.NotificationHandler;
 
 /**
@@ -54,7 +54,7 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     public List<NoticeVO> loadNotice() {
-        Integer userId = Integer.parseInt(request.getHeader("userId"));
+        int userId = RequestUtil.getUserId(request);
         //think 通知是否需要被解决后删除 不删除留下来可以做到通知的历史记录
         List<Notification> userId1 = noticeDAO.getBaseMapper().selectList(new QueryWrapper<Notification>().eq("user_id", userId).orderByDesc("timestamp"));
         if (userId1.isEmpty()) {
@@ -81,7 +81,7 @@ public class NoticeServiceImpl implements NoticeService {
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void addFriendApply(String friendName) {
-        String applierId = request.getHeader("userId");
+        int  applierId =  RequestUtil.getUserId(request);
         User user = userDAO.getBaseMapper().selectOne(new QueryWrapper<User>().eq("username", friendName));
         Assert.notNull(user, "用户不存在");
         Assert.isNull(friendDAO.getBaseMapper().selectOne(new QueryWrapper<Friend>().eq("user_id", applierId).eq("friend_id", user.getId())), "已经是好友了");
@@ -90,7 +90,7 @@ public class NoticeServiceImpl implements NoticeService {
             .setData("暂无")
             .setType(NoticeConstant.TYPE_ADD_FRIEND_APPLY)
             .setTimestamp(System.currentTimeMillis())
-            .setSenderId(Integer.parseInt(applierId));
+            .setSenderId(applierId);
         Assert.isTrue(noticeDAO.save(notice));
         RBucket<String> friendBucket = redissonClient.getBucket("token:" + friendId);
         HashMap<Object, Object> map = new HashMap<>(1);
@@ -102,22 +102,11 @@ public class NoticeServiceImpl implements NoticeService {
         }
     }
 
-    @Transactional(rollbackFor = IllegalArgumentException.class)
-    @Override
-    public void addRoomApply(int founderId, RoomApplyEvent payload) {
-        Notification notice = new Notification().setUserId(founderId)
-            .setData(String.valueOf(payload.getRoomId()))
-            .setType(NoticeConstant.TYPE_JOIN_ROOM_APPLY)
-            .setTimestamp(System.currentTimeMillis())
-            .setSenderId(Integer.parseInt(request.getHeader("userId")));
-        Assert.isTrue(noticeDAO.save(notice));
-    }
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void deleteNotification(Integer id) {
-        int i = noticeDAO.getBaseMapper().deleteById(id);
-        Assert.isTrue(i == 1);
+        Assert.isTrue( noticeDAO.getBaseMapper().deleteById(id) == 1);
     }
 
 }

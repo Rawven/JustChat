@@ -34,7 +34,7 @@ import www.raven.jc.util.JwtUtil;
 @Slf4j
 public class DefaultSecurityContextRepository implements ServerSecurityContextRepository {
 
-    @Value("${Raven.key}")
+    @Value("${raven.key}")
     private String key;
     @Resource
     private TokenAuthenticationManager tokenAuthenticationManager;

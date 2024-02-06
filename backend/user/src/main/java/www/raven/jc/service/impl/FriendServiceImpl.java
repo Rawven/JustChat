@@ -16,6 +16,7 @@ import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.Friend;
 import www.raven.jc.entity.po.User;
 import www.raven.jc.service.FriendService;
+import www.raven.jc.util.RequestUtil;
 
 /**
  * friend service impl
@@ -45,7 +46,7 @@ public class FriendServiceImpl implements FriendService {
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void agreeApplyFromFriend(int friendId) {
-        int userId = Integer.parseInt(request.getHeader("userId"));
+        int userId = RequestUtil.getUserId(request);
         Friend friend = new Friend().setUserId((long) userId).setFriendId((long) friendId);
         Friend friend1 = new Friend().setUserId((long) friendId).setFriendId((long) userId);
         boolean b = friendDAO.saveBatch(List.of(friend, friend1));

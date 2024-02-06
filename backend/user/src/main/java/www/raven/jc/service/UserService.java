@@ -48,7 +48,7 @@ public interface UserService {
      * @param userId user id
      * @return {@link UserInfoDTO}
      */
-    InfoVO defaultInfo(Integer userId);
+    InfoVO queryInfoWithSignature(Integer userId);
 
     /**
      * query liked info list

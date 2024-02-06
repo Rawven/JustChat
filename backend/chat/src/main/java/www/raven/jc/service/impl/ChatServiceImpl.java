@@ -15,6 +15,7 @@ import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.api.UserDubbo;
+import www.raven.jc.constant.MessageConstant;
 import www.raven.jc.constant.MqConstant;
 import www.raven.jc.dao.FriendChatDAO;
 import www.raven.jc.dao.MessageDAO;
@@ -67,7 +68,7 @@ public class ChatServiceImpl implements ChatService {
         Message realMsg = new Message().setContent(text)
             .setTimestamp(new Date(timeStamp))
             .setSenderId(userId)
-            .setType("room")
+            .setType(MessageConstant.Room)
             .setReceiverId(String.valueOf(roomId));
         //保存消息
         Assert.isTrue(messageDAO.save(realMsg), "插入失败");
@@ -88,7 +89,7 @@ public class ChatServiceImpl implements ChatService {
         Message realMsg = new Message().setContent(message.getText())
             .setTimestamp(new Date(message.getTime()))
             .setSenderId(userId)
-            .setType("friend")
+            .setType(MessageConstant.Friend)
             .setReceiverId(fixId);
         //保存消息
         Assert.isTrue(messageDAO.save(realMsg), "插入失败");

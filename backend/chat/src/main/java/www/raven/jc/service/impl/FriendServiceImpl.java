@@ -24,6 +24,7 @@ import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.FriendService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MongoUtil;
+import www.raven.jc.util.RequestUtil;
 
 /**
  * friend service impl
@@ -45,7 +46,7 @@ public class FriendServiceImpl implements FriendService {
 
     @Override
     public List<UserFriendVO> initUserFriendPage() {
-        int userId = Integer.parseInt(request.getHeader("userId"));
+        int userId = RequestUtil.getUserId(request);
         //获得好友id
         List<UserInfoDTO> friends = userDubbo.getFriendInfos(userId).getData();
         if (friends.isEmpty()) {
@@ -84,7 +85,7 @@ public class FriendServiceImpl implements FriendService {
     @Override
     @Cacheable(value = "friendHistory", key = "#friendId")
     public List<MessageVO> restoreFriendHistory(Integer friendId) {
-        int userId = Integer.parseInt(request.getHeader("userId"));
+        int userId = RequestUtil.getUserId(request);
         String fixId = MongoUtil.concatenateIds(userId, friendId);
         List<Message> byFriendChatId = messageDAO.getByFriendChatId(fixId);
         ArrayList<Integer> ids = new ArrayList<>() {{
