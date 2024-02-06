@@ -10,10 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.event.EventListener;
 import org.springframework.messaging.Message;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import www.raven.jc.api.UserDubbo;
 import www.raven.jc.constant.MqConstant;
@@ -41,11 +40,13 @@ import static www.raven.jc.service.impl.SocialServiceImpl.PREFIX;
  */
 @Component
 @Slf4j
-public class JcEventListener {
+public class SocialEventListener {
     @Autowired
     private UserDubbo userDubbo;
     @Autowired
     private RedissonClient redissonClient;
+    @Autowired
+    private StreamBridge streamBridge;
 
     @Bean
     public Consumer<Message<Event>> eventToPull() {
@@ -57,14 +58,15 @@ public class JcEventListener {
             String tags = Objects.requireNonNull(msg.getHeaders().get(HEADER_TAGS)).toString();
             log.info("--RocketMq 收到消息的类型tag为：{}",tags);
             //判断消息类型
-            if (MqConstant.TAGS_MOMENT_RELEASE_RECORD.equals(tags)) {
+            if (MqConstant.TAGS_MOMENT_INTERNAL_RELEASE_RECORD.equals(tags)) {
                 handleReleaseEvent(JsonUtil.jsonToObj(msg.getPayload().getData(), MomentReleaseEvent.class));
-            } else if (MqConstant.TAGS_MOMENT_LIKE_RECORD.equals(tags)) {
+            } else if (MqConstant.TAGS_MOMENT_INTERNAL_LIKE_RECORD.equals(tags)) {
                 handleLikeEvent(JsonUtil.jsonToObj(msg.getPayload().getData(), MomentLikeEvent.class));
-            } else if (MqConstant.TAGS_MOMENT_COMMENT_RECORD.equals(tags)) {
+            } else if (MqConstant.TAGS_MOMENT_INTERNAL_COMMENT_RECORD.equals(tags)) {
                 handleCommentEvent(JsonUtil.jsonToObj(msg.getPayload().getData(), MomentCommentEvent.class));
             } else {
                 log.info("--RocketMq 非法的消息，不处理");
+                return;
             }
             MqUtil.protectMsg(msg, redissonClient);
         };
@@ -72,17 +74,28 @@ public class JcEventListener {
 
     public void handleLikeEvent(MomentLikeEvent event) {
         addLikeCache(event.getMomentUserId(), event.getMomentId(), event.getLike());
+
+        streamBridge.send("producer-out-1", MqUtil.createMsg(
+            JsonUtil.objToJson(new MomentNotivce().setMomentId(event.getMomentId()).setUserId(event.getMomentUserId()).setMsg("有人点赞你的朋友圈了")),
+            MqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT));
     }
 
     public void handleCommentEvent(MomentCommentEvent event) {
         Comment comment = event.getComment();
         addCommentCache(event.getMomentUserId(), event.getMomentId(), comment);
 
+
+        streamBridge.send("producer-out-1", MqUtil.createMsg(
+            JsonUtil.objToJson(new MomentNotice().setMomentId(event.getMomentId()).setUserId(event.getMomentUserId()).setMsg("有人评论了你的朋友圈")),
+            MqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT));
     }
 
     public void handleReleaseEvent(MomentReleaseEvent event) {
         Moment moment = event.getMoment();
         addMomentCache(event.getReleaseId(),new MomentVO(moment));
+
+        //TODO 这个为通知其余好友 有人发布了朋友圈
+        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(event), MqConstant.TAGS_MOMENT_NOTICE_MOMENT_FRIEND));
     }
 
 

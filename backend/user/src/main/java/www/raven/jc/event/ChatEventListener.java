@@ -15,10 +15,6 @@ import www.raven.jc.dao.NoticeDAO;
 import www.raven.jc.dao.UserDAO;
 import www.raven.jc.entity.po.Notification;
 import www.raven.jc.entity.po.User;
-import www.raven.jc.event.Event;
-import www.raven.jc.event.FriendMsgEvent;
-import www.raven.jc.event.RoomApplyEvent;
-import www.raven.jc.event.RoomMsgEvent;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 import www.raven.jc.ws.NotificationHandler;
@@ -38,7 +34,7 @@ import static www.raven.jc.constant.MqConstant.*;
  */
 @Service
 @Slf4j
-public class ChatMqConsumer {
+public class ChatEventListener {
 
     @Autowired
     private UserDAO userDAO;
