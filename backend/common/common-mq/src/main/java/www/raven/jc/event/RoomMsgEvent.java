@@ -1,11 +1,10 @@
 package www.raven.jc.event;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-
-import java.util.List;
 
 /**
  * user send msg event

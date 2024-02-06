@@ -7,6 +7,7 @@ package www.raven.jc.util;
  * @date 2024/01/21
  */
 public class MongoUtil {
+    private static final  int MAX_VALID_FIX_ID_LENGTH = 2;
     public static String concatenateIds(Integer userId, Integer friendId) {
         Integer maxId = Math.max(userId, friendId);
         Integer minId = Math.min(userId, friendId);
@@ -15,7 +16,7 @@ public class MongoUtil {
 
     public static Integer resolve(String receiverId, int userId) {
         String[] ids = receiverId.split("&");
-        if (ids.length != 2) {
+        if (ids.length != MAX_VALID_FIX_ID_LENGTH) {
             throw new RuntimeException("receiverId is invalid");
         }
         Integer id1 = Integer.parseInt(ids[0]);

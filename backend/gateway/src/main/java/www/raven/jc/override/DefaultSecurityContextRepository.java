@@ -1,6 +1,9 @@
 package www.raven.jc.override;
 
 import cn.hutool.core.lang.Assert;
+import java.util.List;
+import java.util.Objects;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +21,6 @@ import reactor.core.publisher.Mono;
 import www.raven.jc.constant.JwtConstant;
 import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.util.JwtUtil;
-
-import javax.annotation.Resource;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * default security context repository
@@ -56,11 +55,11 @@ public class DefaultSecurityContextRepository implements ServerSecurityContextRe
         }
         TokenDTO dto = JwtUtil.verify(tokens.get(0), key);
         log.info("访问者信息 {} {} {}", dto.getUserId(), dto.getRole(), dto.getExpireTime());
-        Assert.isTrue(Objects.equals(tokens.get(0), redissonClient.getBucket("token:" + dto.getUserId()).get()), "未登录");
+        Assert.isTrue(Objects.equals(tokens.get(0), redissonClient.getBucket(JwtConstant.TOKEN+ dto.getUserId()).get()), "未登录");
         request.mutate().header(JwtUtil.TIME, String.valueOf(dto.getExpireTime())).header("userId", dto.getUserId().toString()).build();
         Authentication auth = new UsernamePasswordAuthenticationToken(dto.getUserId(), null, AuthorityUtils.createAuthorityList(dto.getRole().toArray(new String[0])));
         return tokenAuthenticationManager.authenticate(
-                auth
+            auth
         ).map(SecurityContextImpl::new);
     }
 }

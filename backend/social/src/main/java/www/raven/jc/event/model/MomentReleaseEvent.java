@@ -1,13 +1,8 @@
 package www.raven.jc.event.model;
 
-import java.time.Clock;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.springframework.context.ApplicationEvent;
 import www.raven.jc.entity.po.Moment;
 
 /**
@@ -19,15 +14,8 @@ import www.raven.jc.entity.po.Moment;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class MomentReleaseEvent extends ApplicationEvent {
+public class MomentReleaseEvent {
     private Integer releaseId;
     private Moment moment;
 
-    public MomentReleaseEvent(Object source) {
-        super(source);
-    }
-
-    public MomentReleaseEvent(Object source, Clock clock) {
-        super(source, clock);
-    }
 }

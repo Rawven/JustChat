@@ -1,11 +1,10 @@
 package www.raven.jc.entity.vo;
 
+import java.util.Date;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import www.raven.jc.util.CommonSerializable;
-
-import java.util.Date;
 
 /**
  * message vo

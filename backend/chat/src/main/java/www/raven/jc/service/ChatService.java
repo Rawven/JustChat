@@ -1,9 +1,8 @@
 package www.raven.jc.service;
 
+import java.util.List;
 import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.entity.vo.MessageVO;
-
-import java.util.List;
 
 /**
  * chat service

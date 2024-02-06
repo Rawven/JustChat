@@ -1,20 +1,22 @@
 package www.raven.jc.ws;
 
-
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArraySet;
+import javax.websocket.OnClose;
+import javax.websocket.OnError;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.server.PathParam;
+import javax.websocket.server.ServerEndpoint;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.exception.WsAttackException;
 import www.raven.jc.util.JwtUtil;
-
-import javax.websocket.*;
-import javax.websocket.server.PathParam;
-import javax.websocket.server.ServerEndpoint;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * notification handler
@@ -36,7 +38,6 @@ public class NotificationHandler extends BaseHandler {
      * 虽然@Component默认是单例模式的，但springboot还是会为每个websocket连接初始化一个bean，所以可以用一个静态set保存起来。
      */
     private static CopyOnWriteArraySet<NotificationHandler> webSockets = new CopyOnWriteArraySet<>();
-
 
     /**
      * 链接成功调用的方法
@@ -97,7 +98,6 @@ public class NotificationHandler extends BaseHandler {
         log.error("Stack trace: {}", (Object) error.getStackTrace());
     }
 
-
     /**
      * send all message
      * 遍历方法
@@ -112,7 +112,6 @@ public class NotificationHandler extends BaseHandler {
             }
         }
     }
-
 
     /**
      * send all message
@@ -151,7 +150,6 @@ public class NotificationHandler extends BaseHandler {
             }
         }
     }
-
 
     @Override
     public int hashCode() {

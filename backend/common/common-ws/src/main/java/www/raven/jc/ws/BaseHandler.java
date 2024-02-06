@@ -1,8 +1,7 @@
 package www.raven.jc.ws;
 
-import lombok.Data;
-
 import javax.websocket.Session;
+import lombok.Data;
 
 /**
  * base handler

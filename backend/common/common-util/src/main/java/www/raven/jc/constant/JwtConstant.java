@@ -7,5 +7,5 @@ package www.raven.jc.constant;
  * @date 2023/11/22
  */
 public class JwtConstant {
-    public static final String TOKEN = "token";
+    public static final String TOKEN = "token:";
 }

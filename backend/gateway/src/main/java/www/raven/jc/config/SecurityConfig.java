@@ -1,6 +1,7 @@
 package www.raven.jc.config;
 
-
+import java.util.Collections;
+import java.util.LinkedList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,9 +21,6 @@ import www.raven.jc.handler.DefaultAuthenticationEntryPoint;
 import www.raven.jc.override.DefaultSecurityContextRepository;
 import www.raven.jc.override.TokenAuthenticationManager;
 
-import java.util.Collections;
-import java.util.LinkedList;
-
 /**
  * security config
  *
@@ -41,28 +39,26 @@ public class SecurityConfig {
     @Autowired
     private DefaultSecurityContextRepository defaultSecurityContextRepository;
 
-
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         http.cors(corsSpec -> corsSpec.configurationSource(corsConfigurationSource()))
-                .authenticationManager(reactiveAuthenticationManager())
-                .securityContextRepository(defaultSecurityContextRepository)
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/auth/**", "/ws/**", "/webSocket/**").permitAll()
-                        .pathMatchers("/chat/**", "/user/**","/file/**","/social/**").hasAnyRole("USER","ADMIN")
-                        .pathMatchers("/admin/**").hasRole("ADMIN")
-                        .anyExchange().authenticated()
-                )
-                .formLogin()
-                // 自定义处理
-                .and()
-                .exceptionHandling()
-                .accessDeniedHandler(defaultAccessDeniedHandler)
-                .and()
-                .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint)
-
+            .authenticationManager(reactiveAuthenticationManager())
+            .securityContextRepository(defaultSecurityContextRepository)
+            .csrf(ServerHttpSecurity.CsrfSpec::disable)
+            .authorizeExchange(exchanges -> exchanges
+                .pathMatchers("/auth/**", "/ws/**", "/webSocket/**").permitAll()
+                .pathMatchers("/chat/**", "/user/**", "/file/**", "/social/**").hasAnyRole("USER", "ADMIN")
+                .pathMatchers("/admin/**").hasRole("ADMIN")
+                .anyExchange().authenticated()
+            )
+            .formLogin()
+            // 自定义处理
+            .and()
+            .exceptionHandling()
+            .accessDeniedHandler(defaultAccessDeniedHandler)
+            .and()
+            .exceptionHandling()
+            .authenticationEntryPoint(authenticationEntryPoint)
 
         ;
         // your other configurations
@@ -89,7 +85,6 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", corsConfiguration);
         return source;
     }
-
 
     @Bean
     ReactiveAuthenticationManager reactiveAuthenticationManager() {

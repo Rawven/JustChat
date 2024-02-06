@@ -13,5 +13,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class CommentModel {
     private String momentId;
+    private Integer momentUserId;
     private String text;
 }

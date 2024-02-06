@@ -9,16 +9,17 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
 /**
- * dubbo aspect
+ * consumer aspect
  *
  * @author 刘家辉
- * @date 2024/01/20
+ * @date 2024/02/06
  */
 @Aspect
 @Component
 @Slf4j
-public class DubboAspect {
-    @Pointcut("execution(* www.raven.jc.api..*.*(..))")
+public class ConsumerAspect {
+
+    @Pointcut("execution(* www.raven.jc.event..*.*(..))")
     public void pointcut() {
 
     }
@@ -30,7 +31,7 @@ public class DubboAspect {
         // 获取方法的参数
         Object[] args = joinPoint.getArgs();
         // 打印出方法的全名和参数的详细信息
-        log.info("----Dubbo请求 : 方法全名: {}, 参数: {}", methodFullName, Arrays.toString(args));
+        log.info("----RocketMq 消费者收到消息 :  接收方法全名: {}, 参数: {}", methodFullName, Arrays.toString(args));
         // 记录方法开始执行的时间
         long startTime = System.currentTimeMillis();
         // 执行方法
@@ -40,10 +41,8 @@ public class DubboAspect {
         // 计算方法执行的时间
         long executeTime = endTime - startTime;
         // 打印出方法的全名、结果和执行时间
-        log.info("----Dubbo返回 : 方法全名: {}, 结果: {}, 执行时间: {} 毫秒", methodFullName, result, executeTime);
-
+        log.info("----RocketMq完成消费 : 方法全名: {}, 结果: {}, 执行时间: {} 毫秒", methodFullName, result, executeTime);
         return result;
 
     }
-
 }

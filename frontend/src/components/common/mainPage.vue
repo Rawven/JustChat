@@ -50,7 +50,7 @@
           <el-text tag="b">Friends</el-text>
         </div>
         <div class="flex items-center space-x-4" @click="turnNotifications">
-          <el-icon v-if="noticeIsNew" color="#FF0000">
+          <el-icon v-if="applyNoticeIsNew" color="#FF0000">
             <Message/>
           </el-icon>
           <el-icon v-else color="#409EFC">
@@ -59,7 +59,10 @@
           <el-text tag="b">Notifications</el-text>
         </div>
         <div class="flex items-center space-x-4" @click="turnMoment">
-          <el-icon>
+          <el-icon v-if="momentNoticeIsNew" color="#FF0000">
+            <PictureFilled/>
+          </el-icon>
+          <el-icon v-else color="#409EFC">
             <PictureFilled/>
           </el-icon>
           <el-text tag="b">Moment</el-text>
@@ -163,10 +166,16 @@ export default {
         this.nowRoomId = newVal;
       }
     },
-    noticeIsNew(newVal, oldVal) {
+    applyNoticeIsNew(newVal, oldVal) {
       if (newVal !== oldVal) {
         // nowRoomId has changed. You can add your logic here to re-render the chat-room component
-        this.noticeIsNew = newVal;
+        this.applyNoticeIsNew = newVal;
+      }
+    },
+    momentNoticeIsNew(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        // nowRoomId has changed. You can add your logic here to re-render the chat-room component
+        this.momentNoticeIsNew = newVal;
       }
     },
   },
@@ -201,7 +210,8 @@ export default {
       roomIndex: new Map(),
       pageSize: 5,
       nowRoomId: 0,
-      noticeIsNew: false,
+      applyNoticeIsNew: false,
+      momentNoticeIsNew: false,
     };
   },
   created() {
@@ -251,11 +261,14 @@ export default {
         console.log('WebSocket message received:', event.data);
         let data = JSON.parse(event.data)
         if (data.type === "FRIEND_APPLY") {
-          this.noticeIsNew = true;
+          this.applyNoticeIsNew = true;
           ElMessage.success('您有新的好友申请');
         } else if (data.type === "ROOM_APPLY") {
-          this.noticeIsNew = true;
+          this.applyNoticeIsNew = true;
           ElMessage.success('您有新的群聊申请');
+        }else if(data.type === "RECORD_MOMENT_FRIEND" || data.type === "RECORD_MOMENT"){
+          this.momentNoticeIsNew = true;
+          ElMessage.success('您有新的朋友圈消息');
         } else {
           let index = this.roomIndex.get(Number(data.roomId));
           this.rooms[index] = {
@@ -282,7 +295,7 @@ export default {
       }
     },
     turnNotifications() {
-      this.noticeIsNew = false;
+      this.applyNoticeIsNew = false;
       this.$router.push('/common/notice');
     },
     checkNull(name) {

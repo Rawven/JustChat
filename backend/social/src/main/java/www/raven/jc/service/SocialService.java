@@ -1,11 +1,9 @@
 package www.raven.jc.service;
 
+import java.util.List;
 import www.raven.jc.entity.model.CommentModel;
 import www.raven.jc.entity.model.MomentModel;
-import www.raven.jc.entity.po.Moment;
 import www.raven.jc.entity.vo.MomentVO;
-
-import java.util.List;
 
 /**
  * social service
@@ -31,9 +29,10 @@ public interface SocialService {
     /**
      * like moment
      *
-     * @param momentId moment id
+     * @param momentId     moment id
+     * @param momentUserId moment user id
      */
-    void likeMoment(String momentId);
+    void likeMoment(String momentId,Integer momentUserId);
 
     /**
      * comment moment
@@ -44,8 +43,10 @@ public interface SocialService {
 
     /**
      * query moment
+     * query moment
      *
-     * @return {@link List}<{@link Moment}>
+     * @param userId user id
+     * @return {@link List}<{@link MomentVO}>
      */
     List<MomentVO> queryMoment(int userId);
 }

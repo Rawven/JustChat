@@ -1,15 +1,19 @@
 package www.raven.jc.controller;
 
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import www.raven.jc.entity.model.LoginModel;
 import www.raven.jc.entity.model.RegisterAdminModel;
 import www.raven.jc.entity.model.RegisterModel;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.AuthService;
-
-import java.util.Objects;
 
 /**
  * account controller
@@ -39,8 +43,8 @@ public class AuthController {
     public CommonResult<String> register(@RequestBody RegisterAdminModel registerModel) {
         if (Objects.equals(registerModel.getPrivateKey(), key)) {
             RegisterModel model = new RegisterModel().setUsername(registerModel.getUsername())
-                    .setPassword(registerModel.getPassword())
-                    .setEmail(registerModel.getEmail());
+                .setPassword(registerModel.getPassword())
+                .setEmail(registerModel.getEmail());
             return CommonResult.operateSuccess("注册成功", authService.registerAdminRole(model));
         } else {
             return CommonResult.operateFailure("注册失败", "私钥错误");
@@ -57,6 +61,5 @@ public class AuthController {
     public CommonResult<String> refresh(@RequestBody String token) {
         return CommonResult.operateSuccess("刷新成功", authService.refreshToken(token));
     }
-
 
 }

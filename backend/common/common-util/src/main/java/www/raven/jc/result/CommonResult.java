@@ -37,43 +37,42 @@ public class CommonResult<T> {
         return new CommonResult<>(ResultCode.FAIL_CODE, false, message);
     }
 
-
     public static CommonResult<Void> operateSuccess(String message) {
         return new CommonResult<>(ResultCode.SUCCESS_CODE, true, message);
     }
 
     public static <T> CommonResult<T> operateSuccess(String message, T data) {
         return new CommonResult<>(
-                ResultCode.SUCCESS_CODE,
-                true,
-                message,
-                data
+            ResultCode.SUCCESS_CODE,
+            true,
+            message,
+            data
         );
     }
 
     public static <T> CommonResult<T> operateFailure(String message, T data) {
         return new CommonResult<>(
-                ResultCode.FAIL_CODE,
-                false,
-                message,
-                data
+            ResultCode.FAIL_CODE,
+            false,
+            message,
+            data
         );
     }
 
     public static <T> CommonResult<T> operateFailure(Integer code, String message) {
         return new CommonResult<>(
-                code,
-                false,
-                message
+            code,
+            false,
+            message
         );
     }
 
     public static <T> CommonResult<T> operateFailure(Integer code, String message, T data) {
         return new CommonResult<>(
-                code,
-                false,
-                message,
-                data
+            code,
+            false,
+            message,
+            data
         );
     }
 }

@@ -3,14 +3,19 @@ package www.raven.jc.event;
 import cn.hutool.core.lang.Assert;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.context.annotation.Bean;
+import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 import www.raven.jc.api.UserDubbo;
+import www.raven.jc.constant.MqConstant;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.Comment;
 import www.raven.jc.entity.po.Like;
@@ -21,7 +26,9 @@ import www.raven.jc.event.model.MomentLikeEvent;
 import www.raven.jc.event.model.MomentReleaseEvent;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.util.JsonUtil;
+import www.raven.jc.util.MqUtil;
 
+import static www.raven.jc.constant.MqConstant.HEADER_TAGS;
 import static www.raven.jc.service.impl.SocialServiceImpl.PREFIX;
 
 /**
@@ -32,35 +39,66 @@ import static www.raven.jc.service.impl.SocialServiceImpl.PREFIX;
  * @date 2024/02/06
  */
 @Component
-public class JcEventListener {
+@Slf4j
+public class SocialEventListener {
     @Autowired
     private UserDubbo userDubbo;
     @Autowired
     private RedissonClient redissonClient;
-    /**
-     * handle like event
-     *  线程默认同步 所以要调成异步
-     * @param event event
-     */
-    @Async
-    @EventListener
+    @Autowired
+    private StreamBridge streamBridge;
+
+    @Bean
+    public Consumer<Message<Event>> eventToPull() {
+        return msg -> {
+            //判断是否重复消息
+            if (MqUtil.checkMsgIsvalid(msg, redissonClient)) {
+                return;
+            }
+            String tags = Objects.requireNonNull(msg.getHeaders().get(HEADER_TAGS)).toString();
+            log.info("--RocketMq 收到消息的类型tag为：{}", tags);
+            //判断消息类型
+            if (MqConstant.TAGS_MOMENT_INTERNAL_RELEASE_RECORD.equals(tags)) {
+                handleReleaseEvent(JsonUtil.jsonToObj(msg.getPayload().getData(), MomentReleaseEvent.class));
+            } else if (MqConstant.TAGS_MOMENT_INTERNAL_LIKE_RECORD.equals(tags)) {
+                handleLikeEvent(JsonUtil.jsonToObj(msg.getPayload().getData(), MomentLikeEvent.class));
+            } else if (MqConstant.TAGS_MOMENT_INTERNAL_COMMENT_RECORD.equals(tags)) {
+                handleCommentEvent(JsonUtil.jsonToObj(msg.getPayload().getData(), MomentCommentEvent.class));
+            } else {
+                log.info("--RocketMq 非法的消息，不处理");
+                return;
+            }
+            MqUtil.protectMsg(msg, redissonClient);
+        };
+    }
+
     public void handleLikeEvent(MomentLikeEvent event) {
         addLikeCache(event.getMomentUserId(), event.getMomentId(), event.getLike());
+
+        streamBridge.send("producer-out-1", MqUtil.createMsg(
+            JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(event.getMomentId()).setUserId(event.getMomentUserId()).setMsg("有人点赞你的朋友圈了")),
+            MqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT));
     }
-    @Async
-    @EventListener
+
     public void handleCommentEvent(MomentCommentEvent event) {
         Comment comment = event.getComment();
         addCommentCache(event.getMomentUserId(), event.getMomentId(), comment);
 
-    }
-    @Async
-    @EventListener
-    public void handleReleaseEvent(MomentReleaseEvent event) {
-        Moment moment = event.getMoment();
-        addMomentCache(event.getReleaseId(),new MomentVO(moment));
+        streamBridge.send("producer-out-1", MqUtil.createMsg(
+            JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(event.getMomentId()).setUserId(event.getMomentUserId()).setMsg("有人评论了你的朋友圈")),
+            MqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT));
     }
 
+    public void handleReleaseEvent(MomentReleaseEvent event) {
+        Moment moment = event.getMoment();
+        addMomentCache(event.getReleaseId(), new MomentVO(moment));
+
+        //TODO 这个为通知其余好友 有人发布了朋友圈
+        streamBridge.send("producer-out-1", MqUtil.createMsg(
+            JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(event.getMoment().getMomentId().toHexString()).setUserId(event.getMoment().getUserInfo().getUserId())
+                .setMsg("有人发布了朋友圈"))
+            , MqConstant.TAGS_MOMENT_NOTICE_MOMENT_FRIEND));
+    }
 
     public void addMomentCache(Integer userId, MomentVO momentVo) {
         List<RScoredSortedSet<Object>> collect1 = getMomentCache(userId);
@@ -89,7 +127,7 @@ public class JcEventListener {
                 // 移除旧的MomentVO
                 scoredSortedSet.remove(momentVO);
                 List<Like> likes = momentVO.getLikes();
-                if(likes==null){
+                if (likes == null) {
                     likes = new ArrayList<>();
                     momentVO.setLikes(likes);
                 }
@@ -111,7 +149,7 @@ public class JcEventListener {
                 // 移除旧的MomentVO
                 scoredSortedSet.remove(momentVO);
                 List<Comment> comments = momentVO.getComments();
-                if(comments==null){
+                if (comments == null) {
                     comments = new ArrayList<>();
                     momentVO.setComments(comments);
                 }
@@ -124,12 +162,12 @@ public class JcEventListener {
 
     private List<MomentVO> getFriendMoment(RScoredSortedSet<Object> scoredSortedSet, String momentId) {
         List<Object> objects = (List<Object>) scoredSortedSet.valueRange(0, -1);
-        List<MomentVO> moments = objects.stream().map(o -> (MomentVO)o).collect(Collectors.toList());
+        List<MomentVO> moments = objects.stream().map(o -> (MomentVO) o).collect(Collectors.toList());
         return moments.stream().filter(momentVO -> momentVO.getMomentId().equals(momentId)).collect(Collectors.toList());
     }
 
     private List<RScoredSortedSet<Object>> getMomentCache(Integer userId) {
-        Assert.isTrue(userDubbo != null,"userDubbo Null");
+        Assert.isTrue(userDubbo != null, "userDubbo Null");
         RpcResult<List<UserInfoDTO>> friendAndMeInfos = userDubbo.getFriendAndMeInfos(userId);
         Assert.isTrue(friendAndMeInfos.isSuccess(), "获取好友信息失败");
         List<Integer> collect = friendAndMeInfos.getData().stream().map(UserInfoDTO::getUserId).collect(Collectors.toList());

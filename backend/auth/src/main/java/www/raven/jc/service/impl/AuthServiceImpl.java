@@ -1,8 +1,12 @@
 package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,12 +25,6 @@ import www.raven.jc.entity.model.RegisterModel;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.AuthService;
 import www.raven.jc.util.JwtUtil;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * account service impl
@@ -51,8 +49,8 @@ public class AuthServiceImpl implements AuthService {
         RpcResult<UserAuthDTO> result = userDubbo.getUserToAuth(loginModel.getUsername());
         Assert.isTrue(result.isSuccess());
         UserAuthDTO user = result.getData();
-        if (redissonClient.getBucket(JwtConstant.TOKEN + ":" + user.getUserId()).isExists()) {
-            return redissonClient.getBucket(JwtConstant.TOKEN + ":" + user.getUserId()).get().toString();
+        if (redissonClient.getBucket(JwtConstant.TOKEN  + user.getUserId()).isExists()) {
+            return redissonClient.getBucket(JwtConstant.TOKEN + user.getUserId()).get().toString();
         }
         Assert.isTrue(passwordEncoder.matches(loginModel.getPassword(), user.getPassword()), "密码错误");
         RpcResult<List<RoleDTO>> rolesById = userDubbo.getRolesById(user.getUserId());
@@ -95,7 +93,7 @@ public class AuthServiceImpl implements AuthService {
         Assert.isFalse(userDubbo.checkUserExit(registerModel.getUsername()).getData());
         UserRegisterDTO user = new UserRegisterDTO();
         user.setEmail(registerModel.getEmail()).setPassword(passwordEncoder.encode(registerModel.getPassword()))
-                .setUsername(registerModel.getUsername()).setRoleIds(roleIds).setProfile(registerModel.getProfile());
+            .setUsername(registerModel.getUsername()).setRoleIds(roleIds).setProfile(registerModel.getProfile());
         RpcResult<UserAuthDTO> insert = userDubbo.insert(user);
         Assert.isTrue(insert.isSuccess());
         List<RoleDTO> list = new ArrayList<>();
@@ -105,14 +103,13 @@ public class AuthServiceImpl implements AuthService {
         return getTokenClaims(insert.getData().getUserId(), list.stream().map(RoleDTO::getValue).collect(Collectors.toList()));
     }
 
-
     private String getTokenClaims(int userId, List<String> role) {
         HashMap<String, Object> claims = new HashMap<>(3);
         claims.put("userId", userId);
         claims.put("role", role);
         claims.put("expireTime", System.currentTimeMillis() + 1000 * 60 * 30);
         String token = JwtUtil.createToken(claims, key);
-        redissonClient.getBucket(JwtConstant.TOKEN + ":" + userId).set(token,60, TimeUnit.MINUTES);
+        redissonClient.getBucket(JwtConstant.TOKEN + userId).set(token, 60, TimeUnit.MINUTES);
         return token;
     }
 

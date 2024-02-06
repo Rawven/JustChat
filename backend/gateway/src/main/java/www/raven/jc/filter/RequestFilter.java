@@ -1,5 +1,7 @@
 package www.raven.jc.filter;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -15,9 +17,6 @@ import www.raven.jc.result.CommonResult;
 import www.raven.jc.result.ResultCode;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.JwtUtil;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
 /**
  * request filter

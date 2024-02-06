@@ -1,15 +1,13 @@
 package www.raven.jc.entity.po;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import java.io.Serializable;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 import www.raven.jc.dto.UserInfoDTO;
-
-import java.util.List;
 import www.raven.jc.util.CommonSerializable;
 
 /**

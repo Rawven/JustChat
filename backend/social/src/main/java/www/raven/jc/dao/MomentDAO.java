@@ -1,5 +1,6 @@
 package www.raven.jc.dao;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -12,8 +13,6 @@ import www.raven.jc.entity.po.Comment;
 import www.raven.jc.entity.po.Like;
 import www.raven.jc.entity.po.Moment;
 
-import java.util.List;
-
 /**
  * moment dao
  *
@@ -22,10 +21,9 @@ import java.util.List;
  */
 @Repository
 public class MomentDAO {
+    private static final String COLLECTION_MOMENT = "moment";
     @Autowired
     private MongoTemplate mongoTemplate;
-
-    private static final String COLLECTION_MOMENT = "moment";
 
     public Moment save(Moment moment) {
         return mongoTemplate.save(moment, COLLECTION_MOMENT);
@@ -37,16 +35,16 @@ public class MomentDAO {
 
     public boolean like(String momentId, Like like) {
         return mongoTemplate.updateFirst(new Query(Criteria.where("_id").is(momentId)),
-                new Update().push("likes", like), COLLECTION_MOMENT).getModifiedCount() > 0;
+            new Update().push("likes", like), COLLECTION_MOMENT).getModifiedCount() > 0;
     }
 
     public boolean comment(String momentId, Comment comment) {
         return mongoTemplate.updateFirst(new Query(Criteria.where("_id").is(momentId)),
-                new Update().push("comments", comment), COLLECTION_MOMENT).getModifiedCount() > 0;
+            new Update().push("comments", comment), COLLECTION_MOMENT).getModifiedCount() > 0;
     }
 
     public List<Moment> queryMoment(List<UserInfoDTO> infos) {
-         //查找 ids 中的用户的动态 按照时间排序 只查7条
+        //查找 ids 中的用户的动态 按照时间排序 只查7条
         Query with = new Query(Criteria.where("userInfo").in(infos)).limit(7).with(Sort.by(Sort.Direction.DESC, "timestamp"));
         return mongoTemplate.find(with, Moment.class, COLLECTION_MOMENT);
 

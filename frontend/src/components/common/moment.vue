@@ -156,13 +156,13 @@
             </svg>
           </div>
           <div class="mt-3 flex justify-between text-gray-500">
-            <el-button @click="tolike(moment.momentId)">
+            <el-button @click="tolike(moment.momentId,moment.userInfo.userId)">
               <el-icon>
                 <Star/>
               </el-icon>
             </el-button>
             <el-input v-model="moment.input" placeholder="要评论吗"
-                      @keyup.enter="submitComment(moment.momentId,moment.input)"/>
+                      @keyup.enter="submitComment(moment.momentId,moment.input,moment.userInfo.userId)"/>
           </div>
         </div>
       </el-main>
@@ -285,8 +285,8 @@ export default {
         this.$message.success('文件上传成功');
       })
     },
-    tolike(momentId) {
-      this.realAxios.get(`http://` + Host + `:7000/social/likeMoment/${momentId}`,
+    tolike(momentId,momentUserId) {
+      this.realAxios.get(`http://` + Host + `:7000/social/likeMoment/${momentId}/${momentUserId}/`,
           {
             headers: {
               'token': localStorage.getItem("token")
@@ -303,10 +303,11 @@ export default {
         this.feedData = response.data.data;
       })
     },
-    submitComment(momentId, text) {
+    submitComment(momentId, text,momentUserId) {
       this.realAxios.post(`http://` + Host + `:7000/social/commentMoment`, {
             momentId: momentId,
-            text: text
+            text: text,
+            momentUserId: momentUserId
           },
           {
             headers: {

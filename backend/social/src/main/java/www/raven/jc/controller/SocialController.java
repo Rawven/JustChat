@@ -1,15 +1,19 @@
 package www.raven.jc.controller;
 
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import www.raven.jc.entity.model.CommentModel;
 import www.raven.jc.entity.model.MomentModel;
 import www.raven.jc.entity.vo.MomentVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.SocialService;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
  * social controller
@@ -43,11 +47,12 @@ public class SocialController {
         return CommonResult.operateSuccess("删除成功");
     }
 
-    @GetMapping("/likeMoment/{momentId}")
-    public CommonResult<Void> likeMoment(@PathVariable("momentId") String momentId) {
-        socialService.likeMoment(momentId);
+    @GetMapping("/likeMoment/{momentId}/{momentUserId}")
+    public CommonResult<Void> likeMoment(@PathVariable("momentId") String momentId,@PathVariable("momentUserId") Integer momentUserId){
+        socialService.likeMoment(momentId,momentUserId);
         return CommonResult.operateSuccess("点赞成功");
     }
+
     @PostMapping("/commentMoment")
     public CommonResult<Void> commentMoment(@RequestBody CommentModel model) {
         socialService.commentMoment(model);

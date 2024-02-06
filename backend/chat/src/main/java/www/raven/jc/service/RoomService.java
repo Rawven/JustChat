@@ -1,10 +1,9 @@
 package www.raven.jc.service;
 
+import java.util.List;
 import www.raven.jc.entity.model.RoomModel;
 import www.raven.jc.entity.vo.RealRoomVO;
 import www.raven.jc.entity.vo.UserRoomVO;
-
-import java.util.List;
 
 /**
  * room service
@@ -50,7 +49,6 @@ public interface RoomService {
      */
     RealRoomVO queryUserNameRoomList(String column, String text, int page);
 
-
     /**
      * apply to join room
      *
@@ -67,7 +65,6 @@ public interface RoomService {
      */
     void agreeApply(Integer roomId, Integer userId, int noticeId);
 
-
     /**
      * query list page
      * query list page
@@ -77,6 +74,5 @@ public interface RoomService {
      * @return {@link RealRoomVO}
      */
     RealRoomVO queryListPage(int page, int size);
-
 
 }

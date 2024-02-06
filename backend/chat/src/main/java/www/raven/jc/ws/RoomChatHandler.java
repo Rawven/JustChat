@@ -1,8 +1,17 @@
 package www.raven.jc.ws;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArraySet;
+import javax.websocket.OnClose;
+import javax.websocket.OnError;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.server.PathParam;
+import javax.websocket.server.ServerEndpoint;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import www.raven.jc.api.UserDubbo;
@@ -12,13 +21,6 @@ import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.JwtUtil;
-
-import javax.websocket.*;
-import javax.websocket.server.PathParam;
-import javax.websocket.server.ServerEndpoint;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * web socket service
@@ -54,6 +56,7 @@ public class RoomChatHandler extends BaseHandler {
     public void setUserDubbo(UserDubbo userDubbo) {
         RoomChatHandler.userDubbo = userDubbo;
     }
+
     @Autowired
     public void setChatService(ChatService chatService) {
         RoomChatHandler.chatService = chatService;
@@ -63,7 +66,8 @@ public class RoomChatHandler extends BaseHandler {
      * 链接成功调用的方法
      */
     @OnOpen
-    public void onOpen(Session session, @PathParam(value = "token") String token, @PathParam(value = "roomId") String roomId) {
+    public void onOpen(Session session, @PathParam(value = "token") String token,
+        @PathParam(value = "roomId") String roomId) {
         TokenDTO dto = JwtUtil.verify(token, "爱你老妈");
         session.getUserProperties().put("userDto", dto);
         this.session = session;
@@ -130,16 +134,14 @@ public class RoomChatHandler extends BaseHandler {
         log.error("----WebSocket Stack trace: {}", (Object) error.getStackTrace());
     }
 
-
     public void sendRoomMessage(String message) {
         log.info("----WebSocket 广播消息:" + message);
         SESSION_POOL.get(this.roomId).forEach((k, v) -> {
-            if ( v.isOpen()) {
+            if (v.isOpen()) {
                 v.getAsyncRemote().sendText(message);
             }
         });
     }
-
 
     @Override
     public int hashCode() {

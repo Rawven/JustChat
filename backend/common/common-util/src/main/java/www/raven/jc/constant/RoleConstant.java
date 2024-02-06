@@ -13,7 +13,7 @@ public class RoleConstant {
     public static final Integer COMMON_ROLE_NUMBER = 1;
     public static final String ADMIN_ROLE = "ROLE_ADMIN";
     public static final String COMMON_ROLE = "ROLE_USER";
-    public static HashMap<Integer, String> MAP = new HashMap<>(2);
+    public static final HashMap<Integer, String> MAP = new HashMap<>(2);
 
     static {
         MAP.put(ADMIN_ROLE_NUMBER, ADMIN_ROLE);

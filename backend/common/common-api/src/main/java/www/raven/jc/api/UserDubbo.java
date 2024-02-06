@@ -1,10 +1,13 @@
 package www.raven.jc.api;
 
-import www.raven.jc.dto.*;
+import java.util.List;
+import www.raven.jc.dto.QueryUserInfoDTO;
+import www.raven.jc.dto.RoleDTO;
+import www.raven.jc.dto.UserAuthDTO;
+import www.raven.jc.dto.UserInfoDTO;
+import www.raven.jc.dto.UserRegisterDTO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.result.RpcResult;
-
-import java.util.List;
 
 /**
  * account api
@@ -27,7 +30,6 @@ public interface UserDubbo {
      * @return {@link CommonResult}<{@link List}<{@link UserInfoDTO}>>
      */
     RpcResult<List<UserInfoDTO>> getAllInfo();
-
 
     /**
      * get related info list
@@ -68,7 +70,6 @@ public interface UserDubbo {
      * @return {@link CommonResult}<{@link Boolean}>
      */
     RpcResult<Boolean> checkUserExit(String username);
-
 
     /**
      * get batch info

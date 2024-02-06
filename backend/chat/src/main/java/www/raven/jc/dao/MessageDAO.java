@@ -1,5 +1,6 @@
 package www.raven.jc.dao;
 
+import java.util.List;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -8,8 +9,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import www.raven.jc.entity.po.Message;
-
-import java.util.List;
 
 /**
  * mongo service

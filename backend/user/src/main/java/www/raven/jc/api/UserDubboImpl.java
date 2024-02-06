@@ -1,14 +1,17 @@
 package www.raven.jc.api;
 
+import java.util.List;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
-import www.raven.jc.dto.*;
+import www.raven.jc.dto.QueryUserInfoDTO;
+import www.raven.jc.dto.RoleDTO;
+import www.raven.jc.dto.UserAuthDTO;
+import www.raven.jc.dto.UserInfoDTO;
+import www.raven.jc.dto.UserRegisterDTO;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.FriendService;
 import www.raven.jc.service.NoticeService;
 import www.raven.jc.service.UserService;
-
-import java.util.List;
 
 /**
  * user dubbo impl
