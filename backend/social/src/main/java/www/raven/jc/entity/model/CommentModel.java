@@ -2,6 +2,7 @@ package www.raven.jc.entity.model;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
 
 /**
  * comment model
@@ -13,5 +14,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class CommentModel {
     private String momentId;
+    private Integer momentUserId;
     private String text;
 }

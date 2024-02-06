@@ -2,8 +2,12 @@ package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -31,12 +35,6 @@ import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MongoUtil;
 import www.raven.jc.util.MqUtil;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 /**
  * chat service impl
  *
@@ -60,7 +58,6 @@ public class ChatServiceImpl implements ChatService {
     @Autowired
     private StreamBridge streamBridge;
 
-
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     @CacheEvict(value = "roomHistory", key = "#roomId")
@@ -68,10 +65,10 @@ public class ChatServiceImpl implements ChatService {
         long timeStamp = message.getTime();
         String text = message.getText();
         Message realMsg = new Message().setContent(text)
-                .setTimestamp(new Date(timeStamp))
-                .setSenderId(userId)
-                .setType("room")
-                .setReceiverId(String.valueOf(roomId));
+            .setTimestamp(new Date(timeStamp))
+            .setSenderId(userId)
+            .setType("room")
+            .setReceiverId(String.valueOf(roomId));
         //保存消息
         Assert.isTrue(messageDAO.save(realMsg), "插入失败");
         //更新聊天室的最后一条消息
@@ -89,15 +86,15 @@ public class ChatServiceImpl implements ChatService {
     public void saveFriendMsg(MessageDTO message, Integer userId, Integer friendId) {
         String fixId = MongoUtil.concatenateIds(userId, friendId);
         Message realMsg = new Message().setContent(message.getText())
-                .setTimestamp(new Date(message.getTime()))
-                .setSenderId(userId)
-                .setType("friend")
-                .setReceiverId(fixId);
+            .setTimestamp(new Date(message.getTime()))
+            .setSenderId(userId)
+            .setType("friend")
+            .setReceiverId(fixId);
         //保存消息
         Assert.isTrue(messageDAO.save(realMsg), "插入失败");
         //保存最后一条消息
         FriendChat friendChat = new FriendChat().setFixId(fixId)
-                .setLastMsgId(realMsg.getMessageId().toString());
+            .setLastMsgId(realMsg.getMessageId().toString());
         Assert.isTrue(friendChatDAO.save(friendChat), "插入失败");
         FriendMsgEvent friendMsgEvent = new FriendMsgEvent(userId, friendId, JsonUtil.objToJson(realMsg));
         //通知user模块有新消息
@@ -113,22 +110,21 @@ public class ChatServiceImpl implements ChatService {
         Assert.isTrue(allInfo.isSuccess(), "user模块调用失败");
         List<UserInfoDTO> data = allInfo.getData();
         Map<Integer, UserInfoDTO> userInfoMap = data.stream()
-                .collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
+            .collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
         return messages.stream().map(
-                message -> {
-                    MessageVO messageVO = new MessageVO();
-                    messageVO.setText(message.getContent());
-                    messageVO.setTime(message.getTimestamp());
-                    // 从 Map 中查找对应的 UserInfoDTO 对象
-                    UserInfoDTO userInfoDTO = userInfoMap.get(message.getSenderId());
-                    if (userInfoDTO != null) {
-                        messageVO.setUser(userInfoDTO.getUsername());
-                        messageVO.setProfile(userInfoDTO.getProfile());
-                    }
-                    return messageVO;
+            message -> {
+                MessageVO messageVO = new MessageVO();
+                messageVO.setText(message.getContent());
+                messageVO.setTime(message.getTimestamp());
+                // 从 Map 中查找对应的 UserInfoDTO 对象
+                UserInfoDTO userInfoDTO = userInfoMap.get(message.getSenderId());
+                if (userInfoDTO != null) {
+                    messageVO.setUser(userInfoDTO.getUsername());
+                    messageVO.setProfile(userInfoDTO.getProfile());
                 }
+                return messageVO;
+            }
         ).collect(Collectors.toList());
     }
-
 
 }

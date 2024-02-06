@@ -3,10 +3,9 @@ package www.raven.jc.entity.po;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import java.sql.Date;
 import lombok.Data;
 import lombok.experimental.Accessors;
-
-import java.sql.Date;
 
 /**
  * user

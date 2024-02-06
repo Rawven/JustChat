@@ -1,7 +1,13 @@
 package www.raven.jc.controller;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.entity.vo.RealRoomVO;
 import www.raven.jc.entity.vo.UserFriendVO;
@@ -10,8 +16,6 @@ import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.service.FriendService;
 import www.raven.jc.service.RoomService;
-
-import java.util.List;
 
 /**
  * query controller
@@ -39,14 +43,16 @@ public class QueryController {
     public CommonResult<List<UserFriendVO>> initUserFriendPage() {
         return CommonResult.operateSuccess("获取房间列表成功", friendService.initUserFriendPage());
     }
+
     @GetMapping("/queryIdRoomList/{page}/{size}")
     public CommonResult<RealRoomVO> queryRoomList(@PathVariable("page") int page, @PathVariable("size") int size) {
         return CommonResult.operateSuccess("获取房间列表成功", roomService.queryListPage(page, size));
     }
 
     @GetMapping("/queryRelatedRoomList/{text}/{choice}/{page}")
-    public CommonResult<RealRoomVO> queryRelatedRoomList(@PathVariable("text") String text, @PathVariable("choice") int choice,
-                                                         @PathVariable("page") int page) {
+    public CommonResult<RealRoomVO> queryRelatedRoomList(@PathVariable("text") String text,
+        @PathVariable("choice") int choice,
+        @PathVariable("page") int page) {
         RealRoomVO rooms;
         //roomName查找
         if (choice == 1) {

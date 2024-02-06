@@ -4,11 +4,10 @@ import cn.hutool.core.convert.NumberWithFormat;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.jwt.JWTPayload;
 import cn.hutool.jwt.JWTUtil;
-import lombok.extern.slf4j.Slf4j;
-import www.raven.jc.dto.TokenDTO;
-
 import java.util.List;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
+import www.raven.jc.dto.TokenDTO;
 
 /**
  * jwt util
@@ -20,7 +19,6 @@ import java.util.Map;
 public class JwtUtil {
     public static final String TIME = "expireTime";
     public static final String LOGOUT = "LOGOUT";
-
 
     public static String createToken(Map<String, Object> map, String key) {
         map.put("expireTime", System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7);

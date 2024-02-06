@@ -1,5 +1,6 @@
 package www.raven.jc.service;
 
+import java.util.List;
 import www.raven.jc.dto.RoleDTO;
 import www.raven.jc.dto.UserAuthDTO;
 import www.raven.jc.dto.UserInfoDTO;
@@ -7,8 +8,6 @@ import www.raven.jc.dto.UserRegisterDTO;
 import www.raven.jc.entity.vo.AllInfoVO;
 import www.raven.jc.entity.vo.InfoVO;
 import www.raven.jc.entity.vo.RealAllInfoVO;
-
-import java.util.List;
 
 /**
  * info service
@@ -26,7 +25,7 @@ public interface UserService {
      * @param value  value
      * @param id     id
      */
-    void updateByColumn(Integer id,String column, String value);
+    void updateByColumn(Integer id, String column, String value);
 
     /**
      * query single info

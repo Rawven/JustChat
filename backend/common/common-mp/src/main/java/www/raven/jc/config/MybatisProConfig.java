@@ -26,5 +26,4 @@ public class MybatisProConfig {
         return interceptor;
     }
 
-
 }

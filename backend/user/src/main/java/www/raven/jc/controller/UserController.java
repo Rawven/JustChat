@@ -1,8 +1,17 @@
 package www.raven.jc.controller;
 
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import www.raven.jc.annotions.Auth;
 import www.raven.jc.constant.RoleConstant;
 import www.raven.jc.dto.QueryUserInfoDTO;
@@ -12,9 +21,6 @@ import www.raven.jc.entity.vo.RealAllInfoVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.NoticeService;
 import www.raven.jc.service.UserService;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
  * info controller
@@ -33,7 +39,6 @@ public class UserController {
     private NoticeService noticeService;
     @Autowired
     private HttpServletRequest request;
-
 
     /**
      * check user exit
@@ -61,23 +66,21 @@ public class UserController {
     @PostMapping("/setProfile")
     public CommonResult<Void> setProfile(@RequestParam("profile") String profile) {
         String userId = request.getHeader("userId");
-        userService.updateByColumn(Integer.valueOf(userId),"profile",profile);
+        userService.updateByColumn(Integer.valueOf(userId), "profile", profile);
         return CommonResult.operateSuccess("设置头像成功");
     }
-
-
 
     @PostMapping("/setSignature")
     public CommonResult<Void> setSignature(@RequestParam("signature") String signature) {
         String userId = request.getHeader("userId");
-        userService.updateByColumn(Integer.valueOf(userId),"signature", signature);
+        userService.updateByColumn(Integer.valueOf(userId), "signature", signature);
         return CommonResult.operateSuccess("设置签名成功");
     }
 
     @PostMapping("/setUsername")
     public CommonResult<Void> setUsername(@RequestParam("username") String username) {
         String userId = request.getHeader("userId");
-        userService.updateByColumn(Integer.valueOf(userId),"username", username);
+        userService.updateByColumn(Integer.valueOf(userId), "username", username);
         return CommonResult.operateSuccess("重命名成功");
     }
 

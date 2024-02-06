@@ -1,13 +1,11 @@
 package www.raven.jc.entity.po;
 
+import java.util.Date;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.MongoId;
-
-import java.util.Date;
-
 
 /**
  * message

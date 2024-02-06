@@ -23,7 +23,6 @@ public class RedissonConfiguration {
     @Value("${spring.redis.password:}")
     private String password;
 
-
     @Bean
     public RedissonClient redissonClient() {
         Config config = new Config();

@@ -1,13 +1,12 @@
 package www.raven.jc.entity.vo;
 
 import java.io.Serializable;
+import java.util.List;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.Comment;
 import www.raven.jc.entity.po.Like;
-
-import java.util.List;
 import www.raven.jc.entity.po.Moment;
 
 /**
@@ -26,6 +25,7 @@ public class MomentVO implements Serializable {
     private List<Like> likes;
     private List<Comment> comments;
     private Long timestamp;
+
     public MomentVO(Moment moment) {
         this.momentId = moment.getMomentId().toHexString();
         this.userInfo = moment.getUserInfo();

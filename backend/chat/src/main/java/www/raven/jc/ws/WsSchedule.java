@@ -1,11 +1,9 @@
 package www.raven.jc.ws;
 
+import javax.websocket.Session;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import javax.websocket.Session;
-
 
 /**
  * ws schedule

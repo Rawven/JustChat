@@ -1,6 +1,5 @@
 package www.raven.jc.service;
 
-
 import www.raven.jc.entity.model.LoginModel;
 import www.raven.jc.entity.model.RegisterModel;
 
@@ -34,7 +33,6 @@ public interface AuthService {
      * @return {@link String}
      */
     String registerAdminRole(RegisterModel registerModel);
-
 
     /**
      * refresh token

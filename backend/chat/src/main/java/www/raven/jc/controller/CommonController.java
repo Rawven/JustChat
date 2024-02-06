@@ -1,8 +1,13 @@
 package www.raven.jc.controller;
 
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import www.raven.jc.api.UserDubbo;
 import www.raven.jc.entity.model.RoomIdModel;
 import www.raven.jc.entity.model.RoomModel;
@@ -26,7 +31,6 @@ public class CommonController {
     @Autowired
     private UserDubbo userDubbo;
 
-
     @PostMapping("/createRoom")
     public CommonResult<Void> createRoom(@RequestBody RoomModel roomModel) {
         roomService.createRoom(roomModel);
@@ -40,8 +44,9 @@ public class CommonController {
     }
 
     @GetMapping("/agreeToJoinRoom/{roomId}/{userId}/{noticeId}")
-    public CommonResult<Void> agreeApply(@PathVariable("roomId") String roomId, @PathVariable("userId") int userId,@PathVariable("noticeId") int noticeId) {
-        roomService.agreeApply(Integer.valueOf(roomId),userId,noticeId);
+    public CommonResult<Void> agreeApply(@PathVariable("roomId") String roomId, @PathVariable("userId") int userId,
+        @PathVariable("noticeId") int noticeId) {
+        roomService.agreeApply(Integer.valueOf(roomId), userId, noticeId);
         return CommonResult.operateSuccess("同意申请成功");
     }
 

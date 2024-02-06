@@ -1,9 +1,18 @@
 package www.raven.jc.ws;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArraySet;
+import javax.websocket.OnClose;
+import javax.websocket.OnError;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.server.PathParam;
+import javax.websocket.server.ServerEndpoint;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import www.raven.jc.api.UserDubbo;
@@ -13,13 +22,6 @@ import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.JwtUtil;
-
-import javax.websocket.*;
-import javax.websocket.server.PathParam;
-import javax.websocket.server.ServerEndpoint;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * friend chat handler
@@ -33,7 +35,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @Data
 @ServerEndpoint("/ws/friend/{token}/{friendId}")
 public class FriendChatHandler extends BaseHandler {
-
 
     /**
      * 用来存在线连接数
@@ -58,18 +59,17 @@ public class FriendChatHandler extends BaseHandler {
         FriendChatHandler.userDubbo = userDubbo;
     }
 
-
     @Autowired
     public void setChatService(ChatService chatService) {
         FriendChatHandler.chatService = chatService;
     }
 
-
     /**
      * 链接成功调用的方法
      */
     @OnOpen
-    public void onOpen(Session session, @PathParam(value = "token") String token, @PathParam(value = "friendId") String friendId) {
+    public void onOpen(Session session, @PathParam(value = "token") String token,
+        @PathParam(value = "friendId") String friendId) {
         TokenDTO dto = JwtUtil.verify(token, "爱你老妈");
         session.getUserProperties().put("userDto", dto);
         this.session = session;
@@ -130,7 +130,6 @@ public class FriendChatHandler extends BaseHandler {
         log.error("----WebSocket Stack trace: {}", (Object) error.getStackTrace());
     }
 
-
     public void sendFriendMessage(String message) {
         log.info("----WebSocket 广播消息:" + message);
         Session mySession = SESSION_POOL.get(userId).get(friendId);
@@ -138,13 +137,13 @@ public class FriendChatHandler extends BaseHandler {
             mySession.getAsyncRemote().sendText(message);
         }
         Map<Integer, Session> integerSessionMap = SESSION_POOL.get(friendId);
-        if(SESSION_POOL.containsKey(friendId)){
-              if(integerSessionMap.containsKey(userId)){
-                  Session session = integerSessionMap.get(userId);
-                  if(session.isOpen()){
-                      session.getAsyncRemote().sendText(message);
-                  }
-              }
+        if (SESSION_POOL.containsKey(friendId)) {
+            if (integerSessionMap.containsKey(userId)) {
+                Session session = integerSessionMap.get(userId);
+                if (session.isOpen()) {
+                    session.getAsyncRemote().sendText(message);
+                }
+            }
         }
     }
 }

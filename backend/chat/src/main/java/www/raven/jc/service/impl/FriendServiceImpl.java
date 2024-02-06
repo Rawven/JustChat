@@ -1,8 +1,13 @@
 package www.raven.jc.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -19,13 +24,6 @@ import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.FriendService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MongoUtil;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * friend service impl
@@ -45,7 +43,6 @@ public class FriendServiceImpl implements FriendService {
     @Autowired
     private UserDubbo userDubbo;
 
-
     @Override
     public List<UserFriendVO> initUserFriendPage() {
         int userId = Integer.parseInt(request.getHeader("userId"));
@@ -62,25 +59,25 @@ public class FriendServiceImpl implements FriendService {
         List<FriendChat> friendChats = friendChatDAO.getBaseMapper().selectList(new QueryWrapper<FriendChat>().in("fix_id", fixedFriendIds));
         //获取好友的最后一条消息id
         List<ObjectId> idsMsg = friendChats.stream()
-                .map(chat -> new ObjectId(chat.getLastMsgId()))
-                .collect(Collectors.toList());
+            .map(chat -> new ObjectId(chat.getLastMsgId()))
+            .collect(Collectors.toList());
         //获取好友的最后一条消息
         List<Message> messages = messageDAO.getBatchIds(idsMsg);
         //将好友id和好友的最后一条消息id对应起来
         Map<Integer, Message> messageMap = messages.stream()
-                .collect(Collectors.toMap(
-                        message -> message.getSenderId().equals(userId) ? MongoUtil.resolve(message.getReceiverId(), userId) : message.getSenderId(),
-                        Function.identity(),
-                        (oldValue, newValue) -> newValue
-                ));
+            .collect(Collectors.toMap(
+                message -> message.getSenderId().equals(userId) ? MongoUtil.resolve(message.getReceiverId(), userId) : message.getSenderId(),
+                Function.identity(),
+                (oldValue, newValue) -> newValue
+            ));
         return friends.stream().map(friend -> {
             Message message = messageMap.get(friend.getUserId());
             return new UserFriendVO()
-                    .setFriendId(friend.getUserId())
-                    .setFriendName(friend.getUsername())
-                    .setFriendProfile(friend.getProfile())
-                    .setLastMsg(message == null ? "" : JsonUtil.objToJson(message))
-                    .setLastMsgSender(message == null ? "" : message.getSenderId().equals(userId) ? "我" : friend.getUsername());
+                .setFriendId(friend.getUserId())
+                .setFriendName(friend.getUsername())
+                .setFriendProfile(friend.getProfile())
+                .setLastMsg(message == null ? "" : JsonUtil.objToJson(message))
+                .setLastMsgSender(message == null ? "" : message.getSenderId().equals(userId) ? "我" : friend.getUsername());
         }).collect(Collectors.toList());
     }
 
@@ -98,12 +95,11 @@ public class FriendServiceImpl implements FriendService {
         Map<Integer, UserInfoDTO> userInfoMap = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
 
         return byFriendChatId.stream().map(message -> new MessageVO()
-                .setTime(message.getTimestamp())
-                .setText(message.getContent())
-                .setUser(userInfoMap.get(message.getSenderId()).getUsername())
-                .setProfile(userInfoMap.get(message.getSenderId()).getProfile())
+            .setTime(message.getTimestamp())
+            .setText(message.getContent())
+            .setUser(userInfoMap.get(message.getSenderId()).getUsername())
+            .setProfile(userInfoMap.get(message.getSenderId()).getProfile())
         ).collect(Collectors.toList());
     }
-
 
 }

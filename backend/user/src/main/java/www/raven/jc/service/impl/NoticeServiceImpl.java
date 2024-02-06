@@ -2,6 +2,13 @@ package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
@@ -22,14 +29,6 @@ import www.raven.jc.event.RoomApplyEvent;
 import www.raven.jc.service.NoticeService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.ws.NotificationHandler;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * notice service impl
@@ -52,29 +51,30 @@ public class NoticeServiceImpl implements NoticeService {
     private NotificationHandler handler;
     @Autowired
     private RedissonClient redissonClient;
+
     @Override
     public List<NoticeVO> loadNotice() {
         Integer userId = Integer.parseInt(request.getHeader("userId"));
         //think 通知是否需要被解决后删除 不删除留下来可以做到通知的历史记录
         List<Notification> userId1 = noticeDAO.getBaseMapper().selectList(new QueryWrapper<Notification>().eq("user_id", userId).orderByDesc("timestamp"));
-        if(userId1.isEmpty()){
+        if (userId1.isEmpty()) {
             return new ArrayList<>();
         }
         List<Integer> ids = userId1.stream().map(Notification::getSenderId).collect(Collectors.toList());
         List<User> users = userDAO.getBaseMapper().selectList(new QueryWrapper<User>().in("id", ids));
-        Map<Integer,UserInfoDTO> map = users.stream().map(
-                user -> new UserInfoDTO().setUserId(user.getId()).setUsername(user.getUsername()).setProfile(user.getProfile())
+        Map<Integer, UserInfoDTO> map = users.stream().map(
+            user -> new UserInfoDTO().setUserId(user.getId()).setUsername(user.getUsername()).setProfile(user.getProfile())
         ).collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
         return userId1.stream().map(
-                notification -> {
-                    NoticeVO noticeVO = new NoticeVO();
-                    noticeVO.setNoticeId(notification.getId())
-                            .setType(notification.getType())
-                            .setData(notification.getData())
-                            .setTimestamp(notification.getTimestamp())
-                            .setSender(map.get(notification.getSenderId()));
-                    return noticeVO;
-                }
+            notification -> {
+                NoticeVO noticeVO = new NoticeVO();
+                noticeVO.setNoticeId(notification.getId())
+                    .setType(notification.getType())
+                    .setData(notification.getData())
+                    .setTimestamp(notification.getTimestamp())
+                    .setSender(map.get(notification.getSenderId()));
+                return noticeVO;
+            }
         ).collect(Collectors.toList());
     }
 
@@ -83,14 +83,14 @@ public class NoticeServiceImpl implements NoticeService {
     public void addFriendApply(String friendName) {
         String applierId = request.getHeader("userId");
         User user = userDAO.getBaseMapper().selectOne(new QueryWrapper<User>().eq("username", friendName));
-        Assert.notNull(user,"用户不存在");
+        Assert.notNull(user, "用户不存在");
         Assert.isNull(friendDAO.getBaseMapper().selectOne(new QueryWrapper<Friend>().eq("user_id", applierId).eq("friend_id", user.getId())), "已经是好友了");
         Integer friendId = user.getId();
         Notification notice = new Notification().setUserId(friendId)
-                .setData("暂无")
-                .setType(NoticeConstant.TYPE_ADD_FRIEND_APPLY)
-                .setTimestamp(System.currentTimeMillis())
-                .setSenderId(Integer.parseInt(applierId));
+            .setData("暂无")
+            .setType(NoticeConstant.TYPE_ADD_FRIEND_APPLY)
+            .setTimestamp(System.currentTimeMillis())
+            .setSenderId(Integer.parseInt(applierId));
         Assert.isTrue(noticeDAO.save(notice));
         RBucket<String> friendBucket = redissonClient.getBucket("token:" + friendId);
         HashMap<Object, Object> map = new HashMap<>(1);
@@ -106,10 +106,10 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     public void addRoomApply(int founderId, RoomApplyEvent payload) {
         Notification notice = new Notification().setUserId(founderId)
-                .setData(String.valueOf(payload.getRoomId()))
-                .setType(NoticeConstant.TYPE_JOIN_ROOM_APPLY)
-                .setTimestamp(System.currentTimeMillis())
-                .setSenderId(Integer.parseInt(request.getHeader("userId")));
+            .setData(String.valueOf(payload.getRoomId()))
+            .setType(NoticeConstant.TYPE_JOIN_ROOM_APPLY)
+            .setTimestamp(System.currentTimeMillis())
+            .setSenderId(Integer.parseInt(request.getHeader("userId")));
         Assert.isTrue(noticeDAO.save(notice));
     }
 
@@ -119,7 +119,5 @@ public class NoticeServiceImpl implements NoticeService {
         int i = noticeDAO.getBaseMapper().deleteById(id);
         Assert.isTrue(i == 1);
     }
-
-
 
 }

@@ -37,7 +37,6 @@ public class RpcResult<T> extends CommonSerializable {
         return new RpcResult<>(true, message);
     }
 
-
     public static <T> RpcResult<T> operateSuccess(String message, T data) {
         return new RpcResult<>(true, message, data);
     }
