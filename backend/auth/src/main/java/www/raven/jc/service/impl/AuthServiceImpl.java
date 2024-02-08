@@ -2,7 +2,6 @@ package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -61,7 +60,7 @@ public class AuthServiceImpl implements AuthService {
         Assert.isTrue(passwordEncoder.matches(loginModel.getPassword(), user.getPassword()), "密码错误");
         RpcResult<List<RoleDTO>> rolesById = userDubbo.getRolesById(user.getUserId());
         Assert.isTrue(rolesById.isSuccess());
-        return getTokenClaims(user.getUserId(), rolesById.getData().stream().map(RoleDTO::getValue).collect(Collectors.toList()));
+        return produceToken(user.getUserId(), rolesById.getData().stream().map(RoleDTO::getValue).collect(Collectors.toList()));
     }
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
@@ -84,7 +83,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public String refreshToken(String token) {
         TokenDTO verify = JwtUtil.verify(token, key);
-        return getTokenClaims(verify.getUserId(), verify.getRole());
+        return produceToken(verify.getUserId(), verify.getRole());
     }
 
     @Override
@@ -103,15 +102,11 @@ public class AuthServiceImpl implements AuthService {
         RpcResult<UserAuthDTO> insert = userDubbo.insert(user);
         Assert.isTrue(insert.isSuccess(), "注册失败");
         List<RoleDTO> list = roleIds.stream(). map(roleId -> new RoleDTO().setValue( RoleConstant.MAP.get(roleId))).collect(Collectors.toList());
-        return getTokenClaims(insert.getData().getUserId(), list.stream().map(RoleDTO::getValue).collect(Collectors.toList()));
+        return produceToken(insert.getData().getUserId(), list.stream().map(RoleDTO::getValue).collect(Collectors.toList()));
     }
 
-    private String getTokenClaims(int userId, List<String> role) {
-        HashMap<String, Object> claims = new HashMap<>(3);
-        claims.put("userId", userId);
-        claims.put("role", role);
-        claims.put("expireTime", System.currentTimeMillis() + expireTime);
-        String token = JwtUtil.createToken(claims, key,expireTime);
+    private String produceToken(int userId, List<String> role) {
+        String token = JwtUtil.createToken(userId,role,key,expireTime);
         redissonClient.getBucket(JwtConstant.TOKEN + userId).set(token, expireTime, TimeUnit.MILLISECONDS);
         return token;
     }
