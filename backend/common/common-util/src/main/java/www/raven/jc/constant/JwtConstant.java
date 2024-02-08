@@ -8,4 +8,7 @@ package www.raven.jc.constant;
  */
 public class JwtConstant {
     public static final String TOKEN = "token:";
+    public static final String USER_ID = "userId";
+    public static final String ROLE = "role";
+    public static final String TIME = "expireTime";
 }

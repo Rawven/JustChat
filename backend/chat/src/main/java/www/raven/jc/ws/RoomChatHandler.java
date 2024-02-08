@@ -68,7 +68,7 @@ public class RoomChatHandler extends BaseHandler {
     @OnOpen
     public void onOpen(Session session, @PathParam(value = "token") String token,
         @PathParam(value = "roomId") String roomId) {
-        TokenDTO dto = JwtUtil.verify(token, "爱你老妈");
+        TokenDTO dto = JwtUtil.parseToken(token, "爱你老妈");
         session.getUserProperties().put("userDto", dto);
         this.session = session;
         this.roomId = Integer.valueOf(roomId);

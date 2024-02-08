@@ -43,7 +43,7 @@ public class TokenAspect {
         if (StrUtil.isEmpty(token)) {
             throw new RuntimeException("权限不足");
         }
-        TokenDTO dto = JwtUtil.verify(token, key);
+        TokenDTO dto = JwtUtil.parseToken(token, key);
         List<String> role = dto.getRole();
         if (!role.contains(auth.value())) {
             throw new RuntimeException("权限不足");

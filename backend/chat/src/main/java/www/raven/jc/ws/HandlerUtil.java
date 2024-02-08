@@ -18,6 +18,6 @@ public class HandlerUtil {
         Map<Object, Object> map = new HashMap<>(2);
         map.put("userInfo", data);
         map.put("message", messageDTO);
-        return JsonUtil.mapToJson(map);
+        return JsonUtil.objToJson(map);
     }
 }

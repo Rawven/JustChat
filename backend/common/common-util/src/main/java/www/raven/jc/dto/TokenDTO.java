@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 /**
- * token dto
+ * token信息
  *
  * @author 刘家辉
  * @date 2023/11/27

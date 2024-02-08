@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import www.raven.jc.dto.UserInfoDTO;
-import www.raven.jc.util.CommonSerializable;
+import www.raven.jc.model.CommonSerializable;
 
 /**
  * comment

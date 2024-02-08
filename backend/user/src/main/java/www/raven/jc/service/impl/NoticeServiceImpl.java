@@ -94,9 +94,9 @@ public class NoticeServiceImpl implements NoticeService {
         Assert.isTrue(noticeDAO.save(notice));
         RBucket<String> friendBucket = redissonClient.getBucket("token:" + friendId);
         HashMap<Object, Object> map = new HashMap<>(1);
-        map.put("type", MqConstant.TAGS_FRIEND_APPLY);
+        map.put("type", MqConstant.TAGS_USER_FRIEND_APPLY);
         if (friendBucket.isExists()) {
-            handler.sendOneMessage(friendId, JsonUtil.mapToJson(map));
+            handler.sendOneMessage(friendId, JsonUtil.objToJson(map));
         } else {
             log.info("--RocketMq receiver不在线");
         }

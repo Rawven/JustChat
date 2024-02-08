@@ -4,7 +4,7 @@ import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import www.raven.jc.util.CommonSerializable;
+import www.raven.jc.model.CommonSerializable;
 
 /**
  * user register dto

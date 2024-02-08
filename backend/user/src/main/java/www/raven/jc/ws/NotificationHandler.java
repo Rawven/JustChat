@@ -44,7 +44,7 @@ public class NotificationHandler extends BaseHandler {
      */
     @OnOpen
     public void onOpen(Session session, @PathParam(value = "token") String token) {
-        TokenDTO verify = JwtUtil.verify(token, "爱你老妈");
+        TokenDTO verify = JwtUtil.parseToken(token, "爱你老妈");
         session.getUserProperties().put("userDto", verify);
         this.userId = verify.getUserId();
         this.session = session;

@@ -5,12 +5,14 @@ import cn.hutool.core.convert.NumberWithFormat;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.jwt.JWTPayload;
 import cn.hutool.jwt.JWTUtil;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import www.raven.jc.dto.TokenDTO;
+
+import static www.raven.jc.constant.JwtConstant.ROLE;
+import static www.raven.jc.constant.JwtConstant.TIME;
+import static www.raven.jc.constant.JwtConstant.USER_ID;
 
 /**
  * jwt util
@@ -20,9 +22,7 @@ import www.raven.jc.dto.TokenDTO;
  */
 @Slf4j
 public class JwtUtil {
-    public static final String USER_ID = "userId";
-    public static final String ROLE = "role";
-    public static final String TIME = "expireTime";
+
 
     public static String createToken(int userId,List<String> roles, String key,Long expireTime) {
         HashMap<String, Object> map = new HashMap<>(3);
@@ -32,7 +32,7 @@ public class JwtUtil {
         return JWTUtil.createToken(map, key.getBytes());
     }
 
-    public static TokenDTO verify(String token, String key) {
+    public static TokenDTO parseToken(String token, String key) {
         Assert.isTrue(JWTUtil.verify(token, key.getBytes()), "token验证失败");
         JWTPayload payload = JWTUtil.parseToken(token).getPayload();
         NumberWithFormat expireTime = (NumberWithFormat) payload.getClaim(TIME);

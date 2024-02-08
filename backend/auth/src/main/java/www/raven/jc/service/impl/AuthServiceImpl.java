@@ -82,13 +82,13 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String refreshToken(String token) {
-        TokenDTO verify = JwtUtil.verify(token, key);
+        TokenDTO verify = JwtUtil.parseToken(token, key);
         return produceToken(verify.getUserId(), verify.getRole());
     }
 
     @Override
     public void logout(String token) {
-        TokenDTO verify = JwtUtil.verify(token, key);
+        TokenDTO verify = JwtUtil.parseToken(token, key);
         redissonClient.getBucket(JwtConstant.TOKEN+ verify.getUserId()).delete();
         RpcResult<Void> voidCommonResult = userDubbo.saveLogOutTime(verify.getUserId());
         Assert.isTrue(voidCommonResult.isSuccess(), "登出失败");

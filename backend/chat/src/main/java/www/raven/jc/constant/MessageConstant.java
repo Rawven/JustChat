@@ -7,6 +7,6 @@ package www.raven.jc.constant;
  * @date 2024/02/06
  */
 public class MessageConstant {
-    public static final String Friend = "friend";
-    public static final String Room = "room";
+    public static final String FRIEND = "friend";
+    public static final String ROOM = "room";
 }
