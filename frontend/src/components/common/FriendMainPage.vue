@@ -291,7 +291,7 @@ export default {
       return name !== "";
     },
     getFriends() {
-      this.realAxios.get(`http://` + Host + `:7000/chat/common/initUserFriendPage`, {
+      this.realAxios.get(`http://` + Host + `:7000/chat/room/initUserFriendPage`, {
         headers: {
           'token': localStorage.getItem("token")
         }

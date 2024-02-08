@@ -143,7 +143,7 @@ public class RoomServiceImpl implements RoomService {
         Room room = roomDAO.getBaseMapper().selectById(roomId);
         Integer founderId = room.getFounderId();
         //通知user模块 插入一条申请记录
-        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new RoomApplyEvent(userId, founderId, roomId)), MqConstant.TAGS_ROOM_APPLY));
+        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new RoomApplyEvent(userId, founderId, roomId)), MqConstant.TAGS_CHAT_ROOM_APPLY));
     }
 
     @Transactional(rollbackFor = IllegalArgumentException.class)

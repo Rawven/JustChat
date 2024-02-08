@@ -305,7 +305,7 @@ export default {
       this.$router.push('/common/moment');
     },
     getRooms() {
-      this.realAxios.get(`http://` + Host + `:7000/chat/common/initUserMainPage`, {
+      this.realAxios.get(`http://` + Host + `:7000/chat/room/initUserMainPage`, {
         headers: {
           'token': localStorage.getItem("token")
         }

@@ -1,4 +1,4 @@
-package www.raven.jc.util;
+package www.raven.jc.model;
 
 import java.io.Serializable;
 

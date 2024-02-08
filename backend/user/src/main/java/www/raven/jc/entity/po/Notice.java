@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
 @TableName(value = "notice")
 @Data
 @Accessors(chain = true)
-public class Notification {
+public class Notice {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
     private Integer userId;

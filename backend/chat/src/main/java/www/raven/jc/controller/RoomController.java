@@ -5,34 +5,38 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import www.raven.jc.entity.vo.MessageVO;
+import www.raven.jc.api.UserDubbo;
+import www.raven.jc.entity.model.RoomIdModel;
+import www.raven.jc.entity.model.RoomModel;
 import www.raven.jc.entity.vo.RealRoomVO;
 import www.raven.jc.entity.vo.UserFriendVO;
 import www.raven.jc.entity.vo.UserRoomVO;
 import www.raven.jc.result.CommonResult;
-import www.raven.jc.service.ChatService;
+import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.FriendService;
 import www.raven.jc.service.RoomService;
 
 /**
- * query controller
+ * room controller
  *
  * @author 刘家辉
- * @date 2023/12/04
+ * @date 2023/11/23
  */
 @RestController
 @ResponseBody
-@RequestMapping("/common")
-public class QueryController {
-    @Autowired
-    private ChatService chatService;
+@RequestMapping("/room")
+public class RoomController {
+
     @Autowired
     private RoomService roomService;
     @Autowired
     private FriendService friendService;
+    @Autowired
+    private UserDubbo userDubbo;
 
     @GetMapping("/initUserMainPage")
     public CommonResult<List<UserRoomVO>> initUserMainPage() {
@@ -64,13 +68,32 @@ public class QueryController {
         return CommonResult.operateSuccess("获取房间列表成功", rooms);
     }
 
-    @PostMapping("/restoreHistory/{roomId}")
-    public CommonResult<List<MessageVO>> restoreHistory(@PathVariable("roomId") Integer roomId) {
-        return CommonResult.operateSuccess("获取历史记录成功", chatService.restoreRoomHistory(roomId));
+    @PostMapping("/createRoom")
+    public CommonResult<Void> createRoom(@RequestBody RoomModel roomModel) {
+        roomService.createRoom(roomModel);
+        return CommonResult.operateSuccess("创建房间成功");
     }
 
-    @PostMapping("/restoreFriendHistory/{friendId}")
-    public CommonResult<List<MessageVO>> restoreFriendHistory(@PathVariable("friendId") Integer friendId) {
-        return CommonResult.operateSuccess("获取历史记录成功", friendService.restoreFriendHistory(friendId));
+    @PostMapping("/applyToJoinRoom")
+    public CommonResult<Void> applyToJoinRoom(@RequestBody RoomIdModel roomId) {
+        roomService.applyToJoinRoom(roomId.getRoomId());
+        return CommonResult.operateSuccess("申请加入房间成功");
     }
+
+    @GetMapping("/agreeToJoinRoom/{roomId}/{userId}/{noticeId}")
+    public CommonResult<Void> agreeApply(@PathVariable("roomId") String roomId, @PathVariable("userId") int userId,
+        @PathVariable("noticeId") int noticeId) {
+        roomService.agreeApply(Integer.valueOf(roomId), userId, noticeId);
+        return CommonResult.operateSuccess("同意申请成功");
+    }
+
+    @GetMapping("/refuseToJoinRoom/{roomId}/{userId}/{noticeId}")
+    public CommonResult<Void> refuseApply(@PathVariable("noticeId") int noticeId) {
+        RpcResult<Void> voidRpcResult = userDubbo.deleteNotice(noticeId);
+        if (!voidRpcResult.isSuccess()) {
+            return CommonResult.operateFailure(voidRpcResult.getMessage());
+        }
+        return CommonResult.operateSuccess("拒绝申请成功");
+    }
+
 }

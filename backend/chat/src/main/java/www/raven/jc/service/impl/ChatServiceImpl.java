@@ -68,7 +68,7 @@ public class ChatServiceImpl implements ChatService {
         Message realMsg = new Message().setContent(text)
             .setTimestamp(new Date(timeStamp))
             .setSenderId(userId)
-            .setType(MessageConstant.Room)
+            .setType(MessageConstant.ROOM)
             .setReceiverId(String.valueOf(roomId));
         //保存消息
         Assert.isTrue(messageDAO.save(realMsg), "插入失败");
@@ -78,7 +78,7 @@ public class ChatServiceImpl implements ChatService {
         List<Integer> userIds = ids.stream().map(UserRoom::getUserId).collect(Collectors.toList());
         RoomMsgEvent roomMsgEvent = new RoomMsgEvent(userId, roomId, userIds, JsonUtil.objToJson(realMsg));
         //通知user模块有新消息
-        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(roomMsgEvent), MqConstant.TAGS_ROOM_MSG_RECORD));
+        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(roomMsgEvent), MqConstant.TAGS_CHAT_ROOM_MSG_RECORD));
     }
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
@@ -89,7 +89,7 @@ public class ChatServiceImpl implements ChatService {
         Message realMsg = new Message().setContent(message.getText())
             .setTimestamp(new Date(message.getTime()))
             .setSenderId(userId)
-            .setType(MessageConstant.Friend)
+            .setType(MessageConstant.FRIEND)
             .setReceiverId(fixId);
         //保存消息
         Assert.isTrue(messageDAO.save(realMsg), "插入失败");
@@ -99,7 +99,7 @@ public class ChatServiceImpl implements ChatService {
         Assert.isTrue(friendChatDAO.save(friendChat), "插入失败");
         FriendMsgEvent friendMsgEvent = new FriendMsgEvent(userId, friendId, JsonUtil.objToJson(realMsg));
         //通知user模块有新消息
-        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(friendMsgEvent), MqConstant.TAGS_FRIEND_MSG_RECORD));
+        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(friendMsgEvent), MqConstant.TAGS_CHAT_FRIEND_MSG_RECORD));
     }
 
     @Override

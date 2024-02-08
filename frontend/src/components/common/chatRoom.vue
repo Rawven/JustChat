@@ -179,7 +179,7 @@ export default {
     this.socket = new WebSocket(`ws://` + Host + `:8081/ws/room/${token}/${this.theRoom.roomId}`);
 
     this.socket.onopen = () => {
-      this.realAxios.post(`http://` + Host + `:7000/chat/common/restoreHistory/${this.theRoom.roomId}`, {}, {
+      this.realAxios.post(`http://` + Host + `:7000/chat/friend/restoreRoomHistory/${this.theRoom.roomId}`, {}, {
         headers: {
           'token': token
         }

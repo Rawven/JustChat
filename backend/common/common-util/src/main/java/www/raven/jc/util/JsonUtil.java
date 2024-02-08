@@ -28,14 +28,6 @@ public class JsonUtil {
         }
     }
 
-    public static String mapToJson(Map<Object, Object> map) {
-        try {
-            return OBJECT_MAPPER.writeValueAsString(map);
-        } catch (JsonProcessingException e) {
-            log.error("JsonUtil mapToJson error:{}", e.getMessage());
-            throw new RuntimeException(e);
-        }
-    }
 
     public static <T> T jsonToObj(String json, Class<T> clazz) {
         try {

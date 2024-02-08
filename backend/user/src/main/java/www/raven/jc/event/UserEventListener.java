@@ -20,7 +20,7 @@ import www.raven.jc.dao.FriendDAO;
 import www.raven.jc.dao.NoticeDAO;
 import www.raven.jc.dao.UserDAO;
 import www.raven.jc.entity.po.Friend;
-import www.raven.jc.entity.po.Notification;
+import www.raven.jc.entity.po.Notice;
 import www.raven.jc.entity.po.User;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
@@ -78,7 +78,7 @@ public class UserEventListener {
         map.put("msg", payload.getMsg());
         map.put("type", MqConstant.TAGS_MOMENT_NOTICE_MOMENT_FRIEND);
         List<Integer> idsFriend = friends.stream().map(Friend::getFriendId).map(Long::intValue).collect(Collectors.toList());
-        notificationHandler.sendBatchMessage(JsonUtil.mapToJson(map), idsFriend);
+        notificationHandler.sendBatchMessage(JsonUtil.objToJson(map), idsFriend);
     }
 
     private void eventMomentNoticeLikeOrCommentEvent(Message<Event> msg) {
@@ -89,7 +89,7 @@ public class UserEventListener {
         map.put("msg", payload.getMsg());
         map.put("type", MqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT);
         log.info("userId");
-        notificationHandler.sendOneMessage(userId,JsonUtil.mapToJson(map));
+        notificationHandler.sendOneMessage(userId,JsonUtil.objToJson(map));
     }
 
 
@@ -104,11 +104,11 @@ public class UserEventListener {
             }
             String tags = Objects.requireNonNull(msg.getHeaders().get(HEADER_TAGS)).toString();
             //判断消息类型
-            if (MqConstant.TAGS_ROOM_APPLY.equals(tags)) {
+            if (MqConstant.TAGS_CHAT_ROOM_APPLY.equals(tags)) {
                 eventUserJoinRoomApply(msg);
-            } else if (MqConstant.TAGS_ROOM_MSG_RECORD.equals(tags)) {
+            } else if (MqConstant.TAGS_CHAT_ROOM_MSG_RECORD.equals(tags)) {
                 eventRoomSendMsg(msg);
-            } else if (MqConstant.TAGS_FRIEND_MSG_RECORD.equals(tags)) {
+            } else if (MqConstant.TAGS_CHAT_FRIEND_MSG_RECORD.equals(tags)) {
                 eventFriendSendMsg(msg);
             } else {
                 log.info("--RocketMq 非法的消息，不处理");
@@ -124,9 +124,9 @@ public class UserEventListener {
         map.put("receiverId", payload.getReceiverId());
         map.put("senderId", payload.getSenderId());
         map.put("msg", payload.getMsg());
-        map.put("type", MqConstant.TAGS_FRIEND_MSG_RECORD);
+        map.put("type", MqConstant.TAGS_CHAT_FRIEND_MSG_RECORD);
         if (receiverBucket.isExists()) {
-            notificationHandler.sendOneMessage(payload.getReceiverId(), JsonUtil.mapToJson(map));
+            notificationHandler.sendOneMessage(payload.getReceiverId(), JsonUtil.objToJson(map));
         } else {
             log.info("--RocketMq receiver不在线");
         }
@@ -141,7 +141,7 @@ public class UserEventListener {
         RoomApplyEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), RoomApplyEvent.class);
         log.info("--RocketMq receive join room apply event:{}", msg);
         Integer founderId = payload.getFounderId();
-        Notification notice = new Notification().setUserId(founderId)
+        Notice notice = new Notice().setUserId(founderId)
             .setData(String.valueOf(payload.getRoomId()))
             .setType(NoticeConstant.TYPE_JOIN_ROOM_APPLY)
             .setTimestamp(System.currentTimeMillis())
@@ -153,8 +153,8 @@ public class UserEventListener {
             HashMap<Object, Object> map = new HashMap<>(2);
             map.put("roomId", payload.getRoomId());
             map.put("applier", applier.getUsername());
-            map.put("type", MqConstant.TAGS_ROOM_APPLY);
-            notificationHandler.sendOneMessage(founderId, JsonUtil.mapToJson(map));
+            map.put("type", MqConstant.TAGS_CHAT_ROOM_APPLY);
+            notificationHandler.sendOneMessage(founderId, JsonUtil.objToJson(map));
             log.info("--RocketMq 已推送通知给founder");
         }
     }
@@ -171,8 +171,8 @@ public class UserEventListener {
         map.put("roomId", payload.getRoomId());
         map.put("username", userDAO.getBaseMapper().selectById(userId).getUsername());
         map.put("msg", payload.getMsg());
-        map.put("type", MqConstant.TAGS_ROOM_MSG_RECORD);
+        map.put("type", MqConstant.TAGS_CHAT_ROOM_MSG_RECORD);
         List<Integer> idsFromRoom = payload.getIdsFromRoom();
-        notificationHandler.sendBatchMessage(JsonUtil.mapToJson(map), idsFromRoom);
+        notificationHandler.sendBatchMessage(JsonUtil.objToJson(map), idsFromRoom);
     }
 }

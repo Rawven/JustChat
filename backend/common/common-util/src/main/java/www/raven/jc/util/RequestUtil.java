@@ -2,6 +2,7 @@ package www.raven.jc.util;
 
 import cn.hutool.http.server.HttpServerRequest;
 import javax.servlet.http.HttpServletRequest;
+import www.raven.jc.constant.JwtConstant;
 
 /**
  * request util
@@ -11,6 +12,6 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class RequestUtil {
     public static int getUserId(HttpServletRequest request) {
-        return Integer.parseInt(request.getHeader("userId"));
+        return Integer.parseInt(request.getHeader(JwtConstant.USER_ID));
     }
 }

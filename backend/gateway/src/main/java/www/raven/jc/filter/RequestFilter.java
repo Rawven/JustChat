@@ -13,6 +13,7 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import www.raven.jc.constant.JwtConstant;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.result.ResultCode;
 import www.raven.jc.util.JsonUtil;
@@ -47,7 +48,7 @@ public class RequestFilter implements GlobalFilter, Ordered {
         if (request.getURI().getPath().contains(WHITE_PATH)) {
             return chain.filter(exchange);
         }
-        long time = Long.parseLong(Objects.requireNonNull(request.getHeaders().get(JwtUtil.TIME)).get(0));
+        long time = Long.parseLong(Objects.requireNonNull(request.getHeaders().get(JwtConstant.TIME)).get(0));
         if (time < System.currentTimeMillis()) {
             // 获取响应对象
             ServerHttpResponse response = exchange.getResponse();

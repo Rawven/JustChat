@@ -25,7 +25,7 @@ public class ExceptionHandler {
     @org.springframework.web.bind.annotation.ExceptionHandler(IllegalArgumentException.class)
     public CommonResult<Void> handlerIllegalArgumentException(IllegalArgumentException ex) {
         log.error("用户信息或数据库异常", ex);
-        return CommonResult.operateFailure(ex.getMessage());
+        return CommonResult.operateFailure("用户信息或数据库异常 请通知管理员");
     }
 
     @ResponseBody

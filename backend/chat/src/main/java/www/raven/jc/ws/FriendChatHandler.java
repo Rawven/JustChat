@@ -70,7 +70,7 @@ public class FriendChatHandler extends BaseHandler {
     @OnOpen
     public void onOpen(Session session, @PathParam(value = "token") String token,
         @PathParam(value = "friendId") String friendId) {
-        TokenDTO dto = JwtUtil.verify(token, "爱你老妈");
+        TokenDTO dto = JwtUtil.parseToken(token, "爱你老妈");
         session.getUserProperties().put("userDto", dto);
         this.session = session;
         this.friendId = Integer.valueOf(friendId);
