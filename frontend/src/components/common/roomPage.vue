@@ -147,7 +147,7 @@ export default {
   },
   methods: {
     submitForm() {
-      this.realAxios.post('http://' + Host + ':7000/chat/common/createRoom', this.createRoom, {
+      this.realAxios.post('http://' + Host + ':7000/chat/room/createRoom', this.createRoom, {
         headers: {
           'token': localStorage.getItem("token")
         }
@@ -162,7 +162,7 @@ export default {
           })
     },
     getRooms(page) {
-      this.realAxios.get(`http://` + Host + `:7000/chat/common/queryIdRoomList/${page}/${5}`, {
+      this.realAxios.get(`http://` + Host + `:7000/chat/room/queryIdRoomList/${page}/${5}`, {
         headers: {
           'token': localStorage.getItem("token")
         }
@@ -178,7 +178,7 @@ export default {
       this.getRooms(page);
     },
     joinRoom(id) {
-      this.realAxios.post(`http://` + Host + `:7000/chat/common/applyToJoinRoom`, {roomId: id}, {
+      this.realAxios.post(`http://` + Host + `:7000/chat/room/applyToJoinRoom`, {roomId: id}, {
         headers: {
           'token': localStorage.getItem("token")
         }
@@ -191,7 +191,7 @@ export default {
     },
     submitSearch() {
       // 在这里发送请求到后端
-      this.realAxios.get(`http://` + Host + `:7000/chat/common/queryRelatedRoomList/${this.searchText}/${this.radio}/${this.currentPage}`, {
+      this.realAxios.get(`http://` + Host + `:7000/chat/room/queryRelatedRoomList/${this.searchText}/${this.radio}/${this.currentPage}`, {
         headers: {
           'token': localStorage.getItem("token")
         }
