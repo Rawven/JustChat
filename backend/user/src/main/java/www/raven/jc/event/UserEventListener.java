@@ -20,7 +20,7 @@ import www.raven.jc.dao.FriendDAO;
 import www.raven.jc.dao.NoticeDAO;
 import www.raven.jc.dao.UserDAO;
 import www.raven.jc.entity.po.Friend;
-import www.raven.jc.entity.po.Notification;
+import www.raven.jc.entity.po.Notice;
 import www.raven.jc.entity.po.User;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
@@ -141,7 +141,7 @@ public class UserEventListener {
         RoomApplyEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), RoomApplyEvent.class);
         log.info("--RocketMq receive join room apply event:{}", msg);
         Integer founderId = payload.getFounderId();
-        Notification notice = new Notification().setUserId(founderId)
+        Notice notice = new Notice().setUserId(founderId)
             .setData(String.valueOf(payload.getRoomId()))
             .setType(NoticeConstant.TYPE_JOIN_ROOM_APPLY)
             .setTimestamp(System.currentTimeMillis())
