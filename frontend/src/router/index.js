@@ -13,42 +13,42 @@ const router = createRouter({
             component: () => import('@/components/common/moment.vue')
         },
         {
-            path: 'login',
+            path: '/login',
             name: 'LoginView.vue',
             component: loginView
         },
         {
-            path: 'register',
+            path: '/register',
             name: 'RegisterView',
             component: registerView
         },
         {
-            path: 'mainPage',
+            path: '/mainPage',
             name: "MainPageView",
             component: MainPageView
         },
         {
-            path: 'roomPage',
+            path: '/roomPage',
             name: 'RoomPageView',
             component: () => import('@/components/common/roomPage.vue')
         },
         {
-            path: 'updateInfo',
+            path: '/updateInfo',
             name: 'updateInfoView',
             component: UpdateInfoView
         },
         {
-            path: 'notice',
+            path: '/notice',
             name: 'NoticeView',
             component: () => import('@/views/common/Notice.vue')
         },
         {
-            path: 'friend',
+            path: '/friend',
             name: 'FriendView',
             component: () => import('@/views/common/FriendPageView.vue'),
         },
         {
-            path: 'moment',
+            path: '/moment',
             name: 'MomentView',
             component: () => import('@/views/common/MomentView.vue')
         },
@@ -112,8 +112,8 @@ export default router
 
 router.beforeEach((to, from, next) => {
     const token = localStorage.getItem('token');
-    if (!token && to.path !== '/common/login') {
-        next('/common/login');
+    if (!token && to.path !== '/login') {
+        next('login');
     } else {
         next();
     }

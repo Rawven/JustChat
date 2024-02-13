@@ -59,7 +59,7 @@ export default {
   },
   methods: {
     toRegister() {
-      this.$router.push('/common/register');
+      this.$router.push('/register');
     },
     login() {
       this.$refs.loginForm.validate((valid) => {
@@ -76,7 +76,7 @@ export default {
                 }).then(response1 => {
                   localStorage.setItem("userData", JSON.stringify(response1.data.data));
                 })
-                this.$router.push('/common/mainPage');
+                this.$router.push('/mainPage');
               })
         } else {
           this.$message.error('Please fill in all required fields.');

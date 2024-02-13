@@ -89,6 +89,7 @@
             <div v-for="like in moment.likes" :key="like.userInfo.username">
               <el-text type="primary">{{ like.userInfo.username }} - 点赞过</el-text>
             </div>
+            <!-- Comments -->
             <div v-for="comment in moment.comments" :key="comment.userInfo.username">
               <div class="mt-2 rounded-md border p-2 bg-gray-100">
                 <div class="flex items-center justify-between">
