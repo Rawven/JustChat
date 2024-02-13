@@ -14,5 +14,6 @@ import lombok.experimental.Accessors;
 public class CommentModel {
     private String momentId;
     private Integer momentUserId;
+    private String parentId;
     private String text;
 }

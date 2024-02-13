@@ -42,11 +42,18 @@ public class MomentDAO {
         return mongoTemplate.updateFirst(new Query(Criteria.where("_id").is(momentId)),
             new Update().push("comments", comment), COLLECTION_MOMENT).getModifiedCount() > 0;
     }
+    public boolean commentNested(String momentId, String parentId, Comment comment) {
+        Query query = new Query(Criteria.where("_id").is(momentId).and("comments.id").is(parentId));
+        Update update = new Update().push("comments.$.nestedComment", comment);
+        return mongoTemplate.updateFirst(query, update, COLLECTION_MOMENT).getModifiedCount() > 0;
+    }
 
     public List<Moment> queryMoment(List<UserInfoDTO> infos) {
         //查找 ids 中的用户的动态 按照时间排序 只查7条
         Query with = new Query(Criteria.where("userInfo").in(infos)).limit(7).with(Sort.by(Sort.Direction.DESC, "timestamp"));
         return mongoTemplate.find(with, Moment.class, COLLECTION_MOMENT);
-
     }
+
+
+
 }

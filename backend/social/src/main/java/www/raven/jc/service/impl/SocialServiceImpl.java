@@ -1,6 +1,7 @@
 package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.IdUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -92,13 +93,21 @@ public class SocialServiceImpl implements SocialService {
         RpcResult<UserInfoDTO> singleInfo = userDubbo.getSingleInfo(userId);
         Assert.isTrue(singleInfo.isSuccess(), "获取用户信息失败");
         UserInfoDTO data = singleInfo.getData();
-        Comment comment = new Comment().setTimestamp(System.currentTimeMillis())
+        Comment comment = new Comment().setId(IdUtil.getSnowflakeNextIdStr())
+            .setTimestamp(System.currentTimeMillis())
             .setUserInfo(data)
-            .setContent(model.getText());
-        Assert.isTrue(momentDAO.comment(model.getMomentId(), comment), "评论失败");
+            .setContent(model.getText())
+            .setNestedComment(new ArrayList<>());
+        if(model.getParentId()==null) {
+            Assert.isTrue(momentDAO.comment(model.getMomentId(), comment), "评论失败");
+        }else {
+            Assert.isTrue(momentDAO.commentNested(model.getMomentId(), model.getParentId(), comment), "评论失败");
+        }
         //发布更新事件
         streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(new MomentCommentEvent().setMomentId(model.getMomentId()).setMomentUserId(model.getMomentUserId()).setComment(comment)), MqConstant.TAGS_MOMENT_INTERNAL_COMMENT_RECORD));
     }
+
+
 
     @Override
     public List<MomentVO> queryMoment(int userId) {
@@ -118,4 +127,6 @@ public class SocialServiceImpl implements SocialService {
         collect.forEach(momentVO -> scoredSortedSet.add(momentVO.getTimestamp(), momentVO));
         return collect;
     }
+
+
 }

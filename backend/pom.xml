@@ -30,7 +30,7 @@
         <redisson>3.17.1</redisson>
         <mysql-connector.version>8.0.31</mysql-connector.version>
         <mybatis-plus.version>3.5.4</mybatis-plus.version>
-        <hutool>5.8.22</hutool>
+        <hutool>5.8.26</hutool>
         <juint>4.13.2</juint>
         <ipfs>1.3.3</ipfs>
         <log>1.4.7</log>

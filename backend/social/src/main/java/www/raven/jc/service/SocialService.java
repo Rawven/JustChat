@@ -49,4 +49,5 @@ public interface SocialService {
      * @return {@link List}<{@link MomentVO}>
      */
     List<MomentVO> queryMoment(int userId);
+
 }

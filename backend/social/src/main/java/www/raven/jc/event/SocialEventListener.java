@@ -92,8 +92,6 @@ public class SocialEventListener {
     public void handleReleaseEvent(MomentReleaseEvent event) {
         Moment moment = event.getMoment();
         addMomentCache(event.getReleaseId(), new MomentVO(moment));
-
-        //TODO 这个为通知其余好友 有人发布了朋友圈
         streamBridge.send("producer-out-1", MqUtil.createMsg(
             JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(event.getMoment().getMomentId().toHexString()).setUserId(event.getMoment().getUserInfo().getUserId())
                 .setMsg("有人发布了朋友圈"))
