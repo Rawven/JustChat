@@ -75,7 +75,7 @@ public class SocialServiceImpl implements SocialService {
     }
 
     @Override
-    public void likeMoment(String momentId,Integer momentUserId) {
+    public void likeMoment(String momentId, Integer momentUserId) {
         int userId = RequestUtil.getUserId(request);
         RpcResult<UserInfoDTO> singleInfo = userDubbo.getSingleInfo(userId);
         Assert.isTrue(singleInfo.isSuccess(), "获取用户信息失败");
@@ -98,16 +98,14 @@ public class SocialServiceImpl implements SocialService {
             .setUserInfo(data)
             .setContent(model.getText())
             .setNestedComment(new ArrayList<>());
-        if(model.getParentId()==null) {
+        if (model.getCommentId() == null) {
             Assert.isTrue(momentDAO.comment(model.getMomentId(), comment), "评论失败");
-        }else {
-            Assert.isTrue(momentDAO.commentNested(model.getMomentId(), model.getParentId(), comment), "评论失败");
+        } else {
+             comment = momentDAO.commentNested(model.getMomentId(), model.getCommentId(), comment);
         }
         //发布更新事件
         streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(new MomentCommentEvent().setMomentId(model.getMomentId()).setMomentUserId(model.getMomentUserId()).setComment(comment)), MqConstant.TAGS_MOMENT_INTERNAL_COMMENT_RECORD));
     }
-
-
 
     @Override
     public List<MomentVO> queryMoment(int userId) {
@@ -127,6 +125,5 @@ public class SocialServiceImpl implements SocialService {
         collect.forEach(momentVO -> scoredSortedSet.add(momentVO.getTimestamp(), momentVO));
         return collect;
     }
-
 
 }

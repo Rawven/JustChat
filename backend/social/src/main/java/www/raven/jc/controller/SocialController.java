@@ -48,8 +48,9 @@ public class SocialController {
     }
 
     @GetMapping("/likeMoment/{momentId}/{momentUserId}")
-    public CommonResult<Void> likeMoment(@PathVariable("momentId") String momentId,@PathVariable("momentUserId") Integer momentUserId){
-        socialService.likeMoment(momentId,momentUserId);
+    public CommonResult<Void> likeMoment(@PathVariable("momentId") String momentId,
+        @PathVariable("momentUserId") Integer momentUserId) {
+        socialService.likeMoment(momentId, momentUserId);
         return CommonResult.operateSuccess("点赞成功");
     }
 

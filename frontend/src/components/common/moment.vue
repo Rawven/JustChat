@@ -90,10 +90,10 @@
               <el-text type="primary">{{ like.userInfo.username }} - 点赞过</el-text>
             </div>
             <!-- Comments -->
-            <div v-for="comment in moment.comments" :key="comment.userInfo.username">
-              <div class="mt-2 rounded-md border p-2 bg-gray-100">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center space-x-2">
+            <div v-for="comment in moment.comments" :key="comment.userInfo.username" @click="selectComment(comment.id)">
+                  <div  @click="togglePopover(comment.id)" class="mt-2 rounded-md border p-2 bg-gray-100">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center space-x-2">
             <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
               <img
                   :src="ipfsHost()+comment.userInfo.profile"
@@ -101,12 +101,23 @@
                   class="aspect-square h-full w-full"
               />
             </span>
-                    <div class="text-xs text-gray-500">{{ comment.userInfo.username }} - 评论</div>
+                        <div class="text-xs text-gray-500">{{ comment.userInfo.username }} - 评论</div>
+                      </div>
+                      <div class="text-xs text-gray-500">{{ comment.userInfo.timestamp }}</div>
+                    </div>
+                    <p class="mt-2 text-sm text-gray-700">{{ comment.content }}</p>
+                    <div class="flex items-center justify-between">
+                      <div v-for="nestedComment in comment.nestedComment" :key="nestedComment.userInfo.username">
+                        <div class="flex item justify-between">
+                          {{ nestedComment.userInfo.username }} - 回复
+                          {{ nestedComment.content }}
+                        </div>
+                      </div>
+                    </div>
+                    <el-input v-if="selectedCommentId === comment.id" v-model="comment.input" placeholder="要回复吗"
+                              @keyup.enter="submitNestedComment(moment.momentId,comment.input,moment.userInfo.userId,comment.id)"/>
+
                   </div>
-                  <div class="text-xs text-gray-500">{{ comment.userInfo.timestamp }}</div>
-                </div>
-                <p class="mt-2 text-sm text-gray-700">{{ comment.content }}</p>
-              </div>
             </div>
           </div>
           <div class="mt-3 flex justify-between text-gray-500">
@@ -157,7 +168,7 @@
             </svg>
           </div>
           <div class="mt-3 flex justify-between text-gray-500">
-            <el-button @click="tolike(moment.momentId,moment.userInfo.userId)">
+            <el-button @click="toLike(moment.momentId,moment.userInfo.userId)">
               <el-icon>
                 <Star/>
               </el-icon>
@@ -175,10 +186,15 @@
 <script>
 import {ref} from "vue";
 import {Host, ipfsHost} from "@/main";
-import {Star} from "@element-plus/icons-vue";
+import {InfoFilled, Star} from "@element-plus/icons-vue";
 
 export default {
   name: 'Moment-Fuck',
+  computed: {
+    InfoFilled() {
+      return InfoFilled
+    }
+  },
   components: {Star},
   // 在你的Vue组件中使用的数据结构
   inject: {
@@ -189,6 +205,7 @@ export default {
   data() {
 
     return {
+      selectedCommentId: 0,
       host: Host,
       input: "",
       file: "",
@@ -196,9 +213,11 @@ export default {
       upload: ref(),
       create: ref(false),
       comment: {
+        id: "",
         userInfo: "",
         timestamp: "",
         content: "",
+        nestedComment: []
       },
       like: {
         userInfo: "",
@@ -245,6 +264,9 @@ export default {
     this.token = localStorage.getItem("token");
   },
   methods: {
+    selectComment(id) {
+      this.selectedCommentId = id;
+    },
     ipfsHost() {
       return ipfsHost
     },
@@ -286,7 +308,7 @@ export default {
         this.$message.success('文件上传成功');
       })
     },
-    tolike(momentId,momentUserId) {
+    toLike(momentId, momentUserId) {
       this.realAxios.get(`http://` + Host + `:7000/social/likeMoment/${momentId}/${momentUserId}/`,
           {
             headers: {
@@ -304,7 +326,11 @@ export default {
         this.feedData = response.data.data;
       })
     },
-    submitComment(momentId, text,momentUserId) {
+    togglePopover(id) {
+      this.nowComment = id;
+      this.visible = !this.visible;
+    },
+    submitComment(momentId, text, momentUserId) {
       this.realAxios.post(`http://` + Host + `:7000/social/commentMoment`, {
             momentId: momentId,
             text: text,
@@ -317,6 +343,30 @@ export default {
           })
           .then(() => {
             this.$message.success('评论成功');
+            this.input = "";
+          })
+      this.realAxios.get(`http://` + Host + `:7000/social/queryMoment`, {
+        headers: {
+          'token': localStorage.getItem("token")
+        }
+      }).then(response => {
+        this.feedData = response.data.data;
+      })
+    },
+    submitNestedComment(momentId, text, momentUserId, commentId) {
+      this.realAxios.post(`http://` + Host + `:7000/social/commentMoment`, {
+            momentId: momentId,
+            text: text,
+            momentUserId: momentUserId,
+            commentId: commentId
+          },
+          {
+            headers: {
+              'token': localStorage.getItem("token")
+            }
+          })
+          .then(() => {
+            this.$message.success('回复成功');
             this.input = "";
           })
       this.realAxios.get(`http://` + Host + `:7000/social/queryMoment`, {

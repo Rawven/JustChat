@@ -266,7 +266,7 @@ export default {
         } else if (data.type === "ROOM_APPLY") {
           this.applyNoticeIsNew = true;
           ElMessage.success('您有新的群聊申请');
-        }else if(data.type === "RECORD_MOMENT_FRIEND" || data.type === "RECORD_MOMENT"){
+        } else if (data.type === "RECORD_MOMENT_FRIEND" || data.type === "RECORD_MOMENT") {
           this.momentNoticeIsNew = true;
           ElMessage.success('您有新的朋友圈消息');
         } else {

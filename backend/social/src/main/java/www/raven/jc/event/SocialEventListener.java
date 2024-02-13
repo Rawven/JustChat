@@ -151,6 +151,7 @@ public class SocialEventListener {
                     comments = new ArrayList<>();
                     momentVO.setComments(comments);
                 }
+                //TODO 嵌套评论缓存
                 comments.add(comment);
                 // 添加新的Comment
                 scoredSortedSet.add(System.currentTimeMillis(), momentVO);

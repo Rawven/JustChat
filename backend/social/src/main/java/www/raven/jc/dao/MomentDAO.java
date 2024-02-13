@@ -1,6 +1,7 @@
 package www.raven.jc.dao;
 
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -19,6 +20,7 @@ import www.raven.jc.entity.po.Moment;
  * @author 刘家辉
  * @date 2024/01/24
  */
+@Slf4j
 @Repository
 public class MomentDAO {
     private static final String COLLECTION_MOMENT = "moment";
@@ -42,10 +44,20 @@ public class MomentDAO {
         return mongoTemplate.updateFirst(new Query(Criteria.where("_id").is(momentId)),
             new Update().push("comments", comment), COLLECTION_MOMENT).getModifiedCount() > 0;
     }
-    public boolean commentNested(String momentId, String parentId, Comment comment) {
-        Query query = new Query(Criteria.where("_id").is(momentId).and("comments.id").is(parentId));
-        Update update = new Update().push("comments.$.nestedComment", comment);
-        return mongoTemplate.updateFirst(query, update, COLLECTION_MOMENT).getModifiedCount() > 0;
+
+    public Comment commentNested(String momentId, String commentId, Comment nestedComment) {
+        Moment moment = mongoTemplate.findById(momentId, Moment.class, COLLECTION_MOMENT);
+        if (moment != null) {
+            // 使用 Stream 和 filter 简化代码
+            for (Comment comment : moment.getComments()) {
+                if (comment.getId().equals(commentId)) {
+                    comment.getNestedComment().add(nestedComment);
+                    mongoTemplate.save(moment, COLLECTION_MOMENT);
+                    return comment;
+                }
+            }
+        }
+        return null;
     }
 
     public List<Moment> queryMoment(List<UserInfoDTO> infos) {
@@ -53,7 +65,5 @@ public class MomentDAO {
         Query with = new Query(Criteria.where("userInfo").in(infos)).limit(7).with(Sort.by(Sort.Direction.DESC, "timestamp"));
         return mongoTemplate.find(with, Moment.class, COLLECTION_MOMENT);
     }
-
-
 
 }
