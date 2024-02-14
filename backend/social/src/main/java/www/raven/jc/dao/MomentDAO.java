@@ -13,6 +13,7 @@ import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.Comment;
 import www.raven.jc.entity.po.Like;
 import www.raven.jc.entity.po.Moment;
+import www.raven.jc.entity.po.Reply;
 
 /**
  * moment dao
@@ -45,19 +46,10 @@ public class MomentDAO {
             new Update().push("comments", comment), COLLECTION_MOMENT).getModifiedCount() > 0;
     }
 
-    public Comment commentNested(String momentId, String commentId, Comment nestedComment) {
-        Moment moment = mongoTemplate.findById(momentId, Moment.class, COLLECTION_MOMENT);
-        if (moment != null) {
-            // 使用 Stream 和 filter 简化代码
-            for (Comment comment : moment.getComments()) {
-                if (comment.getId().equals(commentId)) {
-                    comment.getNestedComment().add(nestedComment);
-                    mongoTemplate.save(moment, COLLECTION_MOMENT);
-                    return comment;
-                }
-            }
-        }
-        return null;
+    public boolean reply(String momentId, String commentId, Reply reply) {
+        Query query = new Query(Criteria.where("_id").is(momentId).and("comments._id").is(commentId));
+        Update update = new Update().push("comments.$.replies", reply);
+        return mongoTemplate.updateFirst(query, update, COLLECTION_MOMENT).getModifiedCount() > 0;
     }
 
     public List<Moment> queryMoment(List<UserInfoDTO> infos) {

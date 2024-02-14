@@ -1,24 +1,21 @@
 package www.raven.jc.entity.po;
 
-import java.util.List;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import www.raven.jc.dto.UserInfoDTO;
-import www.raven.jc.model.CommonSerializable;
 
 /**
- * comment
+ * reply
  *
  * @author 刘家辉
- * @date 2024/01/24
+ * @date 2024/02/14
  */
-@EqualsAndHashCode(callSuper = true) @Data
+@Data
 @Accessors(chain = true)
-public class Comment extends CommonSerializable {
+public class Reply {
     private String id;
     private UserInfoDTO userInfo;
     private String content;
     private Long timestamp;
-    private List<Reply> replies;
+    private String parentId;
 }

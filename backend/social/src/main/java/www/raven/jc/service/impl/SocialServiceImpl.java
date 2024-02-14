@@ -21,10 +21,12 @@ import www.raven.jc.entity.model.MomentModel;
 import www.raven.jc.entity.po.Comment;
 import www.raven.jc.entity.po.Like;
 import www.raven.jc.entity.po.Moment;
+import www.raven.jc.entity.po.Reply;
 import www.raven.jc.entity.vo.MomentVO;
 import www.raven.jc.event.model.MomentCommentEvent;
 import www.raven.jc.event.model.MomentLikeEvent;
 import www.raven.jc.event.model.MomentReleaseEvent;
+import www.raven.jc.event.model.MomentReplyEvent;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.SocialService;
 import www.raven.jc.util.JsonUtil;
@@ -93,18 +95,27 @@ public class SocialServiceImpl implements SocialService {
         RpcResult<UserInfoDTO> singleInfo = userDubbo.getSingleInfo(userId);
         Assert.isTrue(singleInfo.isSuccess(), "获取用户信息失败");
         UserInfoDTO data = singleInfo.getData();
-        Comment comment = new Comment().setId(IdUtil.getSnowflakeNextIdStr())
-            .setTimestamp(System.currentTimeMillis())
-            .setUserInfo(data)
-            .setContent(model.getText())
-            .setNestedComment(new ArrayList<>());
         if (model.getCommentId() == null) {
+            Comment comment = new Comment().setId(IdUtil.getSnowflakeNextIdStr())
+                .setTimestamp(System.currentTimeMillis())
+                .setUserInfo(data)
+                .setContent(model.getText())
+                .setReplies(new ArrayList<>());
             Assert.isTrue(momentDAO.comment(model.getMomentId(), comment), "评论失败");
+            streamBridge.send("producer-out-0",
+                MqUtil.createMsg(JsonUtil.objToJson(
+                    new MomentCommentEvent().setMomentId(model.getMomentId()).setMomentUserId(model.getMomentUserId()).setComment(comment)), MqConstant.TAGS_MOMENT_INTERNAL_COMMENT_RECORD));
         } else {
-             comment = momentDAO.commentNested(model.getMomentId(), model.getCommentId(), comment);
+            Reply reply = new Reply().setUserInfo(data)
+                .setContent(model.getText())
+                .setTimestamp(System.currentTimeMillis())
+                .setParentId(model.getCommentId());
+            Assert.isTrue(momentDAO.reply(model.getMomentId(), model.getCommentId(), reply), "回复失败");
+            streamBridge.send("producer-out-0",
+                MqUtil.createMsg(JsonUtil.objToJson(
+                    new MomentReplyEvent().setMomentId(model.getMomentId()).setMomentUserId(model.getMomentUserId()).setCommentId(model.getCommentId()).setReply(reply)), MqConstant.TAGS_MOMENT_INTERNAL_REPLY_NOTICE));
         }
         //发布更新事件
-        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(new MomentCommentEvent().setMomentId(model.getMomentId()).setMomentUserId(model.getMomentUserId()).setComment(comment)), MqConstant.TAGS_MOMENT_INTERNAL_COMMENT_RECORD));
     }
 
     @Override
