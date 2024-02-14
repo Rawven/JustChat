@@ -137,15 +137,17 @@ public class SocialEventListener {
         caches.forEach(scoredSortedSet -> {
             // 使用iterator移除旧的MomentVO
             Iterator<Object> iterator = scoredSortedSet.iterator();
+            Double time = (double) System.currentTimeMillis();
             while (iterator.hasNext()) {
                 Object o = iterator.next();
                 if (o instanceof MomentVO && ((MomentVO) o).getMomentId().equals(momentVo.getMomentId())) {
+                    time = scoredSortedSet.getScore(o);
                     iterator.remove();
                     break;  // 找到并删除元素后立即退出循环
                 }
             }
-            // 添加新的MomentVO
-            scoredSortedSet.add(System.currentTimeMillis(), momentVo);
+            // 更新MomentVO
+            scoredSortedSet.add(time, momentVo);
         });
     }
 

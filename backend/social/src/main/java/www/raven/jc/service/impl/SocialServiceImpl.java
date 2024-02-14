@@ -11,6 +11,7 @@ import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import www.raven.jc.api.UserDubbo;
 import www.raven.jc.constant.MqConstant;
@@ -134,9 +135,14 @@ public class SocialServiceImpl implements SocialService {
         Assert.isTrue(friendInfos.isSuccess(), "获取好友信息失败");
         List<Moment> moments = momentDAO.queryMoment(friendInfos.getData());
         List<MomentVO> collect = moments.stream().map(MomentVO::new).collect(Collectors.toList());
+        addMomentCache(collect, userId);
+        return collect;
+    }
+
+    @Async
+    protected void addMomentCache(List<MomentVO> collect, Integer userId) {
         RScoredSortedSet<MomentVO> scoredSortedSet = redissonClient.getScoredSortedSet(PREFIX + userId);
         collect.forEach(momentVO -> scoredSortedSet.add(momentVO.getTimestamp(), momentVO));
-        return collect;
     }
 
 }
