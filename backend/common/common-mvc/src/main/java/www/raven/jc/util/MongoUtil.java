@@ -7,7 +7,8 @@ package www.raven.jc.util;
  * @date 2024/01/21
  */
 public class MongoUtil {
-    private static final  int MAX_VALID_FIX_ID_LENGTH = 2;
+    private static final int MAX_VALID_FIX_ID_LENGTH = 2;
+
     public static String concatenateIds(Integer userId, Integer friendId) {
         Integer maxId = Math.max(userId, friendId);
         Integer minId = Math.min(userId, friendId);

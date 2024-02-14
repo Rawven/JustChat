@@ -187,7 +187,7 @@ export default {
       })
     },
     turnHome() {
-      this.$router.push({path: '/common/mainPage'})
+      this.$router.push({path: '/mainPage'})
     },
     submitSearch() {
       // 在这里发送请求到后端

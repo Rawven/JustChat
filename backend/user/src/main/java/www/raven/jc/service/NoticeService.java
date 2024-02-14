@@ -2,7 +2,6 @@ package www.raven.jc.service;
 
 import java.util.List;
 import www.raven.jc.entity.vo.NoticeVO;
-import www.raven.jc.event.RoomApplyEvent;
 
 /**
  * notice service
@@ -17,7 +16,6 @@ public interface NoticeService {
      * @return {@link List}<{@link NoticeVO}>
      */
     List<NoticeVO> loadNotice();
-
 
     /**
      * add friend apply

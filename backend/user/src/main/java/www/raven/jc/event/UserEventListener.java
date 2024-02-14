@@ -48,6 +48,7 @@ public class UserEventListener {
     private FriendDAO friendDAO;
     @Autowired
     private NoticeDAO noticeDAO;
+
     @Bean
     public Consumer<Message<Event>> eventSocialToUser
         () {
@@ -89,11 +90,8 @@ public class UserEventListener {
         map.put("msg", payload.getMsg());
         map.put("type", MqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT);
         log.info("userId");
-        notificationHandler.sendOneMessage(userId,JsonUtil.objToJson(map));
+        notificationHandler.sendOneMessage(userId, JsonUtil.objToJson(map));
     }
-
-
-
 
     @Bean
     public Consumer<Message<Event>> eventChatToUser() {

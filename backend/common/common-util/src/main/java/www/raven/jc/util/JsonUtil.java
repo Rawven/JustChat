@@ -28,7 +28,6 @@ public class JsonUtil {
         }
     }
 
-
     public static <T> T jsonToObj(String json, Class<T> clazz) {
         try {
             return OBJECT_MAPPER.readValue(json, clazz);

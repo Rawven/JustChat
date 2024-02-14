@@ -1,8 +1,8 @@
 package www.raven.jc.dao;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Repository;
+import www.raven.jc.dao.mapper.UserMapper;
 import www.raven.jc.entity.po.User;
 
 /**
@@ -12,5 +12,5 @@ import www.raven.jc.entity.po.User;
  * @date 2023/12/03
  */
 @Repository
-public class UserDAO extends ServiceImpl<BaseMapper<User>, User> {
+public class UserDAO extends ServiceImpl<UserMapper, User> {
 }

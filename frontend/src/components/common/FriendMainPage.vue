@@ -229,21 +229,21 @@ export default {
       this.realAxios.get(`http://` + Host + `:7000/auth/logout/${token}`, {})
       localStorage.removeItem("token");
       localStorage.removeItem("userData");
-      this.$router.push('/common/login');
+      this.$router.push('/login');
       ElMessage.success('登出成功');
     },
     turnSearch() {
-      this.$router.push('/common/roomPage');
+      this.$router.push('/roomPage');
     },
     turnRooms() {
-      this.$router.push('/common/mainPage');
+      this.$router.push('/mainPage');
     },
     checkOut(friendId) {
       this.nowFriendId = friendId;
       this.friends[this.friendIndex.get(friendId)].isNew = false;
     },
     turnMoment() {
-      this.$router.push('/common/moment');
+      this.$router.push('/moment');
     },
     initWebSocket() {
       let token = localStorage.getItem("token");
@@ -285,7 +285,7 @@ export default {
       }
     },
     turnNotifications() {
-      this.$router.push('/common/notice');
+      this.$router.push('/notice');
     },
     checkNull(name) {
       return name !== "";

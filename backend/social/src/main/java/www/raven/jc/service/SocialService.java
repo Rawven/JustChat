@@ -32,7 +32,7 @@ public interface SocialService {
      * @param momentId     moment id
      * @param momentUserId moment user id
      */
-    void likeMoment(String momentId,Integer momentUserId);
+    void likeMoment(String momentId, Integer momentUserId);
 
     /**
      * comment moment
@@ -49,4 +49,5 @@ public interface SocialService {
      * @return {@link List}<{@link MomentVO}>
      */
     List<MomentVO> queryMoment(int userId);
+
 }

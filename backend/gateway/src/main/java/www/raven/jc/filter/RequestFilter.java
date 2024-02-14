@@ -17,7 +17,6 @@ import www.raven.jc.constant.JwtConstant;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.result.ResultCode;
 import www.raven.jc.util.JsonUtil;
-import www.raven.jc.util.JwtUtil;
 
 /**
  * request filter

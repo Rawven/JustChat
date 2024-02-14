@@ -81,7 +81,7 @@ public class NoticeServiceImpl implements NoticeService {
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void addFriendApply(String friendName) {
-        int  applierId =  RequestUtil.getUserId(request);
+        int applierId = RequestUtil.getUserId(request);
         User user = userDAO.getBaseMapper().selectOne(new QueryWrapper<User>().eq("username", friendName));
         Assert.notNull(user, "用户不存在");
         Assert.isNull(friendDAO.getBaseMapper().selectOne(new QueryWrapper<Friend>().eq("user_id", applierId).eq("friend_id", user.getId())), "已经是好友了");
@@ -102,11 +102,10 @@ public class NoticeServiceImpl implements NoticeService {
         }
     }
 
-
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void deleteNotification(Integer id) {
-        Assert.isTrue( noticeDAO.getBaseMapper().deleteById(id) == 1);
+        Assert.isTrue(noticeDAO.getBaseMapper().deleteById(id) == 1);
     }
 
 }

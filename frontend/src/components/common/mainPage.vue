@@ -238,14 +238,14 @@ export default {
       this.realAxios.get(`http://` + Host + `:7000/auth/logout/${token}`, {})
       localStorage.removeItem("token");
       localStorage.removeItem("userData");
-      this.$router.push('/common/login');
+      this.$router.push('/login');
       ElMessage.success('登出成功');
     },
     turnSearch() {
-      this.$router.push('/common/roomPage');
+      this.$router.push('/roomPage');
     },
     turnFriends() {
-      this.$router.push('/common/friend');
+      this.$router.push('/friend');
     },
     checkOut(roomId) {
       this.nowRoomId = roomId;
@@ -266,7 +266,7 @@ export default {
         } else if (data.type === "ROOM_APPLY") {
           this.applyNoticeIsNew = true;
           ElMessage.success('您有新的群聊申请');
-        }else if(data.type === "RECORD_MOMENT_FRIEND" || data.type === "RECORD_MOMENT"){
+        } else if (data.type === "RECORD_MOMENT_FRIEND" || data.type === "RECORD_MOMENT") {
           this.momentNoticeIsNew = true;
           ElMessage.success('您有新的朋友圈消息');
         } else {
@@ -296,13 +296,13 @@ export default {
     },
     turnNotifications() {
       this.applyNoticeIsNew = false;
-      this.$router.push('/common/notice');
+      this.$router.push('notice');
     },
     checkNull(name) {
       return name !== "";
     },
     turnMoment() {
-      this.$router.push('/common/moment');
+      this.$router.push('/moment');
     },
     getRooms() {
       this.realAxios.get(`http://` + Host + `:7000/chat/room/initUserMainPage`, {

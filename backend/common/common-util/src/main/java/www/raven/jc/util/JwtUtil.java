@@ -23,12 +23,11 @@ import static www.raven.jc.constant.JwtConstant.USER_ID;
 @Slf4j
 public class JwtUtil {
 
-
-    public static String createToken(int userId,List<String> roles, String key,Long expireTime) {
+    public static String createToken(int userId, List<String> roles, String key, Long expireTime) {
         HashMap<String, Object> map = new HashMap<>(3);
         map.put(USER_ID, userId);
         map.put(ROLE, roles);
-        map.put(TIME, System.currentTimeMillis() +expireTime);
+        map.put(TIME, System.currentTimeMillis() + expireTime);
         return JWTUtil.createToken(map, key.getBytes());
     }
 

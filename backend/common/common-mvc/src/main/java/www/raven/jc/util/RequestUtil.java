@@ -1,6 +1,5 @@
 package www.raven.jc.util;
 
-import cn.hutool.http.server.HttpServerRequest;
 import javax.servlet.http.HttpServletRequest;
 import www.raven.jc.constant.JwtConstant;
 

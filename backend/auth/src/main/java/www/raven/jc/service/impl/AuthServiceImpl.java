@@ -54,7 +54,7 @@ public class AuthServiceImpl implements AuthService {
         RpcResult<UserAuthDTO> result = userDubbo.getUserToAuth(loginModel.getUsername());
         Assert.isTrue(result.isSuccess());
         UserAuthDTO user = result.getData();
-        if (redissonClient.getBucket(JwtConstant.TOKEN  + user.getUserId()).isExists()) {
+        if (redissonClient.getBucket(JwtConstant.TOKEN + user.getUserId()).isExists()) {
             return redissonClient.getBucket(JwtConstant.TOKEN + user.getUserId()).get().toString();
         }
         Assert.isTrue(passwordEncoder.matches(loginModel.getPassword(), user.getPassword()), "密码错误");
@@ -89,7 +89,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout(String token) {
         TokenDTO verify = JwtUtil.parseToken(token, key);
-        redissonClient.getBucket(JwtConstant.TOKEN+ verify.getUserId()).delete();
+        redissonClient.getBucket(JwtConstant.TOKEN + verify.getUserId()).delete();
         RpcResult<Void> voidCommonResult = userDubbo.saveLogOutTime(verify.getUserId());
         Assert.isTrue(voidCommonResult.isSuccess(), "登出失败");
     }
@@ -101,12 +101,12 @@ public class AuthServiceImpl implements AuthService {
             .setUsername(registerModel.getUsername()).setRoleIds(roleIds).setProfile(registerModel.getProfile());
         RpcResult<UserAuthDTO> insert = userDubbo.insert(user);
         Assert.isTrue(insert.isSuccess(), "注册失败");
-        List<RoleDTO> list = roleIds.stream(). map(roleId -> new RoleDTO().setValue( RoleConstant.MAP.get(roleId))).collect(Collectors.toList());
+        List<RoleDTO> list = roleIds.stream().map(roleId -> new RoleDTO().setValue(RoleConstant.MAP.get(roleId))).collect(Collectors.toList());
         return produceToken(insert.getData().getUserId(), list.stream().map(RoleDTO::getValue).collect(Collectors.toList()));
     }
 
     private String produceToken(int userId, List<String> role) {
-        String token = JwtUtil.createToken(userId,role,key,expireTime);
+        String token = JwtUtil.createToken(userId, role, key, expireTime);
         redissonClient.getBucket(JwtConstant.TOKEN + userId).set(token, expireTime, TimeUnit.MILLISECONDS);
         return token;
     }

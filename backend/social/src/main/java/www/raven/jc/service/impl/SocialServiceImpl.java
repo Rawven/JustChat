@@ -1,6 +1,7 @@
 package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.IdUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,10 +21,12 @@ import www.raven.jc.entity.model.MomentModel;
 import www.raven.jc.entity.po.Comment;
 import www.raven.jc.entity.po.Like;
 import www.raven.jc.entity.po.Moment;
+import www.raven.jc.entity.po.Reply;
 import www.raven.jc.entity.vo.MomentVO;
 import www.raven.jc.event.model.MomentCommentEvent;
 import www.raven.jc.event.model.MomentLikeEvent;
 import www.raven.jc.event.model.MomentReleaseEvent;
+import www.raven.jc.event.model.MomentReplyEvent;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.SocialService;
 import www.raven.jc.util.JsonUtil;
@@ -61,7 +64,9 @@ public class SocialServiceImpl implements SocialService {
             .setUserInfo(data)
             .setImg(model.getImg())
             .setContent(model.getText())
-            .setTimestamp(System.currentTimeMillis());
+            .setTimestamp(System.currentTimeMillis())
+            .setComments(new ArrayList<>())
+            .setLikes(new ArrayList<>());
         Moment save = momentDAO.save(moment);
         Assert.isTrue(save.getMomentId() != null, "发布失败");
         //发布更新事件
@@ -74,7 +79,7 @@ public class SocialServiceImpl implements SocialService {
     }
 
     @Override
-    public void likeMoment(String momentId,Integer momentUserId) {
+    public void likeMoment(String momentId, Integer momentUserId) {
         int userId = RequestUtil.getUserId(request);
         RpcResult<UserInfoDTO> singleInfo = userDubbo.getSingleInfo(userId);
         Assert.isTrue(singleInfo.isSuccess(), "获取用户信息失败");
@@ -92,12 +97,27 @@ public class SocialServiceImpl implements SocialService {
         RpcResult<UserInfoDTO> singleInfo = userDubbo.getSingleInfo(userId);
         Assert.isTrue(singleInfo.isSuccess(), "获取用户信息失败");
         UserInfoDTO data = singleInfo.getData();
-        Comment comment = new Comment().setTimestamp(System.currentTimeMillis())
-            .setUserInfo(data)
-            .setContent(model.getText());
-        Assert.isTrue(momentDAO.comment(model.getMomentId(), comment), "评论失败");
+        if (model.getCommentId() == null) {
+            Comment comment = new Comment().setId(IdUtil.getSnowflakeNextIdStr())
+                .setTimestamp(System.currentTimeMillis())
+                .setUserInfo(data)
+                .setContent(model.getText())
+                .setReplies(new ArrayList<>());
+            Assert.isTrue(momentDAO.comment(model.getMomentId(), comment), "评论失败");
+            streamBridge.send("producer-out-0",
+                MqUtil.createMsg(JsonUtil.objToJson(
+                    new MomentCommentEvent().setMomentId(model.getMomentId()).setMomentUserId(model.getMomentUserId()).setComment(comment)), MqConstant.TAGS_MOMENT_INTERNAL_COMMENT_RECORD));
+        } else {
+            Reply reply = new Reply().setUserInfo(data)
+                .setContent(model.getText())
+                .setTimestamp(System.currentTimeMillis())
+                .setParentId(model.getCommentId());
+            Assert.isTrue(momentDAO.reply(model.getMomentId(), model.getCommentId(), reply), "回复失败");
+            streamBridge.send("producer-out-0",
+                MqUtil.createMsg(JsonUtil.objToJson(
+                    new MomentReplyEvent().setMomentId(model.getMomentId()).setMomentUserId(model.getMomentUserId()).setCommentId(model.getCommentId()).setReply(reply)), MqConstant.TAGS_MOMENT_INTERNAL_REPLY_NOTICE));
+        }
         //发布更新事件
-        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(new MomentCommentEvent().setMomentId(model.getMomentId()).setMomentUserId(model.getMomentUserId()).setComment(comment)), MqConstant.TAGS_MOMENT_INTERNAL_COMMENT_RECORD));
     }
 
     @Override
@@ -118,4 +138,5 @@ public class SocialServiceImpl implements SocialService {
         collect.forEach(momentVO -> scoredSortedSet.add(momentVO.getTimestamp(), momentVO));
         return collect;
     }
+
 }
