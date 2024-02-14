@@ -90,36 +90,34 @@
               <el-text type="primary">{{ like.userInfo.username }} - 点赞过</el-text>
             </div>
             <!-- Comments -->
-            <div v-for="comment in moment.comments" :key="comment.userInfo.username" @click="selectComment(comment.id)">
-                  <div  @click="togglePopover(comment.id)" class="mt-2 rounded-md border p-2 bg-gray-100">
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center space-x-2">
-            <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
-              <img
-                  :src="ipfsHost()+comment.userInfo.profile"
-                  alt="user profile"
-                  class="aspect-square h-full w-full"
-              />
-            </span>
-                        <div class="text-xs text-gray-500">{{ comment.userInfo.username }} - 评论</div>
-                      </div>
-                      <div class="text-xs text-gray-500">{{ comment.userInfo.timestamp }}</div>
-                    </div>
-                    <p class="mt-2 text-sm text-gray-700">{{ comment.content }}</p>
-                    <div class="flex items-center justify-between">
-                      <div v-for="nestedComment in comment.nestedComment" :key="nestedComment.userInfo.username">
-                        <div class="flex item justify-between">
-                          {{ nestedComment.userInfo.username }} - 回复
-                          {{ nestedComment.content }}
-                        </div>
-                      </div>
-                    </div>
-                    <el-input v-if="selectedCommentId === comment.id" v-model="comment.input" placeholder="要回复吗"
-                              @keyup.enter="submitNestedComment(moment.momentId,comment.input,moment.userInfo.userId,comment.id)"/>
-
+            <div v-for="comment in moment.comments" @click="selectComment(comment.id)" :key="comment.userInfo.username" class="mb-4">
+              <div class="mt-2 rounded-md border p-4 bg-gray-200">
+                <div class="flex items-center justify-between mb-2">
+                  <div class="flex items-center space-x-2">
+        <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
+          <img
+              :src="ipfsHost()+comment.userInfo.profile"
+              alt="user profile"
+              class="aspect-square h-full w-full"
+          />
+        </span>
+                    <div class="text-sm font-bold text-gray-700">{{ comment.userInfo.username }} - 评论</div>
                   </div>
+                  <div class="text-xs text-gray-500">{{ comment.userInfo.timestamp }}</div>
+                </div>
+                <p class="mt-2 text-lg text-gray-700 mb-2">{{ comment.content }}</p>
+                <div class="pl-4">
+                  <div v-for="nestedComment in comment.replies" :key="nestedComment.userInfo.username" class="mb-2">
+                    <div class="flex item justify-between">
+                      <span class="text-sm font-bold text-gray-700">{{ nestedComment.userInfo.username }} - 回复</span>
+                      <span class="text-lg text-gray-700">{{ nestedComment.content }}</span>
+                    </div>
+                  </div>
+                </div>
+                <el-input v-if="selectedCommentId === comment.id" v-model="comment.input" placeholder="要回复吗"
+                          @keyup.enter="submitNestedComment(moment.momentId,comment.input,moment.userInfo.userId,comment.id)"/>
+              </div>
             </div>
-          </div>
           <div class="mt-3 flex justify-between text-gray-500">
             <svg
                 class="text-gray-500"
@@ -177,6 +175,7 @@
                       @keyup.enter="submitComment(moment.momentId,moment.input,moment.userInfo.userId)"/>
           </div>
         </div>
+      </div>
       </el-main>
     </div>
     <!---->
@@ -217,7 +216,7 @@ export default {
         userInfo: "",
         timestamp: "",
         content: "",
-        nestedComment: []
+        replies: []
       },
       like: {
         userInfo: "",
@@ -318,13 +317,16 @@ export default {
           .then(() => {
             this.$message.success('点赞成功');
           })
-      this.realAxios.get(`http://` + Host + `:7000/social/queryMoment`, {
-        headers: {
-          'token': localStorage.getItem("token")
-        }
-      }).then(response => {
-        this.feedData = response.data.data;
-      })
+      //等待5秒
+      setTimeout(() => {
+        this.realAxios.get(`http://${Host}:7000/social/queryMoment`, {
+          headers: {
+            'token': localStorage.getItem("token")
+          }
+        }).then(response => {
+          this.feedData = response.data.data;
+        })
+      }, 5000);
     },
     togglePopover(id) {
       this.nowComment = id;
@@ -345,13 +347,17 @@ export default {
             this.$message.success('评论成功');
             this.input = "";
           })
-      this.realAxios.get(`http://` + Host + `:7000/social/queryMoment`, {
-        headers: {
-          'token': localStorage.getItem("token")
-        }
-      }).then(response => {
-        this.feedData = response.data.data;
-      })
+      //等待5秒
+      setTimeout(() => {
+        this.realAxios.get(`http://${Host}:7000/social/queryMoment`, {
+          headers: {
+            'token': localStorage.getItem("token")
+          }
+        }).then(response => {
+          this.feedData = response.data.data;
+        })
+      }, 5000);
+
     },
     submitNestedComment(momentId, text, momentUserId, commentId) {
       this.realAxios.post(`http://` + Host + `:7000/social/commentMoment`, {
@@ -369,13 +375,16 @@ export default {
             this.$message.success('回复成功');
             this.input = "";
           })
-      this.realAxios.get(`http://` + Host + `:7000/social/queryMoment`, {
-        headers: {
-          'token': localStorage.getItem("token")
-        }
-      }).then(response => {
-        this.feedData = response.data.data;
-      })
+      //等待5秒
+      setTimeout(() => {
+        this.realAxios.get(`http://${Host}:7000/social/queryMoment`, {
+          headers: {
+            'token': localStorage.getItem("token")
+          }
+        }).then(response => {
+          this.feedData = response.data.data;
+        })
+      }, 5000);
     },
     release() {
       this.realAxios.post(`http://` + Host + `:7000/social/releaseMoment`, this.data, {
@@ -387,13 +396,16 @@ export default {
             this.$message.success('发布成功');
             this.create = false;
           })
-      this.realAxios.get(`http://` + Host + `:7000/social/queryMoment`, {
-        headers: {
-          'token': localStorage.getItem("token")
-        }
-      }).then(response => {
-        this.feedData = response.data.data;
-      })
+      //等待5秒
+      setTimeout(() => {
+        this.realAxios.get(`http://${Host}:7000/social/queryMoment`, {
+          headers: {
+            'token': localStorage.getItem("token")
+          }
+        }).then(response => {
+          this.feedData = response.data.data;
+        })
+      }, 5000);
     },
   }
 
