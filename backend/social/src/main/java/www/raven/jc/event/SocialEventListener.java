@@ -2,6 +2,7 @@ package www.raven.jc.event;
 
 import cn.hutool.core.lang.Assert;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -78,7 +79,7 @@ public class SocialEventListener {
 
     public void handleMomentEvent(MomentReleaseEvent event) {
         Moment moment = event.getMoment();
-        updateMomentCache(event.getReleaseId(), new MomentVO(moment));
+        insertOrUpdateMomentCache(event.getReleaseId(), new MomentVO(moment),true);
         streamBridge.send("producer-out-1", MqUtil.createMsg(
             JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(event.getMoment().getMomentId().toHexString()).setUserId(event.getMoment().getUserInfo().getUserId())
                 .setMsg("有人发布了朋友圈"))
@@ -88,14 +89,10 @@ public class SocialEventListener {
     public void handleLikeEvent(MomentLikeEvent event) {
         MomentVO momentVO = getWannaMoment(event.getMomentId(), event.getMomentUserId());
             List<Like> likes = momentVO.getLikes();
-            if (likes == null) {
-                likes = new ArrayList<>();
-                momentVO.setLikes(likes);
-            }
             // 添加新的Like
             likes.add(event.getLike());
             // 添加更新后的MomentVO
-        updateMomentCache(event.getMomentUserId(), momentVO);
+        insertOrUpdateMomentCache(event.getMomentUserId(), momentVO,false);
         streamBridge.send("producer-out-1", MqUtil.createMsg(
             JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(event.getMomentId()).setUserId(event.getMomentUserId()).setMsg("有人点赞你的朋友圈了")),
             MqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT));
@@ -104,13 +101,9 @@ public class SocialEventListener {
     public void handleCommentEvent(MomentCommentEvent event) {
         MomentVO momentVO = getWannaMoment(event.getMomentId(), event.getMomentUserId());
         List<Comment> comments = momentVO.getComments();
-        if (comments == null) {
-            comments = new ArrayList<>();
-            momentVO.setComments(comments);
-        }
         // 添加新的Comment
         comments.add(event.getComment());
-        updateMomentCache(event.getMomentUserId(), momentVO);
+        insertOrUpdateMomentCache(event.getMomentUserId(), momentVO,false);
         streamBridge.send("producer-out-1", MqUtil.createMsg(
             JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(event.getMomentId()).setUserId(event.getMomentUserId()).setMsg("有人评论了你的朋友圈")),
             MqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT));
@@ -119,23 +112,15 @@ public class SocialEventListener {
     private void handleReplyEvent(MomentReplyEvent event) {
         MomentVO momentVO = getWannaMoment(event.getMomentId(), event.getMomentUserId());
         List<Comment> comments = momentVO.getComments();
-        if (comments == null) {
-            comments = new ArrayList<>();
-            momentVO.setComments(comments);
-        }
         // 添加新的Reply
         comments.stream()
             .filter(comment -> comment.getId().equals(event.getCommentId()))
             .findFirst()
             .ifPresent(comment -> {
                 List<Reply> replies = comment.getReplies();
-                if (replies == null) {
-                    replies = new ArrayList<>();
-                    comment.setReplies(replies);
-                }
                 replies.add(event.getReply());
             });
-        updateMomentCache(event.getMomentUserId(), momentVO);
+        insertOrUpdateMomentCache(event.getMomentUserId(), momentVO,false);
         streamBridge.send("producer-out-1", MqUtil.createMsg(
             JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(event.getMomentId()).setUserId(event.getMomentUserId()).setMsg("有人回复了你的朋友圈")),
             MqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT));
@@ -143,16 +128,22 @@ public class SocialEventListener {
 
 
 
-    public void updateMomentCache(Integer userId, MomentVO momentVo) {
-        List<RScoredSortedSet<Object>> collect1 = getHisFriendMomentCache(userId);
-        collect1.forEach(scoredSortedSet -> {
-            // 获取所有的MomentVO
-            List<Object> allMoments = new ArrayList<>(scoredSortedSet.valueRange(0, -1));
-            // 查找并移除旧的MomentVO
-            allMoments.stream()
-                .filter(o -> o instanceof MomentVO && ((MomentVO) o).getMomentId().equals(momentVo.getMomentId()))
-                .findFirst()
-                .ifPresent(scoredSortedSet::remove);
+    public void insertOrUpdateMomentCache(Integer userId, MomentVO momentVo,Boolean insert) {
+        List<RScoredSortedSet<Object>> caches = getHisFriendMomentCache(userId);
+        if(insert){
+            caches.forEach(scoredSortedSet -> scoredSortedSet.add(System.currentTimeMillis(), momentVo));
+            return;
+        }
+        caches.forEach(scoredSortedSet -> {
+            // 使用iterator移除旧的MomentVO
+            Iterator<Object> iterator = scoredSortedSet.iterator();
+            while (iterator.hasNext()) {
+                Object o = iterator.next();
+                if (o instanceof MomentVO && ((MomentVO) o).getMomentId().equals(momentVo.getMomentId())) {
+                    iterator.remove();
+                    break;  // 找到并删除元素后立即退出循环
+                }
+            }
             // 添加新的MomentVO
             scoredSortedSet.add(System.currentTimeMillis(), momentVo);
         });
@@ -168,9 +159,11 @@ public class SocialEventListener {
      */
     private MomentVO getWannaMoment(String momentId,Integer momentUserId) {
         RScoredSortedSet<Object> scoredSortedSet = redissonClient.getScoredSortedSet(PREFIX + momentUserId);
-        List<Object> objects = (List<Object>) scoredSortedSet.valueRange(0, -1);
-        List<MomentVO> moments = objects.stream().map(o -> (MomentVO) o).collect(Collectors.toList());
-        return moments.stream().filter(momentVO -> momentVO.getMomentId().equals(momentId)).findFirst().orElse(null);
+        return scoredSortedSet.stream()
+            .filter(o -> o instanceof MomentVO && ((MomentVO) o).getMomentId().equals(momentId))
+            .map(o -> (MomentVO) o)
+            .findFirst()
+            .orElse(null);
     }
 
     /**

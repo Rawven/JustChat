@@ -64,7 +64,9 @@ public class SocialServiceImpl implements SocialService {
             .setUserInfo(data)
             .setImg(model.getImg())
             .setContent(model.getText())
-            .setTimestamp(System.currentTimeMillis());
+            .setTimestamp(System.currentTimeMillis())
+            .setComments(new ArrayList<>())
+            .setLikes(new ArrayList<>());
         Moment save = momentDAO.save(moment);
         Assert.isTrue(save.getMomentId() != null, "发布失败");
         //发布更新事件
