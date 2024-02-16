@@ -49,5 +49,13 @@ spring:
         server-addr: 10.21.32.154:8848
 server:
   port: 7000
+security:
+    roles:
+      user: USER
+      admin: ADMIN
+    paths:
+     permitAll: /auth/**,/ws/**,/webSocket/**
+     hasAnyRoleUserAdmin: /chat/**,/user/**,/file/**,/social/**
+     hasRoleAdmin : /admin/**
 raven:
   key: 爱你老妈

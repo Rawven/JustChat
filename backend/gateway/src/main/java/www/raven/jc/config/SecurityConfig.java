@@ -30,6 +30,8 @@ import www.raven.jc.override.TokenAuthenticationManager;
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
+
+
     @Autowired
     private TokenAuthenticationManager tokenAuthenticationManager;
     @Autowired
@@ -38,6 +40,9 @@ public class SecurityConfig {
     private DefaultAuthenticationEntryPoint authenticationEntryPoint;
     @Autowired
     private DefaultSecurityContextRepository defaultSecurityContextRepository;
+    @Autowired
+    private SecurityProperty securityProperty;
+
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
@@ -46,22 +51,19 @@ public class SecurityConfig {
             .securityContextRepository(defaultSecurityContextRepository)
             .csrf(ServerHttpSecurity.CsrfSpec::disable)
             .authorizeExchange(exchanges -> exchanges
-                .pathMatchers("/auth/**", "/ws/**", "/webSocket/**").permitAll()
-                .pathMatchers("/chat/**", "/user/**", "/file/**", "/social/**").hasAnyRole("USER", "ADMIN")
-                .pathMatchers("/admin/**").hasRole("ADMIN")
+                .pathMatchers(securityProperty.auth).permitAll()
+                .pathMatchers(securityProperty.users).hasAnyRole(securityProperty.roleUser, securityProperty.roleAdmin)
+                .pathMatchers(securityProperty.admins).hasRole(securityProperty.roleAdmin)
                 .anyExchange().authenticated()
             )
             .formLogin()
-            // 自定义处理
             .and()
             .exceptionHandling()
             .accessDeniedHandler(defaultAccessDeniedHandler)
             .and()
             .exceptionHandling()
             .authenticationEntryPoint(authenticationEntryPoint)
-
         ;
-        // your other configurations
         return http.build();
     }
 
