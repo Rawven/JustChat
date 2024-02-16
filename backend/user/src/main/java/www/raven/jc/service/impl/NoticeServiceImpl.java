@@ -55,17 +55,16 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     public List<NoticeVO> loadNotice() {
         int userId = RequestUtil.getUserId(request);
-        //think 通知是否需要被解决后删除 不删除留下来可以做到通知的历史记录
-        List<Notice> userId1 = noticeDAO.getBaseMapper().selectList(new QueryWrapper<Notice>().eq("user_id", userId).orderByDesc("timestamp"));
-        if (userId1.isEmpty()) {
+        List<Notice> notices = noticeDAO.getBaseMapper().selectList(new QueryWrapper<Notice>().eq("user_id", userId).orderByDesc("timestamp"));
+        if (notices.isEmpty()) {
             return new ArrayList<>();
         }
-        List<Integer> ids = userId1.stream().map(Notice::getSenderId).collect(Collectors.toList());
+        List<Integer> ids = notices.stream().map(Notice::getSenderId).collect(Collectors.toList());
         List<User> users = userDAO.getBaseMapper().selectList(new QueryWrapper<User>().in("id", ids));
         Map<Integer, UserInfoDTO> map = users.stream().map(
             user -> new UserInfoDTO().setUserId(user.getId()).setUsername(user.getUsername()).setProfile(user.getProfile())
         ).collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
-        return userId1.stream().map(
+        return notices.stream().map(
             notice -> {
                 NoticeVO noticeVO = new NoticeVO();
                 noticeVO.setNoticeId(notice.getId())

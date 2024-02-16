@@ -3,7 +3,6 @@ package www.raven.jc.config;
 import java.util.Collections;
 import java.util.LinkedList;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.DelegatingReactiveAuthenticationManager;
@@ -52,9 +51,9 @@ public class SecurityConfig {
             .securityContextRepository(defaultSecurityContextRepository)
             .csrf(ServerHttpSecurity.CsrfSpec::disable)
             .authorizeExchange(exchanges -> exchanges
-                .pathMatchers(securityProperty.permitAll).permitAll()
-                .pathMatchers(securityProperty.hasAnyRoleUserAdmin).hasAnyRole(securityProperty.RoleUser, securityProperty.RoleAdmin)
-                .pathMatchers(securityProperty.hasRoleAdmin).hasRole(securityProperty.RoleAdmin)
+                .pathMatchers(securityProperty.auth).permitAll()
+                .pathMatchers(securityProperty.users).hasAnyRole(securityProperty.roleUser, securityProperty.roleAdmin)
+                .pathMatchers(securityProperty.admins).hasRole(securityProperty.roleAdmin)
                 .anyExchange().authenticated()
             )
             .formLogin()

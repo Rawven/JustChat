@@ -12,17 +12,17 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SecurityProperty {
     @Value("${security.paths.permitAll}")
-    public String[] permitAll;
+    public String[] auth;
 
     @Value("${security.paths.hasAnyRoleUserAdmin}")
-    public String[] hasAnyRoleUserAdmin;
+    public String[] users;
 
     @Value("${security.paths.hasRoleAdmin}")
-    public String[] hasRoleAdmin;
+    public String[] admins;
 
     @Value("${security.roles.user}")
-    public String RoleUser;
+    public String roleUser;
 
     @Value("${security.roles.admin}")
-    public String RoleAdmin;
+    public String roleAdmin;
 }

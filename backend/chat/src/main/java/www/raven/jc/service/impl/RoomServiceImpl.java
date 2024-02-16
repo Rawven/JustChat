@@ -77,12 +77,10 @@ public class RoomServiceImpl implements RoomService {
     public List<UserRoomVO> initUserMainPage() {
         int userId = RequestUtil.getUserId(request);
         //获取用户加入的聊天室id
-        List<UserRoom> roomIdList = userRoomDAO.getBaseMapper().selectList(new QueryWrapper<UserRoom>().eq("user_id", userId));
-        if (roomIdList.isEmpty()) {
+        List<Room> rooms = roomDAO.getBaseMapper().selectRoomByUserId(userId);
+        if(rooms.isEmpty()){
             return new ArrayList<>();
         }
-        List<Integer> roomIds = roomIdList.stream().map(UserRoom::getRoomId).collect(Collectors.toList());
-        List<Room> rooms = roomDAO.getBaseMapper().selectList(new QueryWrapper<Room>().in("room_id", roomIds));
         //获取所有聊天室的最后一条消息id
         List<ObjectId> idsMsg = rooms.stream()
             .filter(room -> room.getLastMsgId() != null)
