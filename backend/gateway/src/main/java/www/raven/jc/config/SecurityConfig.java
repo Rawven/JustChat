@@ -3,6 +3,7 @@ package www.raven.jc.config;
 import java.util.Collections;
 import java.util.LinkedList;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.DelegatingReactiveAuthenticationManager;
@@ -30,6 +31,8 @@ import www.raven.jc.override.TokenAuthenticationManager;
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
+
+
     @Autowired
     private TokenAuthenticationManager tokenAuthenticationManager;
     @Autowired
@@ -38,6 +41,9 @@ public class SecurityConfig {
     private DefaultAuthenticationEntryPoint authenticationEntryPoint;
     @Autowired
     private DefaultSecurityContextRepository defaultSecurityContextRepository;
+    @Autowired
+    private SecurityProperty securityProperty;
+
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
@@ -46,22 +52,19 @@ public class SecurityConfig {
             .securityContextRepository(defaultSecurityContextRepository)
             .csrf(ServerHttpSecurity.CsrfSpec::disable)
             .authorizeExchange(exchanges -> exchanges
-                .pathMatchers("/auth/**", "/ws/**", "/webSocket/**").permitAll()
-                .pathMatchers("/chat/**", "/user/**", "/file/**", "/social/**").hasAnyRole("USER", "ADMIN")
-                .pathMatchers("/admin/**").hasRole("ADMIN")
+                .pathMatchers(securityProperty.permitAll).permitAll()
+                .pathMatchers(securityProperty.hasAnyRoleUserAdmin).hasAnyRole(securityProperty.RoleUser, securityProperty.RoleAdmin)
+                .pathMatchers(securityProperty.hasRoleAdmin).hasRole(securityProperty.RoleAdmin)
                 .anyExchange().authenticated()
             )
             .formLogin()
-            // 自定义处理
             .and()
             .exceptionHandling()
             .accessDeniedHandler(defaultAccessDeniedHandler)
             .and()
             .exceptionHandling()
             .authenticationEntryPoint(authenticationEntryPoint)
-
         ;
-        // your other configurations
         return http.build();
     }
 
