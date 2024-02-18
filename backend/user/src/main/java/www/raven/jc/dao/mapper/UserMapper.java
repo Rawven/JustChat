@@ -2,7 +2,6 @@ package www.raven.jc.dao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import java.util.List;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.repository.query.Param;
 import www.raven.jc.entity.po.User;
 

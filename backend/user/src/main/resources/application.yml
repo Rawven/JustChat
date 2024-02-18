@@ -51,5 +51,6 @@ spring:
     password: root
 server:
   port: 8080
-Raven:
+jwt:
   key: 爱你老妈
+  expire: 604800000

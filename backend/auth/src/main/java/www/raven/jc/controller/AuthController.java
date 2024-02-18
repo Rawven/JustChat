@@ -2,13 +2,13 @@ package www.raven.jc.controller;
 
 import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import www.raven.jc.config.JwtProperty;
 import www.raven.jc.entity.model.LoginModel;
 import www.raven.jc.entity.model.RegisterAdminModel;
 import www.raven.jc.entity.model.RegisterModel;
@@ -26,8 +26,8 @@ import www.raven.jc.service.AuthService;
 public class AuthController {
     @Autowired
     private AuthService authService;
-    @Value("${raven.key}")
-    private String key;
+    @Autowired
+    private JwtProperty jwtProperty;
 
     @PostMapping("/login")
     public CommonResult<String> login(@RequestBody LoginModel loginModel) {
@@ -41,7 +41,7 @@ public class AuthController {
 
     @PostMapping("/registerAdmin")
     public CommonResult<String> register(@RequestBody RegisterAdminModel registerModel) {
-        if (Objects.equals(registerModel.getPrivateKey(), key)) {
+        if (Objects.equals(registerModel.getPrivateKey(), jwtProperty.key)) {
             RegisterModel model = new RegisterModel().setUsername(registerModel.getUsername())
                 .setPassword(registerModel.getPassword())
                 .setEmail(registerModel.getEmail());

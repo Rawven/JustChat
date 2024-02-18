@@ -1,7 +1,6 @@
 package www.raven.jc.event;
 
 import cn.hutool.core.lang.Assert;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -16,7 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 import www.raven.jc.api.UserDubbo;
-import www.raven.jc.constant.MqConstant;
+import www.raven.jc.constant.SocialUserMqConstant;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.Comment;
 import www.raven.jc.entity.po.Like;
@@ -25,6 +24,7 @@ import www.raven.jc.entity.po.Reply;
 import www.raven.jc.entity.vo.MomentVO;
 import www.raven.jc.event.model.MomentCommentEvent;
 import www.raven.jc.event.model.MomentLikeEvent;
+import www.raven.jc.event.model.MomentNoticeEvent;
 import www.raven.jc.event.model.MomentReleaseEvent;
 import www.raven.jc.event.model.MomentReplyEvent;
 import www.raven.jc.result.RpcResult;
@@ -32,7 +32,7 @@ import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 
 import static www.raven.jc.constant.MqConstant.HEADER_TAGS;
-import static www.raven.jc.service.impl.SocialServiceImpl.PREFIX;
+import static www.raven.jc.constant.RedisSortedConstant.PREFIX;
 
 /**
  * JcEvent listener
@@ -61,13 +61,13 @@ public class SocialEventListener {
             String tags = Objects.requireNonNull(msg.getHeaders().get(HEADER_TAGS)).toString();
             log.info("--RocketMq 收到消息的类型tag为：{}", tags);
             //判断消息类型
-            if (MqConstant.TAGS_MOMENT_INTERNAL_RELEASE_RECORD.equals(tags)) {
+            if (SocialUserMqConstant.TAGS_MOMENT_INTERNAL_RELEASE_RECORD.equals(tags)) {
                 handleMomentEvent(JsonUtil.jsonToObj(msg.getPayload().getData(), MomentReleaseEvent.class));
-            } else if (MqConstant.TAGS_MOMENT_INTERNAL_LIKE_RECORD.equals(tags)) {
+            } else if (SocialUserMqConstant.TAGS_MOMENT_INTERNAL_LIKE_RECORD.equals(tags)) {
                 handleLikeEvent(JsonUtil.jsonToObj(msg.getPayload().getData(), MomentLikeEvent.class));
-            } else if (MqConstant.TAGS_MOMENT_INTERNAL_COMMENT_RECORD.equals(tags)) {
+            } else if (SocialUserMqConstant.TAGS_MOMENT_INTERNAL_COMMENT_RECORD.equals(tags)) {
                 handleCommentEvent(JsonUtil.jsonToObj(msg.getPayload().getData(), MomentCommentEvent.class));
-            } else if(MqConstant.TAGS_MOMENT_INTERNAL_REPLY_NOTICE.equals(tags)) {
+            } else if(SocialUserMqConstant.TAGS_MOMENT_INTERNAL_REPLY_NOTICE.equals(tags)) {
                 handleReplyEvent(JsonUtil.jsonToObj(msg.getPayload().getData(), MomentReplyEvent.class));
             }else {
                 log.info("--RocketMq 非法的消息，不处理");
@@ -83,7 +83,7 @@ public class SocialEventListener {
         streamBridge.send("producer-out-1", MqUtil.createMsg(
             JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(event.getMoment().getMomentId().toHexString()).setUserId(event.getMoment().getUserInfo().getUserId())
                 .setMsg("有人发布了朋友圈"))
-            , MqConstant.TAGS_MOMENT_NOTICE_MOMENT_FRIEND));
+            , SocialUserMqConstant.TAGS_MOMENT_NOTICE_MOMENT_FRIEND));
     }
 
     public void handleLikeEvent(MomentLikeEvent event) {
@@ -95,7 +95,7 @@ public class SocialEventListener {
         insertOrUpdateMomentCache(event.getMomentUserId(), momentVO,false);
         streamBridge.send("producer-out-1", MqUtil.createMsg(
             JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(event.getMomentId()).setUserId(event.getMomentUserId()).setMsg("有人点赞你的朋友圈了")),
-            MqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT));
+            SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT));
     }
 
     public void handleCommentEvent(MomentCommentEvent event) {
@@ -106,7 +106,7 @@ public class SocialEventListener {
         insertOrUpdateMomentCache(event.getMomentUserId(), momentVO,false);
         streamBridge.send("producer-out-1", MqUtil.createMsg(
             JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(event.getMomentId()).setUserId(event.getMomentUserId()).setMsg("有人评论了你的朋友圈")),
-            MqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT));
+            SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT));
     }
 
     private void handleReplyEvent(MomentReplyEvent event) {
@@ -123,7 +123,7 @@ public class SocialEventListener {
         insertOrUpdateMomentCache(event.getMomentUserId(), momentVO,false);
         streamBridge.send("producer-out-1", MqUtil.createMsg(
             JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(event.getMomentId()).setUserId(event.getMomentUserId()).setMsg("有人回复了你的朋友圈")),
-            MqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT));
+            SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT));
     }
 
 

@@ -17,15 +17,16 @@
         <module name="auth" />
         <module name="social" />
         <module name="common-aop" />
-        <module name="common-mq" />
         <module name="common-mp" />
         <module name="common-redis" />
         <module name="common-api" />
         <module name="common-mvc" />
         <module name="common-ws" />
         <module name="chat" />
+        <module name="common-mq-base" />
         <module name="user" />
         <module name="gateway" />
+        <module name="common-mq-chat-user-model" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

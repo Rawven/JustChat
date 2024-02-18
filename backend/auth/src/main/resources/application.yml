@@ -27,9 +27,8 @@ spring:
     password: root
 server:
   port: 8082
-raven:
-  key: 爱你老妈
 jwt:
+  key: 爱你老妈
   expire: 604800000
 logging:
   level:

@@ -7,9 +7,14 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <artifactId>common-mq</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
     <name>common-mq</name>
     <url>http://maven.apache.org</url>
+    <modules>
+        <module>common-mq-chat-user-model</module>
+        <module>common-mq-base</module>
+        <module>common-mq-social-user-model</module>
+    </modules>
     <dependencies>
         <dependency>
             <groupId>com.alibaba.cloud</groupId>

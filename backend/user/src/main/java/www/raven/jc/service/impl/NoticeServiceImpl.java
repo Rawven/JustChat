@@ -15,7 +15,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import www.raven.jc.constant.MqConstant;
+import www.raven.jc.constant.ChatUserMqConstant;
 import www.raven.jc.constant.NoticeConstant;
 import www.raven.jc.dao.FriendDAO;
 import www.raven.jc.dao.NoticeDAO;
@@ -93,7 +93,7 @@ public class NoticeServiceImpl implements NoticeService {
         Assert.isTrue(noticeDAO.save(notice));
         RBucket<String> friendBucket = redissonClient.getBucket("token:" + friendId);
         HashMap<Object, Object> map = new HashMap<>(1);
-        map.put("type", MqConstant.TAGS_USER_FRIEND_APPLY);
+        map.put("type", ChatUserMqConstant.TAGS_USER_FRIEND_APPLY);
         if (friendBucket.isExists()) {
             handler.sendOneMessage(friendId, JsonUtil.objToJson(map));
         } else {

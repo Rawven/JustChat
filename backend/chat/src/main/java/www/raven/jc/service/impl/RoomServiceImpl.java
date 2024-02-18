@@ -18,7 +18,7 @@ import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.api.UserDubbo;
-import www.raven.jc.constant.MqConstant;
+import www.raven.jc.constant.ChatUserMqConstant;
 import www.raven.jc.dao.MessageDAO;
 import www.raven.jc.dao.RoomDAO;
 import www.raven.jc.dao.UserRoomDAO;
@@ -31,7 +31,7 @@ import www.raven.jc.entity.po.UserRoom;
 import www.raven.jc.entity.vo.DisplayRoomVO;
 import www.raven.jc.entity.vo.RealRoomVO;
 import www.raven.jc.entity.vo.UserRoomVO;
-import www.raven.jc.event.RoomApplyEvent;
+import www.raven.jc.event.model.RoomApplyEvent;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.RoomService;
 import www.raven.jc.util.JsonUtil;
@@ -75,10 +75,11 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public List<UserRoomVO> initUserMainPage() {
-        int userId = RequestUtil.getUserId(request);
         //获取用户加入的聊天室id
+        int userId = RequestUtil.getUserId(request);
+        //获取用户加入的聊天室
         List<Room> rooms = roomDAO.getBaseMapper().selectRoomByUserId(userId);
-        if(rooms.isEmpty()){
+        if (rooms.isEmpty()) {
             return new ArrayList<>();
         }
         //获取所有聊天室的最后一条消息id
@@ -141,7 +142,7 @@ public class RoomServiceImpl implements RoomService {
         Room room = roomDAO.getBaseMapper().selectById(roomId);
         Integer founderId = room.getFounderId();
         //通知user模块 插入一条申请记录
-        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new RoomApplyEvent(userId, founderId, roomId)), MqConstant.TAGS_CHAT_ROOM_APPLY));
+        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new RoomApplyEvent(userId, founderId, roomId)), ChatUserMqConstant.TAGS_CHAT_ROOM_APPLY));
     }
 
     @Transactional(rollbackFor = IllegalArgumentException.class)

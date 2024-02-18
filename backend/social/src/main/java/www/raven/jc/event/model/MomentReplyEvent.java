@@ -2,7 +2,6 @@ package www.raven.jc.event.model;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import www.raven.jc.entity.po.Comment;
 import www.raven.jc.entity.po.Reply;
 
 /**
