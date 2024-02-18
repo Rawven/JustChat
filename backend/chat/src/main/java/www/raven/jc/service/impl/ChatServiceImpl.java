@@ -15,8 +15,8 @@ import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.api.UserDubbo;
+import www.raven.jc.constant.ChatUserMqConstant;
 import www.raven.jc.constant.MessageConstant;
-import www.raven.jc.constant.MqConstant;
 import www.raven.jc.dao.FriendChatDAO;
 import www.raven.jc.dao.MessageDAO;
 import www.raven.jc.dao.RoomDAO;
@@ -28,8 +28,8 @@ import www.raven.jc.entity.po.Message;
 import www.raven.jc.entity.po.Room;
 import www.raven.jc.entity.po.UserRoom;
 import www.raven.jc.entity.vo.MessageVO;
-import www.raven.jc.event.FriendMsgEvent;
-import www.raven.jc.event.RoomMsgEvent;
+import www.raven.jc.event.model.FriendMsgEvent;
+import www.raven.jc.event.model.RoomMsgEvent;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
@@ -78,7 +78,7 @@ public class ChatServiceImpl implements ChatService {
         List<Integer> userIds = ids.stream().map(UserRoom::getUserId).collect(Collectors.toList());
         RoomMsgEvent roomMsgEvent = new RoomMsgEvent(userId, roomId, userIds, JsonUtil.objToJson(realMsg));
         //通知user模块有新消息
-        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(roomMsgEvent), MqConstant.TAGS_CHAT_ROOM_MSG_RECORD));
+        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(roomMsgEvent), ChatUserMqConstant.TAGS_CHAT_ROOM_MSG_RECORD));
     }
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
@@ -99,7 +99,7 @@ public class ChatServiceImpl implements ChatService {
         Assert.isTrue(friendChatDAO.save(friendChat), "插入失败");
         FriendMsgEvent friendMsgEvent = new FriendMsgEvent(userId, friendId, JsonUtil.objToJson(realMsg));
         //通知user模块有新消息
-        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(friendMsgEvent), MqConstant.TAGS_CHAT_FRIEND_MSG_RECORD));
+        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(friendMsgEvent), ChatUserMqConstant.TAGS_CHAT_FRIEND_MSG_RECORD));
     }
 
     @Override

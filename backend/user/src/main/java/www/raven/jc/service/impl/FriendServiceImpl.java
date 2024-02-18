@@ -1,8 +1,6 @@
 package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
@@ -14,7 +12,6 @@ import www.raven.jc.dao.FriendDAO;
 import www.raven.jc.dao.UserDAO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.Friend;
-import www.raven.jc.entity.po.User;
 import www.raven.jc.service.FriendService;
 import www.raven.jc.util.RequestUtil;
 

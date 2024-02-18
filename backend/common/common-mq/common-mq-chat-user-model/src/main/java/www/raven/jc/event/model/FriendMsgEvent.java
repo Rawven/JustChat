@@ -1,4 +1,4 @@
-package www.raven.jc.event;
+package www.raven.jc.event.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
