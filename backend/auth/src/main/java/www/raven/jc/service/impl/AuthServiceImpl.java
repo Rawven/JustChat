@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.api.UserDubbo;
+import www.raven.jc.config.JwtProperty;
 import www.raven.jc.constant.JwtConstant;
 import www.raven.jc.constant.RoleConstant;
 import www.raven.jc.dto.RoleDTO;
@@ -40,14 +41,9 @@ public class AuthServiceImpl implements AuthService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private UserDubbo userDubbo;
-    @Value("${raven.key}")
-    private String key;
-    /**
-     * 默认7天
-     * expire time
-     */
-    @Value("${jwt.expire}")
-    private Long expireTime;
+    @Autowired
+    private JwtProperty jwtProperty;
+
 
     @Override
     public String login(LoginModel loginModel) {
@@ -82,13 +78,13 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String refreshToken(String token) {
-        TokenDTO verify = JwtUtil.parseToken(token, key);
+        TokenDTO verify = JwtUtil.parseToken(token, jwtProperty.key);
         return produceToken(verify.getUserId(), verify.getRole());
     }
 
     @Override
     public void logout(String token) {
-        TokenDTO verify = JwtUtil.parseToken(token, key);
+        TokenDTO verify = JwtUtil.parseToken(token, jwtProperty.key);
         redissonClient.getBucket(JwtConstant.TOKEN + verify.getUserId()).delete();
         RpcResult<Void> voidCommonResult = userDubbo.saveLogOutTime(verify.getUserId());
         Assert.isTrue(voidCommonResult.isSuccess(), "登出失败");
@@ -106,8 +102,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private String produceToken(int userId, List<String> role) {
-        String token = JwtUtil.createToken(userId, role, key, expireTime);
-        redissonClient.getBucket(JwtConstant.TOKEN + userId).set(token, expireTime, TimeUnit.MILLISECONDS);
+        String token = JwtUtil.createToken(userId, role, jwtProperty.key, jwtProperty.expireTime);
+        redissonClient.getBucket(JwtConstant.TOKEN + userId).set(token, jwtProperty.expireTime, TimeUnit.MILLISECONDS);
         return token;
     }
 

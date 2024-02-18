@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import www.raven.jc.config.JwtProperty;
 import www.raven.jc.constant.JwtConstant;
 import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.util.JwtUtil;
@@ -29,8 +30,8 @@ public class TokenAspect {
 
     @Autowired
     private HttpServletRequest request;
-    @Value("${raven.key}")
-    private String key;
+   @Autowired
+   private JwtProperty jwtProperty;
 
     @Pointcut("@annotation(www.raven.jc.annotions.Auth)")
     public void pointcut() {
@@ -43,7 +44,7 @@ public class TokenAspect {
         if (StrUtil.isEmpty(token)) {
             throw new RuntimeException("权限不足");
         }
-        TokenDTO dto = JwtUtil.parseToken(token, key);
+        TokenDTO dto = JwtUtil.parseToken(token, jwtProperty.key);
         List<String> role = dto.getRole();
         if (!role.contains(auth.value())) {
             throw new RuntimeException("权限不足");

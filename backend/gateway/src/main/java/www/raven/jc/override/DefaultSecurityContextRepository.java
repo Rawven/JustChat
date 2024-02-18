@@ -18,6 +18,7 @@ import org.springframework.security.web.server.context.ServerSecurityContextRepo
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import www.raven.jc.config.JwtProperty;
 import www.raven.jc.constant.JwtConstant;
 import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.util.JwtUtil;
@@ -34,8 +35,8 @@ import www.raven.jc.util.JwtUtil;
 @Slf4j
 public class DefaultSecurityContextRepository implements ServerSecurityContextRepository {
 
-    @Value("${raven.key}")
-    private String key;
+    @Autowired
+    private JwtProperty jwtProperty;
     @Resource
     private TokenAuthenticationManager tokenAuthenticationManager;
     @Autowired
@@ -53,7 +54,7 @@ public class DefaultSecurityContextRepository implements ServerSecurityContextRe
         if (tokens == null || tokens.isEmpty()) {
             return Mono.empty();
         }
-        TokenDTO dto = JwtUtil.parseToken(tokens.get(0), key);
+        TokenDTO dto = JwtUtil.parseToken(tokens.get(0), jwtProperty.key);
         log.info("访问者信息 {} {} {}", dto.getUserId(), dto.getRole(), dto.getExpireTime());
         Assert.isTrue(Objects.equals(tokens.get(0), redissonClient.getBucket(JwtConstant.TOKEN + dto.getUserId()).get()), "未登录");
         request.mutate().header(JwtConstant.TIME, String.valueOf(dto.getExpireTime())).header(JwtConstant.USER_ID, dto.getUserId().toString()).build();

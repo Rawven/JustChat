@@ -57,5 +57,6 @@ security:
      permitAll: /auth/**,/ws/**,/webSocket/**
      hasAnyRoleUserAdmin: /chat/**,/user/**,/file/**,/social/**
      hasRoleAdmin : /admin/**
-raven:
+jwt:
   key: 爱你老妈
+  expire: 604800000

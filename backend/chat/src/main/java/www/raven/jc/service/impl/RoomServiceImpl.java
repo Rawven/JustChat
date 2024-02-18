@@ -75,8 +75,9 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public List<UserRoomVO> initUserMainPage() {
-        int userId = RequestUtil.getUserId(request);
         //获取用户加入的聊天室id
+        int userId = RequestUtil.getUserId(request);
+        //获取用户加入的聊天室
         List<Room> rooms = roomDAO.getBaseMapper().selectRoomByUserId(userId);
         if(rooms.isEmpty()){
             return new ArrayList<>();
