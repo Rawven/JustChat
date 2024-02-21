@@ -64,12 +64,15 @@ public class UserEventListener {
             }
             String tags = Objects.requireNonNull(msg.getHeaders().get(HEADER_TAGS)).toString();
             //判断消息类型
-            if (SocialUserMqConstant.TAGS_MOMENT_NOTICE_MOMENT_FRIEND.equals(tags)) {
-                eventMomentNoticeFriendEvent(msg);
-            } else if (SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT.equals(tags)) {
-                eventMomentNoticeLikeOrCommentEvent(msg);
-            } else {
-                log.info("--RocketMq 非法的消息，不处理");
+            switch (tags) {
+                case SocialUserMqConstant.TAGS_MOMENT_NOTICE_MOMENT_FRIEND:
+                    eventMomentNoticeFriendEvent(msg);
+                    break;
+                case SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT:
+                    eventMomentNoticeLikeOrCommentEvent(msg);
+                    break;
+                default:
+                    log.info("--RocketMq 非法的消息，不处理");
             }
             MqUtil.protectMsg(msg, redissonClient);
         };
@@ -107,14 +110,18 @@ public class UserEventListener {
             }
             String tags = Objects.requireNonNull(msg.getHeaders().get(HEADER_TAGS)).toString();
             //判断消息类型
-            if (ChatUserMqConstant.TAGS_CHAT_ROOM_APPLY.equals(tags)) {
-                eventUserJoinRoomApply(msg);
-            } else if (ChatUserMqConstant.TAGS_CHAT_ROOM_MSG_RECORD.equals(tags)) {
-                eventRoomSendMsg(msg);
-            } else if (ChatUserMqConstant.TAGS_CHAT_FRIEND_MSG_RECORD.equals(tags)) {
-                eventFriendSendMsg(msg);
-            } else {
-                log.info("--RocketMq 非法的消息，不处理");
+            switch (tags) {
+                case ChatUserMqConstant.TAGS_CHAT_FRIEND_MSG_RECORD:
+                    eventFriendSendMsg(msg);
+                    break;
+                case ChatUserMqConstant.TAGS_CHAT_ROOM_APPLY:
+                    eventUserJoinRoomApply(msg);
+                    break;
+                case ChatUserMqConstant.TAGS_CHAT_ROOM_MSG_RECORD:
+                    eventRoomSendMsg(msg);
+                    break;
+                default:
+                    log.info("--RocketMq 非法的消息，不处理");
             }
             MqUtil.protectMsg(msg, redissonClient);
         };

@@ -115,7 +115,7 @@
                   </div>
                 </div>
                 <el-input v-if="selectedCommentId === comment.id" v-model="comment.input" placeholder="要回复吗"
-                          @keyup.enter="submitNestedComment(moment.momentId,comment.input,moment.userInfo.userId,comment.id)"/>
+                          @keyup.enter="submitNestedComment(moment.momentId,comment.input,moment.userInfo.userId,comment.id,moment.timestamp)"/>
               </div>
             </div>
           <div class="mt-3 flex justify-between text-gray-500">
@@ -166,13 +166,13 @@
             </svg>
           </div>
           <div class="mt-3 flex justify-between text-gray-500">
-            <el-button @click="toLike(moment.momentId,moment.userInfo.userId)">
+            <el-button @click="toLike(moment.momentId,moment.userInfo.userId,moment.timestamp)">
               <el-icon>
                 <Star/>
               </el-icon>
             </el-button>
             <el-input v-model="moment.input" placeholder="要评论吗"
-                      @keyup.enter="submitComment(moment.momentId,moment.input,moment.userInfo.userId)"/>
+                      @keyup.enter="submitComment(moment.momentId,moment.input,moment.userInfo.userId,moment.timestamp)"/>
           </div>
         </div>
       </div>
@@ -307,8 +307,12 @@ export default {
         this.$message.success('文件上传成功');
       })
     },
-    toLike(momentId, momentUserId) {
-      this.realAxios.get(`http://` + Host + `:7000/social/likeMoment/${momentId}/${momentUserId}/`,
+    toLike(momentId, momentUserId,momentTimeStamp) {
+      this.realAxios.post(`http://` + Host + `:7000/social/likeMoment`,{
+            momentId: momentId,
+            momentUserId: momentUserId,
+            momentTimeStamp: Number(momentTimeStamp)
+      },
           {
             headers: {
               'token': localStorage.getItem("token")
@@ -332,11 +336,13 @@ export default {
       this.nowComment = id;
       this.visible = !this.visible;
     },
-    submitComment(momentId, text, momentUserId) {
+    submitComment(momentId, text, momentUserId,momentTimeStamp) {
+      this.$message.success(momentTimeStamp);
       this.realAxios.post(`http://` + Host + `:7000/social/commentMoment`, {
             momentId: momentId,
             text: text,
-            momentUserId: momentUserId
+            momentUserId: momentUserId,
+            momentTimeStamp: momentTimeStamp
           },
           {
             headers: {
@@ -347,7 +353,6 @@ export default {
             this.$message.success('评论成功');
             this.input = "";
           })
-      //等待5秒
       setTimeout(() => {
         this.realAxios.get(`http://${Host}:7000/social/queryMoment`, {
           headers: {
@@ -356,15 +361,23 @@ export default {
         }).then(response => {
           this.feedData = response.data.data;
         })
-      }, 5000);
 
-    },
-    submitNestedComment(momentId, text, momentUserId, commentId) {
+    },2000)},
+
+    submitNestedComment(momentId, text, momentUserId, commentId,momentTimeStamp) {
+      this.realAxios.get(`http://` + Host + `:7000/social/test`,{
+        headers: {
+          'token': localStorage.getItem("token")
+        }
+      }).then(response => {
+
+      })
       this.realAxios.post(`http://` + Host + `:7000/social/commentMoment`, {
             momentId: momentId,
             text: text,
             momentUserId: momentUserId,
-            commentId: commentId
+            commentId: commentId,
+            momentTimeStamp: Number(momentTimeStamp)
           },
           {
             headers: {
@@ -375,7 +388,7 @@ export default {
             this.$message.success('回复成功');
             this.input = "";
           })
-      //等待5秒
+      //等待0.6秒 来抹平更新缓存延迟（如果在校园网环境也许会更短 无需等待？）
       setTimeout(() => {
         this.realAxios.get(`http://${Host}:7000/social/queryMoment`, {
           headers: {
@@ -384,7 +397,7 @@ export default {
         }).then(response => {
           this.feedData = response.data.data;
         })
-      }, 5000);
+      }, 600);
     },
     release() {
       this.realAxios.post(`http://` + Host + `:7000/social/releaseMoment`, this.data, {
@@ -405,7 +418,7 @@ export default {
         }).then(response => {
           this.feedData = response.data.data;
         })
-      }, 5000);
+      }, 2000);
     },
   }
 
