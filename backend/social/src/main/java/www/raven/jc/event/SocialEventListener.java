@@ -79,37 +79,26 @@ public class SocialEventListener {
             MqUtil.protectMsg(msg, redissonClient);
         };
     }
-
-    public void handleMomentEvent(MomentReleaseEvent event) {
+    private void handleMomentEvent(MomentReleaseEvent event) {
         Moment moment = event.getMoment();
-        insertOrUpdateMomentCache(event.getReleaseId(), new MomentVO(moment),true);
-        streamBridge.send("producer-out-1", MqUtil.createMsg(
-            JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(event.getMoment().getMomentId().toHexString()).setUserId(event.getMoment().getUserInfo().getUserId())
-                .setMsg("有人发布了朋友圈"))
-            , SocialUserMqConstant.TAGS_MOMENT_NOTICE_MOMENT_FRIEND));
+        handleEvent(new MomentVO(moment),true,"有人发布了朋友圈",SocialUserMqConstant.TAGS_MOMENT_NOTICE_MOMENT_FRIEND);
     }
 
-    public void handleLikeEvent(MomentLikeEvent event) {
+    private void handleLikeEvent(MomentLikeEvent event) {
         MomentVO momentVO = getWannaMoment(event.getMomentId(), event.getMomentUserId());
             List<Like> likes = momentVO.getLikes();
             // 添加新的Like
             likes.add(event.getLike());
             // 添加更新后的MomentVO
-        insertOrUpdateMomentCache(event.getMomentUserId(), momentVO,false);
-        streamBridge.send("producer-out-1", MqUtil.createMsg(
-            JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(event.getMomentId()).setUserId(event.getMomentUserId()).setMsg("有人点赞你的朋友圈了")),
-            SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT));
+        handleEvent(momentVO,false,"有人点赞了你的朋友圈",SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT);
     }
 
-    public void handleCommentEvent(MomentCommentEvent event) {
+    private void handleCommentEvent(MomentCommentEvent event) {
         MomentVO momentVO = getWannaMoment(event.getMomentId(), event.getMomentUserId());
         List<Comment> comments = momentVO.getComments();
         // 添加新的Comment
         comments.add(event.getComment());
-        insertOrUpdateMomentCache(event.getMomentUserId(), momentVO,false);
-        streamBridge.send("producer-out-1", MqUtil.createMsg(
-            JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(event.getMomentId()).setUserId(event.getMomentUserId()).setMsg("有人评论了你的朋友圈")),
-            SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT));
+        handleEvent(momentVO,false,"有人评论了你的朋友圈",SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT);
     }
 
     private void handleReplyEvent(MomentReplyEvent event) {
@@ -123,40 +112,35 @@ public class SocialEventListener {
                 List<Reply> replies = comment.getReplies();
                 replies.add(event.getReply());
             });
-        insertOrUpdateMomentCache(event.getMomentUserId(), momentVO,false);
+        handleEvent(momentVO,false,"有人回复了你的评论",SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT);
+    }
+
+    private void handleEvent(MomentVO momentVo,Boolean insert,String msg,String tag) {
+        insertOrUpdateMomentCache(momentVo.getUserInfo().getUserId(),momentVo,insert);
         streamBridge.send("producer-out-1", MqUtil.createMsg(
-            JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(event.getMomentId()).setUserId(event.getMomentUserId()).setMsg("有人回复了你的朋友圈")),
-            SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT));
+            JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(momentVo.getMomentId()).setUserId(momentVo.getUserInfo().getUserId()).setMsg(msg)),
+            tag));
     }
 
 
 
     public void insertOrUpdateMomentCache(Integer userId, MomentVO momentVo,Boolean insert) {
         List<RScoredSortedSet<Object>> caches = getHisFriendMomentCache(userId);
+        Long time = momentVo.getTimestamp();
         if(insert){
             caches.forEach(scoredSortedSet -> {
                 if (scoredSortedSet.size() > setProperty.maxSize) {
                     scoredSortedSet.pollFirst();
                 }
-                scoredSortedSet.add(System.currentTimeMillis(), momentVo);
+                scoredSortedSet.add(time, momentVo);
             });
-            return;
+        }else {
+            caches.forEach(scoredSortedSet -> {
+                // 更新MomentVO
+                scoredSortedSet.removeRangeByScore(time, true, time, true);
+                scoredSortedSet.add(time, momentVo);
+            });
         }
-        caches.forEach(scoredSortedSet -> {
-            // 使用iterator移除旧的MomentVO
-            Iterator<Object> iterator = scoredSortedSet.iterator();
-            Double time = (double) System.currentTimeMillis();
-            while (iterator.hasNext()) {
-                Object o = iterator.next();
-                if (o instanceof MomentVO && ((MomentVO) o).getMomentId().equals(momentVo.getMomentId())) {
-                    time = scoredSortedSet.getScore(o);
-                    iterator.remove();
-                    break;  // 找到并删除元素后立即退出循环
-                }
-            }
-            // 更新MomentVO
-            scoredSortedSet.add(time, momentVo);
-        });
     }
 
     /**
