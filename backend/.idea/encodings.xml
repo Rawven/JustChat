@@ -27,6 +27,8 @@
     <file url="file://$PROJECT_DIR$/common/common-mq/common-mq-base/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/common/common-mq/common-mq-chat-user-model/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/common/common-mq/common-mq-chat-user-model/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/common/common-mq/common-mq-social-user-model/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/common/common-mq/common-mq-social-user-model/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/common/common-mq/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/common/common-mq/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/common/common-mvc/src/main/java" charset="UTF-8" />

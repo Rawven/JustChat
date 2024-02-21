@@ -14,5 +14,6 @@ server:
   port: 8888
 Ipfs:
   api: /ip4/127.0.0.1/tcp/5001
-Raven:
+jwt:
   key: 爱你老妈
+  expire: 604800000

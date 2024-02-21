@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 import www.raven.jc.api.UserDubbo;
+import www.raven.jc.config.ScoredSortedSetProperty;
 import www.raven.jc.constant.SocialUserMqConstant;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.Comment;
@@ -32,7 +33,7 @@ import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 
 import static www.raven.jc.constant.MqConstant.HEADER_TAGS;
-import static www.raven.jc.constant.RedisSortedConstant.PREFIX;
+import static www.raven.jc.constant.ScoredSortedSetConstant.PREFIX;
 
 /**
  * JcEvent listener
@@ -50,6 +51,8 @@ public class SocialEventListener {
     private RedissonClient redissonClient;
     @Autowired
     private StreamBridge streamBridge;
+    @Autowired
+    private ScoredSortedSetProperty setProperty;
 
     @Bean
     public Consumer<Message<Event>> eventToPull() {
@@ -131,7 +134,12 @@ public class SocialEventListener {
     public void insertOrUpdateMomentCache(Integer userId, MomentVO momentVo,Boolean insert) {
         List<RScoredSortedSet<Object>> caches = getHisFriendMomentCache(userId);
         if(insert){
-            caches.forEach(scoredSortedSet -> scoredSortedSet.add(System.currentTimeMillis(), momentVo));
+            caches.forEach(scoredSortedSet -> {
+                if (scoredSortedSet.size() > setProperty.maxSize) {
+                    scoredSortedSet.pollFirst();
+                }
+                scoredSortedSet.add(System.currentTimeMillis(), momentVo);
+            });
             return;
         }
         caches.forEach(scoredSortedSet -> {
