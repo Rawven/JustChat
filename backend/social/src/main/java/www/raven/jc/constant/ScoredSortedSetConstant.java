@@ -6,7 +6,7 @@ package www.raven.jc.constant;
  * @author 刘家辉
  * @date 2024/02/18
  */
-public class RedisSortedConstant {
+public class ScoredSortedSetConstant {
     public static final String PREFIX = "moment_";
-    public static final Integer MAX_SIZE = 15;
+
 }

@@ -63,6 +63,10 @@ spring:
     password: root
 server:
   port: 8071
+redis:
+  sorted-set:
+    max-size: 15
+    expire-days: 3
 jwt:
   key: 爱你老妈
   expire: 604800000

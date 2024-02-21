@@ -12,10 +12,9 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.messaging.Message;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import www.raven.jc.api.UserDubbo;
-import www.raven.jc.constant.RedisSortedConstant;
+import www.raven.jc.constant.ScoredSortedSetConstant;
 import www.raven.jc.constant.SocialUserMqConstant;
 import www.raven.jc.dao.MomentDAO;
 import www.raven.jc.dto.UserInfoDTO;
@@ -133,7 +132,7 @@ public class SocialServiceImpl implements SocialService {
 
     @Override
     public List<MomentVO> queryMoment(int userId) {
-        RScoredSortedSet<MomentVO> scoredSortedSet = redissonClient.getScoredSortedSet(RedisSortedConstant.PREFIX + userId);
+        RScoredSortedSet<MomentVO> scoredSortedSet = redissonClient.getScoredSortedSet(ScoredSortedSetConstant.PREFIX + userId);
         if (scoredSortedSet.isExists()) {
             // 获取有序集合的所有元素
             return scoredSortedSet.stream().collect(Collectors.toList());
