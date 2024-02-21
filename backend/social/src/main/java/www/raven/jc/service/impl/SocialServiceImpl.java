@@ -25,6 +25,7 @@ import www.raven.jc.entity.po.Moment;
 import www.raven.jc.entity.po.Reply;
 import www.raven.jc.entity.vo.MomentVO;
 import www.raven.jc.result.RpcResult;
+import www.raven.jc.service.CacheAsyncService;
 import www.raven.jc.service.SocialService;
 import www.raven.jc.util.RequestUtil;
 
@@ -49,7 +50,7 @@ public class SocialServiceImpl implements SocialService {
     @Autowired
     private StreamBridge streamBridge;
     @Autowired
-    private CacheAsyncServiceImpl cacheAsyncServiceImpl;
+    private CacheAsyncService cacheAsyncService;
 
     @Override
     public void releaseMoment(MomentModel model) {
@@ -66,7 +67,7 @@ public class SocialServiceImpl implements SocialService {
             .setLikes(new ArrayList<>());
         Moment save = momentDAO.save(moment);
         Assert.isTrue(save.getMomentId() != null, "发布失败");
-        cacheAsyncServiceImpl.updateMomentCacheAndNotice(userId, save);
+        cacheAsyncService.updateMomentCacheAndNotice(userId, save);
        }
 
     @Override
@@ -82,7 +83,7 @@ public class SocialServiceImpl implements SocialService {
         UserInfoDTO data = singleInfo.getData();
         Like like = new Like().setTimestamp(System.currentTimeMillis()).setUserInfo(data);
         Assert.isTrue(momentDAO.like(likeModel.getMomentId(), like), "点赞失败");
-        cacheAsyncServiceImpl.updateLikeCacheAndNotice(userId, likeModel.getMomentTimeStamp(), like);
+        cacheAsyncService.updateLikeCacheAndNotice(userId, likeModel.getMomentTimeStamp(), like);
     }
 
     @Override
@@ -98,14 +99,14 @@ public class SocialServiceImpl implements SocialService {
                 .setContent(model.getText())
                 .setReplies(new ArrayList<>());
             Assert.isTrue(momentDAO.comment(model.getMomentId(), comment), "评论失败");
-            cacheAsyncServiceImpl.updateCommentCacheAndNotice(userId, model.getMomentTimeStamp(), comment);
+            cacheAsyncService.updateCommentCacheAndNotice(userId, model.getMomentTimeStamp(), comment);
             } else {
             Reply reply = new Reply().setUserInfo(data)
                 .setContent(model.getText())
                 .setTimestamp(System.currentTimeMillis())
                 .setParentId(model.getCommentId());
             Assert.isTrue(momentDAO.reply(model.getMomentId(), model.getCommentId(), reply), "回复失败");
-            cacheAsyncServiceImpl.updateReplyCacheAndNotice(userId, model.getMomentTimeStamp(), reply);
+            cacheAsyncService.updateReplyCacheAndNotice(userId, model.getMomentTimeStamp(), reply);
           }
         //发布更新事件
     }
@@ -121,7 +122,7 @@ public class SocialServiceImpl implements SocialService {
         Assert.isTrue(friendInfos.isSuccess(), "获取好友信息失败");
         List<Moment> moments = momentDAO.queryMoment(friendInfos.getData());
         List<MomentVO> collect = moments.stream().map(MomentVO::new).collect(Collectors.toList());
-        cacheAsyncServiceImpl.addMomentCache(collect, userId);
+        cacheAsyncService.addMomentCache(collect, userId);
         return collect;
     }
 

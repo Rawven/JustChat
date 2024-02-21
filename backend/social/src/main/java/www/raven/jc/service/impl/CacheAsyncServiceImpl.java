@@ -2,8 +2,10 @@ package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,7 @@ import static www.raven.jc.constant.ScoredSortedSetConstant.PREFIX;
  * @date 2024/02/18
  */
 @Service
+@Slf4j
 public class CacheAsyncServiceImpl implements CacheAsyncService {
 
     @Autowired
@@ -92,9 +95,9 @@ public class CacheAsyncServiceImpl implements CacheAsyncService {
         momentVO.getComments().add(comment);
         handleEvent(momentVO,false,"有人评论了你的朋友圈",SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT,lists);
     }
-    @Async
     @Override
     public void updateReplyCacheAndNotice(Integer userId,Long momentTime,Reply reply) {
+        long start = System.currentTimeMillis();
         List<RScoredSortedSet<Object>> lists = getCacheNeedUpdate(userId, momentTime);
         if(lists.isEmpty()){
             return;
@@ -109,6 +112,7 @@ public class CacheAsyncServiceImpl implements CacheAsyncService {
                 List<Reply> replies = comment.getReplies();
                 replies.add(reply);
             });
+        log.info("updateReplyCacheAndNotice cost:{}",System.currentTimeMillis()-start);
         handleEvent(momentVO,false,"有人回复了你的评论",SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT,lists);
     }
 
@@ -159,7 +163,6 @@ public class CacheAsyncServiceImpl implements CacheAsyncService {
      * @return {@link List}<{@link RScoredSortedSet}<{@link Object}>>
      */
     private List<RScoredSortedSet<Object>> getHisFriendMomentCache(Integer userId) {
-        Assert.isTrue(userDubbo != null, "userDubbo Null");
         RpcResult<List<UserInfoDTO>> friendAndMeInfos = userDubbo.getFriendAndMeInfos(userId);
         Assert.isTrue(friendAndMeInfos.isSuccess(), "获取好友信息失败");
         List<Integer> collect = friendAndMeInfos.getData().stream().map(UserInfoDTO::getUserId).collect(Collectors.toList());
@@ -168,7 +171,15 @@ public class CacheAsyncServiceImpl implements CacheAsyncService {
 
     private  List<RScoredSortedSet<Object>>  getCacheNeedUpdate(Integer userId,long time){
         List<RScoredSortedSet<Object>> list = getHisFriendMomentCache(userId);
+        if(list.isEmpty()){
+            return new ArrayList<>();
+        }
         //检查所有有序集合若有分数等于time则将该集合加入一个list里
-        return list.stream().filter(scoredSortedSet -> scoredSortedSet.contains(time)).collect(Collectors.toList());
+        List<RScoredSortedSet<Object>> collect = new ArrayList<>();
+        list.forEach(scoredSortedSet -> scoredSortedSet.valueRange(time, true, time, true).stream().findFirst().ifPresent(o -> collect.add(scoredSortedSet)));
+        if(collect.isEmpty()){
+            return new ArrayList<>();
+        }
+        return collect;
     }
 }

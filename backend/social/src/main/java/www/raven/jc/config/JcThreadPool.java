@@ -19,7 +19,7 @@ public class JcThreadPool {
      *
      * @return {@link ThreadPoolTaskExecutor}
      */
-    @Bean
+    @Bean("JcThreadPoolTaskExecutor")
         public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
             ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
             //配置核心线程数

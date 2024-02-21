@@ -22,7 +22,7 @@ public interface CacheAsyncService {
      * @param collect collect
      * @param userId  user id
      */
-    @Async
+    @Async("JcThreadPoolTaskExecutor")
      void addMomentCache(List<MomentVO> collect, Integer userId);
 
     /**
@@ -31,7 +31,7 @@ public interface CacheAsyncService {
      * @param userId user id
      * @param moment moment
      */
-    @Async
+    @Async("JcThreadPoolTaskExecutor")
      void updateMomentCacheAndNotice(Integer userId, Moment moment) ;
 
     /**
@@ -41,7 +41,7 @@ public interface CacheAsyncService {
      * @param momentTime moment time
      * @param like       like
      */
-    @Async
+    @Async("JcThreadPoolTaskExecutor")
      void updateLikeCacheAndNotice(Integer userId,Long momentTime, Like like);
 
     /**
@@ -51,7 +51,7 @@ public interface CacheAsyncService {
      * @param momentTime moment time
      * @param comment    comment
      */
-    @Async
+    @Async("JcThreadPoolTaskExecutor")
      void updateCommentCacheAndNotice(Integer userId,Long momentTime, Comment comment);
 
     /**
@@ -61,6 +61,6 @@ public interface CacheAsyncService {
      * @param momentTime moment time
      * @param reply      reply
      */
-    @Async
+    @Async("JcThreadPoolTaskExecutor")
      void updateReplyCacheAndNotice(Integer userId,Long momentTime, Reply reply) ;
 }
