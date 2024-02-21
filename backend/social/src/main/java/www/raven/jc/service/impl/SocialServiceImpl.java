@@ -133,13 +133,10 @@ public class SocialServiceImpl implements SocialService {
 
     @Override
     public List<MomentVO> queryMoment(int userId) {
-        if (redissonClient.getScoredSortedSet(RedisSortedConstant.PREFIX + userId).isExists()) {
-            // 获取有序集合
-            RScoredSortedSet<MomentVO> scoredSortedSet = redissonClient.getScoredSortedSet(RedisSortedConstant.PREFIX + userId);
-            // 获取最近时间里的10条朋友圈
-            return new ArrayList<>(
-                scoredSortedSet.valueRangeReversed(0, false, Double.POSITIVE_INFINITY, true, 0, 10)
-            );
+        RScoredSortedSet<MomentVO> scoredSortedSet = redissonClient.getScoredSortedSet(RedisSortedConstant.PREFIX + userId);
+        if (scoredSortedSet.isExists()) {
+            // 获取有序集合的所有元素
+            return scoredSortedSet.stream().collect(Collectors.toList());
         }
         RpcResult<List<UserInfoDTO>> friendInfos = userDubbo.getFriendAndMeInfos(userId);
         Assert.isTrue(friendInfos.isSuccess(), "获取好友信息失败");

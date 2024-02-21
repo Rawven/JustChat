@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 import www.raven.jc.api.UserDubbo;
+import www.raven.jc.constant.RedisSortedConstant;
 import www.raven.jc.constant.SocialUserMqConstant;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.Comment;
@@ -131,7 +132,12 @@ public class SocialEventListener {
     public void insertOrUpdateMomentCache(Integer userId, MomentVO momentVo,Boolean insert) {
         List<RScoredSortedSet<Object>> caches = getHisFriendMomentCache(userId);
         if(insert){
-            caches.forEach(scoredSortedSet -> scoredSortedSet.add(System.currentTimeMillis(), momentVo));
+            caches.forEach(scoredSortedSet -> {
+                if (scoredSortedSet.size() > RedisSortedConstant.MAX_SIZE) {
+                    scoredSortedSet.pollFirst();
+                }
+                scoredSortedSet.add(System.currentTimeMillis(), momentVo);
+            });
             return;
         }
         caches.forEach(scoredSortedSet -> {

@@ -23,8 +23,12 @@ public class AsyncService {
 
     @Async
     public void addMomentCache(List<MomentVO> collect, Integer userId) {
-
         RScoredSortedSet<MomentVO> scoredSortedSet = redissonClient.getScoredSortedSet(RedisSortedConstant.PREFIX + userId);
-        collect.forEach(momentVO -> scoredSortedSet.add(momentVO.getTimestamp(), momentVO));
+        collect.forEach(momentVO -> {
+            if (scoredSortedSet.size() >= RedisSortedConstant.MAX_SIZE) {
+                scoredSortedSet.pollFirst(); // 删除分数最低的元素
+            }
+            scoredSortedSet.add(momentVO.getTimestamp(), momentVO);
+        });
     }
 }

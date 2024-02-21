@@ -8,4 +8,5 @@ package www.raven.jc.constant;
  */
 public class RedisSortedConstant {
     public static final String PREFIX = "moment_";
+    public static final Integer MAX_SIZE = 15;
 }
