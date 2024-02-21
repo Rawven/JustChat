@@ -352,6 +352,7 @@ export default {
             this.$message.success('评论成功');
             this.input = "";
           })
+      setTimeout(() => {
         this.realAxios.get(`http://${Host}:7000/social/queryMoment`, {
           headers: {
             'token': localStorage.getItem("token")
@@ -360,7 +361,8 @@ export default {
           this.feedData = response.data.data;
         })
 
-    },
+    },2000)},
+
     submitNestedComment(momentId, text, momentUserId, commentId) {
       this.realAxios.post(`http://` + Host + `:7000/social/commentMoment`, {
             momentId: momentId,
@@ -377,7 +379,7 @@ export default {
             this.$message.success('回复成功');
             this.input = "";
           })
-      //等待5秒
+      //等待2秒
       setTimeout(() => {
         this.realAxios.get(`http://${Host}:7000/social/queryMoment`, {
           headers: {
@@ -386,7 +388,7 @@ export default {
         }).then(response => {
           this.feedData = response.data.data;
         })
-      }, 5000);
+      }, 2000);
     },
     release() {
       this.realAxios.post(`http://` + Host + `:7000/social/releaseMoment`, this.data, {
@@ -407,7 +409,7 @@ export default {
         }).then(response => {
           this.feedData = response.data.data;
         })
-      }, 5000);
+      }, 2000);
     },
   }
 

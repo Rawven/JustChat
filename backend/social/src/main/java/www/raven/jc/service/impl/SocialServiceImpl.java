@@ -4,7 +4,6 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -12,11 +11,9 @@ import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
-import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
 import www.raven.jc.api.UserDubbo;
 import www.raven.jc.constant.ScoredSortedSetConstant;
-import www.raven.jc.constant.SocialUserMqConstant;
 import www.raven.jc.dao.MomentDAO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.model.CommentModel;
@@ -27,15 +24,8 @@ import www.raven.jc.entity.po.Like;
 import www.raven.jc.entity.po.Moment;
 import www.raven.jc.entity.po.Reply;
 import www.raven.jc.entity.vo.MomentVO;
-import www.raven.jc.event.Event;
-import www.raven.jc.event.model.MomentCommentEvent;
-import www.raven.jc.event.model.MomentLikeEvent;
-import www.raven.jc.event.model.MomentReleaseEvent;
-import www.raven.jc.event.model.MomentReplyEvent;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.SocialService;
-import www.raven.jc.util.JsonUtil;
-import www.raven.jc.util.MqUtil;
 import www.raven.jc.util.RequestUtil;
 
 /**
@@ -59,7 +49,7 @@ public class SocialServiceImpl implements SocialService {
     @Autowired
     private StreamBridge streamBridge;
     @Autowired
-    private AsyncService asyncService;
+    private CacheAsyncServiceImpl cacheAsyncServiceImpl;
 
     @Override
     public void releaseMoment(MomentModel model) {
@@ -74,13 +64,10 @@ public class SocialServiceImpl implements SocialService {
             .setTimestamp(System.currentTimeMillis())
             .setComments(new ArrayList<>())
             .setLikes(new ArrayList<>());
-        boolean add = redissonClient.getScoredSortedSet(ScoredSortedSetConstant.PREFIX + userId).add(moment.getTimestamp(), new MomentVO(moment));
-        Assert.isTrue(add, "发布失败");
         Moment save = momentDAO.save(moment);
         Assert.isTrue(save.getMomentId() != null, "发布失败");
-        //发布更新事件
-        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(new MomentReleaseEvent().setReleaseId(userId).setMoment(save)), SocialUserMqConstant.TAGS_MOMENT_INTERNAL_RELEASE_RECORD));
-    }
+        cacheAsyncServiceImpl.updateMomentCacheAndNotice(userId, save);
+       }
 
     @Override
     public void deleteMoment(String momentId) {
@@ -95,14 +82,7 @@ public class SocialServiceImpl implements SocialService {
         UserInfoDTO data = singleInfo.getData();
         Like like = new Like().setTimestamp(System.currentTimeMillis()).setUserInfo(data);
         Assert.isTrue(momentDAO.like(likeModel.getMomentId(), like), "点赞失败");
-
-        MomentLikeEvent event = new MomentLikeEvent()
-            .setMomentId(likeModel.getMomentId())
-            .setMomentUserId(likeModel.getMomentUserId())
-            .setLike(like);
-        Message<Event> msg = MqUtil.createMsg(JsonUtil.objToJson(event), SocialUserMqConstant.TAGS_MOMENT_INTERNAL_LIKE_RECORD);
-        //发布更新事件
-        streamBridge.send("producer-out-0", msg);
+        cacheAsyncServiceImpl.updateLikeCacheAndNotice(userId, likeModel.getMomentTimeStamp(), like);
     }
 
     @Override
@@ -118,19 +98,15 @@ public class SocialServiceImpl implements SocialService {
                 .setContent(model.getText())
                 .setReplies(new ArrayList<>());
             Assert.isTrue(momentDAO.comment(model.getMomentId(), comment), "评论失败");
-            streamBridge.send("producer-out-0",
-                MqUtil.createMsg(JsonUtil.objToJson(
-                    new MomentCommentEvent().setMomentId(model.getMomentId()).setMomentUserId(model.getMomentUserId()).setComment(comment)), SocialUserMqConstant.TAGS_MOMENT_INTERNAL_COMMENT_RECORD));
-        } else {
+            cacheAsyncServiceImpl.updateCommentCacheAndNotice(userId, model.getMomentTimeStamp(), comment);
+            } else {
             Reply reply = new Reply().setUserInfo(data)
                 .setContent(model.getText())
                 .setTimestamp(System.currentTimeMillis())
                 .setParentId(model.getCommentId());
             Assert.isTrue(momentDAO.reply(model.getMomentId(), model.getCommentId(), reply), "回复失败");
-            streamBridge.send("producer-out-0",
-                MqUtil.createMsg(JsonUtil.objToJson(
-                    new MomentReplyEvent().setMomentId(model.getMomentId()).setMomentUserId(model.getMomentUserId()).setCommentId(model.getCommentId()).setReply(reply)), SocialUserMqConstant.TAGS_MOMENT_INTERNAL_REPLY_NOTICE));
-        }
+            cacheAsyncServiceImpl.updateReplyCacheAndNotice(userId, model.getMomentTimeStamp(), reply);
+          }
         //发布更新事件
     }
 
@@ -145,7 +121,7 @@ public class SocialServiceImpl implements SocialService {
         Assert.isTrue(friendInfos.isSuccess(), "获取好友信息失败");
         List<Moment> moments = momentDAO.queryMoment(friendInfos.getData());
         List<MomentVO> collect = moments.stream().map(MomentVO::new).collect(Collectors.toList());
-        asyncService.addMomentCache(collect, userId);
+        cacheAsyncServiceImpl.addMomentCache(collect, userId);
         return collect;
     }
 
