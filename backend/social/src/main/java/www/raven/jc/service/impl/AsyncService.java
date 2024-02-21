@@ -1,5 +1,6 @@
 package www.raven.jc.service.impl;
 
+import java.time.Duration;
 import java.util.List;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
@@ -24,6 +25,8 @@ public class AsyncService {
     @Async
     public void addMomentCache(List<MomentVO> collect, Integer userId) {
         RScoredSortedSet<MomentVO> scoredSortedSet = redissonClient.getScoredSortedSet(RedisSortedConstant.PREFIX + userId);
+        // 3天过期
+        scoredSortedSet.expire(Duration.ofDays(3));
         collect.forEach(momentVO -> {
             if (scoredSortedSet.size() >= RedisSortedConstant.MAX_SIZE) {
                 scoredSortedSet.pollFirst(); // 删除分数最低的元素
