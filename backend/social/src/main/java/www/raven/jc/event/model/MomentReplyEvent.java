@@ -17,4 +17,5 @@ public class MomentReplyEvent {
     private String momentId;
     private Integer momentUserId;
     private Reply reply;
+    private Long momentTime;
 }

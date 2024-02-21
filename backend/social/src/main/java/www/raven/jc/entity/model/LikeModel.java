@@ -4,17 +4,15 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 /**
- * comment model
+ * like model
  *
  * @author 刘家辉
- * @date 2024/01/24
+ * @date 2024/02/21
  */
 @Data
 @Accessors(chain = true)
-public class CommentModel {
+public class LikeModel {
     private String momentId;
     private Integer momentUserId;
     private Long momentTimeStamp;
-    private String commentId;
-    private String text;
 }

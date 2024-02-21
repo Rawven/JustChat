@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import www.raven.jc.constant.SocialUserMqConstant;
 import www.raven.jc.dao.MomentDAO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.model.CommentModel;
+import www.raven.jc.entity.model.LikeModel;
 import www.raven.jc.entity.model.MomentModel;
 import www.raven.jc.entity.po.Comment;
 import www.raven.jc.entity.po.Like;
@@ -72,6 +74,8 @@ public class SocialServiceImpl implements SocialService {
             .setTimestamp(System.currentTimeMillis())
             .setComments(new ArrayList<>())
             .setLikes(new ArrayList<>());
+        boolean add = redissonClient.getScoredSortedSet(ScoredSortedSetConstant.PREFIX + userId).add(moment.getTimestamp(), new MomentVO(moment));
+        Assert.isTrue(add, "发布失败");
         Moment save = momentDAO.save(moment);
         Assert.isTrue(save.getMomentId() != null, "发布失败");
         //发布更新事件
@@ -84,17 +88,17 @@ public class SocialServiceImpl implements SocialService {
     }
 
     @Override
-    public void likeMoment(String momentId, Integer momentUserId) {
+    public void likeMoment(LikeModel likeModel) {
         int userId = RequestUtil.getUserId(request);
         RpcResult<UserInfoDTO> singleInfo = userDubbo.getSingleInfo(userId);
         Assert.isTrue(singleInfo.isSuccess(), "获取用户信息失败");
         UserInfoDTO data = singleInfo.getData();
-        Like like = new Like().setTimestamp(System.currentTimeMillis()).setUserInfo(data)
-            .setTimestamp(System.currentTimeMillis());
-        Assert.isTrue(momentDAO.like(momentId, like), "点赞失败");
+        Like like = new Like().setTimestamp(System.currentTimeMillis()).setUserInfo(data);
+        Assert.isTrue(momentDAO.like(likeModel.getMomentId(), like), "点赞失败");
+
         MomentLikeEvent event = new MomentLikeEvent()
-            .setMomentId(momentId)
-            .setMomentUserId(momentUserId)
+            .setMomentId(likeModel.getMomentId())
+            .setMomentUserId(likeModel.getMomentUserId())
             .setLike(like);
         Message<Event> msg = MqUtil.createMsg(JsonUtil.objToJson(event), SocialUserMqConstant.TAGS_MOMENT_INTERNAL_LIKE_RECORD);
         //发布更新事件

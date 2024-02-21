@@ -18,5 +18,6 @@ public class MomentCommentEvent {
     private Comment comment;
     private String momentId;
     private Integer momentUserId;
+    private Long momentTime;
 
 }

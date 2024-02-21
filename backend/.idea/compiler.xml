@@ -14,7 +14,6 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="common-mq-social-user-model" />
-        <module name="fileSystem" />
         <module name="common-util" />
         <module name="auth" />
         <module name="social" />
@@ -24,6 +23,7 @@
         <module name="common-api" />
         <module name="common-mvc" />
         <module name="common-ws" />
+        <module name="file" />
         <module name="chat" />
         <module name="common-mq-base" />
         <module name="user" />

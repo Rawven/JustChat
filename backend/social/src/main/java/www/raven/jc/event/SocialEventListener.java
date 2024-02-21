@@ -1,7 +1,6 @@
 package www.raven.jc.event;
 
 import cn.hutool.core.lang.Assert;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -17,10 +16,10 @@ import org.springframework.stereotype.Component;
 import www.raven.jc.api.UserDubbo;
 import www.raven.jc.config.ScoredSortedSetProperty;
 import www.raven.jc.constant.SocialUserMqConstant;
+import www.raven.jc.dao.MomentDAO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.Comment;
 import www.raven.jc.entity.po.Like;
-import www.raven.jc.entity.po.Moment;
 import www.raven.jc.entity.po.Reply;
 import www.raven.jc.entity.vo.MomentVO;
 import www.raven.jc.event.model.MomentCommentEvent;
@@ -47,6 +46,8 @@ import static www.raven.jc.constant.ScoredSortedSetConstant.PREFIX;
 public class SocialEventListener {
     @Autowired
     private UserDubbo userDubbo;
+    @Autowired
+    private MomentDAO momentDAO;
     @Autowired
     private RedissonClient redissonClient;
     @Autowired
@@ -80,29 +81,39 @@ public class SocialEventListener {
         };
     }
     private void handleMomentEvent(MomentReleaseEvent event) {
-        Moment moment = event.getMoment();
-        handleEvent(new MomentVO(moment),true,"有人发布了朋友圈",SocialUserMqConstant.TAGS_MOMENT_NOTICE_MOMENT_FRIEND);
+        List<RScoredSortedSet<Object>> list = getHisFriendMomentCache(event.getMoment().getUserInfo().getUserId());
+        handleEvent(new MomentVO(event.getMoment()),true,"有人发布了朋友圈",SocialUserMqConstant.TAGS_MOMENT_NOTICE_MOMENT_FRIEND,list);
     }
 
     private void handleLikeEvent(MomentLikeEvent event) {
-        MomentVO momentVO = getWannaMoment(event.getMomentId(), event.getMomentUserId());
+        List<RScoredSortedSet<Object>> lists = getCacheNeedUpdate(event.getMomentUserId(), event.getMomentTime());
+        if(lists.isEmpty()){
+            return;
+        }
+        MomentVO momentVO = getWannaMoment(lists,event.getMomentTime());
             List<Like> likes = momentVO.getLikes();
             // 添加新的Like
             likes.add(event.getLike());
             // 添加更新后的MomentVO
-        handleEvent(momentVO,false,"有人点赞了你的朋友圈",SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT);
+        handleEvent(momentVO,false,"有人点赞了你的朋友圈",SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT,lists);
     }
 
     private void handleCommentEvent(MomentCommentEvent event) {
-        MomentVO momentVO = getWannaMoment(event.getMomentId(), event.getMomentUserId());
-        List<Comment> comments = momentVO.getComments();
-        // 添加新的Comment
-        comments.add(event.getComment());
-        handleEvent(momentVO,false,"有人评论了你的朋友圈",SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT);
+        List<RScoredSortedSet<Object>> lists = getCacheNeedUpdate(event.getMomentUserId(), event.getMomentTime());
+        if(lists.isEmpty()){
+            return;
+        }
+        MomentVO momentVO = getWannaMoment(lists,event.getMomentTime());
+        momentVO.getComments().add(event.getComment());
+        handleEvent(momentVO,false,"有人评论了你的朋友圈",SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT,lists);
     }
 
     private void handleReplyEvent(MomentReplyEvent event) {
-        MomentVO momentVO = getWannaMoment(event.getMomentId(), event.getMomentUserId());
+        List<RScoredSortedSet<Object>> lists = getCacheNeedUpdate(event.getMomentUserId(), event.getMomentTime());
+        if(lists.isEmpty()){
+            return;
+        }
+        MomentVO momentVO =  getWannaMoment(lists,event.getMomentTime());
         List<Comment> comments = momentVO.getComments();
         // 添加新的Reply
         comments.stream()
@@ -112,11 +123,11 @@ public class SocialEventListener {
                 List<Reply> replies = comment.getReplies();
                 replies.add(event.getReply());
             });
-        handleEvent(momentVO,false,"有人回复了你的评论",SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT);
+        handleEvent(momentVO,false,"有人回复了你的评论",SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT,lists);
     }
 
-    private void handleEvent(MomentVO momentVo,Boolean insert,String msg,String tag) {
-        insertOrUpdateMomentCache(momentVo.getUserInfo().getUserId(),momentVo,insert);
+    private void handleEvent(MomentVO momentVo,Boolean insert,String msg,String tag,List<RScoredSortedSet<Object>> caches) {
+        insertOrUpdateMomentCache(momentVo,insert,caches);
         streamBridge.send("producer-out-1", MqUtil.createMsg(
             JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(momentVo.getMomentId()).setUserId(momentVo.getUserInfo().getUserId()).setMsg(msg)),
             tag));
@@ -124,8 +135,7 @@ public class SocialEventListener {
 
 
 
-    public void insertOrUpdateMomentCache(Integer userId, MomentVO momentVo,Boolean insert) {
-        List<RScoredSortedSet<Object>> caches = getHisFriendMomentCache(userId);
+    public void insertOrUpdateMomentCache(MomentVO momentVo,Boolean insert,List<RScoredSortedSet<Object>> caches) {
         Long time = momentVo.getTimestamp();
         if(insert){
             caches.forEach(scoredSortedSet -> {
@@ -147,17 +157,12 @@ public class SocialEventListener {
      * get special moment
      * 获取特定的朋友圈
      *
-     * @param momentId     moment id
-     * @param momentUserId moment user id
+     * @param lists lists
+     * @param time  time
      * @return {@link MomentVO}
      */
-    private MomentVO getWannaMoment(String momentId,Integer momentUserId) {
-        RScoredSortedSet<Object> scoredSortedSet = redissonClient.getScoredSortedSet(PREFIX + momentUserId);
-        return scoredSortedSet.stream()
-            .filter(o -> o instanceof MomentVO && ((MomentVO) o).getMomentId().equals(momentId))
-            .map(o -> (MomentVO) o)
-            .findFirst()
-            .orElse(null);
+    private MomentVO getWannaMoment(List<RScoredSortedSet<Object>> lists,Long time) {
+        return (MomentVO) lists.get(0).valueRange(time,true,time,true).stream().findFirst().orElse(null);
     }
 
     /**
@@ -173,5 +178,11 @@ public class SocialEventListener {
         Assert.isTrue(friendAndMeInfos.isSuccess(), "获取好友信息失败");
         List<Integer> collect = friendAndMeInfos.getData().stream().map(UserInfoDTO::getUserId).collect(Collectors.toList());
         return collect.stream().map(integer -> redissonClient.getScoredSortedSet(PREFIX + integer)).collect(Collectors.toList());
+    }
+
+    private  List<RScoredSortedSet<Object>>  getCacheNeedUpdate(Integer userId,long time){
+        List<RScoredSortedSet<Object>> list = getHisFriendMomentCache(userId);
+        //检查所有有序集合若有分数等于time则将该集合加入一个list里
+        return list.stream().filter(scoredSortedSet -> scoredSortedSet.contains(time)).collect(Collectors.toList());
     }
 }

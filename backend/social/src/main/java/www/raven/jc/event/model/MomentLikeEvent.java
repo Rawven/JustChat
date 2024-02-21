@@ -18,5 +18,5 @@ public class MomentLikeEvent {
     private Like like;
     private String momentId;
     private Integer momentUserId;
-
+    private Long momentTime;
 }

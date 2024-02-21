@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import www.raven.jc.entity.model.CommentModel;
+import www.raven.jc.entity.model.LikeModel;
 import www.raven.jc.entity.model.MomentModel;
 import www.raven.jc.entity.vo.MomentVO;
 import www.raven.jc.result.CommonResult;
@@ -41,16 +42,15 @@ public class SocialController {
         return CommonResult.operateSuccess("发布成功");
     }
 
-    @GetMapping("/deleteMoment/{momentId}")
+    @PostMapping("/deleteMoment/{momentId}")
     public CommonResult<Void> deleteMoment(@PathVariable("momentId") String momentId) {
         socialService.deleteMoment(momentId);
         return CommonResult.operateSuccess("删除成功");
     }
 
-    @GetMapping("/likeMoment/{momentId}/{momentUserId}")
-    public CommonResult<Void> likeMoment(@PathVariable("momentId") String momentId,
-        @PathVariable("momentUserId") Integer momentUserId) {
-        socialService.likeMoment(momentId, momentUserId);
+    @PostMapping("/likeMoment")
+    public CommonResult<Void> likeMoment(@RequestBody LikeModel model) {
+        socialService.likeMoment(model);
         return CommonResult.operateSuccess("点赞成功");
     }
 
