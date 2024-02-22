@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import Main from '@/components/common/notification.vue';
+import Main from '@/components/common/main/notification.vue';
 
 export default {
   components: {

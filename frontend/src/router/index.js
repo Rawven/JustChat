@@ -10,7 +10,7 @@ const router = createRouter({
         {
             path: '/test',
             name: 'test',
-            component: () => import('@/components/common/moment.vue')
+            component: () => import('@/components/common/main/moment.vue')
         },
         {
             path: '/login',
@@ -30,7 +30,7 @@ const router = createRouter({
         {
             path: '/room',
             name: 'RoomPageView',
-            component: () => import('@/components/common/roomPage.vue')
+            component: () => import('@/components/common/main/roomPage.vue')
         },
         {
             path: '/updateInfo',
