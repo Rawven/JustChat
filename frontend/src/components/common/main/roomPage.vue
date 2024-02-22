@@ -1,11 +1,10 @@
 <template>
-  <el-container>
+  <el-container class="room-container">
     <el-aside>
       <JcAside></JcAside>
     </el-aside>
      <el-main>
-    <el-header
-        class=" space-y-1.5 flex flex-row items-center justify-between p-6 bg-[#000000] text-[#b3a7df] border-b-2 border-green-500">
+    <el-header>
       <h3 class="font-semibold tracking-tight text-2xl font-serif text-[#b3a7df]">聊天室大厅</h3>
       <div class="flex space-x-4">
         <el-row>
@@ -14,27 +13,12 @@
             <el-radio-button :label="1" border>根据房间名</el-radio-button>
           </el-radio-group>
         </el-row>
-        <input
+        <el-input
             v-model="searchText"
             aria-label="Search chat rooms"
-            class="flex h-10 rounded-md ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full p-3 border border-[#b3a7df] text-lg mb-4 bg-[#000000] text-[#b3a7df]"
             placeholder="Search for a chat room..."
-            type="search"
+            @keyup.enter="submitSearch"
         />
-        <button
-            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-background hover:bg-accent hover:text-accent-foreground border-green-500"
-            @click="submitSearch">
-          <el-icon>
-            <Promotion/>
-          </el-icon>
-        </button>
-        <button
-            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-background hover:bg-accent hover:text-accent-foreground border-green-500"
-            @click="turnHome">
-          <el-icon>
-            <HomeFilled/>
-          </el-icon>
-        </button>
       </div>
     </el-header>
     <el-main class="p-6 border-t flex flex-row-reverse space-x-4">
@@ -108,11 +92,10 @@
 <script>
 import {Host} from "@/main";
 import {ElMessage} from "element-plus";
-import {HomeFilled, Promotion} from "@element-plus/icons-vue";
 import JcAside from "@/components/common/aside.vue";
 
 export default {
-  components: {JcAside, HomeFilled, Promotion},
+  components: {JcAside},
   inject: {
     realAxios: {
       from: 'axiosFilter'
@@ -189,9 +172,6 @@ export default {
         ElMessage.success('申请成功')
       })
     },
-    turnHome() {
-      this.$router.push({path: '/mainPage'})
-    },
     submitSearch() {
       // 在这里发送请求到后端
       this.realAxios.get(`http://` + Host + `:7000/chat/room/queryRelatedRoomList/${this.searchText}/${this.radio}/${this.currentPage}`, {
@@ -208,5 +188,9 @@ export default {
 
 </script>
 <style scoped>
+.room-container {
+  height: 100vh;
+  overflow: hidden;
+}
 
 </style>

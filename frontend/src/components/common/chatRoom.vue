@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col flex-1 max-w-full mainDiv">
+  <el-container class="cr-container">
     <header class="flex items-center justify-between p-4 bg-white border-b border-gray-200 theH">
       <div class="flex items-center space-x-4">
         <a class="text-gray-500 hover:text-gray-900" href="#">
@@ -128,7 +128,7 @@
         </button>
       </div>
     </footer>
-  </div>
+  </el-container>
 </template>
 
 <script>
@@ -263,7 +263,7 @@ body {
 .main-content {
   height: 90%; /* 设置高度为视口的100% */
   overflow-y: auto; /* 当内容溢出时显示滚动条 */
-  padding-top: 30px;
+  padding-top: 50px;
 }
 
 @keyframes fadeIn {
@@ -277,13 +277,8 @@ body {
 
 .useFoot, .main-content, .theH {
   box-sizing: border-box;
-
-  width: 77%;
+ width: 70%;
   position: fixed;
-}
-
-.theH {
-  top: 0;
 }
 
 .useFoot {

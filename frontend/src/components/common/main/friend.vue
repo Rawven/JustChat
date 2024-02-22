@@ -2,23 +2,7 @@
   <el-container class="containerM">
     <JcAside></JcAside>
     <el-aside class="theAside w-64 border-r border-gray-200 overflow-y-auto ">
-      <el-header class="p-4 border-b border-gray-200">
-        <el-row>
           <img :src="ipfsHost()+userInfo.profile" alt="User Avatar" class="avatar">
-          <h2 class="logo"> Just Chat </h2>
-        </el-row>
-      </el-header>
-      <el-main class="p-4 border-b border-gray-200">
-        <div class="flex items-center space-x-4">
-      <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
-        <span class="flex h-full w-full items-center justify-center rounded-full bg-muted">CN</span>
-      </span>
-          <div>
-            <h3 class="text-lg font-semibold">{{ userInfo.username }}</h3>
-            <p class="text-sm text-gray-400">{{ userInfo.signature }}</p>
-          </div>
-        </div>
-      </el-main>
       <el-header class="p-4 border-b border-gray-200">
         <h2 class="text-lg font-semibold">我的好友</h2>
       </el-header>
@@ -221,14 +205,12 @@ body {
   overflow: hidden;
   font-family: 'Roboto', sans-serif;
   font-weight: bold;
-  background-color: #f0f0f0; /* 添加背景色 */
 }
 
 .list-room {
   overflow: hidden;
   padding: 10px;
   margin-bottom: 10px;
-  background-color: #f0f0f0; /* 添加背景色 */
 }
 
 
@@ -243,18 +225,6 @@ body {
   height: 75px;
   border-radius: 50%;
 }
-
-
-
-.logo {
-  font-size: 28px;
-  color: #409EFF;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 30px;
-  animation: fadeIn 2s;
-}
-
 @keyframes fadeIn {
   from {
     opacity: 0;

@@ -270,7 +270,7 @@ export default {
 .useFoot, .main-content, .theH {
   box-sizing: border-box;
 
-  width: 77%;
+  width: 70%;
   position: fixed;
 }
 

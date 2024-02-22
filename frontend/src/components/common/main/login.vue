@@ -8,7 +8,7 @@
                 style="width: 200px; height: 200px"
             ></el-image>
             <br>
-            <el-text class="text-center" style="font-size: 20px; font-weight: bold">黑夜为谁而嚎？</el-text>
+            <el-text class="text-center" style="font-size: 20px; font-weight: bold">黑夜为何嚎哭？</el-text>
             <el-form ref="loginForm" :model="user" :rules="rules" class="login-form" label-width="80px">
               <el-form-item label="用户名" prop="username">
                 <el-input v-model="user.username" prefix-icon="el-icon-user"></el-input>

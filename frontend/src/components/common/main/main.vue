@@ -2,23 +2,10 @@
   <el-container class="containerM">
     <JcAside></JcAside>
     <el-aside class="theAside w-64 border-r border-gray-200 overflow-y-auto">
-      <el-header class="p-4 border-b border-gray-200">
         <el-row>
-          <img :src="ipfsHost()+userInfo.profile" alt="User Avatar" class="avatar">
-          <h2 class="logo"> Just Chat </h2>
-        </el-row>
-      </el-header>
-      <el-main class="p-4 border-b border-gray-200">
-        <div class="flex items-center space-x-4">
-      <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
-        <span class="flex h-full w-full items-center justify-center rounded-full bg-muted">CN</span>
-      </span>
-          <div>
-            <h3 class="text-lg font-semibold">{{ userInfo.username }}</h3>
-            <p class="text-sm text-gray-400">{{ userInfo.signature }}</p>
-          </div>
-        </div>
-      </el-main>
+        <img :src="ipfsHost()+userInfo.profile" alt="User Avatar" class="avatar">
+      </el-row>
+      <br>
       <el-header class="p-4 border-b border-gray-200">
         <h2 class="text-lg font-semibold">我的群聊</h2>
       </el-header>
@@ -67,7 +54,6 @@ import {reactive, ref} from "vue";
 import ChatRoom from "@/components/common/chatRoom.vue";
 import {ChatLineRound, ChatRound} from "@element-plus/icons-vue";
 import {ElMessage} from "element-plus";
-import Aside from "@/components/common/aside.vue";
 import JcAside from "@/components/common/aside.vue";
 
 export default {
@@ -241,14 +227,12 @@ body {
   overflow: hidden;
   font-family: 'Roboto', sans-serif;
   font-weight: bold;
-  background-color: #f0f0f0; /* 添加背景色 */
 }
 
 .list-room {
   overflow: hidden;
   padding: 10px;
   margin-bottom: 10px;
-  background-color: #f0f0f0; /* 添加背景色 */
 }
 
 .containerM {
@@ -269,16 +253,6 @@ body {
   margin: 0;
   padding: 0;
   top: 0;
-  background-color: #f0f0f0; /* 添加背景色 */
-}
-
-.logo {
-  font-size: 28px;
-  color: #409EFF;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 30px;
-  animation: fadeIn 2s;
 }
 
 @keyframes fadeIn {
