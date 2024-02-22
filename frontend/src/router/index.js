@@ -23,12 +23,12 @@ const router = createRouter({
             component: registerView
         },
         {
-            path: '/mainPage',
+            path: '/main',
             name: "MainPageView",
             component: MainPageView
         },
         {
-            path: '/roomPage',
+            path: '/room',
             name: 'RoomPageView',
             component: () => import('@/components/common/roomPage.vue')
         },

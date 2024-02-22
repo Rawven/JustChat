@@ -76,7 +76,7 @@ export default {
                 }).then(response1 => {
                   localStorage.setItem("userData", JSON.stringify(response1.data.data));
                 })
-                this.$router.push('/mainPage');
+                this.$router.push('/main');
               })
         } else {
           this.$message.error('Please fill in all required fields.');
@@ -109,7 +109,7 @@ export default {
   right: 0; /* 设置距离右侧为 0 */
   bottom: 0; /* 设置距离底部为 0 */
   background-color: #f5f5f5; /* 设置背景颜色为灰色 */
-  width: 700cm; /* 设置宽度为100% */
+  width: 100%; /* 设置宽度为100% */
   height: 100%; /* 设置高度为100% */
 }
 

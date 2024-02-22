@@ -1,8 +1,9 @@
 <template>
-  <el-container
-      class="roomContainer bg-[#000000]"
-      data-v0-t="card"
-  >
+  <el-container>
+    <el-aside>
+      <JcAside></JcAside>
+    </el-aside>
+     <el-main>
     <el-header
         class=" space-y-1.5 flex flex-row items-center justify-between p-6 bg-[#000000] text-[#b3a7df] border-b-2 border-green-500">
       <h3 class="font-semibold tracking-tight text-2xl font-serif text-[#b3a7df]">聊天室大厅</h3>
@@ -101,15 +102,17 @@
         </el-card>
       </div>
     </el-main>
+     </el-main>
   </el-container>
 </template>
 <script>
 import {Host} from "@/main";
 import {ElMessage} from "element-plus";
 import {HomeFilled, Promotion} from "@element-plus/icons-vue";
+import JcAside from "@/components/common/aside.vue";
 
 export default {
-  components: {HomeFilled, Promotion},
+  components: {JcAside, HomeFilled, Promotion},
   inject: {
     realAxios: {
       from: 'axiosFilter'
@@ -205,15 +208,5 @@ export default {
 
 </script>
 <style scoped>
-.avatar {
-  width: 75px;
-  height: 75px;
-  border-radius: 50%;
-}
 
-.roomContainer {
-  width: 300%;
-  top: 0;
-  margin: 0;
-}
 </style>

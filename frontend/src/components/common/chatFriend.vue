@@ -244,7 +244,6 @@ export default {
   width: 100%;
   display: flex;
   flex-direction: column;
-  margin: 20px; /* 添加这一行 */
 }
 
 

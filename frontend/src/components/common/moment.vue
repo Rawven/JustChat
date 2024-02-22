@@ -1,7 +1,8 @@
 <template>
-  <el-container class="CC">
-    <div class="CC bg-gray-100">
-      <el-header class="flex items-center p-4 border-b border-gray-200 bg-white shadow-sm">
+  <el-container style="height: 100vh;"> <!-- 设置合适的高度 -->
+    <JcAside></JcAside>
+    <el-main style="overflow-y: auto;"> <!-- 添加样式以启用滚动 -->
+      <el-header >
         <svg class="text-gray-600"
              fill="none"
              height="24"
@@ -177,8 +178,7 @@
         </div>
       </div>
       </el-main>
-    </div>
-    <!---->
+    </el-main>
   </el-container>
 </template>
 
@@ -186,6 +186,7 @@
 import {ref} from "vue";
 import {Host, ipfsHost} from "@/main";
 import {InfoFilled, Star} from "@element-plus/icons-vue";
+import JcAside from "@/components/common/aside.vue";
 
 export default {
   name: 'Moment-Fuck',
@@ -194,7 +195,7 @@ export default {
       return InfoFilled
     }
   },
-  components: {Star},
+  components: {JcAside, Star},
   // 在你的Vue组件中使用的数据结构
   inject: {
     realAxios: {
@@ -365,13 +366,6 @@ export default {
     },2000)},
 
     submitNestedComment(momentId, text, momentUserId, commentId,momentTimeStamp) {
-      this.realAxios.get(`http://` + Host + `:7000/social/test`,{
-        headers: {
-          'token': localStorage.getItem("token")
-        }
-      }).then(response => {
-
-      })
       this.realAxios.post(`http://` + Host + `:7000/social/commentMoment`, {
             momentId: momentId,
             text: text,
@@ -388,7 +382,7 @@ export default {
             this.$message.success('回复成功');
             this.input = "";
           })
-      //等待0.6秒 来抹平更新缓存延迟（如果在校园网环境也许会更短 无需等待？）
+      //等待0.01秒 来抹平更新缓存延迟（如果在校园网环境也许会更短 无需等待？）
       setTimeout(() => {
         this.realAxios.get(`http://${Host}:7000/social/queryMoment`, {
           headers: {
@@ -397,7 +391,7 @@ export default {
         }).then(response => {
           this.feedData = response.data.data;
         })
-      }, 600);
+      }, 100);
     },
     release() {
       this.realAxios.post(`http://` + Host + `:7000/social/releaseMoment`, this.data, {
@@ -427,21 +421,8 @@ export default {
 </script>
 
 <style scoped>
-.CC {
-  height: 100%;
-  width: 56cm;
-  margin: 0;
-  padding: 0;
-}
-
 .img-size {
   width: 200px;
   height: 200px;
-}
-
-.ccc {
-  height: 50%; /* 设置高度为视口的100% */
-  overflow-y: auto; /* 当内容溢出时显示滚动条 */
-  padding-top: 30px;
 }
 </style>
