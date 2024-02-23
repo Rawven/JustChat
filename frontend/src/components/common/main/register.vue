@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <el-container class="register-container">
     <el-card class="box-card">
       <el-header>
         <el-text class="title">来注册一个账号吧👆👨</el-text>
@@ -19,7 +19,7 @@
             :http-request="uploadFile"
             action=""
             class="upload-demo">
-          <el-button size="small" type="primary">点击上传</el-button>
+          <el-button size="small" type="primary" plain>点击上传</el-button>
           <template #tip>
             <div class="el-upload__tip">
               jpg/png files with a size less than 500KB.
@@ -27,7 +27,7 @@
           </template>
         </el-upload>
         <el-form-item>
-          <el-button type="primary" @click="register">Register</el-button>
+          <el-button type="primary" @click="register" plain>Register</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -87,7 +87,15 @@ export default {
               .then(response => {
                 localStorage.setItem("token", response.data.data);
                 // 注册成功后可以进行相关的处理，例如跳转到登录页面
-                this.$router.push('/mainPage');
+                this.$message.success('注册成功');
+                this.realAxios.post('http://' + Host + ':7000/user/common/defaultInfo', {}, {
+                  headers: {
+                    'token': localStorage.getItem("token")
+                  }
+                }).then(response1 => {
+                  localStorage.setItem("userData", JSON.stringify(response1.data.data));
+                })
+                this.$router.push('/main');
               })
         } else {
           this.$message.error('Please fill in all required fields.');
@@ -99,6 +107,17 @@ export default {
 </script>
 
 <style scoped>
+
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  background-image: url('/pexels-eberhard-grossgasteiger-691668.jpg'); /* 替换成你的背景图链接 */
+  background-size: cover; /* 背景图铺满整个容器 */
+  background-position: center; /* 背景图居中 */
+}
 
 .title {
   font-size: 24px;
