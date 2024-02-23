@@ -1,5 +1,8 @@
 package www.raven.jc.entity.model;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -12,7 +15,12 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class LikeModel {
+    @NotBlank(message = "momentId不能为空")
     private String momentId;
+    @NotNull(message = "momentUserId不能为空")
+    @Min(value = 1, message = "momentUserId最小为1")
     private Integer momentUserId;
+    @NotNull(message = "momentTimeStamp不能为空")
+    @Min(value = 1, message = "momentTimeStamp最小为1")
     private Long momentTimeStamp;
 }

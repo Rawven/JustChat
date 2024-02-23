@@ -1,5 +1,7 @@
 package www.raven.jc.entity.model;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -12,7 +14,13 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class FriendMsgModel {
+    @NotNull (message = "friendId不能为空")
+    @Min(value = 1, message = "friendId最小为1")
     private Integer friendId;
+    @NotNull (message = "page不能为空")
+    @Min(value = 1, message = "page最小为1")
     private Integer page;
+    @NotNull (message = "size不能为空")
+    @Min(value = 1, message = "size最小为1")
     private Integer size;
 }

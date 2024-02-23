@@ -52,59 +52,6 @@ const router = createRouter({
             name: 'MomentView',
             component: () => import('@/views/common/MomentView.vue')
         },
-        {
-            path: '/admin',
-            children: [
-                {
-                    path: 'login',
-                    name: 'AdminLoginView',
-                    component: () => import('@/views/admin/LoginView.vue')
-                },
-                {
-                    path: 'mainPage',
-                    name: 'AdminMainPageView',
-                    component: () => import('@/views/admin/MainView.vue')
-                },
-                {
-
-                    path: 'roomPage',
-                    name: 'AdminRoomPageView',
-                    component: () => import('@/views/admin/RoomView.vue')
-                },
-                {
-                    path: 'register',
-                    name: 'AdminRegisterView',
-                    component: () => import('@/views/admin/RegisterView.vue')
-                }
-                // {
-                //     path: 'mainPage',
-                //     name: 'AdminMainPageView',
-                //     component: () => import('@/views/admin/AdminMainPageView.vue')
-                // },
-                // {
-                //     path: 'roomManage',
-                //     name: 'AdminRoomManageView',
-                //     component: () => import('@/views/admin/AdminRoomManageView.vue')
-                // },
-                // {
-                //     path: 'userManage',
-                //     name: 'AdminUserManageView',
-                //     component: () => import('@/views/admin/AdminUserManageView.vue')
-                // },
-                // {
-                //     path: 'roomManage/:roomId',
-                //     name: 'AdminRoomInfoView',
-                //     component: () => import('@/views/admin/AdminRoomInfoView.vue'),
-                //     props: true
-                // },
-                // {
-                //     path: 'userManage/:userId',
-                //     name: 'AdminUserInfoView',
-                //     component: () => import('@/views/admin/AdminUserInfoView.vue'),
-                //     props: true
-                // }
-            ]
-        }
     ]
 })
 

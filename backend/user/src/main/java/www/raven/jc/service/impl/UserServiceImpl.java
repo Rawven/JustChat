@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
             setUsername(user.getUsername()).
             setPassword(user.getPassword())
             .setEmail(user.getEmail()).setProfile(user.getProfile());
-        Assert.isTrue(userDAO.getBaseMapper().insert(realUser) > 0);
+        Assert.isTrue(userDAO.getBaseMapper().insert(realUser) > 0, "插入用户失败");
         List<Role> roles = rolesDAO.getBaseMapper().selectBatchIds(user.getRoleIds());
         List<UserRole> userRoles = new ArrayList<>();
         for (Role role : roles) {

@@ -2,6 +2,7 @@ package www.raven.jc.controller;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,12 +35,12 @@ public class MessageController {
     private FriendService friendService;
 
     @PostMapping("/restoreRoomHistory")
-    public CommonResult<List<MessageVO>> getGroupMsgHistory(@RequestBody GroupMsgModel model) {
+    public CommonResult<List<MessageVO>> getGroupMsgHistory(@RequestBody @Validated GroupMsgModel model) {
         return CommonResult.operateSuccess("获取历史记录成功", chatService.getGroupMsgPages(model));
     }
 
     @PostMapping("/restoreFriendHistory")
-    public CommonResult<List<MessageVO>> getFriendMsgHistory(@RequestBody FriendMsgModel model) {
+    public CommonResult<List<MessageVO>> getFriendMsgHistory(@RequestBody @Validated FriendMsgModel model) {
         return CommonResult.operateSuccess("获取历史记录成功", friendService.getFriendMsgPages(model));
     }
 }
