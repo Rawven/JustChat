@@ -18,6 +18,7 @@ import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.api.UserDubbo;
+import www.raven.jc.constant.ApplyStatusConstant;
 import www.raven.jc.constant.ChatUserMqConstant;
 import www.raven.jc.dao.MessageDAO;
 import www.raven.jc.dao.RoomDAO;
@@ -33,6 +34,7 @@ import www.raven.jc.entity.vo.RealRoomVO;
 import www.raven.jc.entity.vo.UserRoomVO;
 import www.raven.jc.event.model.RoomApplyEvent;
 import www.raven.jc.result.RpcResult;
+import www.raven.jc.service.ChatAsyncService;
 import www.raven.jc.service.RoomService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
@@ -61,6 +63,8 @@ public class RoomServiceImpl implements RoomService {
     private StreamBridge streamBridge;
     @Autowired
     private RedissonClient redissonClient;
+    @Autowired
+    private ChatAsyncService chatAsyncService;
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
@@ -69,8 +73,10 @@ public class RoomServiceImpl implements RoomService {
             .setRoomDescription(roomModel.getDescription())
             .setMaxPeople(roomModel.getMaxPeople()).
             setFounderId(Integer.parseInt(request.getHeader("userId")));
-        Assert.isTrue(roomDAO.getBaseMapper().insert(room) > 0);
-        Assert.isTrue(userRoomDAO.getBaseMapper().insert(new UserRoom().setRoomId(room.getRoomId()).setUserId(room.getFounderId())) > 0);
+        Assert.isTrue(roomDAO.getBaseMapper().insert(room) > 0, "创建失败");
+        Assert.isTrue(userRoomDAO.getBaseMapper().
+                insert(new UserRoom().setRoomId(room.getRoomId()).setUserId(room.getFounderId()).setStatus(ApplyStatusConstant.APPLY_STATUS_AGREE)) > 0,
+            "创建失败");
     }
 
     @Override
@@ -138,21 +144,20 @@ public class RoomServiceImpl implements RoomService {
     public void applyToJoinRoom(Integer roomId) {
         int userId = RequestUtil.getUserId(request);
         Assert.isNull(userRoomDAO.getBaseMapper().selectOne(new QueryWrapper<UserRoom>().eq("user_id", userId).eq("room_id", roomId)),
-            "您已经在这个聊天室了");
-        Room room = roomDAO.getBaseMapper().selectById(roomId);
-        Integer founderId = room.getFounderId();
-        //通知user模块 插入一条申请记录
-        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new RoomApplyEvent(userId, founderId, roomId)), ChatUserMqConstant.TAGS_CHAT_ROOM_APPLY));
-    }
+            "您已经申请过这个聊天室了");
+        UserRoom userRoom = new UserRoom().setUserId(userId).setRoomId(roomId)
+            .setStatus(ApplyStatusConstant.APPLY_STATUS_APPLY);
+        int insert = userRoomDAO.getBaseMapper().insert(userRoom);
+        Assert.isTrue(insert > 0, "插入失败");
+        chatAsyncService.sendNotice(roomId, userId);
+        }
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void agreeApply(Integer roomId, Integer userId, int noticeId) {
-        int ownerId = RequestUtil.getUserId(request);
-        Assert.isTrue(roomDAO.getBaseMapper().selectById(roomId).getFounderId().equals(ownerId), "您不是房主");
-        Assert.isTrue(userRoomDAO.getBaseMapper().selectOne(new QueryWrapper<UserRoom>().eq("user_id", userId).eq("room_id", roomId)) == null,
-            "该用户已经在这个聊天室了");
-        Assert.isTrue(userRoomDAO.getBaseMapper().insert(new UserRoom().setRoomId(roomId).setUserId(userId)) > 0);
+        int update = userRoomDAO.getBaseMapper().update(new UserRoom().setStatus(ApplyStatusConstant.APPLY_STATUS_AGREE),
+            new QueryWrapper<UserRoom>().eq("user_id", userId).eq("room_id", roomId));
+        Assert.isTrue(update > 0, "更新失败");
         RpcResult<Void> voidRpcResult = userDubbo.deleteNotice(noticeId);
         Assert.isTrue(voidRpcResult.isSuccess(), "user模块调用失败");
     }
