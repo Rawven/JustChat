@@ -2,6 +2,8 @@ package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -12,9 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.api.UserDubbo;
+import www.raven.jc.constant.ApplyStatusConstant;
 import www.raven.jc.constant.ChatUserMqConstant;
 import www.raven.jc.constant.MessageConstant;
 import www.raven.jc.dao.FriendChatDAO;
@@ -23,6 +27,7 @@ import www.raven.jc.dao.RoomDAO;
 import www.raven.jc.dao.UserRoomDAO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
+import www.raven.jc.entity.model.GroupMsgModel;
 import www.raven.jc.entity.po.FriendChat;
 import www.raven.jc.entity.po.Message;
 import www.raven.jc.entity.po.Room;
@@ -31,6 +36,7 @@ import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.event.model.FriendMsgEvent;
 import www.raven.jc.event.model.RoomMsgEvent;
 import www.raven.jc.result.RpcResult;
+import www.raven.jc.service.ChatAsyncService;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MongoUtil;
@@ -59,9 +65,9 @@ public class ChatServiceImpl implements ChatService {
     @Autowired
     private StreamBridge streamBridge;
 
+
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
-    @CacheEvict(value = "roomHistory", key = "#roomId")
     public void saveRoomMsg(Integer userId, MessageDTO message, Integer roomId) {
         long timeStamp = message.getTime();
         String text = message.getText();
@@ -70,11 +76,10 @@ public class ChatServiceImpl implements ChatService {
             .setSenderId(userId)
             .setType(MessageConstant.ROOM)
             .setReceiverId(String.valueOf(roomId));
-        //保存消息
-        Assert.isTrue(messageDAO.save(realMsg), "插入失败");
+        messageDAO.getBaseMapper().save(realMsg);
         //更新聊天室的最后一条消息
         Assert.isTrue(roomDAO.getBaseMapper().updateById(new Room().setRoomId(roomId).setLastMsgId(realMsg.getMessageId().toString())) > 0, "更新失败");
-        List<UserRoom> ids = userRoomDAO.getBaseMapper().selectList(new QueryWrapper<UserRoom>().eq("room_id", roomId));
+        List<UserRoom> ids = userRoomDAO.getBaseMapper().selectList(new QueryWrapper<UserRoom>().eq("room_id", roomId).eq("status", ApplyStatusConstant.APPLY_STATUS_AGREE));
         List<Integer> userIds = ids.stream().map(UserRoom::getUserId).collect(Collectors.toList());
         RoomMsgEvent roomMsgEvent = new RoomMsgEvent(userId, roomId, userIds, JsonUtil.objToJson(realMsg));
         //通知user模块有新消息
@@ -83,7 +88,6 @@ public class ChatServiceImpl implements ChatService {
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
-    @CacheEvict(value = "friendHistory", key = "#friendId")
     public void saveFriendMsg(MessageDTO message, Integer userId, Integer friendId) {
         String fixId = MongoUtil.concatenateIds(userId, friendId);
         Message realMsg = new Message().setContent(message.getText())
@@ -92,7 +96,7 @@ public class ChatServiceImpl implements ChatService {
             .setType(MessageConstant.FRIEND)
             .setReceiverId(fixId);
         //保存消息
-        Assert.isTrue(messageDAO.save(realMsg), "插入失败");
+       messageDAO.getBaseMapper().save(realMsg);
         //保存最后一条消息
         FriendChat friendChat = new FriendChat().setFixId(fixId)
             .setLastMsgId(realMsg.getMessageId().toString());
@@ -103,9 +107,11 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    @Cacheable(value = "roomHistory", key = "#roomId")
-    public List<MessageVO> restoreRoomHistory(Integer roomId) {
-        List<Message> messages = messageDAO.getByRoomId(roomId);
+    public List<MessageVO> getGroupMsgPages(GroupMsgModel model) {
+        PageRequest pageRequest = PageRequest.of(model.getPage(), model.getSize());
+        List<Message> messages = new ArrayList<>(messageDAO.getMsgWithPagination(String.valueOf(model.getRoomId()),"room", pageRequest).getContent());
+        //给messages排序 从小到大
+        messages.sort(Comparator.comparingLong(o -> o.getTimestamp().getTime()));
         List<Integer> userIds = messages.stream().map(Message::getSenderId).collect(Collectors.toList());
         RpcResult<List<UserInfoDTO>> allInfo = userDubbo.getBatchInfo(userIds);
         Assert.isTrue(allInfo.isSuccess(), "user模块调用失败");

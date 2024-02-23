@@ -35,6 +35,8 @@
     <file url="file://$PROJECT_DIR$/common/common-mvc/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/common/common-redis/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/common/common-redis/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/common/common-threadpool/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/common/common-threadpool/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/common/common-util/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/common/common-util/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/common/common-ws/src/main/java" charset="UTF-8" />

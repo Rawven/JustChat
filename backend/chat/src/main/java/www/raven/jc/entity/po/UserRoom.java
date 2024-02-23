@@ -20,4 +20,5 @@ public class UserRoom {
     private Integer id;
     private Integer userId;
     private Integer roomId;
+    private int status;
 }

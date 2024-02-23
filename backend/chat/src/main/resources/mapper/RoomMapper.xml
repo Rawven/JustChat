@@ -8,7 +8,7 @@
         SELECT r.*
         FROM user_room ur
                  JOIN room r ON ur.room_id = r.room_id
-        WHERE ur.user_id = #{userId}
+        WHERE ur.user_id = #{userId} and ur.status =3
     </select>
 
 </mapper>

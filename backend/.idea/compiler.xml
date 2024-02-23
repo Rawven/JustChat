@@ -17,6 +17,7 @@
         <module name="common-util" />
         <module name="auth" />
         <module name="social" />
+        <module name="common-threadpool" />
         <module name="common-aop" />
         <module name="common-mp" />
         <module name="common-redis" />

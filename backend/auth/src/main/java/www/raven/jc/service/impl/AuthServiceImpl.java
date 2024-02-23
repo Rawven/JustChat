@@ -47,14 +47,14 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public String login(LoginModel loginModel) {
         RpcResult<UserAuthDTO> result = userDubbo.getUserToAuth(loginModel.getUsername());
-        Assert.isTrue(result.isSuccess());
+        Assert.isTrue(result.isSuccess(),"用户不存在");
         UserAuthDTO user = result.getData();
         if (redissonClient.getBucket(JwtConstant.TOKEN + user.getUserId()).isExists()) {
             return redissonClient.getBucket(JwtConstant.TOKEN + user.getUserId()).get().toString();
         }
         Assert.isTrue(passwordEncoder.matches(loginModel.getPassword(), user.getPassword()), "密码错误");
         RpcResult<List<RoleDTO>> rolesById = userDubbo.getRolesById(user.getUserId());
-        Assert.isTrue(rolesById.isSuccess());
+        Assert.isTrue(rolesById.isSuccess(), "获取角色失败");
         return produceToken(user.getUserId(), rolesById.getData().stream().map(RoleDTO::getValue).collect(Collectors.toList()));
     }
 
