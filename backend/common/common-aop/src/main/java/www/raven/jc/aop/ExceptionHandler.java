@@ -18,27 +18,26 @@ public class ExceptionHandler {
     @org.springframework.web.bind.annotation.ExceptionHandler(NullPointerException.class)
     public CommonResult<Void> handlerNullPointerException(NullPointerException ex) {
         log.error("空指针异常", ex);
-        return CommonResult.operateFailure("后端逻辑有误 请通知管理员");
+        return CommonResult.operateFailure(ex.getMessage());
     }
 
     @ResponseBody
     @org.springframework.web.bind.annotation.ExceptionHandler(IllegalArgumentException.class)
     public CommonResult<Void> handlerIllegalArgumentException(IllegalArgumentException ex) {
-        log.error("用户信息或数据库异常", ex);
-        return CommonResult.operateFailure("用户信息或数据库异常 请通知管理员");
+        return CommonResult.operateFailure(ex.getLocalizedMessage());
     }
 
     @ResponseBody
     @org.springframework.web.bind.annotation.ExceptionHandler(RuntimeException.class)
     public CommonResult<Void> handlerRuntimeException(RuntimeException ex) {
         log.error("运行时异常", ex);
-        return CommonResult.operateFailure("运行异常 请通知管理员");
+        return CommonResult.operateFailure(ex.getMessage());
     }
 
     @ResponseBody
     @org.springframework.web.bind.annotation.ExceptionHandler(Exception.class)
     public CommonResult<Void> handlerException(Exception ex) {
         log.error("未知异常", ex);
-        return CommonResult.operateFailure("系统繁忙 请稍后再试");
+        return CommonResult.operateFailure(ex.getLocalizedMessage());
     }
 }
