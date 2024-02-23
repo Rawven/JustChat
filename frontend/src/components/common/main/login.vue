@@ -1,10 +1,10 @@
 <template>
-  <el-container class="login-container">
+  <el-container class="JcContainer">
           <el-card class="login-card">
             <el-image
                 class="image"
                 fit="contain"
-                src="https://avatars.githubusercontent.com/u/121878866?s=400&u=44ed833ce20456153341fb5fa7620190c9aaabdd&v=4"
+                src="public/pexels-laura-meinhardt-3678799.jpg"
                 style="width: 200px; height: 200px"
             ></el-image>
             <br>
@@ -20,7 +20,8 @@
                 <el-button type="success"  @click="login" plain>Login</el-button>
               </el-form-item>
             </el-form>
-            <el-button class="button" type="text" @click="toRegister" plain>还没有账号？</el-button>
+
+            <el-button class="button" type="primary" @click="toRegister" plain>还没有账号？</el-button>
           </el-card>
   </el-container>
 </template>
@@ -95,16 +96,6 @@ export default {
 }
 
 
-.login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  width: 100%;
-  background-image: url('/pexels-eberhard-grossgasteiger-691668.jpg'); /* 替换成你的背景图链接 */
-  background-size: cover; /* 背景图铺满整个容器 */
-  background-position: center; /* 背景图居中 */
-}
 
 .login-card {
   width: 400px;

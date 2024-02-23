@@ -1,12 +1,12 @@
 <template>
-  <el-container class="containerM">
+  <el-container class="JcContainer">
     <JcAside></JcAside>
     <el-aside class="theAside w-64 border-r border-gray-200 overflow-y-auto ">
           <img :src="ipfsHost()+userInfo.profile" alt="User Avatar" class="avatar">
       <el-header class="p-4 border-b border-gray-200">
         <h2 class="text-lg font-semibold">我的好友</h2>
       </el-header>
-      <el-menu class="p-4 space-y-2">
+      <el-menu class="p-4 space-y-2 menu">
         <div
             v-for="(friend) in friends"
             :key="friend.isNew"
@@ -207,18 +207,16 @@ body {
   font-weight: bold;
 }
 
+.menu{
+  background-color: transparent;
+}
+
 .list-room {
   overflow: hidden;
   padding: 10px;
   margin-bottom: 10px;
 }
 
-
-.containerM {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-}
 
 .avatar {
   width: 75px;

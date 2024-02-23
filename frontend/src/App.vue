@@ -22,6 +22,20 @@ export default {
     };
   },
   methods: {
+    uploadFile(param) {
+      const formData = new FormData()
+      formData.append('file', param.file)
+      const url = 'http://' + Host + ':7000/file/upload'
+      this.realAxios.post(url, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'token': localStorage.getItem("token")
+        }
+      }).then(response => {
+        this.user.profile = response.data.data;
+        this.$message.success('文件上传成功');
+      })
+    },
     // 关闭窗口之前执行
     beforeunloadHandler() {
       this.beforeUnload_time = new Date().getTime();

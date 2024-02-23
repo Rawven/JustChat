@@ -1,5 +1,5 @@
 <template>
-  <el-container class="Cont">
+  <el-container class="JcContainer">
     <el-aside>
     <JcAside></JcAside>
     </el-aside>
@@ -329,11 +329,6 @@ export default {
 };
 </script>
 <style>
-.Cont {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-}
 
 .elN {
   height: 100%;

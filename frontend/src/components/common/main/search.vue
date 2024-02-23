@@ -1,5 +1,5 @@
 <template>
-  <el-container class="room-container">
+  <el-container class="JcContainer">
     <el-aside>
       <JcAside></JcAside>
     </el-aside>
@@ -9,8 +9,8 @@
       <div class="flex space-x-4">
         <el-row>
           <el-radio-group v-model="radio" class="radio" text>
-            <el-radio-button :label="0" border>根据用户名</el-radio-button>
-            <el-radio-button :label="1" border>根据房间名</el-radio-button>
+            <el-radio-button :label="0" border>根据用户名搜索</el-radio-button>
+            <el-radio-button :label="1" border>根据房间名搜索</el-radio-button>
           </el-radio-group>
         </el-row>
         <el-input
@@ -21,8 +21,38 @@
         />
       </div>
     </el-header>
-    <el-main class="p-6 border-t flex flex-row-reverse space-x-4">
-      <div class="w-2/3 p-6 space-y-8">
+    <el-main class="aa-main">
+      <el-aside>
+          <el-card class="mt-6 border rounded-md shadow-sm bg-[#000000] text-[#b3a7df] p-6">
+            <input
+                v-model="createRoom.name"
+                aria-label="Chat room name"
+                class="flex h-10 rounded-md ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full p-3 border border-[#b3a7df] text-lg mb-4 bg-[#000000] text-[#b3a7df]"
+                placeholder="Enter room name..."
+                type="text"
+            />
+            <input
+                v-model="createRoom.description"
+                aria-label="Chat room description"
+                class="flex h-10 rounded-md ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full p-3 border border-[#b3a7df] text-lg mb-4 bg-[#000000] text-[#b3a7df]"
+                placeholder="Enter room description..."
+                type="text"
+            />
+            <input
+                v-model="createRoom.maxPeople"
+                aria-label="Chat room maxPeople"
+                class="flex h-10 rounded-md ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full p-3 border border-[#b3a7df] text-lg mb-4 bg-[#000000] text-[#b3a7df]"
+                placeholder="Enter room maxPeople..."
+                type="text"
+            />
+            <button
+                class="inline-flex items-center justify-center rounded-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 w-full mt-6 bg-[#4c51bf] text-[#b3a7df] text-lg font-serif"
+                @click="submitForm">
+              创建群聊
+            </button>
+          </el-card>
+      </el-aside>
+      <el-main>
         <div v-for="(room,index) in rooms"
              :key="index"
              class="flex flex-row items-start space-x-6 p-6 bg-[#1a202c] rounded-lg shadow-md border-2 border-green-500"
@@ -48,43 +78,7 @@
                        layout="prev, pager, next"
                        @current-change="handlePageChange"
         />
-      </div>
-      <div class="w-1/3 p-6 bg-[#1a202c] rounded-lg shadow-md border-2 border-green-500">
-        <button
-            id="95mdbpe1sme"
-            class="inline-flex items-center justify-center rounded-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-full bg-purple-200 text-[#4c51bf] text-lg mb-6 font-serif"
-        >
-          Create Chat Room
-        </button>
-        <el-card class="mt-6 border rounded-md shadow-sm bg-[#000000] text-[#b3a7df] p-6">
-          <input
-              v-model="createRoom.name"
-              aria-label="Chat room name"
-              class="flex h-10 rounded-md ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full p-3 border border-[#b3a7df] text-lg mb-4 bg-[#000000] text-[#b3a7df]"
-              placeholder="Enter room name..."
-              type="text"
-          />
-          <input
-              v-model="createRoom.description"
-              aria-label="Chat room description"
-              class="flex h-10 rounded-md ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full p-3 border border-[#b3a7df] text-lg mb-4 bg-[#000000] text-[#b3a7df]"
-              placeholder="Enter room description..."
-              type="text"
-          />
-          <input
-              v-model="createRoom.maxPeople"
-              aria-label="Chat room maxPeople"
-              class="flex h-10 rounded-md ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full p-3 border border-[#b3a7df] text-lg mb-4 bg-[#000000] text-[#b3a7df]"
-              placeholder="Enter room maxPeople..."
-              type="text"
-          />
-          <button
-              class="inline-flex items-center justify-center rounded-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 w-full mt-6 bg-[#4c51bf] text-[#b3a7df] text-lg font-serif"
-              @click="submitForm">
-            Submit
-          </button>
-        </el-card>
-      </div>
+      </el-main>
     </el-main>
      </el-main>
   </el-container>
@@ -96,6 +90,7 @@ import JcAside from "@/components/common/aside.vue";
 
 export default {
   components: {JcAside},
+  name: 'Jc-search',
   inject: {
     realAxios: {
       from: 'axiosFilter'
@@ -188,9 +183,8 @@ export default {
 
 </script>
 <style scoped>
-.room-container {
-  height: 100vh;
-  overflow: hidden;
+.aa-main{
+  display: flex;
 }
 
 </style>

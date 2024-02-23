@@ -28,12 +28,12 @@ const router = createRouter({
             component: MainPageView
         },
         {
-            path: '/room',
+            path: '/search',
             name: 'RoomPageView',
-            component: () => import('@/components/common/main/roomPage.vue')
+            component: () => import('@/components/common/main/search.vue')
         },
         {
-            path: '/updateInfo',
+            path: '/personal',
             name: 'updateInfoView',
             component: UpdateInfoView
         },
@@ -112,9 +112,9 @@ export default router
 
 router.beforeEach((to, from, next) => {
     const token = localStorage.getItem('token');
-    if (!token && to.path !== '/login') {
-        next('login');
-    } else {
+    if (!token &&( to.path !== '/login' && to.path!=='/register') ) {
+        next('/login');
+    }else {
         next();
     }
 });

@@ -1,5 +1,5 @@
 <template>
-  <el-container class="register-container">
+  <el-container class="JcContainer">
     <el-card class="box-card">
       <el-header>
         <el-text class="title">来注册一个账号吧👆👨</el-text>
@@ -108,16 +108,6 @@ export default {
 
 <style scoped>
 
-.register-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  width: 100%;
-  background-image: url('/pexels-eberhard-grossgasteiger-691668.jpg'); /* 替换成你的背景图链接 */
-  background-size: cover; /* 背景图铺满整个容器 */
-  background-position: center; /* 背景图居中 */
-}
 
 .title {
   font-size: 24px;

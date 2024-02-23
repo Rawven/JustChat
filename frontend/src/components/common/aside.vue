@@ -1,5 +1,5 @@
 <template>
-  <el-aside class="w-48 border-r border-gray-200 overflow-y-auto">
+  <el-aside class="asle">
     <el-header class="p-4 border-b border-gray-200">
       <h2 class="text-lg font-semibold">侧边栏</h2>
     </el-header>
@@ -26,6 +26,11 @@
         </el-icon>
         <el-text tag="b">Moment</el-text>
       </div>
+      <div class="flex items-center space-x-4" @click="turnPersonal">
+        <el-icon><Avatar /></el-icon>
+        <el-text tag="b">Personal</el-text>
+      </div>
+
       <div class="flex items-center space-x-4" @click="logOut">
         <el-icon><Close /></el-icon>
         <span>Logout</span>
@@ -35,16 +40,16 @@
 </template>
 
 <script>
-import {Bell, Close, House, PictureFilled, Plus, User} from "@element-plus/icons-vue";
+import {Avatar, Bell, Close, House, PictureFilled, Plus, User} from "@element-plus/icons-vue";
 import {defineComponent} from "vue";
 import router from "@/router";
 
 export default defineComponent({
   name: 'Jc-Aside',
-  components: {Close, Bell, Plus, House, User, PictureFilled},
+  components: {Avatar, Close, Bell, Plus, House, User, PictureFilled},
   methods: {
     turnSearch() {
-      router.push('/room')
+      router.push('/search')
     },
     turnRooms() {
       router.push('/main')
@@ -58,6 +63,9 @@ export default defineComponent({
     turnMoment() {
       router.push('/moment')
     },
+    turnPersonal() {
+      router.push('/personal')
+    },
     logOut() {
       router.push('logOut')
     }
@@ -68,5 +76,12 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.asle{
+  width: 200px;
+  background-color: transparent;
+}
+.asle *{
+  background-color: transparent;
+}
 
 </style>

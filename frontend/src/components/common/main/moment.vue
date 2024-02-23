@@ -1,5 +1,5 @@
 <template>
-  <el-container style="height: 100vh;"> <!-- 设置合适的高度 -->
+  <el-container class="JcContainer">
     <JcAside></JcAside>
     <el-main style="overflow-y: auto;"> <!-- 添加样式以启用滚动 -->
       <el-header >

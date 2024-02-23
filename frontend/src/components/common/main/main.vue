@@ -1,5 +1,5 @@
 <template>
-  <el-container class="containerM">
+  <el-container class="JcContainer">
     <JcAside></JcAside>
     <el-aside class="theAside w-64 border-r border-gray-200 overflow-y-auto">
         <el-row>
@@ -9,7 +9,7 @@
       <el-header class="p-4 border-b border-gray-200">
         <h2 class="text-lg font-semibold">我的群聊</h2>
       </el-header>
-      <el-menu class="p-4 space-y-2">
+      <el-menu class="p-4 space-y-2 menu">
         <div
             v-for="(room) in rooms"
             :key="room.isNew"
@@ -52,7 +52,7 @@
 import {Host, ipfsHost} from "@/main";
 import {reactive, ref} from "vue";
 import ChatRoom from "@/components/common/chatRoom.vue";
-import {ChatLineRound, ChatRound} from "@element-plus/icons-vue";
+import {ChatLineRound, ChatRound, Menu} from "@element-plus/icons-vue";
 import {ElMessage} from "element-plus";
 import JcAside from "@/components/common/aside.vue";
 
@@ -80,7 +80,7 @@ export default {
 
   name: 'MainPage',
   // eslint-disable-next-line vue/no-reserved-component-names
-  components: {JcAside, ChatLineRound, ChatRound, ChatRoom},
+  components: { JcAside, ChatLineRound, ChatRound, ChatRoom},
   inject: {
     realAxios: {
       from: 'axiosFilter'
@@ -116,10 +116,7 @@ export default {
   created() {
     this.getRooms();
     //this.updateMessageCount();
-    let item = localStorage.getItem("userData");
-    if (item) {
-      this.userInfo = JSON.parse(item);
-    }
+    this.getUserData();
     this.initWebSocket();
 
   },
@@ -131,6 +128,12 @@ export default {
     ref,
     Host() {
       return Host
+    },
+    getUserData() {
+      let item = localStorage.getItem("userData");
+      if (item) {
+        this.userInfo = JSON.parse(item);
+      }
     },
     logOut() {
       let token = localStorage.getItem("token");
@@ -213,10 +216,12 @@ export default {
         this.rooms = response.data.data;
         console.log(this.rooms)
         // 将获取的房间总数赋值给 totalRooms
+        if(this.rooms.length > 0){
         this.nowRoomId = this.rooms[0].roomId;
         this.rooms.forEach((room, index) => {
           this.roomIndex.set(Number(room.roomId), index);
-        });
+        }
+        );}
       })
     },
   }
@@ -228,17 +233,15 @@ body {
   font-family: 'Roboto', sans-serif;
   font-weight: bold;
 }
+.menu{
+  background-color: transparent;
+}
+
 
 .list-room {
   overflow: hidden;
   padding: 10px;
   margin-bottom: 10px;
-}
-
-.containerM {
-  width: 100%;
-  height: 100%;
-  margin: 0;
 }
 
 .avatar {
