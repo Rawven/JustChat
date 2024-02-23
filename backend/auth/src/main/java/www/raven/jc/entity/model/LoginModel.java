@@ -1,5 +1,6 @@
 package www.raven.jc.entity.model;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -11,8 +12,8 @@ import lombok.Data;
  */
 @Data
 public class LoginModel {
-    @NotNull
+    @NotBlank(message = "用户名不能为空")
     private String username;
-    @NotNull
+    @NotBlank(message = "密码不能为空")
     private String password;
 }

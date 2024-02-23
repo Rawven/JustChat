@@ -1,5 +1,6 @@
 package www.raven.jc.controller;
 
+import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,8 +29,8 @@ public class FriendController {
     private NoticeService noticeService;
 
     @GetMapping("/agreeToBeFriend/{friendId}/{noticeId}")
-    public CommonResult<Void> agreeApplyFriend(@PathVariable("friendId") int friendId,
-        @PathVariable("noticeId") int noticeId) {
+    public CommonResult<Void> agreeApplyFriend(@PathVariable("friendId") @NotNull int friendId,
+        @PathVariable("noticeId") @NotNull int noticeId) {
         friendService.agreeApplyFromFriend(friendId);
         noticeService.deleteNotification(noticeId);
         return CommonResult.operateSuccess("成为好友成功");
@@ -37,7 +38,7 @@ public class FriendController {
 
     @GetMapping("/refuseToBeFriend/{friendId}/{noticeId}")
     public CommonResult<Void> refuseApplyFriend(@PathVariable("friendId") int friendId,
-        @PathVariable("noticeId") int noticeId) {
+        @PathVariable("noticeId") @NotNull int noticeId) {
         noticeService.deleteNotification(noticeId);
         return CommonResult.operateSuccess("拒绝好友成功");
     }

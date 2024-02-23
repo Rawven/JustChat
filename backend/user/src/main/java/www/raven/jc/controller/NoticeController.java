@@ -1,6 +1,7 @@
 package www.raven.jc.controller;
 
 import java.util.List;
+import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +33,7 @@ public class NoticeController {
     }
 
     @GetMapping("/addFriendApply/{friendName}")
-    public CommonResult<Void> addFriendApply(@PathVariable("friendName") String friendName) {
+    public CommonResult<Void> addFriendApply(@PathVariable("friendName") @NotNull String friendName) {
         noticeService.addFriendApply(friendName);
         return CommonResult.operateSuccess("添加好友申请成功");
     }
