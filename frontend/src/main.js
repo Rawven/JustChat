@@ -14,8 +14,8 @@ import "@/tailcss.css";
 
 const app = createApp(App)
 app.use(VueParticles)
-export const Host = "localhost"
-export const ipfsHost = "http://127.0.0.1:8083/ipfs/"
+export const Host = "10.44.59.225"
+export const ipfsHost = "http://10.44.59.225:8083/ipfs/"
 app.use(createPinia())
 app.use(router)
 app.use(ElementPlus)

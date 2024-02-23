@@ -1,6 +1,7 @@
 package www.raven.jc.service;
 
 import java.util.List;
+import www.raven.jc.entity.model.FriendMsgModel;
 import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.entity.vo.UserFriendVO;
 
@@ -21,8 +22,8 @@ public interface FriendService {
     /**
      * restore friend history
      *
-     * @param friendId friend id
+     * @param model model
      * @return {@link List}<{@link MessageVO}>
      */
-    List<MessageVO> restoreFriendHistory(Integer friendId);
+    List<MessageVO> getFriendMsgPages(FriendMsgModel model);
 }

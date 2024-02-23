@@ -7,7 +7,7 @@
         </div>
       </div>
     </el-header>
-    <el-main class="flex-1 p-4 space-y-4  main-content">
+    <el-main class="flex-1 p-4 space-y-4  main-content"  style="overflow-y: auto;" @scroll="handleScroll">
       <div v-for="(message, index) in messages" :key="index">
         <div v-if="isMe(message)">
           <div class="flex flex-col items-end space-y-2">
@@ -33,8 +33,6 @@
                 <img :src="ipfsHost()+message.profile" alt="User Avatar" class="avatar">
               </template>
             </el-popconfirm>
-
-
             <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full mt-2">
           <span
               class="flex h-full w-full items-center justify-center rounded-full bg-muted font-medium text-lg font-serif">{{
@@ -50,7 +48,7 @@
         </div>
       </div>
     </el-main>
-    <footer class="p-4 bg-white border-t border-gray-200 useFoot">
+    <el-footer class=" foot ">
       <div class="flex items-center space-x-4 this">
         <button
             class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10">
@@ -74,6 +72,7 @@
             v-model="message"
             class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 flex-1"
             placeholder="Type a message"
+            @keyup.enter="sendMessage"
         />
         <button
             class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
@@ -81,7 +80,7 @@
           Send
         </button>
       </div>
-    </footer>
+    </el-footer>
   </el-container>
 </template>
 
@@ -113,7 +112,7 @@ export default {
   },
   data() {
     return {
-
+      page: 0,
       theFriend: {
         friendId: '',
         lastMsg: '',
@@ -133,19 +132,7 @@ export default {
     this.socket = new WebSocket(`ws://` + Host + `:8081/ws/friend/${token}/${this.theFriend.friendId}`);
 
     this.socket.onopen = () => {
-      this.realAxios.post(`http://` + Host + `:7000/chat/message/restoreFriendHistory/${this.theFriend.friendId}`, {}, {
-        headers: {
-          'token': token
-        }
-      })
-          .then(response => {
-            this.messages = response.data.data.map(messageVO => ({
-              time: new Date(messageVO.time).getTime(), // 将Date对象转换为时间戳
-              text: messageVO.text,
-              user: messageVO.user,
-              profile: messageVO.profile
-            })); // 使用map方法将每个MessageVO对象转换为msg对象
-          })
+      this.getHistory();
       console.log('WebSocket is open now.');
     };
 
@@ -180,6 +167,61 @@ export default {
     Host() {
       return Host
     },
+    handleScroll(event) {
+      const scrollTop = event.target.scrollTop;
+      // 如果滚动到顶部，执行你的事件
+      if (scrollTop === 0) {
+        this.addMsg();
+      }
+    },
+    addMsg() {
+      let token = localStorage.getItem("token");
+      this.realAxios.post(`http://` + Host + `:7000/chat/message/restoreFriendHistory`, {
+        friendId: this.theFriend.friendId,
+        page: this.page,
+        size: 15
+      }, {
+        headers: {
+          'token': token
+        }
+      })
+          .then(response => {
+            const newMessages = response.data.data.map(messageVO => ({
+              time: new Date(messageVO.time).getTime(),
+              text: messageVO.text,
+              user: messageVO.user,
+              profile: messageVO.profile
+            }));
+
+            // 使用 push 方法将新的消息添加到数组中
+            this.messages.push(...newMessages);
+            this.messages.sort((a, b) => a.time - b.time);
+            this.page++;
+          });
+    }
+    ,  getHistory(){
+      let token = localStorage.getItem("token");
+      this.realAxios.post(`http://` + Host + `:7000/chat/message/restoreFriendHistory`, {
+        friendId: this.theFriend.friendId,
+        page: this.page,
+        size: 15
+      }, {
+        headers: {
+          'token': token
+        }
+      })
+          .then(response => {
+            this.messages = response.data.data.map(messageVO => ({
+              time: new Date(messageVO.time).getTime(), // 将Date对象转换为时间戳
+              text: messageVO.text,
+              user: messageVO.user,
+              profile: messageVO.profile
+            })); // 使用map方法将每个MessageVO对象转换为msg对象
+
+            this.messages.sort((a, b) => b.time - a.time);
+            this.page++;
+          })
+    },
     sendMessage() {
       if (this.message) {
         const msg = {time: Date.now(), text: this.message};
@@ -207,7 +249,7 @@ export default {
 <style scoped>
 .chatFriend-container {
   display: flex;
-  height: 100vh;
+  height: 100%;
   width: 100%;
 }
 
@@ -217,19 +259,6 @@ export default {
   width: 100%;
   z-index: 1000;
 }
-
-
-.this {
-  overflow: hidden;
-}
-
-
-.main-content {
-  height: 90%; /* 设置高度为视口的100% */
-  overflow-y: auto; /* 当内容溢出时显示滚动条 */
-  padding-top: 50px;
-}
-
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -239,16 +268,26 @@ export default {
   }
 }
 
-.useFoot, .main-content,.header {
+ .main-content,.header {
   box-sizing: border-box;
   width: 100%;
 }
 
-
-.useFoot {
-  animation: fadeIn 1s;
-  bottom: 0;
+.main-content {
+  height: 75%; /* 设置高度为视口的100% */
+  overflow-y: auto; /* 当内容溢出时显示滚动条 */
+  padding-top: 50px;
+  padding-bottom: 50px;
+  margin-bottom: 25px;
 }
 
-
+.foot {
+  animation: fadeIn 1s;
+  position: fixed;
+  bottom: 0;
+  width: 70%; /* 使用 100% 宽度，确保覆盖整个屏幕 */
+  background-color: transparent; /* 如果需要，根据你的设计添加合适的背景颜色 */
+  z-index: 1; /* 确保位于其他元素之上 */
+  margin-top: 20px; /* 设置 el-footer 与上方元素的间距 */
+}
 </style>

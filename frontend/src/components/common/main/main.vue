@@ -52,7 +52,7 @@
 import {Host, ipfsHost} from "@/main";
 import {reactive, ref} from "vue";
 import ChatRoom from "@/components/common/chatRoom.vue";
-import {ChatLineRound, ChatRound, Menu} from "@element-plus/icons-vue";
+import {ChatLineRound, ChatRound} from "@element-plus/icons-vue";
 import {ElMessage} from "element-plus";
 import JcAside from "@/components/common/aside.vue";
 

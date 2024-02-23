@@ -265,7 +265,7 @@ export default {
     handleRoomAgree(data) {
       this.realAxios({
         method: 'get',
-        url: `http://` + Host + `:7000/chat/common/agreeToJoinRoom/${data.data}/${data.sender.userId}/${data.noticeId}`,
+        url: `http://` + Host + `:7000/chat/room/agreeToJoinRoom/${data.data}/${data.sender.userId}/${data.noticeId}`,
         data: {},
         headers: {
           'token': localStorage.getItem("token")
