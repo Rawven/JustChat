@@ -72,7 +72,7 @@ public class SocialServiceImpl implements SocialService {
 
     @Override
     public void deleteMoment(String momentId) {
-        Assert.isTrue(momentDAO.delete(momentId));
+        Assert.isTrue(momentDAO.delete(momentId), "删除失败");
     }
 
     @Override

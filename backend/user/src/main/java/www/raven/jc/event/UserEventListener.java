@@ -156,7 +156,7 @@ public class UserEventListener {
             .setType(NoticeConstant.TYPE_JOIN_ROOM_APPLY)
             .setTimestamp(System.currentTimeMillis())
             .setSenderId(payload.getApplyId());
-        Assert.isTrue(noticeDAO.save(notice));
+        Assert.isTrue(noticeDAO.save(notice), "保存通知失败");
         RBucket<String> founderBucket = redissonClient.getBucket("token:" + founderId);
         if (founderBucket.isExists()) {
             User applier = userDAO.getBaseMapper().selectById(payload.getApplyId());

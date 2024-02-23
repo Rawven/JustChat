@@ -50,7 +50,11 @@ public class UserDubboImpl implements UserDubbo {
 
     @Override
     public RpcResult<UserAuthDTO> getUserToAuth(String username) {
-        return RpcResult.operateSuccess("查找成功", userService.querySingleInfoByColumn("username", username));
+        UserAuthDTO auth = userService.querySingleInfoByColumn("username", username);
+        if(auth == null){
+            return RpcResult.operateFailure("无对应账户信息");
+        }
+        return RpcResult.operateSuccess("查找成功", auth);
     }
 
     @Override

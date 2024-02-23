@@ -2,6 +2,7 @@ package www.raven.jc.service;
 
 import java.util.List;
 import www.raven.jc.entity.dto.MessageDTO;
+import www.raven.jc.entity.model.GroupMsgModel;
 import www.raven.jc.entity.vo.MessageVO;
 
 /**
@@ -25,10 +26,10 @@ public interface ChatService {
     /**
      * restore history
      *
-     * @param roomId room id
+     * @param model model
      * @return {@link List}<{@link MessageVO}>
      */
-    List<MessageVO> restoreRoomHistory(Integer roomId);
+    List<MessageVO> getGroupMsgPages(GroupMsgModel model);
 
     /**
      * save friend msg

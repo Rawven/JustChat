@@ -54,7 +54,7 @@
                   :http-request="uploadFile"
                   action=""
                   class="upload-demo">
-                <el-button size="small" type="primary">点击上传</el-button>
+                <el-button size="small" type="primary" plain>点击上传</el-button>
                 <template #tip>
                   <div class="el-upload__tip">
                     jpg/png files with a size less than 500KB.

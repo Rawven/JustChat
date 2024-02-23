@@ -7,7 +7,7 @@
         </div>
       </div>
     </header>
-    <main class="flex-1 p-4 space-y-4  main-content">
+    <main class="flex-1 p-4 space-y-4  main-content" @scroll="handleScroll">
       <div v-for="(message, index) in messages" :key="index">
         <div v-if="isMe(message)">
           <div class="flex flex-col items-end space-y-2">
@@ -74,6 +74,7 @@
             v-model="message"
             class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 flex-1"
             placeholder="Type a message"
+            @keyup.enter="sendMessage"
         />
         <button
             class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
@@ -113,6 +114,7 @@ export default {
   },
   data() {
     return {
+      page:0,
       theRoom: {
         roomId: '',
         lastMsg: '',
@@ -133,19 +135,7 @@ export default {
     this.socket = new WebSocket(`ws://` + Host + `:8081/ws/room/${token}/${this.theRoom.roomId}`);
 
     this.socket.onopen = () => {
-      this.realAxios.post(`http://` + Host + `:7000/chat/message/restoreRoomHistory/${this.theRoom.roomId}`, {}, {
-        headers: {
-          'token': token
-        }
-      })
-          .then(response => {
-            this.messages = response.data.data.map(messageVO => ({
-              time: new Date(messageVO.time).getTime(), // 将Date对象转换为时间戳
-              text: messageVO.text,
-              user: messageVO.user,
-              profile: messageVO.profile
-            })); // 使用map方法将每个MessageVO对象转换为msg对象
-          })
+      this.getHistory();
       console.log('WebSocket is open now.');
     };
 
@@ -171,6 +161,28 @@ export default {
   },
 
   methods: {
+    getHistory(){
+      let token = localStorage.getItem("token");
+      this.realAxios.post(`http://` + Host + `:7000/chat/message/restoreRoomHistory`, {
+        roomId: this.theRoom.roomId,
+        page: this.page,
+        size: 15
+      }, {
+        headers: {
+          'token': token
+        }
+      })
+          .then(response => {
+            this.messages = response.data.data.map(messageVO => ({
+              time: new Date(messageVO.time).getTime(), // 将Date对象转换为时间戳
+              text: messageVO.text,
+              user: messageVO.user,
+              profile: messageVO.profile
+            })); // 使用map方法将每个MessageVO对象转换为msg对象
+          })
+
+      this.page++;
+    },
     ipfsHost() {
       return ipfsHost
     },
@@ -186,7 +198,39 @@ export default {
         this.socket.send(JSON.stringify(msg));
         this.message = '';
       }
-    },
+    }
+    ,handleScroll(event) {
+      const scrollTop = event.target.scrollTop;
+      // 如果滚动到顶部，执行你的事件
+      if (scrollTop === 0) {
+        this.addMsg();
+      }
+    },addMsg() {
+      let token = localStorage.getItem("token");
+      this.realAxios.post(`http://` + Host + `:7000/chat/message/restoreRoomHistory`, {
+        roomId: this.theRoom.roomId,
+        page: this.page,
+        size: 15
+      }, {
+        headers: {
+          'token': token
+        }
+      })
+          .then(response => {
+            const newMessages = response.data.data.map(messageVO => ({
+              time: new Date(messageVO.time).getTime(),
+              text: messageVO.text,
+              user: messageVO.user,
+              profile: messageVO.profile
+            }));
+
+            // 使用 push 方法将新的消息添加到数组中
+            this.messages.push(...newMessages);
+            this.messages.sort((a, b) => a.time - b.time);
+            this.page++;
+          });
+    }
+    ,
     addApplyFriend(username) {
       this.realAxios.get(`http://` + Host + `:7000/user/notice/addFriendApply/${username}`, {
         headers: {
@@ -198,9 +242,7 @@ export default {
           type: 'success'
         });
       })
-    },
-
-  },
+    },}
 };
 </script>
 

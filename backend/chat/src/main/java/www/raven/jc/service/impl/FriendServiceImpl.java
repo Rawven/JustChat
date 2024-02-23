@@ -11,11 +11,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import www.raven.jc.api.UserDubbo;
 import www.raven.jc.dao.FriendChatDAO;
 import www.raven.jc.dao.MessageDAO;
 import www.raven.jc.dto.UserInfoDTO;
+import www.raven.jc.entity.model.FriendMsgModel;
 import www.raven.jc.entity.po.FriendChat;
 import www.raven.jc.entity.po.Message;
 import www.raven.jc.entity.vo.MessageVO;
@@ -83,18 +85,16 @@ public class FriendServiceImpl implements FriendService {
     }
 
     @Override
-    @Cacheable(value = "friendHistory", key = "#friendId")
-    public List<MessageVO> restoreFriendHistory(Integer friendId) {
+    public List<MessageVO> getFriendMsgPages(FriendMsgModel model) {
         int userId = RequestUtil.getUserId(request);
-        String fixId = MongoUtil.concatenateIds(userId, friendId);
-        List<Message> byFriendChatId = messageDAO.getByFriendChatId(fixId);
+        String fixId = MongoUtil.concatenateIds(userId, model.getFriendId());
+        List<Message> byFriendChatId = messageDAO.getMsgWithPagination(fixId,"friend", PageRequest.of(model.getPage(), model.getSize())).getContent();
         ArrayList<Integer> ids = new ArrayList<>() {{
             add(userId);
-            add(friendId);
+            add(model.getFriendId());
         }};
         RpcResult<List<UserInfoDTO>> batchInfo = userDubbo.getBatchInfo(ids);
         Map<Integer, UserInfoDTO> userInfoMap = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
-
         return byFriendChatId.stream().map(message -> new MessageVO()
             .setTime(message.getTimestamp())
             .setText(message.getContent())
