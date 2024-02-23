@@ -97,7 +97,7 @@ public class UserServiceImpl implements UserService {
         User realUser = new User().
             setUsername(user.getUsername()).
             setPassword(user.getPassword())
-            .setEmail(user.getEmail());
+            .setEmail(user.getEmail()).setProfile(user.getProfile());
         Assert.isTrue(userDAO.getBaseMapper().insert(realUser) > 0);
         List<Role> roles = rolesDAO.getBaseMapper().selectBatchIds(user.getRoleIds());
         List<UserRole> userRoles = new ArrayList<>();
