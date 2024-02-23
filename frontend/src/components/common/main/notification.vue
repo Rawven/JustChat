@@ -1,5 +1,9 @@
 <template>
-  <el-container class="Cont">
+  <el-container class="JcContainer">
+    <el-aside>
+    <JcAside></JcAside>
+    </el-aside>
+    <el-main>
     <el-header class="flex items-center justify-between p-6 bg-white dark:bg-gray-800 shadow-md">
       <a class="flex items-center gap-2 font-semibold text-gray-900 dark:text-gray-100" href="#">
         <svg
@@ -168,15 +172,17 @@
         </a>
       </div>
     </el-footer>
+    </el-main>
   </el-container>
 </template>
 <script>
 import {Timer} from "@element-plus/icons-vue";
 import {Host} from "@/main";
+import JcAside from "@/components/common/aside.vue";
 
 export default {
   name: 'MainPage',
-  components: {Timer},
+  components: {JcAside, Timer},
   inject: {
     realAxios: {
       from: 'axiosFilter'
@@ -323,11 +329,6 @@ export default {
 };
 </script>
 <style>
-.Cont {
-  height: 100%;
-  width: 50cm;
-  margin: 0;
-}
 
 .elN {
   height: 100%;

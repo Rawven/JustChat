@@ -10,7 +10,7 @@ const router = createRouter({
         {
             path: '/test',
             name: 'test',
-            component: () => import('@/components/common/moment.vue')
+            component: () => import('@/components/common/main/moment.vue')
         },
         {
             path: '/login',
@@ -23,17 +23,17 @@ const router = createRouter({
             component: registerView
         },
         {
-            path: '/mainPage',
+            path: '/main',
             name: "MainPageView",
             component: MainPageView
         },
         {
-            path: '/roomPage',
+            path: '/search',
             name: 'RoomPageView',
-            component: () => import('@/components/common/roomPage.vue')
+            component: () => import('@/components/common/main/search.vue')
         },
         {
-            path: '/updateInfo',
+            path: '/personal',
             name: 'updateInfoView',
             component: UpdateInfoView
         },
@@ -112,9 +112,9 @@ export default router
 
 router.beforeEach((to, from, next) => {
     const token = localStorage.getItem('token');
-    if (!token && to.path !== '/login') {
-        next('login');
-    } else {
+    if (!token &&( to.path !== '/login' && to.path!=='/register') ) {
+        next('/login');
+    }else {
         next();
     }
 });

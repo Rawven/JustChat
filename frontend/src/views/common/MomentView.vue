@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import Main from '@/components/common/moment.vue';
+import Main from '@/components/common/main/moment.vue';
 
 export default {
   components: {

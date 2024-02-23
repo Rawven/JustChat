@@ -1,11 +1,9 @@
 <template>
-  <div>
-    <Main/>
-  </div>
+    <Main class="main"/>
 </template>
 
 <script>
-import Main from '@/components/common/notification.vue';
+import Main from '@/components/common/main/notification.vue';
 
 export default {
   components: {
@@ -14,3 +12,10 @@ export default {
   }
 };
 </script>
+<style>
+.main {
+  background-color: #f5f5f5;
+  width: 100%;
+  height: 100%;
+}
+</style>

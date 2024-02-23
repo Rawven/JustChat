@@ -1,57 +1,11 @@
 <template>
-  <div class="flex flex-col flex-1 max-w-full mainDiv">
-    <header class="flex items-center justify-between p-4 bg-white border-b border-gray-200 theH">
+  <el-container class="cr-container">
+    <header class="flex items-center justify-between p-4 bg-white border-b border-gray-200 ">
       <div class="flex items-center space-x-4">
-        <a class="text-gray-500 hover:text-gray-900" href="#">
-          <svg
-              class="w-6 h-6"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="50"
-              xmlns="http://www.w3.org/2000/svg"
-          >
-            <path d="m12 19-7-7 7-7"></path>
-            <path d="M19 12H5"></path>
-          </svg>
-        </a>
         <div>
           <h2 class="text-lg font-semibold">{{ this.theRoom.roomName }}</h2>
         </div>
       </div>
-      <a class="text-gray-500 hover:text-gray-900" href="#">
-        <svg
-            class="w-6 h-6"
-            fill="none"
-            height="24"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-            width="50"
-            xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"></path>
-          <path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path>
-          <path d="M12 2v2"></path>
-          <path d="M12 22v-2"></path>
-          <path d="m17 20.66-1-1.73"></path>
-          <path d="M11 10.27 7 3.34"></path>
-          <path d="m20.66 17-1.73-1"></path>
-          <path d="m3.34 7 1.73 1"></path>
-          <path d="M14 12h8"></path>
-          <path d="M2 12h2"></path>
-          <path d="m20.66 7-1.73 1"></path>
-          <path d="m3.34 17 1.73-1"></path>
-          <path d="m17 3.34-1 1.73"></path>
-          <path d="m11 13.73-4 6.93"></path>
-        </svg>
-      </a>
     </header>
     <main class="flex-1 p-4 space-y-4  main-content">
       <div v-for="(message, index) in messages" :key="index">
@@ -128,7 +82,7 @@
         </button>
       </div>
     </footer>
-  </div>
+  </el-container>
 </template>
 
 <script>
@@ -251,6 +205,12 @@ export default {
 </script>
 
 <style scoped>
+.cr-container {
+  height: 100%;
+  width: auto;
+  display: flex;
+  flex-direction: column;
+}
 body {
   overflow: hidden; /* 阻止整个页面滚动 */
 }
@@ -263,7 +223,7 @@ body {
 .main-content {
   height: 90%; /* 设置高度为视口的100% */
   overflow-y: auto; /* 当内容溢出时显示滚动条 */
-  padding-top: 30px;
+  padding-top: 50px;
 }
 
 @keyframes fadeIn {
@@ -275,15 +235,9 @@ body {
   }
 }
 
-.useFoot, .main-content, .theH {
+.useFoot, .main-content {
   box-sizing: border-box;
-
-  width: 77%;
-  position: fixed;
-}
-
-.theH {
-  top: 0;
+ width: 100%;
 }
 
 .useFoot {

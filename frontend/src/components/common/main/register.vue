@@ -1,8 +1,8 @@
 <template>
-  <el-container>
+  <el-container class="JcContainer">
     <el-card class="box-card">
       <el-header>
-        <el-text class="title">来注册一个管理员账号吧👆👨</el-text>
+        <el-text class="title">来注册一个账号吧👆👨</el-text>
       </el-header>
       <el-form ref="registerForm" :model="user" :rules="rules" label-width="80px">
         <el-form-item label="Username" prop="username">
@@ -14,11 +14,20 @@
         <el-form-item label="Password" prop="password">
           <el-input v-model="user.password" required type="password"></el-input>
         </el-form-item>
-        <el-form-item label="Secret Key" prop="secretKey">
-          <el-input v-model="user.privateKey" required></el-input>
-        </el-form-item>
+        <el-text>上传图片</el-text>
+        <el-upload
+            :http-request="uploadFile"
+            action=""
+            class="upload-demo">
+          <el-button size="small" type="primary" plain>点击上传</el-button>
+          <template #tip>
+            <div class="el-upload__tip">
+              jpg/png files with a size less than 500KB.
+            </div>
+          </template>
+        </el-upload>
         <el-form-item>
-          <el-button type="primary" @click="register">Register</el-button>
+          <el-button type="primary" @click="register" plain>Register</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -29,7 +38,8 @@
 import {Host} from "@/main";
 
 export default {
-  name: 'adminRegister',
+  name: 'userRegister',
+  // eslint-disable-next-line vue/no-unused-components
   inject: {
     realAxios: {
       from: 'axiosFilter'
@@ -41,26 +51,51 @@ export default {
         username: '',
         email: '',
         password: '',
-        privateKey: '',
+        profile: '',
       },
       rules: {
+        // Add validation rules if needed
         username: [{required: true, message: 'Please enter your username', trigger: 'blur'}],
         email: [
           {required: true, message: 'Please enter your email', trigger: 'blur'},
         ],
         password: [{required: true, message: 'Please enter your password', trigger: 'blur'}],
-        privateKey: [{required: true, message: 'Please enter your secret key', trigger: 'blur'}],
       },
     };
   },
   methods: {
+    uploadFile(param) {
+      const formData = new FormData()
+      formData.append('file', param.file)
+      const url = 'http://' + Host + ':7000/file/upload'
+      this.realAxios.post(url, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'token': localStorage.getItem("token")
+        }
+      }).then(response => {
+        this.user.profile = response.data.data;
+        this.$message.success('文件上传成功');
+      })
+    },
     register() {
+      // 表单校验
       this.$refs.registerForm.validate((valid) => {
         if (valid) {
-          this.realAxios.post('http://' + Host + ':7000/auth/registerAdmin', this.user)
+          // 发送注册请求
+          this.realAxios.post(`http://` + Host + `:7000/auth/register`, this.user)
               .then(response => {
                 localStorage.setItem("token", response.data.data);
-                this.$router.push('/admin/mainPage');
+                // 注册成功后可以进行相关的处理，例如跳转到登录页面
+                this.$message.success('注册成功');
+                this.realAxios.post('http://' + Host + ':7000/user/common/defaultInfo', {}, {
+                  headers: {
+                    'token': localStorage.getItem("token")
+                  }
+                }).then(response1 => {
+                  localStorage.setItem("userData", JSON.stringify(response1.data.data));
+                })
+                this.$router.push('/main');
               })
         } else {
           this.$message.error('Please fill in all required fields.');
@@ -72,6 +107,8 @@ export default {
 </script>
 
 <style scoped>
+
+
 .title {
   font-size: 24px;
   color: #409EFF;
@@ -101,4 +138,6 @@ export default {
   height: 50%; /* 设置卡片高度为70% */
 
 }
+
+/* 根据需要添加样式 */
 </style>
