@@ -1,6 +1,7 @@
 package www.raven.jc.service;
 
 import java.util.List;
+import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
 import www.raven.jc.entity.model.RoomModel;
 import www.raven.jc.entity.vo.RealRoomVO;
 import www.raven.jc.entity.vo.UserRoomVO;
@@ -64,6 +65,15 @@ public interface RoomService {
      * @param noticeId notice id
      */
     void agreeApply(Integer roomId, Integer userId, int noticeId);
+
+    /**
+     * refuse apply
+     *
+     * @param roomId   room id
+     * @param userId   user id
+     * @param noticeId notice id
+     */
+    void refuseApply(Integer roomId, Integer userId, int noticeId);
 
     /**
      * query list page

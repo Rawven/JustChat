@@ -87,12 +87,16 @@ public class RoomController {
         return CommonResult.operateSuccess("同意申请成功");
     }
 
+    /**
+     * refuse apply
+     *
+     * @param noticeId notice id
+     * @return {@link CommonResult}<{@link Void}>
+     */
     @GetMapping("/refuseToJoinRoom/{roomId}/{userId}/{noticeId}")
-    public CommonResult<Void> refuseApply(@PathVariable("noticeId") int noticeId) {
-        RpcResult<Void> voidRpcResult = userDubbo.deleteNotice(noticeId);
-        if (!voidRpcResult.isSuccess()) {
-            return CommonResult.operateFailure(voidRpcResult.getMessage());
-        }
+    public CommonResult<Void> refuseApply(@PathVariable("noticeId") int noticeId,
+        @PathVariable("roomId") String roomId, @PathVariable("userId") int userId) {
+        roomService.refuseApply(Integer.valueOf(roomId), userId, noticeId);
         return CommonResult.operateSuccess("拒绝申请成功");
     }
 

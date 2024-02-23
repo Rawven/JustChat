@@ -90,7 +90,7 @@ public class NoticeServiceImpl implements NoticeService {
             .setType(NoticeConstant.TYPE_ADD_FRIEND_APPLY)
             .setTimestamp(System.currentTimeMillis())
             .setSenderId(applierId);
-        Assert.isTrue(noticeDAO.save(notice));
+        Assert.isTrue(noticeDAO.save(notice), "添加失败");
         RBucket<String> friendBucket = redissonClient.getBucket("token:" + friendId);
         HashMap<Object, Object> map = new HashMap<>(1);
         map.put("type", ChatUserMqConstant.TAGS_USER_FRIEND_APPLY);

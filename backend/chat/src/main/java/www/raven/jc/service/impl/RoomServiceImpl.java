@@ -163,6 +163,15 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    public void refuseApply(Integer roomId, Integer userId, int noticeId) {
+        int update = userRoomDAO.getBaseMapper().update(new UserRoom().setStatus(ApplyStatusConstant.APPLY_STATUS_REFUSE),
+            new QueryWrapper<UserRoom>().eq("user_id", userId).eq("room_id", roomId));
+        Assert.isTrue(update > 0, "更新失败");
+        RpcResult<Void> voidRpcResult = userDubbo.deleteNotice(noticeId);
+        Assert.isTrue(voidRpcResult.isSuccess(), "user模块调用失败");
+    }
+
+    @Override
     public RealRoomVO queryListPage(int page, int size) {
         Long total = roomDAO.getBaseMapper().selectCount(null);
         Page<Room> chatRoomPage = roomDAO.getBaseMapper().selectPage(new Page<>(page, size), new QueryWrapper<>());
