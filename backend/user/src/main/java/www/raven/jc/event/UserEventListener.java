@@ -15,6 +15,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
 import www.raven.jc.constant.ChatUserMqConstant;
+import www.raven.jc.constant.JwtConstant;
+import www.raven.jc.constant.MqConstant;
 import www.raven.jc.constant.NoticeConstant;
 import www.raven.jc.constant.SocialUserMqConstant;
 import www.raven.jc.dao.FriendDAO;
@@ -97,7 +99,6 @@ public class UserEventListener {
         map.put("momentId", payload.getMomentId());
         map.put("msg", payload.getMsg());
         map.put("type", SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT);
-        log.info("userId");
         notificationHandler.sendOneMessage(userId, JsonUtil.objToJson(map));
     }
 
@@ -129,7 +130,7 @@ public class UserEventListener {
 
     private void eventFriendSendMsg(Message<Event> msg) {
         FriendMsgEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), FriendMsgEvent.class);
-        RBucket<String> receiverBucket = redissonClient.getBucket("token:" + payload.getReceiverId());
+        RBucket<String> receiverBucket = redissonClient.getBucket(JwtConstant.TOKEN+ payload.getReceiverId());
         HashMap<Object, Object> map = new HashMap<>(2);
         map.put("receiverId", payload.getReceiverId());
         map.put("senderId", payload.getSenderId());
@@ -157,7 +158,7 @@ public class UserEventListener {
             .setTimestamp(System.currentTimeMillis())
             .setSenderId(payload.getApplyId());
         Assert.isTrue(noticeDAO.save(notice), "保存通知失败");
-        RBucket<String> founderBucket = redissonClient.getBucket("token:" + founderId);
+        RBucket<String> founderBucket = redissonClient.getBucket(JwtConstant.TOKEN + founderId);
         if (founderBucket.isExists()) {
             User applier = userDAO.getBaseMapper().selectById(payload.getApplyId());
             HashMap<Object, Object> map = new HashMap<>(2);
@@ -166,6 +167,8 @@ public class UserEventListener {
             map.put("type", ChatUserMqConstant.TAGS_CHAT_ROOM_APPLY);
             notificationHandler.sendOneMessage(founderId, JsonUtil.objToJson(map));
             log.info("--RocketMq 已推送通知给founder");
+        }else {
+            log.info("--RocketMq founder不在线");
         }
     }
 

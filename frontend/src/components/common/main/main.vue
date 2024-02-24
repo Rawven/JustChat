@@ -120,7 +120,6 @@ export default {
     this.initWebSocket();
 
   },
-
   methods: {
     ipfsHost() {
       return ipfsHost
