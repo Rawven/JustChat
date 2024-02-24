@@ -43,11 +43,36 @@
 import {Avatar, Bell, Close, House, PictureFilled, Plus, User} from "@element-plus/icons-vue";
 import {defineComponent} from "vue";
 import router from "@/router";
+import {ElMessage} from "element-plus";
 
 export default defineComponent({
   name: 'Jc-Aside',
   components: {Avatar, Close, Bell, Plus, House, User, PictureFilled},
+  inject: {
+    realAxios: {
+      from: 'axiosFilter'
+    }
+  },
+  activated() {
+    ElMessage.success('Welcome back!')
+    let time = localStorage.getItem("expireTime");
+    if(time < 1000 * 60 * 60 * 24){
+      this.refreshToken();
+    }
+  },
   methods: {
+    refreshToken() {
+      let token = localStorage.getItem("token");
+      this.realAxios.post('http://localhost:7000/auth/refreshToken', {
+        token:token
+      }, {
+        headers: {
+          'token': localStorage.getItem("token")
+        }
+      }).then(response => {
+        this.userInfo = response.data.data;
+      })
+      },
     turnSearch() {
       router.push('/search')
     },

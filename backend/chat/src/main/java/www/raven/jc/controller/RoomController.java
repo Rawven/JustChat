@@ -40,12 +40,12 @@ public class RoomController {
     private FriendService friendService;
     @Autowired
     private UserDubbo userDubbo;
-
+    //TODO 分页
     @GetMapping("/initUserMainPage")
     public CommonResult<List<UserRoomVO>> initUserMainPage() {
         return CommonResult.operateSuccess("获取房间列表成功", roomService.initUserMainPage());
     }
-
+    //TODO 分页
     @GetMapping("/initUserFriendPage")
     public CommonResult<List<UserFriendVO>> initUserFriendPage() {
         return CommonResult.operateSuccess("获取房间列表成功", friendService.initUserFriendPage());

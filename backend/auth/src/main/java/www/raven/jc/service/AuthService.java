@@ -2,6 +2,7 @@ package www.raven.jc.service;
 
 import www.raven.jc.entity.model.LoginModel;
 import www.raven.jc.entity.model.RegisterModel;
+import www.raven.jc.entity.vo.TokenVO;
 
 /**
  * account service
@@ -16,7 +17,7 @@ public interface AuthService {
      * @param loginModel login model
      * @return token
      */
-    String login(LoginModel loginModel);
+    TokenVO login(LoginModel loginModel);
 
     /**
      * register
@@ -24,7 +25,7 @@ public interface AuthService {
      * @param registerModel register model
      * @return {@link String}
      */
-    String registerCommonRole(RegisterModel registerModel);
+    TokenVO registerCommonRole(RegisterModel registerModel);
 
     /**
      * register admin role
@@ -32,7 +33,7 @@ public interface AuthService {
      * @param registerModel register model
      * @return {@link String}
      */
-    String registerAdminRole(RegisterModel registerModel);
+    TokenVO registerAdminRole(RegisterModel registerModel);
 
     /**
      * refresh token
@@ -40,7 +41,7 @@ public interface AuthService {
      * @param token token
      * @return {@link String}
      */
-    String refreshToken(String token);
+    TokenVO refreshToken(String token);
 
     /**
      * logout
