@@ -54,8 +54,8 @@ security:
       user: USER
       admin: ADMIN
     paths:
-     permitAll: /auth/**,/ws/**,/webSocket/**
-     hasAnyRoleUserAdmin: /chat/**,/user/**,/file/**,/social/**
+     permitAll: /auth/**,/ws/**,/file/**,/webSocket/**
+     hasAnyRoleUserAdmin: /chat/**,/user/**,/social/**
      hasRoleAdmin : /admin/**
 jwt:
   key: 爱你老妈

@@ -1,5 +1,10 @@
 package www.raven.jc.config;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.annotation.PostConstruct;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
@@ -25,4 +30,21 @@ public class SecurityProperty {
 
     @Value("${security.roles.admin}")
     public String roleAdmin;
+
+    @Getter private String[] wordsArray;
+
+    @PostConstruct
+    public void init() {
+        List<String> words = new ArrayList<>();
+        for (String part : auth) {
+            String[] subParts = part.split("/");
+            for (String subPart : subParts) {
+                if (!subPart.isEmpty() && !"**".equals(subPart)) {
+                    words.add(subPart);
+                }
+            }
+        }
+        wordsArray = words.toArray(new String[0]);
+    }
+
 }

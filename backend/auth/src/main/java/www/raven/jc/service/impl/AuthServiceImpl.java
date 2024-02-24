@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -49,8 +50,9 @@ public class AuthServiceImpl implements AuthService {
         RpcResult<UserAuthDTO> result = userDubbo.getUserToAuth(loginModel.getUsername());
         Assert.isTrue(result.isSuccess(),"用户不存在");
         UserAuthDTO user = result.getData();
-        if (redissonClient.getBucket(JwtConstant.TOKEN + user.getUserId()).isExists()) {
-            return redissonClient.getBucket(JwtConstant.TOKEN + user.getUserId()).get().toString();
+        RBucket<Object> bucket = redissonClient.getBucket(JwtConstant.TOKEN + user.getUserId());
+        if (bucket.isExists()) {
+            return bucket.get().toString();
         }
         Assert.isTrue(passwordEncoder.matches(loginModel.getPassword(), user.getPassword()), "密码错误");
         RpcResult<List<RoleDTO>> rolesById = userDubbo.getRolesById(user.getUserId());
@@ -90,7 +92,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private String register(RegisterModel registerModel, List<Integer> roleIds) {
-        Assert.isFalse(userDubbo.checkUserExit(registerModel.getUsername()).getData());
+        Assert.isFalse(userDubbo.checkUserExit(registerModel.getUsername()).getData(),"用户名已存在");
         UserRegisterDTO user = new UserRegisterDTO();
         user.setEmail(registerModel.getEmail()).setPassword(passwordEncoder.encode(registerModel.getPassword()))
             .setUsername(registerModel.getUsername()).setRoleIds(roleIds).setProfile(registerModel.getProfile());

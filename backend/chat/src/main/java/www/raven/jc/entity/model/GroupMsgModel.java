@@ -18,7 +18,7 @@ public class GroupMsgModel {
     @Min(value = 1, message = "roomId最小为1")
     private Integer roomId;
     @NotNull (message = "page不能为空")
-    @Min(value = 1, message = "page最小为1")
+    @Min(value = 0, message = "page最小为0")
     private Integer page;
     @NotNull (message = "size不能为空")
     @Min(value = 1, message = "size最小为1")

@@ -139,7 +139,8 @@ export default {
             this.createRoom.name = '';
             this.createRoom.description = '';
             this.createRoom.maxPeople = '';
-
+           //直接刷新页面
+            window.location.reload();
           })
     },
     getRooms(page) {

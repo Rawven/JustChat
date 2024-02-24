@@ -3,6 +3,7 @@ package www.raven.jc.filter;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -13,6 +14,7 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import www.raven.jc.config.SecurityProperty;
 import www.raven.jc.constant.JwtConstant;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.result.ResultCode;
@@ -27,13 +29,15 @@ import www.raven.jc.util.JsonUtil;
 @Slf4j
 @Component
 public class RequestFilter implements GlobalFilter, Ordered {
-    private static final String WHITE_PATH = "auth";
+    @Autowired
+    private SecurityProperty securityProperty;
 
     @Override
     public int getOrder() {
         // -2 is response filter, request filter should be called before that
         return -3;
     }
+
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -44,8 +48,10 @@ public class RequestFilter implements GlobalFilter, Ordered {
         log.info("Request URI: " + request.getURI());
         log.info("Request Headers: " + request.getHeaders());
         log.info("Request Query Params: " + request.getQueryParams());
-        if (request.getURI().getPath().contains(WHITE_PATH)) {
-            return chain.filter(exchange);
+        for (String path:securityProperty.getWordsArray()){
+            if (request.getURI().getPath().contains(path)){
+                return chain.filter(exchange);
+            }
         }
         long time = Long.parseLong(Objects.requireNonNull(request.getHeaders().get(JwtConstant.TIME)).get(0));
         if (time < System.currentTimeMillis()) {

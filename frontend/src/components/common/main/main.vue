@@ -114,13 +114,15 @@ export default {
     };
   },
   created() {
-    this.getRooms();
     //this.updateMessageCount();
     this.getUserData();
     this.initWebSocket();
 
   },
-
+  activated() {
+    ElMessage.success('群聊页面激活');
+    this.getRooms();
+  },
   methods: {
     ipfsHost() {
       return ipfsHost

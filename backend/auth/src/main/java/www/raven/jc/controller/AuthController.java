@@ -41,18 +41,6 @@ public class AuthController {
         return CommonResult.operateSuccess("注册成功", authService.registerCommonRole(registerModel));
     }
 
-    @PostMapping("/registerAdmin")
-    public CommonResult<String> register(@RequestBody @Validated RegisterAdminModel registerModel) {
-        if (Objects.equals(registerModel.getPrivateKey(), jwtProperty.key)) {
-            RegisterModel model = new RegisterModel().setUsername(registerModel.getUsername())
-                .setPassword(registerModel.getPassword())
-                .setEmail(registerModel.getEmail());
-            return CommonResult.operateSuccess("注册成功", authService.registerAdminRole(model));
-        } else {
-            return CommonResult.operateFailure("注册失败", "私钥错误");
-        }
-    }
-
     @GetMapping("/logout/{token}")
     public CommonResult<Void> logout(@PathVariable("token") @NotBlank String token) {
         authService.logout(token);
