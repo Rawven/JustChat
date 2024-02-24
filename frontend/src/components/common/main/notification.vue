@@ -56,14 +56,14 @@
               </el-table-column>
               <el-table-column label="Operations">
                 <template #default="scope">
-                  <el-button size="small" @click="handleFriendAgree(scope.row)"
+                  <el-button size="small" @click="handleFriendAgree(scope.row)" plain type="primary"
                   >Agree
                   </el-button
                   >
                   <el-button
                       size="small"
                       type="danger"
-                      @click="handleFriendReject(scope.row)"
+                      @click="handleFriendReject(scope.row)" plain
                   >reject
                   </el-button
                   >
@@ -97,7 +97,7 @@
               </el-table-column>
               <el-table-column label="Operations" style="margin-right: 10px;">
                 <template #default="scope">
-                  <el-button size="small" style="margin-right: 10px;" @click="handleRoomAgree(scope.row)"
+                  <el-button size="small" style="margin-right: 10px;" type="primary" @click="handleRoomAgree(scope.row)" plain
                   >Agree
                   </el-button
                   >
@@ -105,7 +105,7 @@
                       size="small"
                       style="margin-right: 10px;"
                       type="danger"
-                      @click="handleRoomReject( scope.row)"
+                      @click="handleRoomReject( scope.row)" plain
                   >reject
                   </el-button
                   >
@@ -116,62 +116,6 @@
         </el-col>
       </el-row>
     </el-main>
-    <el-footer class="flex items-center justify-between p-6 bg-white dark:bg-gray-800 shadow-md">
-      <p class="text-sm text-gray-500 dark:text-gray-400">© 2024 My Website</p>
-      <div class="flex gap-4">
-        <a href="#">
-          <svg
-              class="h-5 w-5 text-gray-500 dark:text-gray-400"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-          >
-            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-          </svg>
-        </a>
-        <a href="#">
-          <svg
-              class="h-5 w-5 text-gray-500 dark:text-gray-400"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-                d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
-          </svg>
-        </a>
-        <a href="#">
-          <svg
-              class="h-5 w-5 text-gray-500 dark:text-gray-400"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect height="20" rx="5" ry="5" width="20" x="2" y="2"></rect>
-            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-            <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
-          </svg>
-        </a>
-      </div>
-    </el-footer>
     </el-main>
   </el-container>
 </template>
@@ -179,6 +123,7 @@
 import {Timer} from "@element-plus/icons-vue";
 import {Host} from "@/main";
 import JcAside from "@/components/common/aside.vue";
+import {ElMessage} from "element-plus";
 
 export default {
   name: 'MainPage',
@@ -205,18 +150,22 @@ export default {
       },
     };
   },
-  created() {
-    this.realAxios.get(`http://` + Host + `:7000/user/notice/getNotice`, {
-      headers: {
-        'token': localStorage.getItem("token")
-      }
-    }).then(response => {
-      this.tableDatas = response.data.data;
-    })
+  activated() {
+    ElMessage.success('通知页面激活');
+    this.getNotice();
   },
   methods: {
     Host() {
       return Host
+    },
+    getNotice(){
+      this.realAxios.get(`http://` + Host + `:7000/user/notice/getNotice`, {
+        headers: {
+          'token': localStorage.getItem("token")
+        }
+      }).then(response => {
+        this.tableDatas = response.data.data;
+      })
     },
     handleFriendAgree(data) {
       this.realAxios({

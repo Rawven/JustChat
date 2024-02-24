@@ -97,16 +97,15 @@ export default {
     };
   },
   created() {
-    this.getFriends();
-    //this.updateMessageCount();
     let item = localStorage.getItem("userData");
     if (item) {
       this.userInfo = JSON.parse(item);
     }
     this.initWebSocket();
-
   },
-
+  activated() {
+    this.getFriends();
+  },
   methods: {
     ipfsHost() {
       return ipfsHost
