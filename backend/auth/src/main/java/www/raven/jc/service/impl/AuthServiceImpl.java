@@ -22,6 +22,7 @@ import www.raven.jc.dto.UserAuthDTO;
 import www.raven.jc.dto.UserRegisterDTO;
 import www.raven.jc.entity.model.LoginModel;
 import www.raven.jc.entity.model.RegisterModel;
+import www.raven.jc.entity.vo.TokenVO;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.AuthService;
 import www.raven.jc.util.JwtUtil;
@@ -46,13 +47,13 @@ public class AuthServiceImpl implements AuthService {
 
 
     @Override
-    public String login(LoginModel loginModel) {
+    public TokenVO login(LoginModel loginModel) {
         RpcResult<UserAuthDTO> result = userDubbo.getUserToAuth(loginModel.getUsername());
         Assert.isTrue(result.isSuccess(),"用户不存在");
         UserAuthDTO user = result.getData();
         RBucket<Object> bucket = redissonClient.getBucket(JwtConstant.TOKEN + user.getUserId());
         if (bucket.isExists()) {
-            return bucket.get().toString();
+            return new TokenVO().setToken(bucket.get().toString()).setExpireTime(jwtProperty.expireTime);
         }
         Assert.isTrue(passwordEncoder.matches(loginModel.getPassword(), user.getPassword()), "密码错误");
         RpcResult<List<RoleDTO>> rolesById = userDubbo.getRolesById(user.getUserId());
@@ -62,7 +63,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
-    public String registerCommonRole(RegisterModel registerModel) {
+    public TokenVO registerCommonRole(RegisterModel registerModel) {
         ArrayList<Integer> list = new ArrayList<>();
         list.add(RoleConstant.COMMON_ROLE_NUMBER);
         return register(registerModel, list);
@@ -70,7 +71,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
-    public String registerAdminRole(RegisterModel registerModel) {
+    public TokenVO registerAdminRole(RegisterModel registerModel) {
         ArrayList<Integer> list = new ArrayList<>();
         list.add(RoleConstant.ADMIN_ROLE_NUMBER);
         list.add(RoleConstant.COMMON_ROLE_NUMBER);
@@ -78,7 +79,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String refreshToken(String token) {
+    public TokenVO refreshToken(String token) {
         TokenDTO verify = JwtUtil.parseToken(token, jwtProperty.key);
         return produceToken(verify.getUserId(), verify.getRole());
     }
@@ -91,7 +92,7 @@ public class AuthServiceImpl implements AuthService {
         Assert.isTrue(voidCommonResult.isSuccess(), "登出失败");
     }
 
-    private String register(RegisterModel registerModel, List<Integer> roleIds) {
+    private TokenVO register(RegisterModel registerModel, List<Integer> roleIds) {
         Assert.isFalse(userDubbo.checkUserExit(registerModel.getUsername()).getData(),"用户名已存在");
         UserRegisterDTO user = new UserRegisterDTO();
         user.setEmail(registerModel.getEmail()).setPassword(passwordEncoder.encode(registerModel.getPassword()))
@@ -102,10 +103,10 @@ public class AuthServiceImpl implements AuthService {
         return produceToken(insert.getData().getUserId(), list.stream().map(RoleDTO::getValue).collect(Collectors.toList()));
     }
 
-    private String produceToken(int userId, List<String> role) {
+    private TokenVO produceToken(int userId, List<String> role) {
         String token = JwtUtil.createToken(userId, role, jwtProperty.key, jwtProperty.expireTime);
         redissonClient.getBucket(JwtConstant.TOKEN + userId).set(token, jwtProperty.expireTime, TimeUnit.MILLISECONDS);
-        return token;
+        return new TokenVO().setToken(token).setExpireTime(jwtProperty.expireTime);
     }
 
 }

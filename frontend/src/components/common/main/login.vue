@@ -64,7 +64,8 @@ export default {
           this.realAxios.post('http://' + Host + ':7000/auth/login', this.user)
               .then(response => {
                 localStorage.removeItem("token");
-                localStorage.setItem("token", response.data.data);
+                localStorage.setItem("token", response.data.data.token);
+                localStorage.setItem("expireTime", response.data.data.expireTime);
                 this.realAxios.post('http://' + Host + ':7000/user/common/defaultInfo', {}, {
                   headers: {
                     'token': localStorage.getItem("token")

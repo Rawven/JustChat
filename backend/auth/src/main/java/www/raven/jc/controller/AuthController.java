@@ -14,6 +14,7 @@ import www.raven.jc.config.JwtProperty;
 import www.raven.jc.entity.model.LoginModel;
 import www.raven.jc.entity.model.RegisterAdminModel;
 import www.raven.jc.entity.model.RegisterModel;
+import www.raven.jc.entity.vo.TokenVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.AuthService;
 
@@ -32,12 +33,12 @@ public class AuthController {
     private JwtProperty jwtProperty;
 
     @PostMapping("/login")
-    public CommonResult<String> login(@RequestBody @Validated LoginModel loginModel) {
+    public CommonResult<TokenVO> login(@RequestBody @Validated LoginModel loginModel) {
         return CommonResult.operateSuccess("登录成功", authService.login(loginModel));
     }
 
     @PostMapping("/register")
-    public CommonResult<String> register(@RequestBody @Validated RegisterModel registerModel) {
+    public CommonResult<TokenVO> register(@RequestBody @Validated RegisterModel registerModel) {
         return CommonResult.operateSuccess("注册成功", authService.registerCommonRole(registerModel));
     }
 
@@ -48,7 +49,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public CommonResult<String> refresh(@RequestBody @NotBlank String token) {
+    public CommonResult<TokenVO> refresh(@RequestBody @NotBlank String token) {
         return CommonResult.operateSuccess("刷新成功", authService.refreshToken(token));
     }
 
