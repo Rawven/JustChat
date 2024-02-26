@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.constant.ChatUserMqConstant;
+import www.raven.jc.constant.JwtConstant;
 import www.raven.jc.constant.NoticeConstant;
 import www.raven.jc.dao.FriendDAO;
 import www.raven.jc.dao.NoticeDAO;
@@ -25,10 +26,10 @@ import www.raven.jc.entity.po.Friend;
 import www.raven.jc.entity.po.Notice;
 import www.raven.jc.entity.po.User;
 import www.raven.jc.entity.vo.NoticeVO;
+import www.raven.jc.event.SseNotificationHandler;
 import www.raven.jc.service.NoticeService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.RequestUtil;
-import www.raven.jc.ws.NotificationHandler;
 
 /**
  * notice service impl
@@ -47,8 +48,6 @@ public class NoticeServiceImpl implements NoticeService {
     private UserDAO userDAO;
     @Autowired
     private FriendDAO friendDAO;
-    @Autowired
-    private NotificationHandler handler;
     @Autowired
     private RedissonClient redissonClient;
 
@@ -83,6 +82,9 @@ public class NoticeServiceImpl implements NoticeService {
         int applierId = RequestUtil.getUserId(request);
         User user = userDAO.getBaseMapper().selectOne(new QueryWrapper<User>().eq("username", friendName));
         Assert.notNull(user, "用户不存在");
+        Assert.isNull(noticeDAO.getBaseMapper().selectOne(new QueryWrapper<Notice>().
+            eq("user_id", user.getId()).eq("sender_id", applierId).
+            eq("type", NoticeConstant.TYPE_ADD_FRIEND_APPLY)), "已经申请过了");
         Assert.isNull(friendDAO.getBaseMapper().selectOne(new QueryWrapper<Friend>().eq("user_id", applierId).eq("friend_id", user.getId())), "已经是好友了");
         Integer friendId = user.getId();
         Notice notice = new Notice().setUserId(friendId)
@@ -91,13 +93,14 @@ public class NoticeServiceImpl implements NoticeService {
             .setTimestamp(System.currentTimeMillis())
             .setSenderId(applierId);
         Assert.isTrue(noticeDAO.save(notice), "添加失败");
-        RBucket<String> friendBucket = redissonClient.getBucket("token:" + friendId);
+        RBucket<String> friendBucket = redissonClient.getBucket(JwtConstant.TOKEN + friendId);
         HashMap<Object, Object> map = new HashMap<>(1);
+        map.put("applyId", applierId);
         map.put("type", ChatUserMqConstant.TAGS_USER_FRIEND_APPLY);
         if (friendBucket.isExists()) {
-            handler.sendOneMessage(friendId, JsonUtil.objToJson(map));
+            SseNotificationHandler.sendMessage(friendId, JsonUtil.objToJson(map));
         } else {
-            log.info("--RocketMq receiver不在线");
+            log.info("--sse receiver不在线");
         }
     }
 

@@ -16,7 +16,6 @@ import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
 import www.raven.jc.constant.ChatUserMqConstant;
 import www.raven.jc.constant.JwtConstant;
-import www.raven.jc.constant.MqConstant;
 import www.raven.jc.constant.NoticeConstant;
 import www.raven.jc.constant.SocialUserMqConstant;
 import www.raven.jc.dao.FriendDAO;
@@ -31,7 +30,6 @@ import www.raven.jc.event.model.RoomApplyEvent;
 import www.raven.jc.event.model.RoomMsgEvent;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
-import www.raven.jc.ws.NotificationHandler;
 
 import static www.raven.jc.constant.MqConstant.HEADER_TAGS;
 
@@ -47,8 +45,6 @@ public class UserEventListener {
 
     @Autowired
     private UserDAO userDAO;
-    @Autowired
-    private NotificationHandler notificationHandler;
     @Autowired
     private RedissonClient redissonClient;
     @Autowired
@@ -89,7 +85,7 @@ public class UserEventListener {
         map.put("msg", payload.getMsg());
         map.put("type", SocialUserMqConstant.TAGS_MOMENT_NOTICE_MOMENT_FRIEND);
         List<Integer> idsFriend = friends.stream().map(Friend::getFriendId).map(Long::intValue).collect(Collectors.toList());
-        notificationHandler.sendBatchMessage(JsonUtil.objToJson(map), idsFriend);
+        SseNotificationHandler.sendBatchMessage(JsonUtil.objToJson(map), idsFriend);
     }
 
     private void eventMomentNoticeLikeOrCommentEvent(Message<Event> msg) {
@@ -99,7 +95,7 @@ public class UserEventListener {
         map.put("momentId", payload.getMomentId());
         map.put("msg", payload.getMsg());
         map.put("type", SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT);
-        notificationHandler.sendOneMessage(userId, JsonUtil.objToJson(map));
+        SseNotificationHandler.sendMessage(userId, JsonUtil.objToJson(map));
     }
 
     @Bean
@@ -131,13 +127,13 @@ public class UserEventListener {
     private void eventFriendSendMsg(Message<Event> msg) {
         FriendMsgEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), FriendMsgEvent.class);
         RBucket<String> receiverBucket = redissonClient.getBucket(JwtConstant.TOKEN+ payload.getReceiverId());
-        HashMap<Object, Object> map = new HashMap<>(2);
+        HashMap<Object, Object> map = new HashMap<>(4);
         map.put("receiverId", payload.getReceiverId());
         map.put("senderId", payload.getSenderId());
         map.put("msg", payload.getMsg());
         map.put("type", ChatUserMqConstant.TAGS_CHAT_FRIEND_MSG_RECORD);
         if (receiverBucket.isExists()) {
-            notificationHandler.sendOneMessage(payload.getReceiverId(), JsonUtil.objToJson(map));
+            SseNotificationHandler.sendMessage(payload.getReceiverId(), JsonUtil.objToJson(map));
         } else {
             log.info("--RocketMq receiver不在线");
         }
@@ -165,7 +161,7 @@ public class UserEventListener {
             map.put("roomId", payload.getRoomId());
             map.put("applier", applier.getUsername());
             map.put("type", ChatUserMqConstant.TAGS_CHAT_ROOM_APPLY);
-            notificationHandler.sendOneMessage(founderId, JsonUtil.objToJson(map));
+            SseNotificationHandler.sendMessage(founderId, JsonUtil.objToJson(map));
             log.info("--RocketMq 已推送通知给founder");
         }else {
             log.info("--RocketMq founder不在线");
@@ -186,6 +182,6 @@ public class UserEventListener {
         map.put("msg", payload.getMsg());
         map.put("type", ChatUserMqConstant.TAGS_CHAT_ROOM_MSG_RECORD);
         List<Integer> idsFromRoom = payload.getIdsFromRoom();
-        notificationHandler.sendBatchMessage(JsonUtil.objToJson(map), idsFromRoom);
+        SseNotificationHandler.sendBatchMessage(JsonUtil.objToJson(map), idsFromRoom);
     }
 }
