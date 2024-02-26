@@ -6,7 +6,7 @@
 | Vue          | spring-gateway       | mysql  | rocketMq|
 | element-plus | spring-boot          | redis  | nacos |
 |              | dubbo                | ipfs   |       |
-|              | websocket            | mongodb|       |
+|              |                      | mongodb|       |
 --------
 暂时启动策略（后续写为docker-compose脚本）
 前端启动 npm run dev
