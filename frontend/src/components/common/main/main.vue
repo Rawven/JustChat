@@ -116,8 +116,6 @@ export default {
   created() {
     //this.updateMessageCount();
     this.getUserData();
-    this.initWebSocket();
-
   },
   activated() {
     ElMessage.success('群聊页面激活');
@@ -154,39 +152,6 @@ export default {
     checkOut(roomId) {
       this.nowRoomId = roomId;
       this.rooms[this.roomIndex.get(roomId)].isNew = false;
-    },
-    initWebSocket() {
-      let token = localStorage.getItem("token");
-      this.websocket = new WebSocket(`ws://` + Host + `:8080/ws/${token}`);
-      this.websocket.onopen = () => {
-        console.log('WebSocket is open now.');
-      };
-      this.websocket.onmessage = (event) => {
-        console.log('WebSocket message received:', event.data);
-        let data = JSON.parse(event.data)
-        if (data.type === "FRIEND_APPLY") {
-          this.applyNoticeIsNew = true;
-          ElMessage.success('您有新的好友申请');
-        } else if (data.type === "ROOM_APPLY") {
-          this.applyNoticeIsNew = true;
-          ElMessage.success('您有新的群聊申请');
-        } else if (data.type === "RECORD_MOMENT_FRIEND" || data.type === "RECORD_MOMENT") {
-          this.momentNoticeIsNew = true;
-          ElMessage.success('您有新的朋友圈消息');
-        } else {
-          let index = this.roomIndex.get(Number(data.roomId));
-          this.rooms[index] = {
-            ...this.rooms[index],
-            lastMsg: data.msg,
-            lastMsgSender: data.username,
-            isNew: true
-          };
-          console.log(this.rooms[index])
-        }
-      };
-      this.websocket.onclose = () => {
-        console.log('WebSocket is closed now.');
-      };
     },
     // 其他方法...
     formatDateOrTime(timestamp) {

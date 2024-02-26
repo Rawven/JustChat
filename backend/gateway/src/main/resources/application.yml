@@ -54,7 +54,7 @@ security:
       user: USER
       admin: ADMIN
     paths:
-     permitAll: /auth/**,/ws/**,/file/**,/webSocket/**
+     permitAll: /auth/**,/ws/**,/file/**,/webSocket/**,/user/sse/**
      hasAnyRoleUserAdmin: /chat/**,/user/**,/social/**
      hasRoleAdmin : /admin/**
 jwt:

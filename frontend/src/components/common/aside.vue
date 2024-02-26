@@ -44,6 +44,7 @@ import {Avatar, Bell, Close, House, PictureFilled, Plus, User} from "@element-pl
 import {defineComponent} from "vue";
 import router from "@/router";
 import {ElMessage} from "element-plus";
+import {Host} from "@/main";
 
 export default defineComponent({
   name: 'Jc-Aside',
@@ -53,8 +54,10 @@ export default defineComponent({
       from: 'axiosFilter'
     }
   },
+  created() {
+    this.initSseNotice();
+  },
   activated() {
-    ElMessage.success('Welcome back!')
     let time = localStorage.getItem("expireTime");
     if(time < 1000 * 60 * 60 * 24){
       this.refreshToken();
@@ -73,6 +76,37 @@ export default defineComponent({
         this.userInfo = response.data.data;
       })
       },
+    initSseNotice() {
+      let token = localStorage.getItem("token");
+      let source ;
+      if (window.EventSource) {
+        source = new EventSource(`http://` + Host + `:7000/user/sse/connect/${token}`);
+        source.addEventListener('open', () => {
+        }, false);
+        source.addEventListener('message', (event) => {
+          let data = JSON.parse(event.data)
+          if (data.type === "FRIEND_APPLY") {
+            ElMessage.success('您有新的好友申请');
+          } else if (data.type === "ROOM_APPLY") {
+            ElMessage.success('您有新的群聊申请');
+          } else if (data.type === "RECORD_MOMENT_FRIEND" || data.type === "RECORD_MOMENT") {
+            ElMessage.success('您有新的朋友圈消息');
+          }else {
+            ElMessage.info('未知消息类型');
+          }
+        });
+        source.addEventListener('error', (e) => {
+          if (e.readyState === EventSource.CLOSED) {
+            ElMessage.error("连接关闭");
+          } else {
+            console.log(e);
+          }
+        }, false);
+      }
+    },
+    log(e){
+      ElMessage.success(e);
+    },
     turnSearch() {
       router.push('/search')
     },

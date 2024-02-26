@@ -33,7 +33,7 @@ import static www.raven.jc.constant.ScoredSortedSetConstant.PREFIX;
 
 /**
  * async service
- *
+ * 朋友圈是feed
  * @author 刘家辉
  * @date 2024/02/18
  */

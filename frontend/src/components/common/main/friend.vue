@@ -101,7 +101,6 @@ export default {
     if (item) {
       this.userInfo = JSON.parse(item);
     }
-    this.initWebSocket();
   },
   activated() {
     this.getFriends();
@@ -135,35 +134,6 @@ export default {
     turnMoment() {
       this.$router.push('/moment');
     },
-    initWebSocket() {
-      let token = localStorage.getItem("token");
-      this.websocket = new WebSocket(`ws://` + Host + `:8080/ws/${token}`);
-      this.websocket.onopen = () => {
-        console.log('WebSocket is open now.');
-      };
-      this.websocket.onmessage = (event) => {
-
-        let data = JSON.parse(event.data)
-        if (data.type === "FRIEND_APPLY") {
-          this.noticeIsNew = true;
-          ElMessage.success('您有新的好友申请');
-        } else if (data.type === "ROOM_APPLY") {
-          this.noticeIsNew = true;
-          ElMessage.success('您有新的群聊申请');
-        } else {
-          let index = this.friendIndex.get(Number(data.friendId));
-          this.friends[index] = {
-            ...this.friends[index],
-            lastMsg: data.msg,
-            lastMsgSender: data.username,
-            isNew: true
-          };
-        }
-      };
-      this.websocket.onclose = () => {
-        console.log('WebSocket is closed now.');
-      };
-    },
     // 其他方法...
     formatDateOrTime(timestamp) {
       const messageDate = new Date(timestamp);
@@ -190,10 +160,12 @@ export default {
         this.friends = response.data.data;
         console.log(this.friends)
         // 将获取的房间总数赋值给 totalRooms
-        this.nowFriendId = this.friends[0].friendId;
-        this.friends.forEach((friend, index) => {
-          this.friendIndex.set(Number(friend.friendId), index);
-        });
+        if(this.friends.length > 0) {
+          this.nowFriendId = this.friends[0].friendId;
+          this.friends.forEach((friend, index) => {
+            this.friendIndex.set(Number(friend.friendId), index);
+          });
+        }
       })
     },
   }

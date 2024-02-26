@@ -48,7 +48,7 @@ public class RoomController {
     //TODO 分页
     @GetMapping("/initUserFriendPage")
     public CommonResult<List<UserFriendVO>> initUserFriendPage() {
-        return CommonResult.operateSuccess("获取房间列表成功", friendService.initUserFriendPage());
+        return CommonResult.operateSuccess("获取好友列表成功", friendService.initUserFriendPage());
     }
 
     @GetMapping("/queryIdRoomList/{page}/{size}")
