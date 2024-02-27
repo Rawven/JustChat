@@ -14,6 +14,7 @@ import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import www.raven.jc.api.UserDubbo;
 import www.raven.jc.constant.ScoredSortedSetConstant;
+import www.raven.jc.constant.SocialUserMqConstant;
 import www.raven.jc.dao.MomentDAO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.model.CommentModel;
@@ -24,9 +25,12 @@ import www.raven.jc.entity.po.Like;
 import www.raven.jc.entity.po.Moment;
 import www.raven.jc.entity.po.Reply;
 import www.raven.jc.entity.vo.MomentVO;
+import www.raven.jc.event.model.MomentNoticeEvent;
 import www.raven.jc.result.RpcResult;
-import www.raven.jc.service.CacheAsyncService;
+import www.raven.jc.service.TimelineFeedService;
 import www.raven.jc.service.SocialService;
+import www.raven.jc.util.JsonUtil;
+import www.raven.jc.util.MqUtil;
 import www.raven.jc.util.RequestUtil;
 
 /**
@@ -50,7 +54,7 @@ public class SocialServiceImpl implements SocialService {
     @Autowired
     private StreamBridge streamBridge;
     @Autowired
-    private CacheAsyncService cacheAsyncService;
+    private TimelineFeedService timelineFeedService;
 
     @Override
     public void releaseMoment(MomentModel model) {
@@ -67,12 +71,15 @@ public class SocialServiceImpl implements SocialService {
             .setLikes(new ArrayList<>());
         Moment save = momentDAO.save(moment);
         Assert.isTrue(save.getMomentId() != null, "发布失败");
-        cacheAsyncService.updateMomentCacheAndNotice(userId, save);
+        timelineFeedService.insertMomentFeed(userId, save);
+        handleEvent( save.getMomentId().toHexString(), userId, "发布了新的朋友圈",
+            SocialUserMqConstant.TAGS_MOMENT_NOTICE_MOMENT_FRIEND);
        }
 
     @Override
     public void deleteMoment(String momentId) {
         Assert.isTrue(momentDAO.delete(momentId), "删除失败");
+        //待定
     }
 
     @Override
@@ -83,7 +90,8 @@ public class SocialServiceImpl implements SocialService {
         UserInfoDTO data = singleInfo.getData();
         Like like = new Like().setTimestamp(System.currentTimeMillis()).setUserInfo(data);
         Assert.isTrue(momentDAO.like(likeModel.getMomentId(), like), "点赞失败");
-        cacheAsyncService.updateLikeCacheAndNotice(userId, likeModel.getMomentTimeStamp(), like);
+        handleEvent(likeModel.getMomentId(), likeModel.getMomentUserId(), "有人点赞了你的朋友圈",
+            SocialUserMqConstant.TAGS_MOMENT_INTERNAL_LIKE_RECORD);
     }
 
     @Override
@@ -99,33 +107,39 @@ public class SocialServiceImpl implements SocialService {
                 .setContent(model.getText())
                 .setReplies(new ArrayList<>());
             Assert.isTrue(momentDAO.comment(model.getMomentId(), comment), "评论失败");
-            cacheAsyncService.updateCommentCacheAndNotice(userId, model.getMomentTimeStamp(), comment);
             } else {
             Reply reply = new Reply().setUserInfo(data)
                 .setContent(model.getText())
                 .setTimestamp(System.currentTimeMillis())
                 .setParentId(model.getCommentId());
             Assert.isTrue(momentDAO.reply(model.getMomentId(), model.getCommentId(), reply), "回复失败");
-            cacheAsyncService.updateReplyCacheAndNotice(userId, model.getMomentTimeStamp(), reply);
           }
         //发布更新事件
+        handleEvent(model.getMomentId(), model.getMomentUserId(), "有人回复了你的评论", SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT);
     }
 
     @Override
     public List<MomentVO> queryMoment(int userId) {
-        RScoredSortedSet<MomentVO> scoredSortedSet = redissonClient.getScoredSortedSet(ScoredSortedSetConstant.PREFIX + userId);
+        RScoredSortedSet<Integer> scoredSortedSet = redissonClient.getScoredSortedSet(ScoredSortedSetConstant.PREFIX + userId);
+        List<Moment> moments;
+        //存在时间线
         if (scoredSortedSet.isExists()) {
             // 获取有序集合的所有元素
-            return scoredSortedSet.stream().collect(Collectors.toList());
+            List<Integer> collect = scoredSortedSet.stream().collect(Collectors.toList());
+             moments = momentDAO.queryBatchMomentsById(collect);
+        }else {
+            RpcResult<List<UserInfoDTO>> friendInfos = userDubbo.getFriendAndMeInfos(userId);
+            Assert.isTrue(friendInfos.isSuccess(), "获取好友信息失败");
+            moments = momentDAO.queryBatchMomentsByUserInfo(friendInfos.getData());
+            List<MomentVO> collect = moments.stream().map(MomentVO::new).collect(Collectors.toList());
+            timelineFeedService.addMomentTimelineFeeding(collect, userId);
         }
-        RpcResult<List<UserInfoDTO>> friendInfos = userDubbo.getFriendAndMeInfos(userId);
-        Assert.isTrue(friendInfos.isSuccess(), "获取好友信息失败");
-        List<Moment> moments = momentDAO.queryMoment(friendInfos.getData());
-        List<MomentVO> collect = moments.stream().map(MomentVO::new).collect(Collectors.toList());
-        cacheAsyncService.addMomentCache(collect, userId);
-        return collect;
+        return moments.stream().map(MomentVO::new).collect(Collectors.toList());
     }
 
-
-
+    private void handleEvent(String momentId,Integer userId,String msg,String tag) {
+        streamBridge.send("producer-out-1", MqUtil.createMsg(
+            JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(momentId).setUserId(userId).setMsg(msg)),
+            tag));
+    }
 }

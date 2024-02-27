@@ -8,7 +8,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 import www.raven.jc.dao.mapper.MomentMapper;
 import www.raven.jc.dto.UserInfoDTO;
@@ -59,10 +58,16 @@ public class MomentDAO {
         Update update = new Update().push("comments.$.replies", reply);
         return mongoTemplate.updateFirst(query, update, COLLECTION_MOMENT).getModifiedCount() > 0;
     }
+    
+    public List<Moment> queryBatchMomentsById(List<Integer> list) {
+        //通过_id查找用户的动态 按照时间排序
+        Query with = new Query(Criteria.where("_id").in(list)).with(Sort.by(Sort.Direction.DESC, "timestamp"));
+        return mongoTemplate.find(with, Moment.class, COLLECTION_MOMENT);
+    }
 
-    public List<Moment> queryMoment(List<UserInfoDTO> infos) {
+    public List<Moment> queryBatchMomentsByUserInfo(List<UserInfoDTO> list) {
         //查找 ids 中的用户的动态 按照时间排序 只查7条
-        Query with = new Query(Criteria.where("userInfo").in(infos)).limit(15).with(Sort.by(Sort.Direction.DESC, "timestamp"));
+        Query with = new Query(Criteria.where("userInfo").in(list)).limit(15).with(Sort.by(Sort.Direction.DESC, "timestamp"));
         return mongoTemplate.find(with, Moment.class, COLLECTION_MOMENT);
     }
 
