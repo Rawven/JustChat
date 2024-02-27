@@ -20,23 +20,36 @@
         <module name="common-threadpool" />
         <module name="common-aop" />
         <module name="common-mp" />
+        <module name="jc-user" />
         <module name="common-redis" />
         <module name="common-api" />
         <module name="common-mvc" />
+        <module name="jc-auth" />
         <module name="common-ws" />
         <module name="file" />
         <module name="chat" />
         <module name="common-mq-base" />
+        <module name="jc-im" />
+        <module name="jc-feed" />
         <module name="user" />
         <module name="gateway" />
+        <module name="jc-file" />
+        <module name="jc-gateway" />
         <module name="common-mq-chat-user-model" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="admin" target="11" />
+      <module name="auth" target="11" />
+      <module name="chat" target="11" />
+      <module name="common" target="11" />
       <module name="common-api-user" target="11" />
       <module name="common-base" target="11" />
       <module name="common-User" target="11" />
+      <module name="file" target="11" />
+      <module name="gateway" target="11" />
+      <module name="social" target="11" />
+      <module name="user" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>
