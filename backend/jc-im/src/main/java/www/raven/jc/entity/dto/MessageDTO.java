@@ -14,4 +14,5 @@ import lombok.experimental.Accessors;
 public class MessageDTO {
     private Long time;
     private String text;
+    private String type;
 }

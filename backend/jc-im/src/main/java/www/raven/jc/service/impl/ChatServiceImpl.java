@@ -44,6 +44,7 @@ import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MongoUtil;
 import www.raven.jc.util.MqUtil;
 import www.raven.jc.ws.RoomChatHandler;
+import www.raven.jc.ws.WebsocketHandler;
 
 /**
  * chat service impl
@@ -85,13 +86,19 @@ public class ChatServiceImpl implements ChatService {
             new QueryWrapper<UserRoom>().eq("room_id", roomId).
                 eq("status", ApplyStatusConstant.APPLY_STATUS_AGREE)).
             stream().map(UserRoom::getUserId).collect(Collectors.toList());
-        //离线消息
+        //TODO 离线消息
 
-        Map<Integer, Map<Integer, Session>> pool = RoomChatHandler.SESSION_POOL;
+        Map<Integer, Map<Integer, Session>> pool = WebsocketHandler.GROUP_SESSION_POOL;
+         //对离线用户进行离线信息保存
+        userIds.forEach(
+            id -> {
+                if (pool.get(id) == null) {
+                    RScoredSortedSet<Object> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + id);
+                    scoredSortedSet.add(timeStamp,JsonUtil.objToJson(realMsg));
+                }
+            }
+        );
 
-        RScoredSortedSet<Object> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + userId);
-        scoredSortedSet.expire(OfflineMessagesConstant.EXPIRE_DAYS);
-        scoredSortedSet.add(message.getTime(), JsonUtil.objToJson(realMsg));
 
         //保存进入历史消息db
         messageDAO.getBaseMapper().save(realMsg);

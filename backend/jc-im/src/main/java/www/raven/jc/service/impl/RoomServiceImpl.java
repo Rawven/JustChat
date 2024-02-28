@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.api.UserDubbo;
 import www.raven.jc.constant.ApplyStatusConstant;
-import www.raven.jc.constant.ChatUserMqConstant;
 import www.raven.jc.dao.MessageDAO;
 import www.raven.jc.dao.RoomDAO;
 import www.raven.jc.dao.UserRoomDAO;
@@ -32,12 +31,10 @@ import www.raven.jc.entity.po.UserRoom;
 import www.raven.jc.entity.vo.DisplayRoomVO;
 import www.raven.jc.entity.vo.RealRoomVO;
 import www.raven.jc.entity.vo.UserRoomVO;
-import www.raven.jc.event.model.RoomApplyEvent;
 import www.raven.jc.result.RpcResult;
-import www.raven.jc.service.ChatAsyncService;
+import www.raven.jc.service.AsyncService;
 import www.raven.jc.service.RoomService;
 import www.raven.jc.util.JsonUtil;
-import www.raven.jc.util.MqUtil;
 import www.raven.jc.util.RequestUtil;
 
 /**
@@ -64,7 +61,7 @@ public class RoomServiceImpl implements RoomService {
     @Autowired
     private RedissonClient redissonClient;
     @Autowired
-    private ChatAsyncService chatAsyncService;
+    private AsyncService asyncService;
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
@@ -149,7 +146,7 @@ public class RoomServiceImpl implements RoomService {
             .setStatus(ApplyStatusConstant.APPLY_STATUS_APPLY);
         int insert = userRoomDAO.getBaseMapper().insert(userRoom);
         Assert.isTrue(insert > 0, "插入失败");
-        chatAsyncService.sendNotice(roomId, userId);
+        asyncService.sendNotice(roomId, userId);
         }
 
     @Transactional(rollbackFor = IllegalArgumentException.class)

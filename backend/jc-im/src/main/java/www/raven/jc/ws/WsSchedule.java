@@ -25,25 +25,15 @@ public class WsSchedule {
     @Scheduled(fixedRate = 60000)
     public void checkRoomWs() {
         long currentTime = System.currentTimeMillis();
-        for (RoomChatHandler roomChatHandler : RoomChatHandler.webSockets) {
-            if ((currentTime - roomChatHandler.getLastActivityTime()) > EXPIRATION_TIME) {
-                closeRoomExpiredConnection(roomChatHandler);
+        for (WebsocketHandler websocketHandler : WebsocketHandler.webSockets) {
+            if ((currentTime - websocketHandler.getLastActivityTime()) > EXPIRATION_TIME) {
+                closeRoomExpiredConnection(websocketHandler);
             }
         }
     }
 
-    @Scheduled(fixedRate = 60000)
-    public void checkFriendWs() {
-        long currentTime = System.currentTimeMillis();
-        for (FriendChatHandler friendChatHandler : FriendChatHandler.webSockets) {
-            if ((currentTime - friendChatHandler.getLastActivityTime()) > EXPIRATION_TIME) {
-                closeFriendExpiredConnection(friendChatHandler);
-            }
-        }
-    }
-
-    private void closeFriendExpiredConnection(FriendChatHandler friendChatHandler) {
-        Session session = friendChatHandler.getSession();
+    private void closeRoomExpiredConnection(WebsocketHandler websocket) {
+        Session session = websocket.getSession();
         if (session != null && session.isOpen()) {
             try {
                 session.close();
@@ -51,20 +41,7 @@ public class WsSchedule {
                 log.error("关闭过期连接失败");
             }
         }
-        FriendChatHandler.webSockets.remove(friendChatHandler);
-        log.info("WebSocket连接过期，用户id为{},总数为:{}", friendChatHandler.getUserId(), FriendChatHandler.webSockets.size());
-    }
-
-    private void closeRoomExpiredConnection(RoomChatHandler roomChatHandler) {
-        Session session = roomChatHandler.getSession();
-        if (session != null && session.isOpen()) {
-            try {
-                session.close();
-            } catch (Exception e) {
-                log.error("关闭过期连接失败");
-            }
-        }
-        RoomChatHandler.webSockets.remove(roomChatHandler);
-        log.info("WebSocket连接过期，用户id为{},总数为:{}", roomChatHandler.getUserId(), RoomChatHandler.webSockets.size());
+        WebsocketHandler.webSockets.remove(websocket);
+        log.info("WebSocket连接过期，用户id为{},总数为:{}", websocket.getUserId(), WebsocketHandler.webSockets.size());
     }
 }

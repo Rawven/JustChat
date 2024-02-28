@@ -7,7 +7,7 @@ import www.raven.jc.constant.ChatUserMqConstant;
 import www.raven.jc.dao.RoomDAO;
 import www.raven.jc.entity.po.Room;
 import www.raven.jc.event.model.RoomApplyEvent;
-import www.raven.jc.service.ChatAsyncService;
+import www.raven.jc.service.AsyncService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 
@@ -18,7 +18,7 @@ import www.raven.jc.util.MqUtil;
  * @date 2024/02/23
  */
 @Service
-public class ChatAsyncServiceImpl implements ChatAsyncService {
+public class AsyncServiceImpl implements AsyncService {
     @Autowired
     private RoomDAO roomDAO;
     @Autowired
@@ -29,5 +29,15 @@ public class ChatAsyncServiceImpl implements ChatAsyncService {
         Integer founderId = room.getFounderId();
         //通知user模块 插入一条申请记录
         streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new RoomApplyEvent(userId, founderId, roomId)), ChatUserMqConstant.TAGS_CHAT_ROOM_APPLY));
+    }
+
+    @Override
+    public void updateRoomMap(Integer userId, String sessionId) {
+
+    }
+
+    @Override
+    public void updateFriendMap(Integer userId, String sessionId) {
+
     }
 }
