@@ -13,6 +13,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class MessageDTO {
     private Long time;
+    private Integer id;
     private String text;
     private String type;
 }

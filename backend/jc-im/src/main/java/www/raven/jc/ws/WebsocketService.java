@@ -13,14 +13,11 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import www.raven.jc.api.UserDubbo;
 import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
-import www.raven.jc.exception.WsAttackException;
-import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.JwtUtil;
 
@@ -34,39 +31,43 @@ import www.raven.jc.util.JwtUtil;
 @Slf4j
 @ServerEndpoint("/ws/{token}")
 @Data
-public class WebsocketHandler extends BaseHandler {
+public class WebsocketService  {
     /**
      * 用来存在线连接数
      */
     public static final Map<Integer, Session> SESSION_POOL = new HashMap<>();
     /**
-     * 用来存在线连接数
+     * 用来存私聊关系
      */
     public static final Map<Integer, Map<Integer, Session>> FRIEND_SESSION_POOL = new HashMap<>();
     /**
-     * 用来存在线连接数
+     * 用来存群聊关系
      */
     public static final Map<Integer, Map<Integer, Session>> GROUP_SESSION_POOL = new HashMap<>();
     /**
      * concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
      * 虽然@Component默认是单例模式的，但springboot还是会为每个websocket连接初始化一个bean，所以可以用一个静态set保存起来。
      */
-    public static CopyOnWriteArraySet<WebsocketHandler> webSockets = new CopyOnWriteArraySet<>();
+    public static CopyOnWriteArraySet<WebsocketService> webSockets = new CopyOnWriteArraySet<>();
+    /**
+     * user id
+     * 对应是哪个用户
+     */
+    protected Integer userId;
+
+    /**
+     * 与某个客户端的连接会话，需要通过它来给客户端发送数据
+     **/
+    protected Session session;
+
+    protected long lastActivityTime = System.currentTimeMillis();
 
     private static UserDubbo userDubbo;
+    private static PrivateHandler privateHandler;
+    private static RoomHandler roomHandler;
+    private BaseHandler baseHandler;
 
-    private static ChatService chatService;
 
-
-    @Autowired
-    public void setUserDubbo(UserDubbo userDubbo) {
-        WebsocketHandler.userDubbo = userDubbo;
-    }
-
-    @Autowired
-    public void setChatService(ChatService chatService) {
-        WebsocketHandler.chatService = chatService;
-    }
 
     /**
      * 链接成功调用的方法
@@ -112,10 +113,17 @@ public class WebsocketHandler extends BaseHandler {
         log.info("----WebSocket收到客户端发来的消息:" + message);
         lastActivityTime = System.currentTimeMillis();
         MessageDTO messageDTO = JsonUtil.jsonToObj(message, MessageDTO.class);
-        TokenDTO tokenDTO = (TokenDTO) (session.getUserProperties().get("userDto"));
-        UserInfoDTO data = userDubbo.getSingleInfo(tokenDTO.getUserId()).getData();
-
-        //TODO type
+        switch (messageDTO.getType()){
+            case "friend":
+               setBaseHandler(privateHandler);
+                break;
+            case "room":
+                setBaseHandler(roomHandler);
+                break;
+            default:
+                log.error("未知信息");
+        }
+        this.baseHandler.onMessage(messageDTO,this.session);
     }
 
     /**
@@ -140,7 +148,7 @@ public class WebsocketHandler extends BaseHandler {
      */
     public void sendAllMessage(String message) {
         log.info("【websocket消息】广播消息:" + message);
-        for (WebsocketHandler handler : webSockets) {
+        for (WebsocketService handler : webSockets) {
             if (handler.session.isOpen()) {
                 handler.session.getAsyncRemote().sendText(message);
             }

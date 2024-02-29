@@ -43,8 +43,7 @@ import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MongoUtil;
 import www.raven.jc.util.MqUtil;
-import www.raven.jc.ws.RoomChatHandler;
-import www.raven.jc.ws.WebsocketHandler;
+import www.raven.jc.ws.WebsocketService;
 
 /**
  * chat service impl
@@ -88,7 +87,7 @@ public class ChatServiceImpl implements ChatService {
             stream().map(UserRoom::getUserId).collect(Collectors.toList());
         //TODO 离线消息
 
-        Map<Integer, Map<Integer, Session>> pool = WebsocketHandler.GROUP_SESSION_POOL;
+        Map<Integer, Map<Integer, Session>> pool = WebsocketService.GROUP_SESSION_POOL;
          //对离线用户进行离线信息保存
         userIds.forEach(
             id -> {

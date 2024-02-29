@@ -25,14 +25,14 @@ public class WsSchedule {
     @Scheduled(fixedRate = 60000)
     public void checkRoomWs() {
         long currentTime = System.currentTimeMillis();
-        for (WebsocketHandler websocketHandler : WebsocketHandler.webSockets) {
-            if ((currentTime - websocketHandler.getLastActivityTime()) > EXPIRATION_TIME) {
-                closeRoomExpiredConnection(websocketHandler);
+        for (WebsocketService websocketService : WebsocketService.webSockets) {
+            if ((currentTime - websocketService.getLastActivityTime()) > EXPIRATION_TIME) {
+                closeRoomExpiredConnection(websocketService);
             }
         }
     }
 
-    private void closeRoomExpiredConnection(WebsocketHandler websocket) {
+    private void closeRoomExpiredConnection(WebsocketService websocket) {
         Session session = websocket.getSession();
         if (session != null && session.isOpen()) {
             try {
@@ -41,7 +41,7 @@ public class WsSchedule {
                 log.error("关闭过期连接失败");
             }
         }
-        WebsocketHandler.webSockets.remove(websocket);
-        log.info("WebSocket连接过期，用户id为{},总数为:{}", websocket.getUserId(), WebsocketHandler.webSockets.size());
+        WebsocketService.webSockets.remove(websocket);
+        log.info("WebSocket连接过期，用户id为{},总数为:{}", websocket.getUserId(), WebsocketService.webSockets.size());
     }
 }

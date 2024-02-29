@@ -1,17 +1,7 @@
 package www.raven.jc.ws;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArraySet;
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
 import javax.websocket.Session;
-import javax.websocket.server.PathParam;
-import javax.websocket.server.ServerEndpoint;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,7 +11,6 @@ import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
-import www.raven.jc.util.JwtUtil;
 
 /**
  * friend chat handler
@@ -31,25 +20,27 @@ import www.raven.jc.util.JwtUtil;
  */
 @Slf4j
 @Component
-public class PrivateHandler  {
-    private static UserDubbo userDubbo;
+public class PrivateHandler implements BaseHandler  {
+    @Autowired
+    private  ChatService chatService;
+    @Autowired
+    private  UserDubbo userDubbo;
 
-    private static ChatService chatService;
-
-
-
-    public void onMessage(MessageDTO messageDTO,UserInfoDTO data,Integer friendId) {
-        sendFriendMessage(HandlerUtil.combineMessage(messageDTO, data),data.getUserId(),friendId);
-        chatService.saveFriendMsg(messageDTO, data.getUserId(), friendId);
+    @Override
+    public void onMessage(MessageDTO message,Session session) {
+        TokenDTO tokenDTO = (TokenDTO) (session.getUserProperties().get("userDto"));
+        UserInfoDTO data = userDubbo.getSingleInfo(tokenDTO.getUserId()).getData();
+        sendFriendMessage(HandlerUtil.combineMessage(message, data),data.getUserId(), message.getId());
+        chatService.saveFriendMsg(message, data.getUserId(), message.getId());
     }
 
     public void sendFriendMessage(String message,int userId,int friendId) {
         log.info("----WebSocket 广播消息:" + message);
-        Session mySession = WebsocketHandler.SESSION_POOL.get(userId);
+        Session mySession = WebsocketService.SESSION_POOL.get(userId);
         if (mySession != null && mySession.isOpen()) {
             mySession.getAsyncRemote().sendText(message);
         }
-        Map<Integer, Session> integerSessionMap = WebsocketHandler.FRIEND_SESSION_POOL.get(userId);
+        Map<Integer, Session> integerSessionMap = WebsocketService.FRIEND_SESSION_POOL.get(userId);
             if (integerSessionMap.containsKey(friendId)) {
                 Session session = integerSessionMap.get(friendId);
                 if (session.isOpen()) {
