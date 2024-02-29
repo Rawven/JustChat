@@ -5,19 +5,27 @@
     </el-header>
     <el-menu class="p-4 space-y-2">
       <div class="flex items-center space-x-4" @click="turnSearch">
-        <el-icon><Plus /></el-icon>
+        <el-icon>
+          <Plus/>
+        </el-icon>
         <el-text tag="b">Search</el-text>
       </div>
       <div class="flex items-center space-x-4" @click="turnRooms">
-        <el-icon><House /></el-icon>
+        <el-icon>
+          <House/>
+        </el-icon>
         <el-text tag="b">Rooms</el-text>
       </div>
       <div class="flex items-center space-x-4" @click="turnFriends">
-        <el-icon><User /></el-icon>
+        <el-icon>
+          <User/>
+        </el-icon>
         <el-text tag="b">Friends</el-text>
       </div>
       <div class="flex items-center space-x-4" @click="turnNotifications">
-        <el-icon><Bell /></el-icon>
+        <el-icon>
+          <Bell/>
+        </el-icon>
         <span>Notifications</span>
       </div>
       <div class="flex items-center space-x-4" @click="turnMoment">
@@ -27,12 +35,16 @@
         <el-text tag="b">Moment</el-text>
       </div>
       <div class="flex items-center space-x-4" @click="turnPersonal">
-        <el-icon><Avatar /></el-icon>
+        <el-icon>
+          <Avatar/>
+        </el-icon>
         <el-text tag="b">Personal</el-text>
       </div>
 
       <div class="flex items-center space-x-4" @click="logOut">
-        <el-icon><Close /></el-icon>
+        <el-icon>
+          <Close/>
+        </el-icon>
         <span>Logout</span>
       </div>
     </el-menu>
@@ -44,7 +56,6 @@ import {Avatar, Bell, Close, House, PictureFilled, Plus, User} from "@element-pl
 import {defineComponent} from "vue";
 import router from "@/router";
 import {ElMessage} from "element-plus";
-import {Host} from "@/main";
 
 export default defineComponent({
   name: 'Jc-Aside',
@@ -55,11 +66,11 @@ export default defineComponent({
     }
   },
   created() {
-    this.initSseNotice();
+
   },
   activated() {
     let time = localStorage.getItem("expireTime");
-    if(time < 1000 * 60 * 60 * 24){
+    if (time < 1000 * 60 * 60 * 24) {
       this.refreshToken();
     }
   },
@@ -67,7 +78,7 @@ export default defineComponent({
     refreshToken() {
       let token = localStorage.getItem("token");
       this.realAxios.post('http://localhost:7000/auth/refreshToken', {
-        token:token
+        token: token
       }, {
         headers: {
           'token': localStorage.getItem("token")
@@ -75,36 +86,8 @@ export default defineComponent({
       }).then(response => {
         this.userInfo = response.data.data;
       })
-      },
-    initSseNotice() {
-      let token = localStorage.getItem("token");
-      let source ;
-      if (window.EventSource) {
-        source = new EventSource(`http://` + Host + `:7000/user/sse/connect/${token}`);
-        source.addEventListener('open', () => {
-        }, false);
-        source.addEventListener('message', (event) => {
-          let data = JSON.parse(event.data)
-          if (data.type === "FRIEND_APPLY") {
-            ElMessage.success('您有新的好友申请');
-          } else if (data.type === "ROOM_APPLY") {
-            ElMessage.success('您有新的群聊申请');
-          } else if (data.type === "RECORD_MOMENT_FRIEND" || data.type === "RECORD_MOMENT") {
-            ElMessage.success('您有新的朋友圈消息');
-          }else {
-            ElMessage.info('未知消息类型');
-          }
-        });
-        source.addEventListener('error', (e) => {
-          if (e.readyState === EventSource.CLOSED) {
-            ElMessage.error("连接关闭");
-          } else {
-            console.log(e);
-          }
-        }, false);
-      }
     },
-    log(e){
+    log(e) {
       ElMessage.success(e);
     },
     turnSearch() {
@@ -135,11 +118,12 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.asle{
+.asle {
   width: 200px;
   background-color: transparent;
 }
-.asle *{
+
+.asle * {
   background-color: transparent;
 }
 

@@ -180,6 +180,9 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public RealRoomVO queryListPage(int page, int size) {
         Long total = roomDAO.getBaseMapper().selectCount(null);
+        if(total == 0){
+            return new RealRoomVO().setRooms(new ArrayList<>()).setTotal(0);
+        }
         Page<Room> chatRoomPage = roomDAO.getBaseMapper().selectPage(new Page<>(page, size), new QueryWrapper<>());
         List<DisplayRoomVO> rooms = buildRoomVO(chatRoomPage, userRpcService.getAllInfo().getData());
         return new RealRoomVO().setRooms(rooms).setTotal(Math.toIntExact(total));

@@ -31,12 +31,9 @@ public class PrivateHandler implements BaseHandler {
         if (mySession != null && mySession.isOpen()) {
             mySession.getAsyncRemote().sendText(message);
         }
-        Map<Integer, Session> integerSessionMap = WebsocketService.FRIEND_SESSION_POOL.get(userId);
-        if (integerSessionMap.containsKey(friendId)) {
-            Session session = integerSessionMap.get(friendId);
-            if (session.isOpen()) {
-                session.getAsyncRemote().sendText(message);
-            }
+        Session friendSession = WebsocketService.SESSION_POOL.get(friendId);
+        if (friendSession != null && friendSession.isOpen()) {
+            friendSession.getAsyncRemote().sendText(message);
         }
     }
 

@@ -79,11 +79,11 @@ public class ChatServiceImpl implements ChatService {
             stream().map(UserRoom::getUserId).collect(Collectors.toList());
         //TODO 离线消息
 
-        Map<Integer, Session> sessionMap = WebsocketService.GROUP_SESSION_POOL.get(roomId);
+        Map<Integer, Integer> map = WebsocketService.GROUP_SESSION_POOL.get(roomId);
         //对离线用户进行离线信息保存
         userIds.forEach(
             id -> {
-                if (sessionMap.get(id) == null || !sessionMap.get(id).isOpen()) {
+                if (WebsocketService.SESSION_POOL.get(id) == null || !WebsocketService.SESSION_POOL.get(id).isOpen()) {
                     RScoredSortedSet<Object> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + id);
                     scoredSortedSet.add(timeStamp, JsonUtil.objToJson(message));
                 }
@@ -110,7 +110,7 @@ public class ChatServiceImpl implements ChatService {
             .setReceiverId(fixId);
 
         //对离线用户进行离线信息保存
-        if (WebsocketService.FRIEND_SESSION_POOL.get(friendId) == null || !WebsocketService.SESSION_POOL.get(friendId).isOpen()) {
+        if (WebsocketService.SESSION_POOL.get(friendId) == null || !WebsocketService.SESSION_POOL.get(friendId).isOpen()) {
             RScoredSortedSet<Object> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + user.getUserId());
             scoredSortedSet.add(message.getTime(), JsonUtil.objToJson(message));
         }

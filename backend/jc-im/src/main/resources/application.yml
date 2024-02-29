@@ -25,35 +25,18 @@ spring:
   cloud:
     stream:
       function:
-        definition: eventUserToIm;eventFeedToIm;
-        rocketmq:
-          binder:
-            name-server: 10.21.32.221:9876
-          bindings:
-            eventSocialToUser-in-0:
-              consumer:
-                messageModel: BROADCASTING
-            eventChatToUser-in-0:
-              consumer:
-                messageModel: BROADCASTING
-        bindings:
-          eventUserToIm-in-0:
-            consumer:
-              max-attempts: 3
-            destination: eventUserToIm
-            group: im-module
-          eventFeedToIm-in-0:
-            consumer:
-              max-attempts: 3
-            destination: eventFeedToIm
-            group: im-module
-      bindings:
-        producer-out-1:
-          destination: eventImToIm
-        producer-out-0:
-          destination: eventImToIm
+        definition: eventUserToIm;eventFeedToIm;eventImToIm;
       rocketmq:
         bindings:
+          eventFeedToIm-in-0:
+            consumer:
+              messageModel: BROADCASTING
+          eventUserToIm-in-0:
+            consumer:
+              messageModel: BROADCASTING
+          eventImToIm-in-0:
+            consumer:
+              messageModel: BROADCASTING
           producer-out-1:
             producer:
               sync: false
@@ -64,6 +47,26 @@ spring:
               group: output-0
         binder:
           name-server: 10.21.32.221:9876
+      bindings:
+          producer-out-1:
+           destination: eventImToIm
+          producer-out-0:
+           destination: eventImToIm
+          eventUserToIm-in-0:
+            consumer:
+              max-attempts: 3
+            destination: eventUserToIm
+            group: im-module
+          eventFeedToIm-in-0:
+            consumer:
+              max-attempts: 3
+            destination: eventFeedToIm
+            group: im-module
+          eventImToIm-in-0:
+            consumer:
+              max-attempts: 3
+            destination: eventImToIm
+            group: im-module
     nacos:
       discovery:
         server-addr: 10.21.32.154:8848

@@ -59,9 +59,9 @@ export default router
 
 router.beforeEach((to, from, next) => {
     const token = localStorage.getItem('token');
-    if (!token &&( to.path !== '/login' && to.path!=='/register') ) {
+    if (!token && (to.path !== '/login' && to.path !== '/register')) {
         next('/login');
-    }else {
+    } else {
         next();
     }
 });

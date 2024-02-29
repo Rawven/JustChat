@@ -1,28 +1,28 @@
 <template>
   <el-container class="JcContainer">
-          <el-card class="login-card">
-            <el-image
-                class="image"
-                fit="contain"
-                src="public/pexels-laura-meinhardt-3678799.jpg"
-                style="width: 200px; height: 200px"
-            ></el-image>
-            <br>
-            <el-text class="text-center" style="font-size: 20px; font-weight: bold">？</el-text>
-            <el-form ref="loginForm" :model="user" :rules="rules" class="login-form" label-width="80px">
-              <el-form-item label="用户名" prop="username">
-                <el-input v-model="user.username" prefix-icon="el-icon-user"></el-input>
-              </el-form-item>
-              <el-form-item label="密码" prop="password">
-                <el-input v-model="user.password" prefix-icon="el-icon-lock" type="password"></el-input>
-              </el-form-item>
-              <el-form-item >
-                <el-button type="success"  @click="login" plain>Login</el-button>
-              </el-form-item>
-            </el-form>
+    <el-card class="login-card">
+      <el-image
+          class="image"
+          fit="contain"
+          src="public/pexels-laura-meinhardt-3678799.jpg"
+          style="width: 200px; height: 200px"
+      ></el-image>
+      <br>
+      <el-text class="text-center" style="font-size: 20px; font-weight: bold">？</el-text>
+      <el-form ref="loginForm" :model="user" :rules="rules" class="login-form" label-width="80px">
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="user.username" prefix-icon="el-icon-user"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="user.password" prefix-icon="el-icon-lock" type="password"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button plain type="success" @click="login">Login</el-button>
+        </el-form-item>
+      </el-form>
 
-            <el-button class="button" type="primary" @click="toRegister" plain>还没有账号？</el-button>
-          </el-card>
+      <el-button class="button" plain type="primary" @click="toRegister">还没有账号？</el-button>
+    </el-card>
   </el-container>
 </template>
 <script>
@@ -66,6 +66,9 @@ export default {
                 localStorage.removeItem("token");
                 localStorage.setItem("token", response.data.data.token);
                 localStorage.setItem("expireTime", response.data.data.expireTime);
+                // 创建WebSocket连接
+                const socket = new WebSocket(`ws://` + Host + `:8081/ws/${localStorage.getItem("token")}`);
+                this.$global.setWs(socket);
                 this.realAxios.post('http://' + Host + ':7000/user/common/defaultInfo', {}, {
                   headers: {
                     'token': localStorage.getItem("token")
@@ -73,6 +76,8 @@ export default {
                 }).then(response1 => {
                   localStorage.setItem("userData", JSON.stringify(response1.data.data));
                 })
+
+
                 this.$router.push('/main');
               })
         } else {
@@ -95,7 +100,6 @@ export default {
   margin-left: 50px;
   border-radius: 50%; /* 设置边框半径为 50%，使图片变成圆形 */
 }
-
 
 
 .login-card {

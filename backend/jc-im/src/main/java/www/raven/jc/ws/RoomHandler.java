@@ -1,5 +1,6 @@
 package www.raven.jc.ws;
 
+import java.util.Map;
 import javax.websocket.Session;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +28,16 @@ public class RoomHandler implements BaseHandler {
 
     public static void sendRoomMessage(String message, Integer roomId) {
         log.info("----WebSocket 广播消息:" + message);
-        WebsocketService.GROUP_SESSION_POOL.get(roomId).forEach((k, v) -> {
-            if (v.isOpen()) {
-                v.getAsyncRemote().sendText(message);
-            }
-        });
+
+        Map<Integer, Integer> map = WebsocketService.GROUP_SESSION_POOL.get(roomId);
+        if (map != null) {
+            map.forEach((k, v) -> {
+                Session session = WebsocketService.SESSION_POOL.get(k);
+                if (session != null && session.isOpen()) {
+                    session.getAsyncRemote().sendText(message);
+                }
+            });
+        }
     }
 
     @Override
@@ -42,7 +48,7 @@ public class RoomHandler implements BaseHandler {
             //这里直接遍历更快
             sendRoomMessage(HandlerUtil.combineMessage(message, data), message.getId());
         } catch (Exception e) {
-            log.error("map转json异常");
+            log.error(String.valueOf(e));
         }
         chatService.saveRoomMsg(data, message, message.getId());
     }

@@ -3,26 +3,26 @@
     <el-aside>
       <JcAside></JcAside>
     </el-aside>
-     <el-main>
-    <el-header>
-      <h3 class="font-semibold tracking-tight text-2xl font-serif text-[#b3a7df]">聊天室大厅</h3>
-      <div class="flex space-x-4">
-        <el-row>
-          <el-radio-group v-model="radio" class="radio" text>
-            <el-radio-button :label="0" border>根据用户名搜索</el-radio-button>
-            <el-radio-button :label="1" border>根据房间名搜索</el-radio-button>
-          </el-radio-group>
-        </el-row>
-        <el-input
-            v-model="searchText"
-            aria-label="Search chat rooms"
-            placeholder="Search for a chat room..."
-            @keyup.enter="submitSearch"
-        />
-      </div>
-    </el-header>
-    <el-main class="aa-main">
-      <el-aside>
+    <el-main>
+      <el-header>
+        <h3 class="font-semibold tracking-tight text-2xl font-serif text-[#b3a7df]">聊天室大厅</h3>
+        <div class="flex space-x-4">
+          <el-row>
+            <el-radio-group v-model="radio" class="radio" text>
+              <el-radio-button :label="0" border>根据用户名搜索</el-radio-button>
+              <el-radio-button :label="1" border>根据房间名搜索</el-radio-button>
+            </el-radio-group>
+          </el-row>
+          <el-input
+              v-model="searchText"
+              aria-label="Search chat rooms"
+              placeholder="Search for a chat room..."
+              @keyup.enter="submitSearch"
+          />
+        </div>
+      </el-header>
+      <el-main class="aa-main">
+        <el-aside>
           <el-card class="mt-6 border rounded-md shadow-sm bg-[#000000] text-[#b3a7df] p-6">
             <input
                 v-model="createRoom.name"
@@ -51,36 +51,36 @@
               创建群聊
             </button>
           </el-card>
-      </el-aside>
-      <el-main>
-        <div v-for="(room,index) in rooms"
-             :key="index"
-             class="flex flex-row items-start space-x-6 p-6 bg-[#1a202c] rounded-lg shadow-md border-2 border-green-500"
-        >
-          <div class="flex flex-col space-y-4">
-            <h3 class="font-semibold tracking-tight text-xl font-serif text-[#b3a7df]">{{ room.roomId }}
-              {{ room.roomName }} {{ room.roomDescription }}</h3>
-            <p class="text-md text-[#4a5568] font-serif">
-              Founded by +{{ room.founderName }}.
-            </p>
+        </el-aside>
+        <el-main>
+          <div v-for="(room,index) in rooms"
+               :key="index"
+               class="flex flex-row items-start space-x-6 p-6 bg-[#1a202c] rounded-lg shadow-md border-2 border-green-500"
+          >
+            <div class="flex flex-col space-y-4">
+              <h3 class="font-semibold tracking-tight text-xl font-serif text-[#b3a7df]">{{ room.roomId }}
+                {{ room.roomName }} {{ room.roomDescription }}</h3>
+              <p class="text-md text-[#4a5568] font-serif">
+                Founded by +{{ room.founderName }}.
+              </p>
+            </div>
+            <button
+                class="inline-flex items-center justify-center rounded-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 ml-auto border-[#4c51bf] text-[#4c51bf] text-lg font-serif"
+                @click="joinRoom(room.roomId)">
+              Apply to Join
+            </button>
           </div>
-          <button
-              class="inline-flex items-center justify-center rounded-md font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 ml-auto border-[#4c51bf] text-[#4c51bf] text-lg font-serif"
-              @click="joinRoom(room.roomId)">
-            Apply to Join
-          </button>
-        </div>
-        <el-pagination v-model:current-page="currentPage"
-                       :page-size="pageSize"
-                       :total="totalRooms"
-                       background
-                       class="pagination-container"
-                       layout="prev, pager, next"
-                       @current-change="handlePageChange"
-        />
+          <el-pagination v-model:current-page="currentPage"
+                         :page-size="pageSize"
+                         :total="totalRooms"
+                         background
+                         class="pagination-container"
+                         layout="prev, pager, next"
+                         @current-change="handlePageChange"
+          />
+        </el-main>
       </el-main>
     </el-main>
-     </el-main>
   </el-container>
 </template>
 <script>
@@ -139,7 +139,7 @@ export default {
             this.createRoom.name = '';
             this.createRoom.description = '';
             this.createRoom.maxPeople = '';
-           //直接刷新页面
+            //直接刷新页面
             window.location.reload();
           })
     },
@@ -184,7 +184,7 @@ export default {
 
 </script>
 <style scoped>
-.aa-main{
+.aa-main {
   display: flex;
 }
 

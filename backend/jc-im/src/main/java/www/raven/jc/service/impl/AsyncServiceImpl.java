@@ -38,15 +38,12 @@ public class AsyncServiceImpl implements AsyncService {
 
     @Override
     public void updateRoomMap(Integer userId, List<Room> list) {
-        Session session = WebsocketService.SESSION_POOL.get(userId);
-        if (session != null && session.isOpen()) {
             list.forEach(room -> {
                 if(!WebsocketService.GROUP_SESSION_POOL.containsKey(room.getRoomId())){
                     WebsocketService.GROUP_SESSION_POOL.put(room.getRoomId(), new HashMap<>(10));
                 }
-                WebsocketService.GROUP_SESSION_POOL.get(room.getRoomId()).put(userId, session);
+                WebsocketService.GROUP_SESSION_POOL.get(room.getRoomId()).put(userId, 1);
             });
-        }
     }
 
     @Override

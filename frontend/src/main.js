@@ -9,13 +9,16 @@ import router from './router'
 import VueParticles from 'vue-particles'
 import {axiosFilter} from "@/axios";
 import "@/tailcss.css";
+import global from "./global.js";
 // eslint-disable-next-line no-unused-vars
 // eslint-disable-next-line no-unused-vars
 
 const app = createApp(App)
 app.use(VueParticles)
-export const Host = "10.24.3.176"
-export const ipfsHost = "http://10.24.3.176:8083/ipfs/"
+export const Host = "localhost"
+
+app.config.globalProperties.$global = global;
+export const ipfsHost = "http://localhost:8083/ipfs/"
 app.use(createPinia())
 app.use(router)
 app.use(ElementPlus)

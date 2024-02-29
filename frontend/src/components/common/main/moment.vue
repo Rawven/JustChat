@@ -2,7 +2,7 @@
   <el-container class="JcContainer">
     <JcAside></JcAside>
     <el-main style="overflow-y: auto;"> <!-- 添加样式以启用滚动 -->
-      <el-header >
+      <el-header>
         <svg class="text-gray-600"
              fill="none"
              height="24"
@@ -54,7 +54,7 @@
                   :http-request="uploadFile"
                   action=""
                   class="upload-demo">
-                <el-button size="small" type="primary" plain>点击上传</el-button>
+                <el-button plain size="small" type="primary">点击上传</el-button>
                 <template #tip>
                   <div class="el-upload__tip">
                     jpg/png files with a size less than 500KB.
@@ -91,7 +91,8 @@
               <el-text type="primary">{{ like.userInfo.username }} - 点赞过</el-text>
             </div>
             <!-- Comments -->
-            <div v-for="comment in moment.comments" @click="selectComment(comment.id)" :key="comment.userInfo.username" class="mb-4">
+            <div v-for="comment in moment.comments" :key="comment.userInfo.username" class="mb-4"
+                 @click="selectComment(comment.id)">
               <div class="mt-2 rounded-md border p-4 bg-gray-200">
                 <div class="flex items-center justify-between mb-2">
                   <div class="flex items-center space-x-2">
@@ -119,64 +120,64 @@
                           @keyup.enter="submitNestedComment(moment.momentId,comment.input,moment.userInfo.userId,comment.id,moment.timestamp)"/>
               </div>
             </div>
-          <div class="mt-3 flex justify-between text-gray-500">
-            <svg
-                class="text-gray-500"
-                fill="none"
-                height="24"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-            </svg>
-            <svg
-                class="text-gray-500"
-                fill="none"
-                height="24"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
-            >
-              <polyline points="9 17 4 12 9 7"></polyline>
-              <path d="M20 18v-2a4 4 0 0 0-4-4H4"></path>
-            </svg>
-            <svg
-                class="text-gray-500"
-                fill="none"
-                height="24"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
-              <polyline points="16 6 12 2 8 6"></polyline>
-              <line x1="12" x2="12" y1="2" y2="15"></line>
-            </svg>
-          </div>
-          <div class="mt-3 flex justify-between text-gray-500">
-            <el-button @click="toLike(moment.momentId,moment.userInfo.userId,moment.timestamp)">
-              <el-icon>
-                <Star/>
-              </el-icon>
-            </el-button>
-            <el-input v-model="moment.input" placeholder="要评论吗"
-                      @keyup.enter="submitComment(moment.momentId,moment.input,moment.userInfo.userId,moment.timestamp)"/>
+            <div class="mt-3 flex justify-between text-gray-500">
+              <svg
+                  class="text-gray-500"
+                  fill="none"
+                  height="24"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+              </svg>
+              <svg
+                  class="text-gray-500"
+                  fill="none"
+                  height="24"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  xmlns="http://www.w3.org/2000/svg"
+              >
+                <polyline points="9 17 4 12 9 7"></polyline>
+                <path d="M20 18v-2a4 4 0 0 0-4-4H4"></path>
+              </svg>
+              <svg
+                  class="text-gray-500"
+                  fill="none"
+                  height="24"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                <polyline points="16 6 12 2 8 6"></polyline>
+                <line x1="12" x2="12" y1="2" y2="15"></line>
+              </svg>
+            </div>
+            <div class="mt-3 flex justify-between text-gray-500">
+              <el-button @click="toLike(moment.momentId,moment.userInfo.userId,moment.timestamp)">
+                <el-icon>
+                  <Star/>
+                </el-icon>
+              </el-button>
+              <el-input v-model="moment.input" placeholder="要评论吗"
+                        @keyup.enter="submitComment(moment.momentId,moment.input,moment.userInfo.userId,moment.timestamp)"/>
+            </div>
           </div>
         </div>
-      </div>
       </el-main>
     </el-main>
   </el-container>
@@ -308,12 +309,12 @@ export default {
         this.$message.success('文件上传成功');
       })
     },
-    toLike(momentId, momentUserId,momentTimeStamp) {
-      this.realAxios.post(`http://` + Host + `:7000/social/likeMoment`,{
+    toLike(momentId, momentUserId, momentTimeStamp) {
+      this.realAxios.post(`http://` + Host + `:7000/social/likeMoment`, {
             momentId: momentId,
             momentUserId: momentUserId,
             momentTimeStamp: Number(momentTimeStamp)
-      },
+          },
           {
             headers: {
               'token': localStorage.getItem("token")
@@ -337,7 +338,7 @@ export default {
       this.nowComment = id;
       this.visible = !this.visible;
     },
-    submitComment(momentId, text, momentUserId,momentTimeStamp) {
+    submitComment(momentId, text, momentUserId, momentTimeStamp) {
       this.$message.success(momentTimeStamp);
       this.realAxios.post(`http://` + Host + `:7000/social/commentMoment`, {
             momentId: momentId,
@@ -363,9 +364,10 @@ export default {
           this.feedData = response.data.data;
         })
 
-    },2000)},
+      }, 2000)
+    },
 
-    submitNestedComment(momentId, text, momentUserId, commentId,momentTimeStamp) {
+    submitNestedComment(momentId, text, momentUserId, commentId, momentTimeStamp) {
       this.realAxios.post(`http://` + Host + `:7000/social/commentMoment`, {
             momentId: momentId,
             text: text,

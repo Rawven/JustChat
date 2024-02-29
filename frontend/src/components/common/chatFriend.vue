@@ -7,7 +7,7 @@
         </div>
       </div>
     </el-header>
-    <el-main class="flex-1 p-4 space-y-4  main-content"  style="overflow-y: auto;" @scroll="handleScroll">
+    <el-main class="flex-1 p-4 space-y-4  main-content" style="overflow-y: auto;" @scroll="handleScroll">
       <div v-for="(message, index) in messages" :key="index">
         <div v-if="isMe(message)">
           <div class="flex flex-col items-end space-y-2">
@@ -126,11 +126,10 @@ export default {
     };
   },
   created() {
-    let token = localStorage.getItem("token");
+    localStorage.getItem("token");
     this.theFriend = JSON.parse(this.friend);
     console.log('WebSocket created:', this.theFriend)
-    this.socket = new WebSocket(`ws://` + Host + `:8081/ws/friend/${token}/${this.theFriend.friendId}`);
-
+    this.socket = this.$global.ws;
     this.socket.onopen = () => {
       this.getHistory();
       console.log('WebSocket is open now.');
@@ -155,7 +154,8 @@ export default {
     this.socket.onerror = (event) => {
       console.error('WebSocket error observed:', event);
     };
-  },
+  }
+  ,
 
   methods: {
     ipfsHost() {
@@ -199,7 +199,7 @@ export default {
             this.page++;
           });
     }
-    ,  getHistory(){
+    , getHistory() {
       let token = localStorage.getItem("token");
       this.realAxios.post(`http://` + Host + `:7000/chat/message/restoreFriendHistory`, {
         friendId: this.theFriend.friendId,
@@ -224,8 +224,9 @@ export default {
     },
     sendMessage() {
       if (this.message) {
-        const msg = {time: Date.now(), text: this.message};
-        this.socket.send(JSON.stringify(msg));
+        let userInfo =localStorage.getItem("userData");
+        const msg = {time: Date.now(),id: this.theFriend.friendId, text: this.message,type: "friend",username: userInfo.username, profile: userInfo.profile};
+        this.$global.ws.send(JSON.stringify(msg));
         this.message = '';
       }
     },
@@ -259,6 +260,7 @@ export default {
   width: 100%;
   z-index: 1000;
 }
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -268,7 +270,7 @@ export default {
   }
 }
 
- .main-content,.header {
+.main-content, .header {
   box-sizing: border-box;
   width: 100%;
 }

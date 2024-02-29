@@ -13,6 +13,7 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import www.raven.jc.api.UserRpcService;
 import www.raven.jc.dto.TokenDTO;
@@ -36,13 +37,9 @@ public class WebsocketService {
      */
     public static final Map<Integer, Session> SESSION_POOL = new HashMap<>();
     /**
-     * 用来存私聊关系
-     */
-    public static final Map<Integer, Map<Integer, Session>> FRIEND_SESSION_POOL = new HashMap<>();
-    /**
      * 用来存群聊关系
      */
-    public static final Map<Integer, Map<Integer, Session>> GROUP_SESSION_POOL = new HashMap<>();
+    public static final Map<Integer, Map<Integer, Integer>> GROUP_SESSION_POOL = new HashMap<>();
     /**
      * concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
      * 虽然@Component默认是单例模式的，但springboot还是会为每个websocket连接初始化一个bean，所以可以用一个静态set保存起来。
@@ -51,6 +48,16 @@ public class WebsocketService {
     private static UserRpcService userRpcService;
     private static PrivateHandler privateHandler;
     private static RoomHandler roomHandler;
+
+    @Autowired
+    public void setPrivateHandler(PrivateHandler privateHandler) {
+        WebsocketService.privateHandler = privateHandler;
+    }
+
+    @Autowired
+    public void setRoomHandler(RoomHandler roomHandler) {
+        WebsocketService.roomHandler = roomHandler;
+    }
     /**
      * user id
      * 对应是哪个用户
@@ -61,45 +68,10 @@ public class WebsocketService {
      **/
     protected Session session;
     protected long lastActivityTime = System.currentTimeMillis();
-    private BaseHandler baseHandler;
+    public BaseHandler baseHandler;
 
-    /**
-     * send all message
-     *
-     * @param message message
-     */
-    public static void sendBatchMessage(String message, List<Integer> ids) {
-        log.info("ws:广播消息:" + message);
-        for (Integer id : ids) {
-            Session session = SESSION_POOL.get(id);
-            if (session != null && session.isOpen()) {
-                try {
-                    session.getAsyncRemote().sendText(message);
-                } catch (Exception e) {
-                    log.error(e.getMessage());
-                }
-            }
-        }
-    }
 
-    /**
-     * send one message
-     * send one message
-     *
-     * @param message message
-     * @param id      id
-     */
-    public static void sendOneMessage(Integer id, String message) {
-        Session session = SESSION_POOL.get(id);
-        if (session != null && session.isOpen()) {
-            try {
-                log.info("【websocket消息】 单点消息:" + message);
-                session.getAsyncRemote().sendText(message);
-            } catch (Exception e) {
-                log.error(e.getMessage());
-            }
-        }
-    }
+
 
     /**
      * 链接成功调用的方法
@@ -119,8 +91,8 @@ public class WebsocketService {
             }
         }
         webSockets.add(this);
-        SESSION_POOL.put(verify.getUserId(), session);
-        log.info("ws: 有新的连接,用户id为{},总数为:{}", verify.getUserId(), webSockets.size());
+        SESSION_POOL.put(this.userId, session);
+        log.info("ws: 有新的连接,用户id为{},总数为:{}", this.userId, webSockets.size());
     }
 
     /**
@@ -131,6 +103,7 @@ public class WebsocketService {
     public void onClose() {
         Integer userId1 = this.userId;
         webSockets.remove(this);
+        GROUP_SESSION_POOL.remove(userId1);
         log.info("ws:用户id {} 连接断开，总数为:{}", userId1, webSockets.size());
     }
 
@@ -183,6 +156,44 @@ public class WebsocketService {
         for (WebsocketService handler : webSockets) {
             if (handler.session.isOpen()) {
                 handler.session.getAsyncRemote().sendText(message);
+            }
+        }
+    }
+
+    /**
+     * send all message
+     *
+     * @param message message
+     */
+    public static void sendBatchMessage(String message, List<Integer> ids) {
+        log.info("ws:广播消息:" + message);
+        for (Integer id : ids) {
+            Session session = SESSION_POOL.get(id);
+            if (session != null && session.isOpen()) {
+                try {
+                    session.getAsyncRemote().sendText(message);
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                }
+            }
+        }
+    }
+
+    /**
+     * send one message
+     * send one message
+     *
+     * @param message message
+     * @param id      id
+     */
+    public static void sendOneMessage(Integer id, String message) {
+        Session session = SESSION_POOL.get(id);
+        if (session != null && session.isOpen()) {
+            try {
+                log.info("【websocket消息】 单点消息:" + message);
+                session.getAsyncRemote().sendText(message);
+            } catch (Exception e) {
+                log.error(e.getMessage());
             }
         }
     }
