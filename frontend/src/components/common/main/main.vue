@@ -2,7 +2,7 @@
   <el-container class="JcContainer">
     <JcAside></JcAside>
     <el-aside class="theAside w-64 border-r border-gray-200 overflow-y-auto">
-        <el-row>
+      <el-row>
         <img :src="ipfsHost()+userInfo.profile" alt="User Avatar" class="avatar">
       </el-row>
       <br>
@@ -80,7 +80,7 @@ export default {
 
   name: 'MainPage',
   // eslint-disable-next-line vue/no-reserved-component-names
-  components: { JcAside, ChatLineRound, ChatRound, ChatRoom},
+  components: {JcAside, ChatLineRound, ChatRound, ChatRoom},
   inject: {
     realAxios: {
       from: 'axiosFilter'
@@ -183,12 +183,13 @@ export default {
         this.rooms = response.data.data;
         console.log(this.rooms)
         // 将获取的房间总数赋值给 totalRooms
-        if(this.rooms.length > 0){
-        this.nowRoomId = this.rooms[0].roomId;
-        this.rooms.forEach((room, index) => {
-          this.roomIndex.set(Number(room.roomId), index);
+        if (this.rooms.length > 0) {
+          this.nowRoomId = this.rooms[0].roomId;
+          this.rooms.forEach((room, index) => {
+                this.roomIndex.set(Number(room.roomId), index);
+              }
+          );
         }
-        );}
       })
     },
   }
@@ -200,7 +201,8 @@ body {
   font-family: 'Roboto', sans-serif;
   font-weight: bold;
 }
-.menu{
+
+.menu {
   background-color: transparent;
 }
 

@@ -47,6 +47,50 @@
     <file url="file://$PROJECT_DIR$/file/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gateway/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-auth/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-auth/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-aop/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-aop/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-api/common-api-base/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-api/common-api-base/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-api/common-api-im/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-api/common-api-im/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-api/common-api-user/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-api/common-api-user/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-api/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-mp/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-mp/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-mq/common-mq-base/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-mq/common-mq-base/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-mq/common-mq-chat-user-model/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-mq/common-mq-chat-user-model/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-mq/common-mq-social-user-model/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-mq/common-mq-social-user-model/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-mq/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-mq/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-mvc/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-mvc/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-redis/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-redis/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-threadpool/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-threadpool/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-util/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-util/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-ws/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-ws/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-feed/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-feed/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-file/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-file/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-gateway/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-im/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-im/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-user/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-user/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/social/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/social/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />

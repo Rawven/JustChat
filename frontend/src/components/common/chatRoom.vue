@@ -114,7 +114,7 @@ export default {
   },
   data() {
     return {
-      page:0,
+      page: 0,
       theRoom: {
         roomId: '',
         lastMsg: '',
@@ -129,13 +129,12 @@ export default {
     };
   },
   created() {
-    let token = localStorage.getItem("token");
     this.theRoom = JSON.parse(this.room);
     console.log('WebSocket created:', this.theRoom)
-    this.socket = new WebSocket(`ws://` + Host + `:8081/ws/room/${token}/${this.theRoom.roomId}`);
-
+    this.getOffline();
+    this.socket = this.$global.ws;
     this.socket.onopen = () => {
-      this.getHistory();
+
       console.log('WebSocket is open now.');
     };
 
@@ -161,9 +160,29 @@ export default {
   },
 
   methods: {
-    getHistory(){
+    getOffline() {
       let token = localStorage.getItem("token");
-      this.realAxios.post(`http://` + Host + `:7000/chat/message/restoreRoomHistory`, {
+      this.realAxios.post(`http://` + Host + `:7000/chat/message/getLatestRoomHistory`, {
+        roomId: this.theRoom.roomId,
+      }, {
+        headers: {
+          'token': token
+        }
+      })
+          .then(response => {
+            this.messages = response.data.data.map(messageVO => ({
+              time: new Date(messageVO.time).getTime(), // 将Date对象转换为时间戳
+              text: messageVO.text,
+              user: messageVO.user,
+              profile: messageVO.profile
+            })); // 使用map方法将每个MessageVO对象转换为msg对象
+          })
+
+      this.page++;
+    },
+    getHistory() {
+      let token = localStorage.getItem("token");
+      this.realAxios.post(`http://` + Host + `:7000/chat/message/queryRoomMsgPages`, {
         roomId: this.theRoom.roomId,
         page: this.page,
         size: 15
@@ -194,20 +213,21 @@ export default {
     },
     sendMessage() {
       if (this.message) {
-        const msg = {time: Date.now(), text: this.message};
-        this.socket.send(JSON.stringify(msg));
+        let userInfo =localStorage.getItem("userData");
+        const msg = {time: Date.now(),id: this.theRoom.roomId, text: this.message,type: "room",username: userInfo.username, profile: userInfo.profile};
+        this.$global.ws.send(JSON.stringify(msg));
         this.message = '';
       }
     }
-    ,handleScroll(event) {
+    , handleScroll(event) {
       const scrollTop = event.target.scrollTop;
       // 如果滚动到顶部，执行你的事件
       if (scrollTop === 0) {
         this.addMsg();
       }
-    },addMsg() {
+    }, addMsg() {
       let token = localStorage.getItem("token");
-      this.realAxios.post(`http://` + Host + `:7000/chat/message/restoreRoomHistory`, {
+      this.realAxios.post(`http://` + Host + `:7000/chat/message/queryRoomMsgPages`, {
         roomId: this.theRoom.roomId,
         page: this.page,
         size: 15
@@ -242,7 +262,8 @@ export default {
           type: 'success'
         });
       })
-    },}
+    },
+  }
 };
 </script>
 
@@ -253,6 +274,7 @@ export default {
   display: flex;
   flex-direction: column;
 }
+
 body {
   overflow: hidden; /* 阻止整个页面滚动 */
 }
@@ -279,7 +301,7 @@ body {
 
 .useFoot, .main-content {
   box-sizing: border-box;
- width: 100%;
+  width: 100%;
 }
 
 .useFoot {

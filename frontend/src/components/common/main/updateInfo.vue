@@ -4,32 +4,32 @@
       <JcAside></JcAside>
     </el-aside>
     <el-main>
-    <el-card class="box-card">
-      <el-form ref="form" :model="form" label-width="120px">
-        <el-form-item label="用户名">
-          <el-input v-model="form.username"></el-input>
-          <el-button type="primary" @click="updateUsername" plain>更新用户名</el-button>
-        </el-form-item>
-        <el-form-item label="个性签名">
-          <el-input v-model="form.signature"></el-input>
-          <el-button type="primary" @click="updateSignature" plain>更新个性签名</el-button>
-        </el-form-item>
-        <el-form-item label="头像">
-          <el-upload
-              :http-request="uploadFile"
-              action=""
-              class="upload-demo">
-            <el-button size="small" type="primary" plain>点击上传</el-button>
-            <template #tip>
-              <div class="el-upload__tip">
-                jpg/png files with a size less than 500KB.
-              </div>
-            </template>
-          </el-upload>
-          <el-button type="primary" @click="updateAvatar" plain>更新头像</el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>
+      <el-card class="box-card">
+        <el-form ref="form" :model="form" label-width="120px">
+          <el-form-item label="用户名">
+            <el-input v-model="form.username"></el-input>
+            <el-button plain type="primary" @click="updateUsername">更新用户名</el-button>
+          </el-form-item>
+          <el-form-item label="个性签名">
+            <el-input v-model="form.signature"></el-input>
+            <el-button plain type="primary" @click="updateSignature">更新个性签名</el-button>
+          </el-form-item>
+          <el-form-item label="头像">
+            <el-upload
+                :http-request="uploadFile"
+                action=""
+                class="upload-demo">
+              <el-button plain size="small" type="primary">点击上传</el-button>
+              <template #tip>
+                <div class="el-upload__tip">
+                  jpg/png files with a size less than 500KB.
+                </div>
+              </template>
+            </el-upload>
+            <el-button plain type="primary" @click="updateAvatar">更新头像</el-button>
+          </el-form-item>
+        </el-form>
+      </el-card>
     </el-main>
   </el-container>
 </template>

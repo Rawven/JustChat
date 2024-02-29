@@ -2,7 +2,7 @@
   <el-container class="JcContainer">
     <JcAside></JcAside>
     <el-aside class="theAside w-64 border-r border-gray-200 overflow-y-auto ">
-          <img :src="ipfsHost()+userInfo.profile" alt="User Avatar" class="avatar">
+      <img :src="ipfsHost()+userInfo.profile" alt="User Avatar" class="avatar">
       <el-header class="p-4 border-b border-gray-200">
         <h2 class="text-lg font-semibold">我的好友</h2>
       </el-header>
@@ -41,9 +41,9 @@
       </el-menu>
     </el-aside>
     <el-main>
-    <chat-Friend v-if="nowFriendId >=1" :key="nowFriendId"
-                 :friend="JSON.stringify(this.friends[this.friendIndex.get(nowFriendId)])"
-                 :user="this.userInfo.username"></chat-Friend>
+      <chat-Friend v-if="nowFriendId >=1" :key="nowFriendId"
+                   :friend="JSON.stringify(this.friends[this.friendIndex.get(nowFriendId)])"
+                   :user="this.userInfo.username"></chat-Friend>
     </el-main>
   </el-container>
 </template>
@@ -160,7 +160,7 @@ export default {
         this.friends = response.data.data;
         console.log(this.friends)
         // 将获取的房间总数赋值给 totalRooms
-        if(this.friends.length > 0) {
+        if (this.friends.length > 0) {
           this.nowFriendId = this.friends[0].friendId;
           this.friends.forEach((friend, index) => {
             this.friendIndex.set(Number(friend.friendId), index);
@@ -178,7 +178,7 @@ body {
   font-weight: bold;
 }
 
-.menu{
+.menu {
   background-color: transparent;
 }
 
@@ -194,6 +194,7 @@ body {
   height: 75px;
   border-radius: 50%;
 }
+
 @keyframes fadeIn {
   from {
     opacity: 0;

@@ -19,7 +19,7 @@
             :http-request="uploadFile"
             action=""
             class="upload-demo">
-          <el-button size="small" type="primary" plain>点击上传</el-button>
+          <el-button plain size="small" type="primary">点击上传</el-button>
           <template #tip>
             <div class="el-upload__tip">
               jpg/png files with a size less than 500KB.
@@ -27,7 +27,7 @@
           </template>
         </el-upload>
         <el-form-item>
-          <el-button type="primary" @click="register" plain>Register</el-button>
+          <el-button plain type="primary" @click="register">Register</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -71,7 +71,6 @@ export default {
       this.realAxios.post(url, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          'token': localStorage.getItem("token")
         }
       }).then(response => {
         this.user.profile = response.data.data;
@@ -85,7 +84,7 @@ export default {
           // 发送注册请求
           this.realAxios.post(`http://` + Host + `:7000/auth/register`, this.user)
               .then(response => {
-                localStorage.setItem("token", response.data.data);
+                localStorage.setItem("token", response.data.data.token);
                 // 注册成功后可以进行相关的处理，例如跳转到登录页面
                 this.$message.success('注册成功');
                 this.realAxios.post('http://' + Host + ':7000/user/common/defaultInfo', {}, {
