@@ -31,7 +31,6 @@ import www.raven.jc.override.TokenAuthenticationManager;
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
-
     @Autowired
     private TokenAuthenticationManager tokenAuthenticationManager;
     @Autowired
@@ -42,7 +41,6 @@ public class SecurityConfig {
     private DefaultSecurityContextRepository defaultSecurityContextRepository;
     @Autowired
     private SecurityProperty securityProperty;
-
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {

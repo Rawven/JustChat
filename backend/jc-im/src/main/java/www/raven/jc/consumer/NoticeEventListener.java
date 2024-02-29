@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
-import www.raven.jc.api.UserDubbo;
+import www.raven.jc.api.UserRpcService;
 import www.raven.jc.constant.ChatUserMqConstant;
 import www.raven.jc.constant.JwtConstant;
 import www.raven.jc.constant.NoticeConstant;
@@ -46,7 +46,7 @@ public class NoticeEventListener {
     @Autowired
     private RedissonClient redissonClient;
     @Autowired
-    private UserDubbo userDubbo;
+    private UserRpcService userRpcService;
     @Autowired
     private NoticeDAO noticeDAO;
 
@@ -77,7 +77,7 @@ public class NoticeEventListener {
     private void eventMomentNoticeFriendEvent(Message<Event> msg) {
         MomentNoticeEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), MomentNoticeEvent.class);
         Integer userId = payload.getUserId();
-        RpcResult<List<UserInfoDTO>> friendInfos = userDubbo.getFriendInfos(userId);
+        RpcResult<List<UserInfoDTO>> friendInfos = userRpcService.getFriendInfos(userId);
         Assert.isTrue(friendInfos.isSuccess(), "获取好友列表失败");
         HashMap<Object, Object> map = new HashMap<>(3);
         map.put("momentId", payload.getMomentId());
@@ -125,7 +125,7 @@ public class NoticeEventListener {
 
     private void eventFriendSendMsg(Message<Event> msg) {
         FriendMsgEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), FriendMsgEvent.class);
-        RBucket<String> receiverBucket = redissonClient.getBucket(JwtConstant.TOKEN+ payload.getReceiverId());
+        RBucket<String> receiverBucket = redissonClient.getBucket(JwtConstant.TOKEN + payload.getReceiverId());
         HashMap<Object, Object> map = new HashMap<>(4);
         map.put("receiverId", payload.getReceiverId());
         map.put("senderId", payload.getSenderId());
@@ -159,7 +159,7 @@ public class NoticeEventListener {
             map.put("type", ChatUserMqConstant.TAGS_CHAT_ROOM_APPLY);
             WebsocketService.sendOneMessage(founderId, JsonUtil.objToJson(map));
             log.info("--RocketMq 已推送通知给founder");
-        }else {
+        } else {
             log.info("--RocketMq founder不在线");
         }
     }

@@ -50,13 +50,13 @@ spring:
 server:
   port: 7000
 security:
-    roles:
-      user: USER
-      admin: ADMIN
-    paths:
-     permitAll: /auth/**,/ws/**,/file/**,/webSocket/**,/user/sse/**
-     hasAnyRoleUserAdmin: /chat/**,/user/**,/social/**
-     hasRoleAdmin : /admin/**
+  roles:
+    user: USER
+    admin: ADMIN
+  paths:
+    permitAll: /auth/**,/ws/**,/file/**,/webSocket/**,/user/sse/**
+    hasAnyRoleUserAdmin: /chat/**,/user/**,/social/**
+    hasRoleAdmin: /admin/**
 jwt:
   key: 爱你老妈
   expire: 604800000

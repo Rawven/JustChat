@@ -1,11 +1,7 @@
 package www.raven.jc.service;
 
-import java.util.List;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
-import www.raven.jc.entity.model.LatestGroupMsgModel;
-import www.raven.jc.entity.model.PageGroupMsgModel;
-import www.raven.jc.entity.vo.MessageVO;
 
 /**
  * chat service
@@ -33,6 +29,5 @@ public interface ChatService {
      * @param user     user
      */
     void saveFriendMsg(MessageDTO message, UserInfoDTO user, Integer friendId);
-
 
 }

@@ -75,7 +75,16 @@ public interface UserService {
      * @param value  value
      * @return {@link UserAuthDTO}
      */
-    UserAuthDTO querySingleInfoByColumn(String column, String value);
+    UserAuthDTO queryAuthSingleInfoByColumn(String column, String value);
+    /**
+     * query single info by column
+     *
+     * @param column column
+     * @param value  value
+     * @return {@link UserAuthDTO}
+     */
+    UserInfoDTO querySingleInfoByColumn(String column, String value);
+
 
     /**
      * query roles by id

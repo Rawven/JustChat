@@ -40,7 +40,7 @@
         </dependency>
         <dependency>
             <groupId>www.Raven</groupId>
-            <artifactId>common-api</artifactId>
+            <artifactId>common-api-user</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>

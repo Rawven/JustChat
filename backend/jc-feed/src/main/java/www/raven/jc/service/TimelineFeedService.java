@@ -2,10 +2,7 @@ package www.raven.jc.service;
 
 import java.util.List;
 import org.springframework.scheduling.annotation.Async;
-import www.raven.jc.entity.po.Comment;
-import www.raven.jc.entity.po.Like;
 import www.raven.jc.entity.po.Moment;
-import www.raven.jc.entity.po.Reply;
 import www.raven.jc.entity.vo.MomentVO;
 
 /**
@@ -23,7 +20,7 @@ public interface TimelineFeedService {
      * @param userId  user id
      */
     @Async("JcThreadPoolTaskExecutor")
-     void addMomentTimelineFeeding(List<MomentVO> collect, Integer userId);
+    void addMomentTimelineFeeding(List<MomentVO> collect, Integer userId);
 
     /**
      * handle moment event
@@ -32,5 +29,5 @@ public interface TimelineFeedService {
      * @param moment moment
      */
     @Async("JcThreadPoolTaskExecutor")
-     void insertMomentFeed(Integer userId, Moment moment) ;
+    void insertMomentFeed(Integer userId, Moment moment);
 }

@@ -8,7 +8,6 @@ package www.raven.jc.constant;
  */
 public class ChatUserMqConstant {
 
-
     /**
      * User模块
      */

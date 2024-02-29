@@ -27,10 +27,10 @@ public class ExceptionHandler {
     /**
      * bind exception handler
      * 处理 form data方式调用接口校验失败抛出的异常
+     *
      * @param e e
      * @return {@link CommonResult}<{@link Void}>
-     *
-     * */
+     */
     @ResponseBody
     @org.springframework.web.bind.annotation.ExceptionHandler(BindException.class)
     public CommonResult<Void> bindExceptionHandler(BindException e) {
@@ -38,12 +38,13 @@ public class ExceptionHandler {
         List<String> collect = fieldErrors.stream()
             .map(DefaultMessageSourceResolvable::getDefaultMessage)
             .collect(Collectors.toList());
-        return CommonResult.operateFailure("请求参数异常："+String.join(",", collect));
+        return CommonResult.operateFailure("请求参数异常：" + String.join(",", collect));
     }
 
     /**
      * method argument not valid exception handler
-     *<2> 处理 json 请求体调用接口校验失败抛出的异常
+     * <2> 处理 json 请求体调用接口校验失败抛出的异常
+     *
      * @param e e
      * @return {@link CommonResult}<{@link Void}>
      */
@@ -54,7 +55,7 @@ public class ExceptionHandler {
         List<String> collect = fieldErrors.stream()
             .map(DefaultMessageSourceResolvable::getDefaultMessage)
             .collect(Collectors.toList());
-        return CommonResult.operateFailure("请求参数异常："+String.join(",", collect));
+        return CommonResult.operateFailure("请求参数异常：" + String.join(",", collect));
     }
 
     /**
@@ -66,12 +67,12 @@ public class ExceptionHandler {
      */
     @ResponseBody
     @org.springframework.web.bind.annotation.ExceptionHandler(ConstraintViolationException.class)
-    public CommonResult<Void> constraintViolationExceptionHandler(ConstraintViolationException  e) {
+    public CommonResult<Void> constraintViolationExceptionHandler(ConstraintViolationException e) {
         Set<ConstraintViolation<?>> constraintViolations = e.getConstraintViolations();
         List<String> collect = constraintViolations.stream()
             .map(ConstraintViolation::getMessage)
             .collect(Collectors.toList());
-        return CommonResult.operateFailure("请求参数异常："+String.join(",", collect));
+        return CommonResult.operateFailure("请求参数异常：" + String.join(",", collect));
     }
 
     @ResponseBody

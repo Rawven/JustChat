@@ -14,9 +14,8 @@ import javax.websocket.server.ServerEndpoint;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import www.raven.jc.api.UserDubbo;
+import www.raven.jc.api.UserRpcService;
 import www.raven.jc.dto.TokenDTO;
-import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.JwtUtil;
@@ -31,7 +30,7 @@ import www.raven.jc.util.JwtUtil;
 @Slf4j
 @ServerEndpoint("/ws/{token}")
 @Data
-public class WebsocketService  {
+public class WebsocketService {
     /**
      * 用来存在线连接数
      */
@@ -49,25 +48,58 @@ public class WebsocketService  {
      * 虽然@Component默认是单例模式的，但springboot还是会为每个websocket连接初始化一个bean，所以可以用一个静态set保存起来。
      */
     public static CopyOnWriteArraySet<WebsocketService> webSockets = new CopyOnWriteArraySet<>();
+    private static UserRpcService userRpcService;
+    private static PrivateHandler privateHandler;
+    private static RoomHandler roomHandler;
     /**
      * user id
      * 对应是哪个用户
      */
     protected Integer userId;
-
     /**
      * 与某个客户端的连接会话，需要通过它来给客户端发送数据
      **/
     protected Session session;
-
     protected long lastActivityTime = System.currentTimeMillis();
-
-    private static UserDubbo userDubbo;
-    private static PrivateHandler privateHandler;
-    private static RoomHandler roomHandler;
     private BaseHandler baseHandler;
 
+    /**
+     * send all message
+     *
+     * @param message message
+     */
+    public static void sendBatchMessage(String message, List<Integer> ids) {
+        log.info("ws:广播消息:" + message);
+        for (Integer id : ids) {
+            Session session = SESSION_POOL.get(id);
+            if (session != null && session.isOpen()) {
+                try {
+                    session.getAsyncRemote().sendText(message);
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                }
+            }
+        }
+    }
 
+    /**
+     * send one message
+     * send one message
+     *
+     * @param message message
+     * @param id      id
+     */
+    public static void sendOneMessage(Integer id, String message) {
+        Session session = SESSION_POOL.get(id);
+        if (session != null && session.isOpen()) {
+            try {
+                log.info("【websocket消息】 单点消息:" + message);
+                session.getAsyncRemote().sendText(message);
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
+        }
+    }
 
     /**
      * 链接成功调用的方法
@@ -113,9 +145,9 @@ public class WebsocketService  {
         log.info("----WebSocket收到客户端发来的消息:" + message);
         lastActivityTime = System.currentTimeMillis();
         MessageDTO messageDTO = JsonUtil.jsonToObj(message, MessageDTO.class);
-        switch (messageDTO.getType()){
+        switch (messageDTO.getType()) {
             case "friend":
-               setBaseHandler(privateHandler);
+                setBaseHandler(privateHandler);
                 break;
             case "room":
                 setBaseHandler(roomHandler);
@@ -123,7 +155,7 @@ public class WebsocketService  {
             default:
                 log.error("未知信息");
         }
-        this.baseHandler.onMessage(messageDTO,this.session);
+        this.baseHandler.onMessage(messageDTO, this.session);
     }
 
     /**
@@ -151,44 +183,6 @@ public class WebsocketService  {
         for (WebsocketService handler : webSockets) {
             if (handler.session.isOpen()) {
                 handler.session.getAsyncRemote().sendText(message);
-            }
-        }
-    }
-
-    /**
-     * send all message
-     *
-     * @param message message
-     */
-    public static void sendBatchMessage(String message, List<Integer> ids) {
-        log.info("ws:广播消息:" + message);
-        for (Integer id : ids) {
-            Session session = SESSION_POOL.get(id);
-            if (session != null && session.isOpen()) {
-                try {
-                    session.getAsyncRemote().sendText(message);
-                } catch (Exception e) {
-                    log.error(e.getMessage());
-                }
-            }
-        }
-    }
-
-    /**
-     * send one message
-     * send one message
-     *
-     * @param message message
-     * @param id      id
-     */
-    public static void sendOneMessage(Integer id, String message) {
-        Session session = SESSION_POOL.get(id);
-        if (session != null && session.isOpen()) {
-            try {
-                log.info("【websocket消息】 单点消息:" + message);
-                session.getAsyncRemote().sendText(message);
-            } catch (Exception e) {
-                log.error(e.getMessage());
             }
         }
     }

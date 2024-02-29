@@ -8,7 +8,6 @@ package www.raven.jc.constant;
  */
 public class SocialUserMqConstant {
 
-
     /**
      * Moment模块
      */

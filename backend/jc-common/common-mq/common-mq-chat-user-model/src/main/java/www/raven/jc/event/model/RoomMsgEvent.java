@@ -1,6 +1,5 @@
 package www.raven.jc.event.model;
 
-import cn.hutool.system.UserInfo;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;

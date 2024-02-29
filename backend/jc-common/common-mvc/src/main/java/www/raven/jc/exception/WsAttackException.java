@@ -7,7 +7,4 @@ package www.raven.jc.exception;
  * @date 2024/01/22
  */
 public class WsAttackException extends RuntimeException {
-    public WsAttackException(String message) {
-        super(message);
-    }
 }

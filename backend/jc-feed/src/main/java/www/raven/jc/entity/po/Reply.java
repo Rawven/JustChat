@@ -14,7 +14,7 @@ import www.raven.jc.model.CommonSerializable;
  */
 @EqualsAndHashCode(callSuper = true) @Data
 @Accessors(chain = true)
-public class Reply  extends CommonSerializable {
+public class Reply extends CommonSerializable {
     private String id;
     private UserInfoDTO userInfo;
     private String content;

@@ -53,12 +53,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserAuthDTO querySingleInfoByColumn(String column, String value) {
+    public UserAuthDTO queryAuthSingleInfoByColumn(String column, String value) {
         User user = userDAO.getBaseMapper().selectOne(new QueryWrapper<User>().eq(column, value));
-        if(user == null){
+        if (user == null) {
             return null;
         }
         return new UserAuthDTO().setPassword(user.getPassword()).setUserId(user.getId()).setUsername(user.getUsername());
+    }
+
+    @Override
+    public UserInfoDTO querySingleInfoByColumn(String column, String value) {
+        User user = userDAO.getBaseMapper().selectOne(new QueryWrapper<User>().eq(column, value));
+        Assert.notNull(user, "用户不存在");
+        UserInfoDTO userInfoDTO = new UserInfoDTO();
+        userInfoDTO.setUsername(user.getUsername()).setProfile(user.getProfile()).setUserId(user.getId());
+        return userInfoDTO;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package www.raven.jc.dao;
 
-import cn.hutool.core.util.IdUtil;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +30,7 @@ public class MomentDAO {
     private MongoTemplate mongoTemplate;
     @Autowired
     private MomentMapper momentMapper;
+
     public MomentMapper getBaseMapper() {
         return momentMapper;
     }
@@ -38,6 +38,7 @@ public class MomentDAO {
     public Moment save(Moment moment) {
         return mongoTemplate.save(moment, COLLECTION_MOMENT);
     }
+
     public boolean delete(String momentId) {
         return mongoTemplate.remove(momentId).getDeletedCount() > 0;
     }
@@ -47,7 +48,7 @@ public class MomentDAO {
             new Update().push("likes", like), COLLECTION_MOMENT).getModifiedCount() > 0;
     }
 
-    public boolean comment(String momentId,Comment comment) {
+    public boolean comment(String momentId, Comment comment) {
         return mongoTemplate.updateFirst(new Query(Criteria.where("_id").is(momentId)),
             new Update().push("comments", comment), COLLECTION_MOMENT).getModifiedCount() > 0;
     }
@@ -57,7 +58,7 @@ public class MomentDAO {
         Update update = new Update().push("comments.$.replies", reply);
         return mongoTemplate.updateFirst(query, update, COLLECTION_MOMENT).getModifiedCount() > 0;
     }
-    
+
     public List<Moment> queryBatchMomentsById(List<Integer> list) {
         //通过_id查找用户的动态 按照时间排序
         Query with = new Query(Criteria.where("_id").in(list)).with(Sort.by(Sort.Direction.DESC, "timestamp"));

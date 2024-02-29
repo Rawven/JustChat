@@ -21,10 +21,11 @@ import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import www.raven.jc.api.UserDubbo;
+import www.raven.jc.api.UserRpcService;
 import www.raven.jc.constant.ApplyStatusConstant;
 import www.raven.jc.constant.OfflineMessagesConstant;
 import www.raven.jc.dao.MessageDAO;
+import www.raven.jc.dao.NoticeDAO;
 import www.raven.jc.dao.RoomDAO;
 import www.raven.jc.dao.UserRoomDAO;
 import www.raven.jc.dto.QueryUserInfoDTO;
@@ -45,6 +46,8 @@ import www.raven.jc.service.RoomService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.RequestUtil;
 
+import static www.raven.jc.service.impl.FriendServiceImpl.getMessageById;
+
 /**
  * room service impl
  *
@@ -61,7 +64,7 @@ public class RoomServiceImpl implements RoomService {
     @Autowired
     private HttpServletRequest request;
     @Autowired
-    private UserDubbo userDubbo;
+    private UserRpcService userRpcService;
     @Autowired
     private MessageDAO messageDAO;
     @Autowired
@@ -70,6 +73,8 @@ public class RoomServiceImpl implements RoomService {
     private RedissonClient redissonClient;
     @Autowired
     private AsyncService asyncService;
+    @Autowired
+    private NoticeDAO noticeDAO;
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
@@ -103,7 +108,7 @@ public class RoomServiceImpl implements RoomService {
         //获取聊天室发最后一条信息的用户信息和聊天室创建者的用户信息
         Set<Integer> idsSender = rooms.stream().map(Room::getFounderId).collect(Collectors.toSet());
         //获取聊天室创建者的用户信息
-        RpcResult<List<UserInfoDTO>> batchInfo = userDubbo.getBatchInfo(new ArrayList<>(idsSender));
+        RpcResult<List<UserInfoDTO>> batchInfo = userRpcService.getBatchInfo(new ArrayList<>(idsSender));
         Assert.isTrue(batchInfo.isSuccess(), "user模块调用失败");
         Map<Integer, UserInfoDTO> map = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
         Map<String, Message> messageMap = messages.stream().collect(Collectors.toMap(message -> message.getMessageId().toString(), Function.identity()));
@@ -128,14 +133,14 @@ public class RoomServiceImpl implements RoomService {
     public RealRoomVO queryLikedRoomList(String column, String text, int page) {
         Long total = roomDAO.getBaseMapper().selectCount(null);
         Page<Room> chatRoomPage = roomDAO.getBaseMapper().selectPage(new Page<>(page, 5), new QueryWrapper<Room>().like(column, text));
-        List<DisplayRoomVO> rooms = buildRoomVO(chatRoomPage, userDubbo.getAllInfo().getData());
+        List<DisplayRoomVO> rooms = buildRoomVO(chatRoomPage, userRpcService.getAllInfo().getData());
         return new RealRoomVO().setRooms(rooms).setTotal(Math.toIntExact(total));
     }
 
     @Override
     public RealRoomVO queryUserNameRoomList(String column, String text, int page) {
         Long total = roomDAO.getBaseMapper().selectCount(null);
-        List<UserInfoDTO> queryList = userDubbo.getRelatedInfoList(new QueryUserInfoDTO().setColumn(column).setText(text)).getData();
+        List<UserInfoDTO> queryList = userRpcService.getRelatedInfoList(new QueryUserInfoDTO().setColumn(column).setText(text)).getData();
         List<Integer> userIds = queryList.stream().map(UserInfoDTO::getUserId).collect(Collectors.toList());
         Page<Room> chatRoomPage = roomDAO.getBaseMapper().selectPage(new Page<>(page, 5), new QueryWrapper<Room>().in("founder_id", userIds));
         List<DisplayRoomVO> rooms = buildRoomVO(chatRoomPage, queryList);
@@ -152,7 +157,7 @@ public class RoomServiceImpl implements RoomService {
         int insert = userRoomDAO.getBaseMapper().insert(userRoom);
         Assert.isTrue(insert > 0, "插入失败");
         asyncService.sendNotice(roomId, userId);
-        }
+    }
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
@@ -160,8 +165,7 @@ public class RoomServiceImpl implements RoomService {
         int update = userRoomDAO.getBaseMapper().update(new UserRoom().setStatus(ApplyStatusConstant.APPLY_STATUS_AGREE),
             new QueryWrapper<UserRoom>().eq("user_id", userId).eq("room_id", roomId));
         Assert.isTrue(update > 0, "更新失败");
-        RpcResult<Void> voidRpcResult = userDubbo.deleteNotice(noticeId);
-        Assert.isTrue(voidRpcResult.isSuccess(), "user模块调用失败");
+        Assert.isTrue(noticeDAO.getBaseMapper().deleteById(noticeId) > 0, "删除失败");
     }
 
     @Override
@@ -169,15 +173,14 @@ public class RoomServiceImpl implements RoomService {
         int update = userRoomDAO.getBaseMapper().update(new UserRoom().setStatus(ApplyStatusConstant.APPLY_STATUS_REFUSE),
             new QueryWrapper<UserRoom>().eq("user_id", userId).eq("room_id", roomId));
         Assert.isTrue(update > 0, "更新失败");
-        RpcResult<Void> voidRpcResult = userDubbo.deleteNotice(noticeId);
-        Assert.isTrue(voidRpcResult.isSuccess(), "user模块调用失败");
+        Assert.isTrue(noticeDAO.getBaseMapper().deleteById(noticeId) > 0, "删除失败");
     }
 
     @Override
     public RealRoomVO queryListPage(int page, int size) {
         Long total = roomDAO.getBaseMapper().selectCount(null);
         Page<Room> chatRoomPage = roomDAO.getBaseMapper().selectPage(new Page<>(page, size), new QueryWrapper<>());
-        List<DisplayRoomVO> rooms = buildRoomVO(chatRoomPage, userDubbo.getAllInfo().getData());
+        List<DisplayRoomVO> rooms = buildRoomVO(chatRoomPage, userRpcService.getAllInfo().getData());
         return new RealRoomVO().setRooms(rooms).setTotal(Math.toIntExact(total));
     }
 
@@ -202,7 +205,7 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public List<MessageVO> getGroupMsgPages(PageGroupMsgModel model) {
         PageRequest pageRequest = PageRequest.of(model.getPage(), model.getSize());
-        List<Message> messages = new ArrayList<>(messageDAO.getMsgWithPagination(String.valueOf(model.getRoomId()),"room", pageRequest).getContent());
+        List<Message> messages = new ArrayList<>(messageDAO.getMsgWithPagination(String.valueOf(model.getRoomId()), "room", pageRequest).getContent());
         //给messages排序 从小到大
         messages.sort(Comparator.comparingLong(o -> o.getTimestamp().getTime()));
         return getMessageById(messages);

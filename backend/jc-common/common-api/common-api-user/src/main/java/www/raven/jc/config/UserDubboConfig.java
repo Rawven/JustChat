@@ -4,7 +4,7 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.spring.ReferenceBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import www.raven.jc.api.UserDubbo;
+import www.raven.jc.api.UserRpcService;
 
 /**
  * dubbo config
@@ -13,10 +13,10 @@ import www.raven.jc.api.UserDubbo;
  * @date 2024/02/06
  */
 @Configuration
-public class DubboConfig {
+public class UserDubboConfig {
     @Bean
-    @DubboReference(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
-    public ReferenceBean<UserDubbo> userDubbo() {
+    @DubboReference(interfaceClass = UserRpcService.class, version = "1.0.0", timeout = 15000)
+    public ReferenceBean<UserRpcService> userDubbo() {
         return new ReferenceBean<>();
     }
 }

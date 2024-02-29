@@ -38,7 +38,6 @@ public class RequestFilter implements GlobalFilter, Ordered {
         return -3;
     }
 
-
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
@@ -48,8 +47,8 @@ public class RequestFilter implements GlobalFilter, Ordered {
         log.info("Request URI: " + request.getURI());
         log.info("Request Headers: " + request.getHeaders());
         log.info("Request Query Params: " + request.getQueryParams());
-        for (String path:securityProperty.getWordsArray()){
-            if (request.getURI().getPath().contains(path)){
+        for (String path : securityProperty.getWordsArray()) {
+            if (request.getURI().getPath().contains(path)) {
                 return chain.filter(exchange);
             }
         }

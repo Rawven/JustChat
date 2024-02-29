@@ -15,20 +15,19 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import www.raven.jc.api.UserRpcService;
 import www.raven.jc.constant.ChatUserMqConstant;
 import www.raven.jc.constant.JwtConstant;
 import www.raven.jc.constant.NoticeConstant;
-import www.raven.jc.dao.FriendDAO;
-import www.raven.jc.dao.UserDAO;
+import www.raven.jc.dao.NoticeDAO;
 import www.raven.jc.dto.UserInfoDTO;
-import www.raven.jc.entity.po.Friend;
 import www.raven.jc.entity.po.Notice;
-import www.raven.jc.entity.po.User;
 import www.raven.jc.entity.vo.NoticeVO;
-import www.raven.jc.event.SseNotificationHandler;
+import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.NoticeService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.RequestUtil;
+import www.raven.jc.ws.WebsocketService;
 
 /**
  * notice service impl
@@ -43,6 +42,10 @@ public class NoticeServiceImpl implements NoticeService {
     private HttpServletRequest request;
     @Autowired
     private RedissonClient redissonClient;
+    @Autowired
+    private NoticeDAO noticeDAO;
+    @Autowired
+    private UserRpcService userRpcService;
 
     @Override
     public List<NoticeVO> loadNotice() {
@@ -52,9 +55,10 @@ public class NoticeServiceImpl implements NoticeService {
             return new ArrayList<>();
         }
         List<Integer> ids = notices.stream().map(Notice::getSenderId).collect(Collectors.toList());
-        List<User> users = userDAO.getBaseMapper().selectList(new QueryWrapper<User>().in("id", ids));
-        Map<Integer, UserInfoDTO> map = users.stream().map(
-            user -> new UserInfoDTO().setUserId(user.getId()).setUsername(user.getUsername()).setProfile(user.getProfile())
+        RpcResult<List<UserInfoDTO>> usersResult = userRpcService.getBatchInfo(ids);
+        Assert.isTrue(usersResult.isSuccess(), "获取用户信息失败");
+        Map<Integer, UserInfoDTO> map = usersResult.getData().stream().map(
+            user -> new UserInfoDTO().setUserId(user.getUserId()).setUsername(user.getUsername()).setProfile(user.getProfile())
         ).collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
         return notices.stream().map(
             notice -> {
@@ -73,25 +77,26 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     public void addFriendApply(String friendName) {
         int applierId = RequestUtil.getUserId(request);
-        User user = userDAO.getBaseMapper().selectOne(new QueryWrapper<User>().eq("username", friendName));
-        Assert.notNull(user, "用户不存在");
+
+        RpcResult<UserInfoDTO> userResult = userRpcService.getSingleInfoByColumn(friendName);
+        Assert.isTrue(userResult.isSuccess(), "用户不存在");
+        UserInfoDTO friend = userResult.getData();
         Assert.isNull(noticeDAO.getBaseMapper().selectOne(new QueryWrapper<Notice>().
-            eq("user_id", user.getId()).eq("sender_id", applierId).
+            eq("user_id", friend.getUserId()).eq("sender_id", applierId).
             eq("type", NoticeConstant.TYPE_ADD_FRIEND_APPLY)), "已经申请过了");
-        Assert.isNull(friendDAO.getBaseMapper().selectOne(new QueryWrapper<Friend>().eq("user_id", applierId).eq("friend_id", user.getId())), "已经是好友了");
-        Integer friendId = user.getId();
-        Notice notice = new Notice().setUserId(friendId)
+        Notice notice = new Notice().setUserId(friend.getUserId())
             .setData("暂无")
             .setType(NoticeConstant.TYPE_ADD_FRIEND_APPLY)
             .setTimestamp(System.currentTimeMillis())
             .setSenderId(applierId);
         Assert.isTrue(noticeDAO.save(notice), "添加失败");
-        RBucket<String> friendBucket = redissonClient.getBucket(JwtConstant.TOKEN + friendId);
+
+        RBucket<String> friendBucket = redissonClient.getBucket(JwtConstant.TOKEN + friend.getUserId());
         HashMap<Object, Object> map = new HashMap<>(1);
         map.put("applyId", applierId);
         map.put("type", ChatUserMqConstant.TAGS_USER_FRIEND_APPLY);
         if (friendBucket.isExists()) {
-            SseNotificationHandler.sendMessage(friendId, JsonUtil.objToJson(map));
+            WebsocketService.sendOneMessage(friend.getUserId(), JsonUtil.objToJson(map));
         } else {
             log.info("--sse receiver不在线");
         }

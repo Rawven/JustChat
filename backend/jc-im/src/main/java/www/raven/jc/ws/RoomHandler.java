@@ -4,12 +4,11 @@ import javax.websocket.Session;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import www.raven.jc.api.UserDubbo;
+import www.raven.jc.api.UserRpcService;
 import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.service.ChatService;
-import www.raven.jc.util.JsonUtil;
 
 /**
  * web socket service
@@ -21,15 +20,24 @@ import www.raven.jc.util.JsonUtil;
 @Component
 public class RoomHandler implements BaseHandler {
     @Autowired
-    private  ChatService chatService;
+    private ChatService chatService;
 
     @Autowired
-    private  UserDubbo userDubbo;
+    private UserRpcService userRpcService;
+
+    public static void sendRoomMessage(String message, Integer roomId) {
+        log.info("----WebSocket 广播消息:" + message);
+        WebsocketService.GROUP_SESSION_POOL.get(roomId).forEach((k, v) -> {
+            if (v.isOpen()) {
+                v.getAsyncRemote().sendText(message);
+            }
+        });
+    }
 
     @Override
     public void onMessage(MessageDTO message, Session session) {
         TokenDTO tokenDTO = (TokenDTO) (session.getUserProperties().get("userDto"));
-        UserInfoDTO data = userDubbo.getSingleInfo(tokenDTO.getUserId()).getData();
+        UserInfoDTO data = userRpcService.getSingleInfo(tokenDTO.getUserId()).getData();
         try {
             //这里直接遍历更快
             sendRoomMessage(HandlerUtil.combineMessage(message, data), message.getId());
@@ -37,15 +45,6 @@ public class RoomHandler implements BaseHandler {
             log.error("map转json异常");
         }
         chatService.saveRoomMsg(data, message, message.getId());
-    }
-
-    public static void sendRoomMessage(String message,Integer roomId) {
-        log.info("----WebSocket 广播消息:" + message);
-        WebsocketService.GROUP_SESSION_POOL.get(roomId).forEach((k, v) -> {
-            if (v.isOpen()) {
-                v.getAsyncRemote().sendText(message);
-            }
-        });
     }
 
 }

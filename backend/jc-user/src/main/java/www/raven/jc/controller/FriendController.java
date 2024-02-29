@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import www.raven.jc.api.ImRpcService;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.FriendService;
-import www.raven.jc.service.NoticeService;
 
 /**
  * friend controller
@@ -26,20 +26,20 @@ public class FriendController {
     @Autowired
     private FriendService friendService;
     @Autowired
-    private NoticeService noticeService;
+    private ImRpcService imRpcService;
 
     @GetMapping("/agreeToBeFriend/{friendId}/{noticeId}")
     public CommonResult<Void> agreeApplyFriend(@PathVariable("friendId") @NotNull int friendId,
         @PathVariable("noticeId") @NotNull int noticeId) {
         friendService.agreeApplyFromFriend(friendId);
-        noticeService.deleteNotification(noticeId);
+        imRpcService.deleteNotification(noticeId);
         return CommonResult.operateSuccess("成为好友成功");
     }
 
     @GetMapping("/refuseToBeFriend/{friendId}/{noticeId}")
     public CommonResult<Void> refuseApplyFriend(@PathVariable("friendId") int friendId,
         @PathVariable("noticeId") @NotNull int noticeId) {
-        noticeService.deleteNotification(noticeId);
+        imRpcService.deleteNotification(noticeId);
         return CommonResult.operateSuccess("拒绝好友成功");
     }
 

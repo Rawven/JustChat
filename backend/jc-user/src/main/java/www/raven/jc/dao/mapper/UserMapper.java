@@ -18,7 +18,7 @@ public interface UserMapper extends BaseMapper<User> {
      * @param friendId friend id
      * @return {@link List}<{@link User}>
      */
-    List<User> selectUserByFriendId (@Param("friendId") int friendId);
+    List<User> selectUserByFriendId(@Param("friendId") int friendId);
 
     /**
      * select users and friends

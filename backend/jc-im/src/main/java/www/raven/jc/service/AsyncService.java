@@ -16,7 +16,7 @@ public interface AsyncService {
      * @param userId user id
      */
     @Async("JcThreadPoolTaskExecutor")
-    void sendNotice(Integer roomId,Integer userId);
+    void sendNotice(Integer roomId, Integer userId);
 
     /**
      * update session id
@@ -25,7 +25,8 @@ public interface AsyncService {
      * @param sessionId session id
      */
     @Async("JcThreadPoolTaskExecutor")
-    void updateRoomMap(Integer userId,String sessionId);
+    void updateRoomMap(Integer userId, String sessionId);
+
     /**
      * update session id
      *
@@ -33,5 +34,5 @@ public interface AsyncService {
      * @param sessionId session id
      */
     @Async("JcThreadPoolTaskExecutor")
-    void updateFriendMap(Integer userId,String sessionId);
+    void updateFriendMap(Integer userId, String sessionId);
 }

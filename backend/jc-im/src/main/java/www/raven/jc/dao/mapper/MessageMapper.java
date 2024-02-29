@@ -9,5 +9,5 @@ import www.raven.jc.entity.po.Message;
  * @author 刘家辉
  * @date 2024/02/23
  */
-public interface MessageMapper extends MongoRepository<Message, String>{
+public interface MessageMapper extends MongoRepository<Message, String> {
 }

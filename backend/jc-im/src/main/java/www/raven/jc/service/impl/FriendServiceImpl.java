@@ -16,7 +16,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import www.raven.jc.api.UserDubbo;
+import www.raven.jc.api.UserRpcService;
 import www.raven.jc.constant.OfflineMessagesConstant;
 import www.raven.jc.dao.FriendChatDAO;
 import www.raven.jc.dao.MessageDAO;
@@ -27,7 +27,6 @@ import www.raven.jc.entity.po.FriendChat;
 import www.raven.jc.entity.po.Message;
 import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.entity.vo.UserFriendVO;
-import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.FriendService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MongoUtil;
@@ -49,15 +48,26 @@ public class FriendServiceImpl implements FriendService {
     @Autowired
     private MessageDAO messageDAO;
     @Autowired
-    private UserDubbo userDubbo;
+    private UserRpcService userRpcService;
     @Autowired
     private RedissonClient redissonClient;
+
+    @NotNull
+    static List<MessageVO> getMessageById(List<Message> collect) {
+        return collect.stream().map(message -> {
+            MessageVO messageVO = new MessageVO();
+            messageVO.setText(message.getContent());
+            messageVO.setTime(message.getTimestamp());
+            messageVO.setUserInfoDTO(message.getSender());
+            return messageVO;
+        }).collect(Collectors.toList());
+    }
 
     @Override
     public List<UserFriendVO> initUserFriendPage() {
         int userId = RequestUtil.getUserId(request);
         //获得好友id
-        List<UserInfoDTO> friends = userDubbo.getFriendInfos(userId).getData();
+        List<UserInfoDTO> friends = userRpcService.getFriendInfos(userId).getData();
         if (friends.isEmpty()) {
             return new ArrayList<>();
         }
@@ -95,7 +105,7 @@ public class FriendServiceImpl implements FriendService {
     public List<MessageVO> getFriendMsgPages(PagesFriendMsgModel model) {
         int userId = RequestUtil.getUserId(request);
         String fixId = MongoUtil.concatenateIds(userId, model.getFriendId());
-        List<Message> messages = messageDAO.getMsgWithPagination(fixId,"friend", PageRequest.of(model.getPage(), model.getSize())).getContent();
+        List<Message> messages = messageDAO.getMsgWithPagination(fixId, "friend", PageRequest.of(model.getPage(), model.getSize())).getContent();
         return messages.stream().map(MessageVO::new).collect(Collectors.toList());
     }
 
@@ -114,17 +124,6 @@ public class FriendServiceImpl implements FriendService {
             }
         }
         return getMessageById(collect);
-    }
-
-    @NotNull
-    static List<MessageVO> getMessageById(List<Message> collect) {
-        return collect.stream().map(message -> {
-            MessageVO messageVO = new MessageVO();
-            messageVO.setText(message.getContent());
-            messageVO.setTime(message.getTimestamp());
-            messageVO.setUserInfoDTO(message.getSender());
-            return messageVO;
-        }).collect(Collectors.toList());
     }
 
 }

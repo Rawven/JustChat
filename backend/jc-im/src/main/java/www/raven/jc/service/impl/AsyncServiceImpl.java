@@ -23,8 +23,9 @@ public class AsyncServiceImpl implements AsyncService {
     private RoomDAO roomDAO;
     @Autowired
     private StreamBridge streamBridge;
+
     @Override
-    public void sendNotice(Integer roomId,Integer userId) {
+    public void sendNotice(Integer roomId, Integer userId) {
         Room room = roomDAO.getBaseMapper().selectById(roomId);
         Integer founderId = room.getFounderId();
         //通知user模块 插入一条申请记录

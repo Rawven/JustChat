@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import www.raven.jc.api.UserDubbo;
+import www.raven.jc.api.UserRpcService;
 import www.raven.jc.config.JwtProperty;
 import www.raven.jc.constant.JwtConstant;
 import www.raven.jc.constant.RoleConstant;
@@ -41,22 +41,21 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
-    private UserDubbo userDubbo;
+    private UserRpcService userRpcService;
     @Autowired
     private JwtProperty jwtProperty;
 
-
     @Override
     public TokenVO login(LoginModel loginModel) {
-        RpcResult<UserAuthDTO> result = userDubbo.getUserToAuth(loginModel.getUsername());
-        Assert.isTrue(result.isSuccess(),"用户不存在");
+        RpcResult<UserAuthDTO> result = userRpcService.getUserToAuth(loginModel.getUsername());
+        Assert.isTrue(result.isSuccess(), "用户不存在");
         UserAuthDTO user = result.getData();
         RBucket<Object> bucket = redissonClient.getBucket(JwtConstant.TOKEN + user.getUserId());
         if (bucket.isExists()) {
             return new TokenVO().setToken(bucket.get().toString()).setExpireTime(jwtProperty.expireTime);
         }
         Assert.isTrue(passwordEncoder.matches(loginModel.getPassword(), user.getPassword()), "密码错误");
-        RpcResult<List<RoleDTO>> rolesById = userDubbo.getRolesById(user.getUserId());
+        RpcResult<List<RoleDTO>> rolesById = userRpcService.getRolesById(user.getUserId());
         Assert.isTrue(rolesById.isSuccess(), "获取角色失败");
         return produceToken(user.getUserId(), rolesById.getData().stream().map(RoleDTO::getValue).collect(Collectors.toList()));
     }
@@ -88,16 +87,16 @@ public class AuthServiceImpl implements AuthService {
     public void logout(String token) {
         TokenDTO verify = JwtUtil.parseToken(token, jwtProperty.key);
         redissonClient.getBucket(JwtConstant.TOKEN + verify.getUserId()).delete();
-        RpcResult<Void> voidCommonResult = userDubbo.saveLogOutTime(verify.getUserId());
+        RpcResult<Void> voidCommonResult = userRpcService.saveLogOutTime(verify.getUserId());
         Assert.isTrue(voidCommonResult.isSuccess(), "登出失败");
     }
 
     private TokenVO register(RegisterModel registerModel, List<Integer> roleIds) {
-        Assert.isFalse(userDubbo.checkUserExit(registerModel.getUsername()).getData(),"用户名已存在");
+        Assert.isFalse(userRpcService.checkUserExit(registerModel.getUsername()).getData(), "用户名已存在");
         UserRegisterDTO user = new UserRegisterDTO();
         user.setEmail(registerModel.getEmail()).setPassword(passwordEncoder.encode(registerModel.getPassword()))
             .setUsername(registerModel.getUsername()).setRoleIds(roleIds).setProfile(registerModel.getProfile());
-        RpcResult<UserAuthDTO> insert = userDubbo.insert(user);
+        RpcResult<UserAuthDTO> insert = userRpcService.insert(user);
         Assert.isTrue(insert.isSuccess(), "注册失败");
         List<RoleDTO> list = roleIds.stream().map(roleId -> new RoleDTO().setValue(RoleConstant.MAP.get(roleId))).collect(Collectors.toList());
         return produceToken(insert.getData().getUserId(), list.stream().map(RoleDTO::getValue).collect(Collectors.toList()));

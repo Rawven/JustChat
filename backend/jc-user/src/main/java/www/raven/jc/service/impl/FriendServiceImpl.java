@@ -57,5 +57,4 @@ public class FriendServiceImpl implements FriendService {
         ).collect(Collectors.toList());
     }
 
-
 }

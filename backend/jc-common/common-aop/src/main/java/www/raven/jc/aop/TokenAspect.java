@@ -29,8 +29,8 @@ public class TokenAspect {
 
     @Autowired
     private HttpServletRequest request;
-   @Autowired
-   private JwtProperty jwtProperty;
+    @Autowired
+    private JwtProperty jwtProperty;
 
     @Pointcut("@annotation(www.raven.jc.annotions.Auth)")
     public void pointcut() {

@@ -21,23 +21,22 @@ import www.raven.jc.entity.po.Message;
  * @date 2023/12/17
  */
 @Repository
-public class MessageDAO  {
+public class MessageDAO {
     public static final String COLLECTION_MESSAGE = "message";
     @Autowired
     private MongoTemplate mongoTemplate;
     @Autowired
     private MessageMapper messageMapper;
+
     public MessageMapper getBaseMapper() {
         return messageMapper;
     }
-
-
 
     public List<Message> getBatchIds(List<ObjectId> ids) {
         return mongoTemplate.find(new Query(Criteria.where("_id").in(ids)), Message.class, COLLECTION_MESSAGE);
     }
 
-    public Page<Message> getMsgWithPagination(String receiverId,String type, Pageable pageable) {
+    public Page<Message> getMsgWithPagination(String receiverId, String type, Pageable pageable) {
         Criteria criteria = Criteria.where("receiverId").is(receiverId).and("type").is(type);
         Query query = new Query(criteria);
         // 添加排序条件

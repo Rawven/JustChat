@@ -10,7 +10,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
-import www.raven.jc.api.UserDubbo;
+import www.raven.jc.api.UserRpcService;
 import www.raven.jc.config.ScoredSortedSetProperty;
 import www.raven.jc.constant.TimelineFeedConstant;
 import www.raven.jc.dao.MomentDAO;
@@ -25,6 +25,7 @@ import static www.raven.jc.constant.TimelineFeedConstant.PREFIX;
 /**
  * async service
  * 朋友圈是feed
+ *
  * @author 刘家辉
  * @date 2024/02/18
  */
@@ -35,7 +36,7 @@ public class TimelineFeedServiceImpl implements TimelineFeedService {
     @Autowired
     private ScoredSortedSetProperty setProperty;
     @Autowired
-    private UserDubbo userDubbo;
+    private UserRpcService userRpcService;
     @Autowired
     private MomentDAO momentDAO;
     @Autowired
@@ -46,6 +47,7 @@ public class TimelineFeedServiceImpl implements TimelineFeedService {
     /**
      * add moment timeline feeding
      * 存储用户时间线（仅id）
+     *
      * @param collect collect
      * @param userId  user id
      */
@@ -61,7 +63,6 @@ public class TimelineFeedServiceImpl implements TimelineFeedService {
         });
     }
 
-
     @Override
     public void insertMomentFeed(Integer userId, Moment moment) {
         List<RScoredSortedSet<Object>> list = getHisFriendMomentCache(userId);
@@ -71,7 +72,7 @@ public class TimelineFeedServiceImpl implements TimelineFeedService {
             }
             scoredSortedSet.add(moment.getTimestamp(), moment.getMomentId());
         });
-      }
+    }
 
     /**
      * get his friend moment cache
@@ -81,7 +82,7 @@ public class TimelineFeedServiceImpl implements TimelineFeedService {
      * @return {@link List}<{@link RScoredSortedSet}<{@link Object}>>
      */
     private List<RScoredSortedSet<Object>> getHisFriendMomentCache(Integer userId) {
-        RpcResult<List<UserInfoDTO>> friendAndMeInfos = userDubbo.getFriendAndMeInfos(userId);
+        RpcResult<List<UserInfoDTO>> friendAndMeInfos = userRpcService.getFriendAndMeInfos(userId);
         Assert.isTrue(friendAndMeInfos.isSuccess(), "获取好友信息失败");
         List<Integer> collect = friendAndMeInfos.getData().stream().map(UserInfoDTO::getUserId).collect(Collectors.toList());
         return collect.stream().map(integer -> redissonClient.getScoredSortedSet(PREFIX + integer)).collect(Collectors.toList());

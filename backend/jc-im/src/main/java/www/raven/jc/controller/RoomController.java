@@ -12,14 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import www.raven.jc.api.UserDubbo;
+import www.raven.jc.api.UserRpcService;
 import www.raven.jc.entity.model.RoomIdModel;
 import www.raven.jc.entity.model.RoomModel;
 import www.raven.jc.entity.vo.RealRoomVO;
 import www.raven.jc.entity.vo.UserFriendVO;
 import www.raven.jc.entity.vo.UserRoomVO;
 import www.raven.jc.result.CommonResult;
-import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.FriendService;
 import www.raven.jc.service.RoomService;
 
@@ -39,12 +38,14 @@ public class RoomController {
     @Autowired
     private FriendService friendService;
     @Autowired
-    private UserDubbo userDubbo;
+    private UserRpcService userRpcService;
+
     //TODO 分页
     @GetMapping("/initUserMainPage")
     public CommonResult<List<UserRoomVO>> initUserMainPage() {
         return CommonResult.operateSuccess("获取房间列表成功", roomService.initUserMainPage());
     }
+
     //TODO 分页
     @GetMapping("/initUserFriendPage")
     public CommonResult<List<UserFriendVO>> initUserFriendPage() {
@@ -52,14 +53,15 @@ public class RoomController {
     }
 
     @GetMapping("/queryIdRoomList/{page}/{size}")
-    public CommonResult<RealRoomVO> queryRoomList(@PathVariable("page") @NotNull int page, @PathVariable("size")  @NotNull int size) {
+    public CommonResult<RealRoomVO> queryRoomList(@PathVariable("page") @NotNull int page,
+        @PathVariable("size") @NotNull int size) {
         return CommonResult.operateSuccess("获取房间列表成功", roomService.queryListPage(page, size));
     }
 
     @GetMapping("/queryRelatedRoomList/{text}/{choice}/{page}")
-    public CommonResult<RealRoomVO> queryRelatedRoomList(@PathVariable("text") @NotBlank  String text,
+    public CommonResult<RealRoomVO> queryRelatedRoomList(@PathVariable("text") @NotBlank String text,
         @PathVariable("choice") @NotBlank int choice,
-        @PathVariable("page")  @NotBlank int page) {
+        @PathVariable("page") @NotBlank int page) {
         RealRoomVO rooms;
         //roomName查找
         if (choice == 1) {
@@ -84,7 +86,8 @@ public class RoomController {
     }
 
     @GetMapping("/agreeToJoinRoom/{roomId}/{userId}/{noticeId}")
-    public CommonResult<Void> agreeApply(@PathVariable("roomId") @NotBlank String roomId, @PathVariable("userId") @NotBlank int userId,
+    public CommonResult<Void> agreeApply(@PathVariable("roomId") @NotBlank String roomId,
+        @PathVariable("userId") @NotBlank int userId,
         @PathVariable("noticeId") @NotBlank int noticeId) {
         roomService.agreeApply(Integer.valueOf(roomId), userId, noticeId);
         return CommonResult.operateSuccess("同意申请成功");

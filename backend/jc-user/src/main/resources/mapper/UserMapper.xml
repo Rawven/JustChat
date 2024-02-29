@@ -5,20 +5,20 @@
 <mapper namespace="www.raven.jc.dao.mapper.UserMapper">
 
 
-        <select id="selectUserByFriendId" resultType="www.raven.jc.entity.po.User">
-            SELECT u.*
-            FROM user u
-                     JOIN friend f ON u.id = f.user_id
-            WHERE f.friend_id = #{friendId}
-        </select>
+    <select id="selectUserByFriendId" resultType="www.raven.jc.entity.po.User">
+        SELECT u.*
+        FROM user u
+                 JOIN friend f ON u.id = f.user_id
+        WHERE f.friend_id = #{friendId}
+    </select>
 
-        <select id="selectUsersAndFriends" resultType="www.raven.jc.entity.po.User">
-            SELECT u.*
-            FROM user u
-                     LEFT JOIN friend f ON u.id = f.friend_id
-            WHERE f.user_id = #{userId} OR u.id = #{userId}
-        </select>
-
+    <select id="selectUsersAndFriends" resultType="www.raven.jc.entity.po.User">
+        SELECT u.*
+        FROM user u
+                 LEFT JOIN friend f ON u.id = f.friend_id
+        WHERE f.user_id = #{userId}
+           OR u.id = #{userId}
+    </select>
 
 
 </mapper>

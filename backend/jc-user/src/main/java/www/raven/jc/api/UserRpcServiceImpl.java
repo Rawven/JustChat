@@ -10,7 +10,6 @@ import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.dto.UserRegisterDTO;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.FriendService;
-import www.raven.jc.service.NoticeService;
 import www.raven.jc.service.UserService;
 
 /**
@@ -19,14 +18,12 @@ import www.raven.jc.service.UserService;
  * @author 刘家辉
  * @date 2024/01/19
  */
-@DubboService(interfaceClass = UserDubbo.class, version = "1.0.0", timeout = 15000)
-public class UserDubboImpl implements UserDubbo {
+@DubboService(interfaceClass = UserRpcService.class, version = "1.0.0", timeout = 15000)
+public class UserRpcServiceImpl implements UserRpcService {
     @Autowired
     private UserService userService;
     @Autowired
     private FriendService friendService;
-    @Autowired
-    private NoticeService noticeService;
 
     @Override
     public RpcResult<UserInfoDTO> getSingleInfo(Integer userId) {
@@ -50,8 +47,8 @@ public class UserDubboImpl implements UserDubbo {
 
     @Override
     public RpcResult<UserAuthDTO> getUserToAuth(String username) {
-        UserAuthDTO auth = userService.querySingleInfoByColumn("username", username);
-        if(auth == null){
+        UserAuthDTO auth = userService.queryAuthSingleInfoByColumn("username", username);
+        if (auth == null) {
             return RpcResult.operateFailure("无对应账户信息");
         }
         return RpcResult.operateSuccess("查找成功", auth);
@@ -84,13 +81,12 @@ public class UserDubboImpl implements UserDubbo {
     }
 
     @Override
-    public RpcResult<Void> deleteNotice(int noticeId) {
-        noticeService.deleteNotification(noticeId);
-        return RpcResult.operateSuccess("删除成功");
+    public RpcResult<List<UserInfoDTO>> getFriendAndMeInfos(int i) {
+        return RpcResult.operateSuccess("查找成功", friendService.getFriendAndMeInfos(i));
     }
 
     @Override
-    public RpcResult<List<UserInfoDTO>> getFriendAndMeInfos(int i) {
-        return RpcResult.operateSuccess("查找成功", friendService.getFriendAndMeInfos(i));
+    public RpcResult<UserInfoDTO> getSingleInfoByColumn(String name) {
+        return RpcResult.operateSuccess("查找成功", userService.querySingleInfoByColumn("username", name));
     }
 }

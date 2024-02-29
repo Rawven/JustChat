@@ -1,6 +1,5 @@
 package www.raven.jc.controller;
 
-import java.util.Objects;
 import javax.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import www.raven.jc.config.JwtProperty;
 import www.raven.jc.entity.model.LoginModel;
-import www.raven.jc.entity.model.RegisterAdminModel;
 import www.raven.jc.entity.model.RegisterModel;
 import www.raven.jc.entity.vo.TokenVO;
 import www.raven.jc.result.CommonResult;

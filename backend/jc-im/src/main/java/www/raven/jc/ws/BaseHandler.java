@@ -1,7 +1,6 @@
 package www.raven.jc.ws;
 
 import javax.websocket.Session;
-import lombok.Data;
 import www.raven.jc.entity.dto.MessageDTO;
 
 /**
@@ -18,5 +17,5 @@ public interface BaseHandler {
      * @param message message
      * @param session session
      */
-    void onMessage(MessageDTO message,Session session);
+    void onMessage(MessageDTO message, Session session);
 }

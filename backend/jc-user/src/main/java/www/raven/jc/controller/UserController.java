@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import www.raven.jc.annotions.Auth;
+import www.raven.jc.api.ImRpcService;
 import www.raven.jc.constant.RoleConstant;
 import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.vo.InfoVO;
 import www.raven.jc.entity.vo.RealAllInfoVO;
 import www.raven.jc.result.CommonResult;
-import www.raven.jc.service.NoticeService;
 import www.raven.jc.service.UserService;
 import www.raven.jc.util.RequestUtil;
 
@@ -40,7 +40,7 @@ public class UserController {
     @Autowired
     private UserService userService;
     @Autowired
-    private NoticeService noticeService;
+    private ImRpcService imRpcService;
     @Autowired
     private HttpServletRequest request;
 
@@ -111,7 +111,7 @@ public class UserController {
     }
 
     @PostMapping("/getBatchInfo")
-    CommonResult<List<UserInfoDTO>> getBatchInfo(@RequestBody  List<Integer> userIds) {
+    CommonResult<List<UserInfoDTO>> getBatchInfo(@RequestBody List<Integer> userIds) {
         return CommonResult.operateSuccess("查找成功", userService.queryBatchInfo(userIds));
     }
 

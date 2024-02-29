@@ -15,7 +15,7 @@ import www.raven.jc.result.RpcResult;
  * @author 刘家辉
  * @date 2023/11/23
  */
-public interface UserDubbo {
+public interface UserRpcService {
     /**
      * get single info
      *
@@ -96,14 +96,6 @@ public interface UserDubbo {
     RpcResult<List<UserInfoDTO>> getFriendInfos(int userId);
 
     /**
-     * delete notice
-     *
-     * @param noticeId notice id
-     * @return {@link RpcResult}<{@link Boolean}>
-     */
-    RpcResult<Void> deleteNotice(int noticeId);
-
-    /**
      * get friend and me infos
      *
      * @param i i
@@ -111,4 +103,11 @@ public interface UserDubbo {
      */
     RpcResult<List<UserInfoDTO>> getFriendAndMeInfos(int i);
 
+    /**
+     * get single info by column
+     *
+     * @param name name
+     * @return {@link RpcResult}<{@link UserInfoDTO}>
+     */
+    RpcResult<UserInfoDTO> getSingleInfoByColumn(String name);
 }
