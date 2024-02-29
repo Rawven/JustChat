@@ -129,9 +129,9 @@ export default {
     localStorage.getItem("token");
     this.theFriend = JSON.parse(this.friend);
     console.log('WebSocket created:', this.theFriend)
+    this.getOffline();
     this.socket = this.$global.ws;
     this.socket.onopen = () => {
-      this.getHistory();
       console.log('WebSocket is open now.');
     };
 
@@ -176,7 +176,7 @@ export default {
     },
     addMsg() {
       let token = localStorage.getItem("token");
-      this.realAxios.post(`http://` + Host + `:7000/chat/message/restoreFriendHistory`, {
+      this.realAxios.post(`http://` + Host + `:7000/chat/message/queryFriendMsgPages`, {
         friendId: this.theFriend.friendId,
         page: this.page,
         size: 15
@@ -199,12 +199,10 @@ export default {
             this.page++;
           });
     }
-    , getHistory() {
+    , getOffline() {
       let token = localStorage.getItem("token");
-      this.realAxios.post(`http://` + Host + `:7000/chat/message/restoreFriendHistory`, {
+      this.realAxios.post(`http://` + Host + `:7000/chat/message/getLatestFriendHistory`, {
         friendId: this.theFriend.friendId,
-        page: this.page,
-        size: 15
       }, {
         headers: {
           'token': token

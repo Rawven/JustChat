@@ -131,9 +131,10 @@ export default {
   created() {
     this.theRoom = JSON.parse(this.room);
     console.log('WebSocket created:', this.theRoom)
+    this.getOffline();
     this.socket = this.$global.ws;
     this.socket.onopen = () => {
-      this.getHistory();
+
       console.log('WebSocket is open now.');
     };
 
@@ -159,9 +160,29 @@ export default {
   },
 
   methods: {
+    getOffline() {
+      let token = localStorage.getItem("token");
+      this.realAxios.post(`http://` + Host + `:7000/chat/message/getLatestRoomHistory`, {
+        roomId: this.theRoom.roomId,
+      }, {
+        headers: {
+          'token': token
+        }
+      })
+          .then(response => {
+            this.messages = response.data.data.map(messageVO => ({
+              time: new Date(messageVO.time).getTime(), // 将Date对象转换为时间戳
+              text: messageVO.text,
+              user: messageVO.user,
+              profile: messageVO.profile
+            })); // 使用map方法将每个MessageVO对象转换为msg对象
+          })
+
+      this.page++;
+    },
     getHistory() {
       let token = localStorage.getItem("token");
-      this.realAxios.post(`http://` + Host + `:7000/chat/message/restoreRoomHistory`, {
+      this.realAxios.post(`http://` + Host + `:7000/chat/message/queryRoomMsgPages`, {
         roomId: this.theRoom.roomId,
         page: this.page,
         size: 15
@@ -206,7 +227,7 @@ export default {
       }
     }, addMsg() {
       let token = localStorage.getItem("token");
-      this.realAxios.post(`http://` + Host + `:7000/chat/message/restoreRoomHistory`, {
+      this.realAxios.post(`http://` + Host + `:7000/chat/message/queryRoomMsgPages`, {
         roomId: this.theRoom.roomId,
         page: this.page,
         size: 15
