@@ -18,7 +18,6 @@
         <module name="common-mq-social-user-model" />
         <module name="auth" />
         <module name="common-threadpool" />
-        <module name="common-api-im" />
         <module name="common-redis" />
         <module name="jc-auth" />
         <module name="common-ws" />
@@ -47,6 +46,7 @@
       <module name="auth" target="11" />
       <module name="chat" target="11" />
       <module name="common" target="11" />
+      <module name="common-api-im" target="11" />
       <module name="common-base" target="11" />
       <module name="common-User" target="11" />
       <module name="file" target="11" />

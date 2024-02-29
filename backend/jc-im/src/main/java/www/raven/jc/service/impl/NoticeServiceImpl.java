@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.api.UserRpcService;
-import www.raven.jc.constant.ChatUserMqConstant;
+import www.raven.jc.constant.ImUserMqConstant;
 import www.raven.jc.constant.JwtConstant;
 import www.raven.jc.constant.NoticeConstant;
 import www.raven.jc.dao.NoticeDAO;
@@ -94,7 +94,7 @@ public class NoticeServiceImpl implements NoticeService {
         RBucket<String> friendBucket = redissonClient.getBucket(JwtConstant.TOKEN + friend.getUserId());
         HashMap<Object, Object> map = new HashMap<>(1);
         map.put("applyId", applierId);
-        map.put("type", ChatUserMqConstant.TAGS_USER_FRIEND_APPLY);
+        map.put("type", ImUserMqConstant.TAGS_USER_FRIEND_APPLY);
         if (friendBucket.isExists()) {
             WebsocketService.sendOneMessage(friend.getUserId(), JsonUtil.objToJson(map));
         } else {

@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
 import www.raven.jc.api.UserRpcService;
-import www.raven.jc.constant.ChatUserMqConstant;
+import www.raven.jc.constant.ImUserMqConstant;
 import www.raven.jc.constant.JwtConstant;
 import www.raven.jc.constant.NoticeConstant;
 import www.raven.jc.constant.SocialUserMqConstant;
@@ -23,6 +23,7 @@ import www.raven.jc.dao.NoticeDAO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.Notice;
 import www.raven.jc.event.Event;
+import www.raven.jc.event.model.DeleteNoticeEvent;
 import www.raven.jc.event.model.FriendMsgEvent;
 import www.raven.jc.event.model.MomentNoticeEvent;
 import www.raven.jc.event.model.RoomApplyEvent;
@@ -49,10 +50,28 @@ public class NoticeEventListener {
     private UserRpcService userRpcService;
     @Autowired
     private NoticeDAO noticeDAO;
+    @Bean
+    public Consumer<Message<Event>> eventUserToIm() {
+        return msg -> {
+            //判断是否重复消息
+            if (MqUtil.checkMsgIsvalid(msg, redissonClient)) {
+                return;
+            }
+            String tags = Objects.requireNonNull(msg.getHeaders().get(HEADER_TAGS)).toString();
+            //判断消息类型
+            switch (tags) {
+                case ImUserMqConstant.TAGS_DELETE_NOTICE:
+                     eventDeleteNotice(msg);
+                    break;
+                default:
+                    log.info("--RocketMq 非法的消息，不处理");
+            }
+            MqUtil.protectMsg(msg, redissonClient);
+        };
+    }
 
     @Bean
-    public Consumer<Message<Event>> eventSocialToUser
-        () {
+    public Consumer<Message<Event>> eventFeedToIm() {
         return msg -> {
             //判断是否重复消息
             if (MqUtil.checkMsgIsvalid(msg, redissonClient)) {
@@ -66,6 +85,32 @@ public class NoticeEventListener {
                     break;
                 case SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT:
                     eventMomentNoticeLikeOrCommentEvent(msg);
+                    break;
+                default:
+                    log.info("--RocketMq 非法的消息，不处理");
+            }
+            MqUtil.protectMsg(msg, redissonClient);
+        };
+    }
+
+    @Bean
+    public Consumer<Message<Event>> eventImToIm() {
+        return msg -> {
+            //判断是否重复消息
+            if (MqUtil.checkMsgIsvalid(msg, redissonClient)) {
+                return;
+            }
+            String tags = Objects.requireNonNull(msg.getHeaders().get(HEADER_TAGS)).toString();
+            //判断消息类型
+            switch (tags) {
+                case ImUserMqConstant.TAGS_CHAT_FRIEND_MSG_RECORD:
+                    eventFriendSendMsg(msg);
+                    break;
+                case ImUserMqConstant.TAGS_CHAT_ROOM_APPLY:
+                    eventUserJoinRoomApply(msg);
+                    break;
+                case ImUserMqConstant.TAGS_CHAT_ROOM_MSG_RECORD:
+                    eventRoomSendMsg(msg);
                     break;
                 default:
                     log.info("--RocketMq 非法的消息，不处理");
@@ -97,32 +142,6 @@ public class NoticeEventListener {
         WebsocketService.sendOneMessage(userId, JsonUtil.objToJson(map));
     }
 
-    @Bean
-    public Consumer<Message<Event>> eventChatToUser() {
-        return msg -> {
-            //判断是否重复消息
-            if (MqUtil.checkMsgIsvalid(msg, redissonClient)) {
-                return;
-            }
-            String tags = Objects.requireNonNull(msg.getHeaders().get(HEADER_TAGS)).toString();
-            //判断消息类型
-            switch (tags) {
-                case ChatUserMqConstant.TAGS_CHAT_FRIEND_MSG_RECORD:
-                    eventFriendSendMsg(msg);
-                    break;
-                case ChatUserMqConstant.TAGS_CHAT_ROOM_APPLY:
-                    eventUserJoinRoomApply(msg);
-                    break;
-                case ChatUserMqConstant.TAGS_CHAT_ROOM_MSG_RECORD:
-                    eventRoomSendMsg(msg);
-                    break;
-                default:
-                    log.info("--RocketMq 非法的消息，不处理");
-            }
-            MqUtil.protectMsg(msg, redissonClient);
-        };
-    }
-
     private void eventFriendSendMsg(Message<Event> msg) {
         FriendMsgEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), FriendMsgEvent.class);
         RBucket<String> receiverBucket = redissonClient.getBucket(JwtConstant.TOKEN + payload.getReceiverId());
@@ -130,7 +149,7 @@ public class NoticeEventListener {
         map.put("receiverId", payload.getReceiverId());
         map.put("senderId", payload.getSenderId());
         map.put("msg", payload.getMsg());
-        map.put("type", ChatUserMqConstant.TAGS_CHAT_FRIEND_MSG_RECORD);
+        map.put("type", ImUserMqConstant.TAGS_CHAT_FRIEND_MSG_RECORD);
         if (receiverBucket.isExists()) {
             WebsocketService.sendOneMessage(payload.getReceiverId(), JsonUtil.objToJson(map));
         } else {
@@ -156,7 +175,7 @@ public class NoticeEventListener {
         RBucket<String> founderBucket = redissonClient.getBucket(JwtConstant.TOKEN + founderId);
         if (founderBucket.isExists()) {
             HashMap<Object, Object> map = new HashMap<>(1);
-            map.put("type", ChatUserMqConstant.TAGS_CHAT_ROOM_APPLY);
+            map.put("type", ImUserMqConstant.TAGS_CHAT_ROOM_APPLY);
             WebsocketService.sendOneMessage(founderId, JsonUtil.objToJson(map));
             log.info("--RocketMq 已推送通知给founder");
         } else {
@@ -176,8 +195,14 @@ public class NoticeEventListener {
         map.put("roomId", payload.getRoomId());
         map.put("username", userInfoDTO.getUsername());
         map.put("msg", payload.getMsg());
-        map.put("type", ChatUserMqConstant.TAGS_CHAT_ROOM_MSG_RECORD);
+        map.put("type", ImUserMqConstant.TAGS_CHAT_ROOM_MSG_RECORD);
         List<Integer> idsFromRoom = payload.getIdsFromRoom();
         WebsocketService.sendBatchMessage(JsonUtil.objToJson(map), idsFromRoom);
+    }
+
+
+    private void eventDeleteNotice(Message<Event> msg) {
+        DeleteNoticeEvent event = JsonUtil.jsonToObj(msg.getPayload().getData(), DeleteNoticeEvent.class);
+        Assert.isTrue(noticeDAO.removeById(event.getNoticeId()), "删除失败");
     }
 }

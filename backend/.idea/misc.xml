@@ -18,9 +18,9 @@
         <option value="$PROJECT_DIR$/common-User/pom.xml" />
         <option value="$PROJECT_DIR$/common/common-api-user/pom.xml" />
         <option value="$PROJECT_DIR$/common/common-base/pom.xml" />
+        <option value="$PROJECT_DIR$/jc-common/common-api/common-api-im/pom.xml" />
       </set>
     </option>
-    <option name="workspaceImportForciblyTurnedOn" value="true" />
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="11" project-jdk-type="JavaSDK" />
 </project>

@@ -3,12 +3,12 @@ package www.raven.jc.controller;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import www.raven.jc.api.ImRpcService;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.FriendService;
 
@@ -25,21 +25,18 @@ import www.raven.jc.service.FriendService;
 public class FriendController {
     @Autowired
     private FriendService friendService;
-    @Autowired
-    private ImRpcService imRpcService;
 
     @GetMapping("/agreeToBeFriend/{friendId}/{noticeId}")
     public CommonResult<Void> agreeApplyFriend(@PathVariable("friendId") @NotNull int friendId,
         @PathVariable("noticeId") @NotNull int noticeId) {
-        friendService.agreeApplyFromFriend(friendId);
-        imRpcService.deleteNotification(noticeId);
+        friendService.agreeApplyFromFriend(friendId,noticeId);
         return CommonResult.operateSuccess("成为好友成功");
     }
 
     @GetMapping("/refuseToBeFriend/{friendId}/{noticeId}")
     public CommonResult<Void> refuseApplyFriend(@PathVariable("friendId") int friendId,
         @PathVariable("noticeId") @NotNull int noticeId) {
-        imRpcService.deleteNotification(noticeId);
+        friendService.refuseApplyFromFriend(noticeId);
         return CommonResult.operateSuccess("拒绝好友成功");
     }
 

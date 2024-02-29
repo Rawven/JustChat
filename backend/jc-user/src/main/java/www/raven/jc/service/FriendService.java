@@ -23,8 +23,16 @@ public interface FriendService {
      * add apply friend
      *
      * @param friendId friend id
+     * @param noticeId notice id
      */
-    void agreeApplyFromFriend(int friendId);
+    void agreeApplyFromFriend(int friendId,int noticeId);
+
+    /**
+     * refuse apply from friend
+     *
+     * @param noticeId notice id
+     */
+    void refuseApplyFromFriend(int noticeId);
 
     /**
      * get friend and me infos

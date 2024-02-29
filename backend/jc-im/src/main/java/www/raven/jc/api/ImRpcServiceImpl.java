@@ -3,6 +3,7 @@ package www.raven.jc.api;
 import cn.hutool.core.lang.Assert;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import www.raven.jc.dao.NoticeDAO;
 import www.raven.jc.result.RpcResult;
 
@@ -12,13 +13,11 @@ import www.raven.jc.result.RpcResult;
  * @author 刘家辉
  * @date 2024/02/29
  */
-
-@DubboService(interfaceClass = UserRpcService.class, version = "1.0.0", timeout = 15000)
-public class ImRpcServiceImpl implements ImRpcService {
+@Service
+public class ImRpcServiceImpl  {
     @Autowired
     private NoticeDAO noticeDAO;
 
-    @Override
     public RpcResult<Void> deleteNotification(int id) {
         int i = noticeDAO.getBaseMapper().deleteById(id);
         Assert.isTrue(i == 1, "删除失败");

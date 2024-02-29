@@ -24,11 +24,34 @@ spring:
     name: JC-Chat
   cloud:
     stream:
+      function:
+        definition: eventUserToIm;eventFeedToIm;
+        rocketmq:
+          binder:
+            name-server: 10.21.32.221:9876
+          bindings:
+            eventSocialToUser-in-0:
+              consumer:
+                messageModel: BROADCASTING
+            eventChatToUser-in-0:
+              consumer:
+                messageModel: BROADCASTING
+        bindings:
+          eventUserToIm-in-0:
+            consumer:
+              max-attempts: 3
+            destination: eventUserToIm
+            group: im-module
+          eventFeedToIm-in-0:
+            consumer:
+              max-attempts: 3
+            destination: eventFeedToIm
+            group: im-module
       bindings:
         producer-out-1:
-          destination: eventChatToUser
+          destination: eventImToIm
         producer-out-0:
-          destination: eventChatToUser
+          destination: eventImToIm
       rocketmq:
         bindings:
           producer-out-1:

@@ -1,15 +1,19 @@
 package www.raven.jc.service.impl;
 
+import java.util.HashMap;
+import java.util.List;
+import javax.websocket.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
-import www.raven.jc.constant.ChatUserMqConstant;
+import www.raven.jc.constant.ImUserMqConstant;
 import www.raven.jc.dao.RoomDAO;
 import www.raven.jc.entity.po.Room;
 import www.raven.jc.event.model.RoomApplyEvent;
 import www.raven.jc.service.AsyncService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
+import www.raven.jc.ws.WebsocketService;
 
 /**
  * chat async service impl
@@ -29,12 +33,20 @@ public class AsyncServiceImpl implements AsyncService {
         Room room = roomDAO.getBaseMapper().selectById(roomId);
         Integer founderId = room.getFounderId();
         //通知user模块 插入一条申请记录
-        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new RoomApplyEvent(userId, founderId, roomId)), ChatUserMqConstant.TAGS_CHAT_ROOM_APPLY));
+        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new RoomApplyEvent(userId, founderId, roomId)), ImUserMqConstant.TAGS_CHAT_ROOM_APPLY));
     }
 
     @Override
-    public void updateRoomMap(Integer userId, String sessionId) {
-
+    public void updateRoomMap(Integer userId, List<Room> list) {
+        Session session = WebsocketService.SESSION_POOL.get(userId);
+        if (session != null && session.isOpen()) {
+            list.forEach(room -> {
+                if(!WebsocketService.GROUP_SESSION_POOL.containsKey(room.getRoomId())){
+                    WebsocketService.GROUP_SESSION_POOL.put(room.getRoomId(), new HashMap<>(10));
+                }
+                WebsocketService.GROUP_SESSION_POOL.get(room.getRoomId()).put(userId, session);
+            });
+        }
     }
 
     @Override

@@ -6,13 +6,18 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import www.raven.jc.constant.ImUserMqConstant;
 import www.raven.jc.dao.FriendDAO;
 import www.raven.jc.dao.UserDAO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.Friend;
+import www.raven.jc.event.model.DeleteNoticeEvent;
 import www.raven.jc.service.FriendService;
+import www.raven.jc.util.JsonUtil;
+import www.raven.jc.util.MqUtil;
 import www.raven.jc.util.RequestUtil;
 
 /**
@@ -30,6 +35,8 @@ public class FriendServiceImpl implements FriendService {
     private UserDAO userDAO;
     @Autowired
     private HttpServletRequest request;
+    @Autowired
+    private StreamBridge streamBridge;
 
     @Override
     public List<UserInfoDTO> getFriendInfos(int userId) {
@@ -41,12 +48,18 @@ public class FriendServiceImpl implements FriendService {
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
-    public void agreeApplyFromFriend(int friendId) {
+    public void agreeApplyFromFriend(int friendId,int noticeId) {
         int userId = RequestUtil.getUserId(request);
         Friend friend = new Friend().setUserId((long) userId).setFriendId((long) friendId);
         Friend friend1 = new Friend().setUserId((long) friendId).setFriendId((long) userId);
         boolean b = friendDAO.saveBatch(List.of(friend, friend1));
         Assert.isTrue(b, "成为好友失败");
+        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new DeleteNoticeEvent(noticeId)), ImUserMqConstant.TAGS_DELETE_NOTICE));
+    }
+
+    @Override
+    public void refuseApplyFromFriend(int noticeId) {
+        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new DeleteNoticeEvent(noticeId)), ImUserMqConstant.TAGS_DELETE_NOTICE));
     }
 
     @Override

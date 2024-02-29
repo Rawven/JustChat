@@ -24,7 +24,7 @@ spring:
     stream:
       bindings:
         producer-out-1:
-          destination: eventSocialToUser
+          destination: eventFeedToIm
       rocketmq:
         bindings:
           producer-out-1:

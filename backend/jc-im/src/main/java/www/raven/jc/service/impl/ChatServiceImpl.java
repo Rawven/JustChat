@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.api.UserRpcService;
 import www.raven.jc.constant.ApplyStatusConstant;
-import www.raven.jc.constant.ChatUserMqConstant;
+import www.raven.jc.constant.ImUserMqConstant;
 import www.raven.jc.constant.MessageConstant;
 import www.raven.jc.constant.OfflineMessagesConstant;
 import www.raven.jc.dao.FriendChatDAO;
@@ -96,7 +96,7 @@ public class ChatServiceImpl implements ChatService {
         Assert.isTrue(roomDAO.getBaseMapper().updateById(new Room().setRoomId(roomId).setLastMsgId(realMsg.getMessageId().toString())) > 0, "更新失败");
         RoomMsgEvent roomMsgEvent = new RoomMsgEvent(JsonUtil.objToJson(user), roomId, userIds, JsonUtil.objToJson(realMsg));
         //通知user模块有新消息
-        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(roomMsgEvent), ChatUserMqConstant.TAGS_CHAT_ROOM_MSG_RECORD));
+        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(roomMsgEvent), ImUserMqConstant.TAGS_CHAT_ROOM_MSG_RECORD));
     }
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
@@ -108,6 +108,13 @@ public class ChatServiceImpl implements ChatService {
             .setSender(user)
             .setType(MessageConstant.FRIEND)
             .setReceiverId(fixId);
+
+        //对离线用户进行离线信息保存
+        if (WebsocketService.FRIEND_SESSION_POOL.get(friendId) == null || !WebsocketService.SESSION_POOL.get(friendId).isOpen()) {
+            RScoredSortedSet<Object> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + user.getUserId());
+            scoredSortedSet.add(message.getTime(), JsonUtil.objToJson(message));
+        }
+
         //保存消息
         messageDAO.getBaseMapper().save(realMsg);
         //保存最后一条消息
@@ -116,7 +123,7 @@ public class ChatServiceImpl implements ChatService {
         Assert.isTrue(friendChatDAO.save(friendChat), "插入失败");
         FriendMsgEvent friendMsgEvent = new FriendMsgEvent(user.getUserId(), friendId, JsonUtil.objToJson(realMsg));
         //通知user模块有新消息
-        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(friendMsgEvent), ChatUserMqConstant.TAGS_CHAT_FRIEND_MSG_RECORD));
+        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(friendMsgEvent), ImUserMqConstant.TAGS_CHAT_FRIEND_MSG_RECORD));
     }
 
 }
