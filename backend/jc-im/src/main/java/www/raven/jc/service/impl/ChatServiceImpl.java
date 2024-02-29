@@ -11,6 +11,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.websocket.Session;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,12 +74,13 @@ public class ChatServiceImpl implements ChatService {
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
-    public void saveRoomMsg(Integer userId, MessageDTO message, Integer roomId) {
+    public void saveRoomMsg(UserInfoDTO user, MessageDTO message, Integer roomId) {
         long timeStamp = message.getTime();
         String text = message.getText();
-        Message realMsg = new Message().setContent(text)
+        Message realMsg = new Message()
+            .setContent(text)
             .setTimestamp(new Date(timeStamp))
-            .setSenderId(userId)
+            .setSender(user)
             .setType(MessageConstant.ROOM)
             .setReceiverId(String.valueOf(roomId));
         List<Integer> userIds = userRoomDAO.getBaseMapper().selectList(
@@ -86,14 +88,14 @@ public class ChatServiceImpl implements ChatService {
                 eq("status", ApplyStatusConstant.APPLY_STATUS_AGREE)).
             stream().map(UserRoom::getUserId).collect(Collectors.toList());
         //TODO 离线消息
-
-        Map<Integer, Map<Integer, Session>> pool = WebsocketService.GROUP_SESSION_POOL;
-         //对离线用户进行离线信息保存
+           
+        Map<Integer, Session> sessionMap = WebsocketService.GROUP_SESSION_POOL.get(roomId);
+        //对离线用户进行离线信息保存
         userIds.forEach(
             id -> {
-                if (pool.get(id) == null) {
+                if (sessionMap.get(id) == null||!sessionMap.get(id).isOpen()) {
                     RScoredSortedSet<Object> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + id);
-                    scoredSortedSet.add(timeStamp,JsonUtil.objToJson(realMsg));
+                    scoredSortedSet.add(timeStamp,JsonUtil.objToJson(message));
                 }
             }
         );
@@ -103,18 +105,18 @@ public class ChatServiceImpl implements ChatService {
         messageDAO.getBaseMapper().save(realMsg);
         //更新聊天室的最后一条消息
         Assert.isTrue(roomDAO.getBaseMapper().updateById(new Room().setRoomId(roomId).setLastMsgId(realMsg.getMessageId().toString())) > 0, "更新失败");
-        RoomMsgEvent roomMsgEvent = new RoomMsgEvent(userId, roomId, userIds, JsonUtil.objToJson(realMsg));
+        RoomMsgEvent roomMsgEvent = new RoomMsgEvent(JsonUtil.objToJson(user), roomId, userIds, JsonUtil.objToJson(realMsg));
         //通知user模块有新消息
         streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(roomMsgEvent), ChatUserMqConstant.TAGS_CHAT_ROOM_MSG_RECORD));
     }
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
-    public void saveFriendMsg(MessageDTO message, Integer userId, Integer friendId) {
-        String fixId = MongoUtil.concatenateIds(userId, friendId);
+    public void saveFriendMsg(MessageDTO message, UserInfoDTO user, Integer friendId) {
+        String fixId = MongoUtil.concatenateIds(user.getUserId(), friendId);
         Message realMsg = new Message().setContent(message.getText())
             .setTimestamp(new Date(message.getTime()))
-            .setSenderId(userId)
+            .setSender(user)
             .setType(MessageConstant.FRIEND)
             .setReceiverId(fixId);
         //保存消息
@@ -123,42 +125,12 @@ public class ChatServiceImpl implements ChatService {
         FriendChat friendChat = new FriendChat().setFixId(fixId)
             .setLastMsgId(realMsg.getMessageId().toString());
         Assert.isTrue(friendChatDAO.save(friendChat), "插入失败");
-        FriendMsgEvent friendMsgEvent = new FriendMsgEvent(userId, friendId, JsonUtil.objToJson(realMsg));
+       FriendMsgEvent friendMsgEvent = new FriendMsgEvent(user.getUserId(), friendId, JsonUtil.objToJson(realMsg));
         //通知user模块有新消息
         streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(friendMsgEvent), ChatUserMqConstant.TAGS_CHAT_FRIEND_MSG_RECORD));
     }
 
-    @Override
-    public List<MessageVO> getLatestGroupMsg(LatestGroupMsgModel model) {
-        return null;
-    }
 
-    @Override
-    public List<MessageVO> getGroupMsgPages(PageGroupMsgModel model) {
-        PageRequest pageRequest = PageRequest.of(model.getPage(), model.getSize());
-        List<Message> messages = new ArrayList<>(messageDAO.getMsgWithPagination(String.valueOf(model.getRoomId()),"room", pageRequest).getContent());
-        //给messages排序 从小到大
-        messages.sort(Comparator.comparingLong(o -> o.getTimestamp().getTime()));
-        List<Integer> userIds = messages.stream().map(Message::getSenderId).collect(Collectors.toList());
-        RpcResult<List<UserInfoDTO>> allInfo = userDubbo.getBatchInfo(userIds);
-        Assert.isTrue(allInfo.isSuccess(), "user模块调用失败");
-        List<UserInfoDTO> data = allInfo.getData();
-        Map<Integer, UserInfoDTO> userInfoMap = data.stream()
-            .collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
-        return messages.stream().map(
-            message -> {
-                MessageVO messageVO = new MessageVO();
-                messageVO.setText(message.getContent());
-                messageVO.setTime(message.getTimestamp());
-                // 从 Map 中查找对应的 UserInfoDTO 对象
-                UserInfoDTO userInfoDTO = userInfoMap.get(message.getSenderId());
-                if (userInfoDTO != null) {
-                    messageVO.setUser(userInfoDTO.getUsername());
-                    messageVO.setProfile(userInfoDTO.getProfile());
-                }
-                return messageVO;
-            }
-        ).collect(Collectors.toList());
-    }
+
 
 }

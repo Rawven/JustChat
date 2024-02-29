@@ -36,10 +36,10 @@ public class RoomHandler implements BaseHandler {
         } catch (Exception e) {
             log.error("map转json异常");
         }
-        chatService.saveRoomMsg(data.getUserId(), message, message.getId());
+        chatService.saveRoomMsg(data, message, message.getId());
     }
 
-    public void sendRoomMessage(String message,Integer roomId) {
+    public static void sendRoomMessage(String message,Integer roomId) {
         log.info("----WebSocket 广播消息:" + message);
         WebsocketService.GROUP_SESSION_POOL.get(roomId).forEach((k, v) -> {
             if (v.isOpen()) {

@@ -1,6 +1,7 @@
 package www.raven.jc.service;
 
 import java.util.List;
+import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.entity.model.LatestGroupMsgModel;
 import www.raven.jc.entity.model.PageGroupMsgModel;
@@ -20,26 +21,18 @@ public interface ChatService {
      *
      * @param message message
      * @param roomId  room id
-     * @param userId  user id
+     * @param user    user
      */
-    void saveRoomMsg(Integer userId, MessageDTO message, Integer roomId);
-
-    /**
-     * restore history
-     *
-     * @param model model
-     * @return {@link List}<{@link MessageVO}>
-     */
-    List<MessageVO> getGroupMsgPages(PageGroupMsgModel model);
+    void saveRoomMsg(UserInfoDTO user, MessageDTO message, Integer roomId);
 
     /**
      * save friend msg
      *
      * @param message  message
-     * @param userId   user id
      * @param friendId friend id
+     * @param user     user
      */
-    void saveFriendMsg(MessageDTO message, Integer userId, Integer friendId);
+    void saveFriendMsg(MessageDTO message, UserInfoDTO user, Integer friendId);
 
-    List<MessageVO> getLatestGroupMsg(LatestGroupMsgModel model);
+
 }

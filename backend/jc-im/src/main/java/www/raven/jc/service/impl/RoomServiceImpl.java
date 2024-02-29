@@ -4,6 +4,8 @@ import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,23 +14,29 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.api.UserDubbo;
 import www.raven.jc.constant.ApplyStatusConstant;
+import www.raven.jc.constant.OfflineMessagesConstant;
 import www.raven.jc.dao.MessageDAO;
 import www.raven.jc.dao.RoomDAO;
 import www.raven.jc.dao.UserRoomDAO;
 import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
+import www.raven.jc.entity.model.LatestGroupMsgModel;
+import www.raven.jc.entity.model.PageGroupMsgModel;
 import www.raven.jc.entity.model.RoomModel;
 import www.raven.jc.entity.po.Message;
 import www.raven.jc.entity.po.Room;
 import www.raven.jc.entity.po.UserRoom;
 import www.raven.jc.entity.vo.DisplayRoomVO;
+import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.entity.vo.RealRoomVO;
 import www.raven.jc.entity.vo.UserRoomVO;
 import www.raven.jc.result.RpcResult;
@@ -93,9 +101,7 @@ public class RoomServiceImpl implements RoomService {
         //获取所有聊天室的最后一条消息
         List<Message> messages = messageDAO.getBatchIds(idsMsg);
         //获取聊天室发最后一条信息的用户信息和聊天室创建者的用户信息
-        Set<Integer> idsSender = messages.stream().map(Message::getSenderId).collect(Collectors.toSet());
-        Set<Integer> founderIds = rooms.stream().map(Room::getFounderId).collect(Collectors.toSet());
-        idsSender.addAll(founderIds);
+        Set<Integer> idsSender = rooms.stream().map(Room::getFounderId).collect(Collectors.toSet());
         //获取聊天室创建者的用户信息
         RpcResult<List<UserInfoDTO>> batchInfo = userDubbo.getBatchInfo(new ArrayList<>(idsSender));
         Assert.isTrue(batchInfo.isSuccess(), "user模块调用失败");
@@ -109,8 +115,7 @@ public class RoomServiceImpl implements RoomService {
             if (room.getLastMsgId() != null) {
                 Message message = messageMap.get(room.getLastMsgId());
                 userRoomVO.setLastMsg(JsonUtil.objToJson(message));
-                UserInfoDTO userInfoDTO = map.get(message.getSenderId());
-                userRoomVO.setLastMsgSender(userInfoDTO.getUsername());
+                userRoomVO.setLastMsgSender(message.getSender().getUsername());
             } else {
                 userRoomVO.setLastMsg(""); // 或者一些默认值
                 userRoomVO.setLastMsgSender(""); // 或者一些默认值
@@ -174,6 +179,33 @@ public class RoomServiceImpl implements RoomService {
         Page<Room> chatRoomPage = roomDAO.getBaseMapper().selectPage(new Page<>(page, size), new QueryWrapper<>());
         List<DisplayRoomVO> rooms = buildRoomVO(chatRoomPage, userDubbo.getAllInfo().getData());
         return new RealRoomVO().setRooms(rooms).setTotal(Math.toIntExact(total));
+    }
+
+    @Override
+    public List<MessageVO> getLatestGroupMsg(LatestGroupMsgModel model) {
+        int userId = RequestUtil.getUserId(request);
+        RScoredSortedSet<Message> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + userId);
+        Collection<Message> messages = scoredSortedSet.readAll();
+        //获取所有id=roomId的消息
+        List<Message> collect = new ArrayList<>();
+        for (Message message : messages) {
+            if (message.getReceiverId().equals(String.valueOf(model.getRoomId()))) {
+                collect.add(message);
+                //删除已经获取的离线消息
+                scoredSortedSet.remove(message);
+            }
+        }
+        return getMessageById(collect);
+
+    }
+
+    @Override
+    public List<MessageVO> getGroupMsgPages(PageGroupMsgModel model) {
+        PageRequest pageRequest = PageRequest.of(model.getPage(), model.getSize());
+        List<Message> messages = new ArrayList<>(messageDAO.getMsgWithPagination(String.valueOf(model.getRoomId()),"room", pageRequest).getContent());
+        //给messages排序 从小到大
+        messages.sort(Comparator.comparingLong(o -> o.getTimestamp().getTime()));
+        return getMessageById(messages);
     }
 
     private List<DisplayRoomVO> buildRoomVO(Page<Room> chatRoomPage, List<UserInfoDTO> data) {

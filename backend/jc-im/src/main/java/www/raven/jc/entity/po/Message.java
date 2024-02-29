@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.MongoId;
+import www.raven.jc.dto.UserInfoDTO;
 
 /**
  * message
@@ -21,7 +22,7 @@ public class Message {
      */
     @MongoId
     private ObjectId messageId;
-    private Integer senderId;
+    private UserInfoDTO sender;
     private String content;
     private String type;
     @Indexed

@@ -7,8 +7,14 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <artifactId>common-api</artifactId>
+    <packaging>pom</packaging>
     <name>common-api</name>
     <url>http://maven.apache.org</url>
+    <modules>
+        <module>common-api-user</module>
+        <module>common-api-im</module>
+        <module>common-api-base</module>
+    </modules>
     <dependencies>
         <dependency>
             <groupId>www.Raven</groupId>

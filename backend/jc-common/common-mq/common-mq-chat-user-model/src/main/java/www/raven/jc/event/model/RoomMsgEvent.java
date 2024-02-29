@@ -1,5 +1,6 @@
 package www.raven.jc.event.model;
 
+import cn.hutool.system.UserInfo;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,7 +18,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RoomMsgEvent {
-    private Integer userId;
+    private String userInfo;
     private Integer roomId;
     private List<Integer> idsFromRoom;
     private String msg;

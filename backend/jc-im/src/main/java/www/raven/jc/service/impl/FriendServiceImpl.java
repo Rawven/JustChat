@@ -2,6 +2,7 @@ package www.raven.jc.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -9,10 +10,14 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.jetbrains.annotations.NotNull;
+import org.redisson.api.RScoredSortedSet;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import www.raven.jc.api.UserDubbo;
+import www.raven.jc.constant.OfflineMessagesConstant;
 import www.raven.jc.dao.FriendChatDAO;
 import www.raven.jc.dao.MessageDAO;
 import www.raven.jc.dto.UserInfoDTO;
@@ -45,6 +50,8 @@ public class FriendServiceImpl implements FriendService {
     private MessageDAO messageDAO;
     @Autowired
     private UserDubbo userDubbo;
+    @Autowired
+    private RedissonClient redissonClient;
 
     @Override
     public List<UserFriendVO> initUserFriendPage() {
@@ -69,7 +76,7 @@ public class FriendServiceImpl implements FriendService {
         //将好友id和好友的最后一条消息id对应起来
         Map<Integer, Message> messageMap = messages.stream()
             .collect(Collectors.toMap(
-                message -> message.getSenderId().equals(userId) ? MongoUtil.resolve(message.getReceiverId(), userId) : message.getSenderId(),
+                message -> message.getSender().getUserId().equals(userId) ? MongoUtil.resolve(message.getReceiverId(), userId) : message.getSender().getUserId(),
                 Function.identity(),
                 (oldValue, newValue) -> newValue
             ));
@@ -80,7 +87,7 @@ public class FriendServiceImpl implements FriendService {
                 .setFriendName(friend.getUsername())
                 .setFriendProfile(friend.getProfile())
                 .setLastMsg(message == null ? "" : JsonUtil.objToJson(message))
-                .setLastMsgSender(message == null ? "" : message.getSenderId().equals(userId) ? "我" : friend.getUsername());
+                .setLastMsgSender(message == null ? "" : message.getSender().getUserId().equals(userId) ? "我" : friend.getUsername());
         }).collect(Collectors.toList());
     }
 
@@ -88,24 +95,36 @@ public class FriendServiceImpl implements FriendService {
     public List<MessageVO> getFriendMsgPages(PagesFriendMsgModel model) {
         int userId = RequestUtil.getUserId(request);
         String fixId = MongoUtil.concatenateIds(userId, model.getFriendId());
-        List<Message> byFriendChatId = messageDAO.getMsgWithPagination(fixId,"friend", PageRequest.of(model.getPage(), model.getSize())).getContent();
-        ArrayList<Integer> ids = new ArrayList<>() {{
-            add(userId);
-            add(model.getFriendId());
-        }};
-        RpcResult<List<UserInfoDTO>> batchInfo = userDubbo.getBatchInfo(ids);
-        Map<Integer, UserInfoDTO> userInfoMap = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
-        return byFriendChatId.stream().map(message -> new MessageVO()
-            .setTime(message.getTimestamp())
-            .setText(message.getContent())
-            .setUser(userInfoMap.get(message.getSenderId()).getUsername())
-            .setProfile(userInfoMap.get(message.getSenderId()).getProfile())
-        ).collect(Collectors.toList());
+        List<Message> messages = messageDAO.getMsgWithPagination(fixId,"friend", PageRequest.of(model.getPage(), model.getSize())).getContent();
+        return messages.stream().map(MessageVO::new).collect(Collectors.toList());
     }
 
     @Override
     public List<MessageVO> getLatestFriendMsg(LatestFriendMsgModel model) {
-        return null;
+        int userId = RequestUtil.getUserId(request);
+        RScoredSortedSet<Message> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + userId);
+        Collection<Message> messages = scoredSortedSet.readAll();
+        //获取所有id=roomId的消息
+        List<Message> collect = new ArrayList<>();
+        for (Message message : messages) {
+            if (message.getReceiverId().equals(String.valueOf(model.getFriendId()))) {
+                collect.add(message);
+                //删除已经获取的离线消息
+                scoredSortedSet.remove(message);
+            }
+        }
+        return getMessageById(collect);
+    }
+
+    @NotNull
+    static List<MessageVO> getMessageById(List<Message> collect) {
+        return collect.stream().map(message -> {
+            MessageVO messageVO = new MessageVO();
+            messageVO.setText(message.getContent());
+            messageVO.setTime(message.getTimestamp());
+            messageVO.setUserInfoDTO(message.getSender());
+            return messageVO;
+        }).collect(Collectors.toList());
     }
 
 }

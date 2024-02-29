@@ -160,7 +160,7 @@ public class WebsocketService  {
      *
      * @param message message
      */
-    public void sendBatchMessage(String message, List<Integer> ids) {
+    public static void sendBatchMessage(String message, List<Integer> ids) {
         log.info("ws:广播消息:" + message);
         for (Integer id : ids) {
             Session session = SESSION_POOL.get(id);
@@ -181,7 +181,7 @@ public class WebsocketService  {
      * @param message message
      * @param id      id
      */
-    public void sendOneMessage(Integer id, String message) {
+    public static void sendOneMessage(Integer id, String message) {
         Session session = SESSION_POOL.get(id);
         if (session != null && session.isOpen()) {
             try {

@@ -17,7 +17,6 @@
         <module>common-util</module>
         <module>common-redis</module>
         <module>common-mp</module>
-        <module>common-ws</module>
         <module>common-mvc</module>
         <module>common-threadpool</module>
     </modules>

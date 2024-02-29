@@ -15,5 +15,7 @@ public class MessageDTO {
     private Long time;
     private Integer id;
     private String text;
+    private String username;
+    private String profile;
     private String type;
 }

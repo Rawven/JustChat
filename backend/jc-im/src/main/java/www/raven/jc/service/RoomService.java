@@ -2,7 +2,10 @@ package www.raven.jc.service;
 
 import java.util.List;
 import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
+import www.raven.jc.entity.model.LatestGroupMsgModel;
+import www.raven.jc.entity.model.PageGroupMsgModel;
 import www.raven.jc.entity.model.RoomModel;
+import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.entity.vo.RealRoomVO;
 import www.raven.jc.entity.vo.UserRoomVO;
 
@@ -84,5 +87,21 @@ public interface RoomService {
      * @return {@link RealRoomVO}
      */
     RealRoomVO queryListPage(int page, int size);
+
+    /**
+     * get latest group msg
+     *
+     * @param model model
+     * @return {@link List}<{@link MessageVO}>
+     */
+    List<MessageVO> getLatestGroupMsg(LatestGroupMsgModel model);
+
+    /**
+     * restore history
+     *
+     * @param model model
+     * @return {@link List}<{@link MessageVO}>
+     */
+    List<MessageVO> getGroupMsgPages(PageGroupMsgModel model);
 
 }

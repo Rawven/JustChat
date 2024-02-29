@@ -3,7 +3,10 @@ package www.raven.jc.entity.vo;
 import java.util.Date;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import www.raven.jc.dto.UserInfoDTO;
+import www.raven.jc.entity.po.Message;
 import www.raven.jc.model.CommonSerializable;
 
 /**
@@ -15,10 +18,16 @@ import www.raven.jc.model.CommonSerializable;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Accessors(chain = true)
+@NoArgsConstructor
 public class MessageVO extends CommonSerializable {
     private Date time;
     private String text;
-    private String user;
-    private String profile;
+    private UserInfoDTO userInfoDTO;
+
+    public MessageVO(Message message) {
+        this.time = message.getTimestamp();
+        this.text = message.getContent();
+        this.userInfoDTO = message.getSender();
+    }
 
 }

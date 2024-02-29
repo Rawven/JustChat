@@ -31,10 +31,10 @@ public class PrivateHandler implements BaseHandler  {
         TokenDTO tokenDTO = (TokenDTO) (session.getUserProperties().get("userDto"));
         UserInfoDTO data = userDubbo.getSingleInfo(tokenDTO.getUserId()).getData();
         sendFriendMessage(HandlerUtil.combineMessage(message, data),data.getUserId(), message.getId());
-        chatService.saveFriendMsg(message, data.getUserId(), message.getId());
+        chatService.saveFriendMsg(message, data, message.getId());
     }
 
-    public void sendFriendMessage(String message,int userId,int friendId) {
+    public static void sendFriendMessage(String message,int userId,int friendId) {
         log.info("----WebSocket 广播消息:" + message);
         Session mySession = WebsocketService.SESSION_POOL.get(userId);
         if (mySession != null && mySession.isOpen()) {

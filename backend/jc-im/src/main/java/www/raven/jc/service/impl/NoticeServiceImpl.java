@@ -19,7 +19,6 @@ import www.raven.jc.constant.ChatUserMqConstant;
 import www.raven.jc.constant.JwtConstant;
 import www.raven.jc.constant.NoticeConstant;
 import www.raven.jc.dao.FriendDAO;
-import www.raven.jc.dao.NoticeDAO;
 import www.raven.jc.dao.UserDAO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.Friend;
@@ -42,12 +41,6 @@ import www.raven.jc.util.RequestUtil;
 public class NoticeServiceImpl implements NoticeService {
     @Autowired
     private HttpServletRequest request;
-    @Autowired
-    private NoticeDAO noticeDAO;
-    @Autowired
-    private UserDAO userDAO;
-    @Autowired
-    private FriendDAO friendDAO;
     @Autowired
     private RedissonClient redissonClient;
 

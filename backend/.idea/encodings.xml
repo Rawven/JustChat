@@ -51,6 +51,10 @@
     <file url="file://$PROJECT_DIR$/jc-auth/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/jc-common/common-aop/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/jc-common/common-aop/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-api/common-api-im/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-api/common-api-im/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-api/common-api-user/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-api/common-api-user/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/jc-common/common-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/jc-common/common-api/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/jc-common/common-mp/src/main/java" charset="UTF-8" />
