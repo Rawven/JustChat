@@ -46,11 +46,11 @@ public class RoomHandler implements BaseHandler {
         UserInfoDTO data = userRpcService.getSingleInfo(tokenDTO.getUserId()).getData();
         try {
             //这里直接遍历更快
-            sendRoomMessage(HandlerUtil.combineMessage(message, data), message.getId());
+            sendRoomMessage(HandlerUtil.combineMessage(message, data), message.getBelongId());
         } catch (Exception e) {
             log.error(String.valueOf(e));
         }
-        chatService.saveRoomMsg(data, message, message.getId());
+        chatService.saveRoomMsg(data, message, message.getBelongId());
     }
 
 }

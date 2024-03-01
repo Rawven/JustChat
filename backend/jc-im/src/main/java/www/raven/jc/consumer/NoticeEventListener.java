@@ -103,14 +103,8 @@ public class NoticeEventListener {
             String tags = Objects.requireNonNull(msg.getHeaders().get(HEADER_TAGS)).toString();
             //判断消息类型
             switch (tags) {
-                case ImUserMqConstant.TAGS_CHAT_FRIEND_MSG_RECORD:
-                    eventFriendSendMsg(msg);
-                    break;
                 case ImUserMqConstant.TAGS_CHAT_ROOM_APPLY:
                     eventUserJoinRoomApply(msg);
-                    break;
-                case ImUserMqConstant.TAGS_CHAT_ROOM_MSG_RECORD:
-                    eventRoomSendMsg(msg);
                     break;
                 default:
                     log.info("--RocketMq 非法的消息，不处理");
@@ -118,7 +112,6 @@ public class NoticeEventListener {
             MqUtil.protectMsg(msg, redissonClient);
         };
     }
-
     private void eventMomentNoticeFriendEvent(Message<Event> msg) {
         MomentNoticeEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), MomentNoticeEvent.class);
         Integer userId = payload.getUserId();
@@ -142,20 +135,7 @@ public class NoticeEventListener {
         WebsocketService.sendOneMessage(userId, JsonUtil.objToJson(map));
     }
 
-    private void eventFriendSendMsg(Message<Event> msg) {
-        FriendMsgEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), FriendMsgEvent.class);
-        RBucket<String> receiverBucket = redissonClient.getBucket(JwtConstant.TOKEN + payload.getReceiverId());
-        HashMap<Object, Object> map = new HashMap<>(4);
-        map.put("receiverId", payload.getReceiverId());
-        map.put("senderId", payload.getSenderId());
-        map.put("msg", payload.getMsg());
-        map.put("type", ImUserMqConstant.TAGS_CHAT_FRIEND_MSG_RECORD);
-        if (receiverBucket.isExists()) {
-            WebsocketService.sendOneMessage(payload.getReceiverId(), JsonUtil.objToJson(map));
-        } else {
-            log.info("--RocketMq receiver不在线");
-        }
-    }
+
 
     /**
      * 通知用户有人想要入群
@@ -183,22 +163,6 @@ public class NoticeEventListener {
         }
     }
 
-    /**
-     * 通知在线用户有新消息
-     *
-     * @param msg msg
-     */
-    public void eventRoomSendMsg(Message<Event> msg) {
-        RoomMsgEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), RoomMsgEvent.class);
-        UserInfoDTO userInfoDTO = Convert.convert(UserInfoDTO.class, payload.getUserInfo());
-        HashMap<Object, Object> map = new HashMap<>(3);
-        map.put("roomId", payload.getRoomId());
-        map.put("username", userInfoDTO.getUsername());
-        map.put("msg", payload.getMsg());
-        map.put("type", ImUserMqConstant.TAGS_CHAT_ROOM_MSG_RECORD);
-        List<Integer> idsFromRoom = payload.getIdsFromRoom();
-        WebsocketService.sendBatchMessage(JsonUtil.objToJson(map), idsFromRoom);
-    }
 
 
     private void eventDeleteNotice(Message<Event> msg) {

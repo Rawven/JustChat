@@ -67,7 +67,7 @@ export default {
                 localStorage.setItem("token", response.data.data.token);
                 localStorage.setItem("expireTime", response.data.data.expireTime);
                 // 创建WebSocket连接
-                const socket = new WebSocket(`ws://` + Host + `:8081/ws/${localStorage.getItem("token")}`);
+                const socket = new WebSocket(`ws://` + Host + `:8881/ws/${localStorage.getItem("token")}`);
                 this.$global.setWs(socket);
                 this.realAxios.post('http://' + Host + ':7000/user/common/defaultInfo', {}, {
                   headers: {

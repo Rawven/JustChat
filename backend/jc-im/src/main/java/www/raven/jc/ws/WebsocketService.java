@@ -165,8 +165,9 @@ public class WebsocketService {
      *
      * @param message message
      */
+    //TODO
     public static void sendBatchMessage(String message, List<Integer> ids) {
-        log.info("ws:广播消息:" + message);
+        log.info("websocket:广播消息:" + message);
         for (Integer id : ids) {
             Session session = SESSION_POOL.get(id);
             if (session != null && session.isOpen()) {

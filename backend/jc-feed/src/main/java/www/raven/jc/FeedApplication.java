@@ -18,8 +18,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 @EnableDiscoveryClient
 @EnableAspectJAutoProxy
-public class SocialApplication {
+public class FeedApplication {
     public static void main(String[] args) {
-        SpringApplication.run(SocialApplication.class, args);
+        SpringApplication.run(FeedApplication.class, args);
     }
 }

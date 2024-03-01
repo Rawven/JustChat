@@ -22,8 +22,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @MapperScan("www.raven.jc.dao")
 @EnableDubbo
 @EnableAsync
-public class ChatApplication {
+public class ImApplication {
     public static void main(String[] args) {
-        SpringApplication.run(ChatApplication.class, args);
+        SpringApplication.run(ImApplication.class, args);
     }
 }

@@ -75,7 +75,7 @@ spring:
     username: root
     password: root
 server:
-  port: 8081
+  port: 8881
 jwt:
   key: 爱你老妈
   expire: 604800000

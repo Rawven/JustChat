@@ -30,6 +30,7 @@ import www.raven.jc.dao.RoomDAO;
 import www.raven.jc.dao.UserRoomDAO;
 import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
+import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.entity.model.LatestGroupMsgModel;
 import www.raven.jc.entity.model.PageGroupMsgModel;
 import www.raven.jc.entity.model.RoomModel;
@@ -46,7 +47,6 @@ import www.raven.jc.service.RoomService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.RequestUtil;
 
-import static www.raven.jc.service.impl.FriendServiceImpl.getMessageById;
 
 /**
  * room service impl
@@ -191,18 +191,18 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public List<MessageVO> getLatestGroupMsg(LatestGroupMsgModel model) {
         int userId = RequestUtil.getUserId(request);
-        RScoredSortedSet<Message> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + userId);
-        Collection<Message> messages = scoredSortedSet.readAll();
+        RScoredSortedSet<MessageVO> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + userId);
+        Collection<MessageVO> messages = scoredSortedSet.readAll();
         //获取所有id=roomId的消息
-        List<Message> collect = new ArrayList<>();
-        for (Message message : messages) {
-            if (message.getReceiverId().equals(String.valueOf(model.getRoomId()))) {
+        List<MessageVO> collect = new ArrayList<>();
+        for (MessageVO message : messages) {
+            if (message.getBelongId().equals(model.getRoomId())) {
                 collect.add(message);
                 //删除已经获取的离线消息
                 scoredSortedSet.remove(message);
             }
         }
-        return getMessageById(collect);
+        return collect;
 
     }
 
@@ -212,7 +212,7 @@ public class RoomServiceImpl implements RoomService {
         List<Message> messages = new ArrayList<>(messageDAO.getMsgWithPagination(String.valueOf(model.getRoomId()), "room", pageRequest).getContent());
         //给messages排序 从小到大
         messages.sort(Comparator.comparingLong(o -> o.getTimestamp().getTime()));
-        return getMessageById(messages);
+        return  messages.stream().map(MessageVO::new).collect(Collectors.toList());
     }
 
     private List<DisplayRoomVO> buildRoomVO(Page<Room> chatRoomPage, List<UserInfoDTO> data) {
