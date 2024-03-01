@@ -87,6 +87,7 @@
 <script>
 import {Host, ipfsHost} from "@/main";
 import {InfoFilled} from "@element-plus/icons-vue";
+import {ElMessage} from "element-plus";
 
 export default {
   name: 'ChatFriend',
@@ -138,13 +139,24 @@ export default {
     this.socket.onmessage = (event) => {
       console.log('WebSocket message received:', event.data);
       const data = JSON.parse(event.data);
-      const msg = {
-        time: Date.now(),
-        text: data.message.text,
-        user: data.userInfo.username,
-        profile: data.userInfo.profile
-      };
-      this.messages.push(msg);
+      if (data.type === "FRIEND_APPLY") {
+        this.applyNoticeIsNew = true;
+        ElMessage.success('您有新的好友申请');
+      } else if (data.type === "ROOM_APPLY") {
+        this.applyNoticeIsNew = true;
+        ElMessage.success('您有新的群聊申请');
+      } else if (data.type === "RECORD_MOMENT_FRIEND" || data.type === "RECORD_MOMENT") {
+        this.momentNoticeIsNew = true;
+        ElMessage.success('您有新的朋友圈消息');
+      } else if(data.type === "CHAT"){
+        const msg = {
+          time: Date.now(),
+          text: data.message.text,
+          user: data.userInfo.username,
+          profile: data.userInfo.profile
+        };
+        this.messages.push(msg);
+      }
     };
 
     this.socket.onclose = () => {

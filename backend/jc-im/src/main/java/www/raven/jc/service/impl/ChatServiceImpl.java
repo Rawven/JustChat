@@ -29,6 +29,7 @@ import www.raven.jc.entity.po.FriendChat;
 import www.raven.jc.entity.po.Message;
 import www.raven.jc.entity.po.Room;
 import www.raven.jc.entity.po.UserRoom;
+import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.event.model.FriendMsgEvent;
 import www.raven.jc.event.model.RoomMsgEvent;
 import www.raven.jc.service.ChatService;
@@ -85,7 +86,7 @@ public class ChatServiceImpl implements ChatService {
             id -> {
                 if (WebsocketService.SESSION_POOL.get(id) == null || !WebsocketService.SESSION_POOL.get(id).isOpen()) {
                     RScoredSortedSet<Object> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + id);
-                    scoredSortedSet.add(timeStamp, JsonUtil.objToJson(message));
+                    scoredSortedSet.add(timeStamp, JsonUtil.objToJson(new MessageVO(realMsg)));
                 }
             }
         );
@@ -112,7 +113,7 @@ public class ChatServiceImpl implements ChatService {
         //对离线用户进行离线信息保存
         if (WebsocketService.SESSION_POOL.get(friendId) == null || !WebsocketService.SESSION_POOL.get(friendId).isOpen()) {
             RScoredSortedSet<Object> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + user.getUserId());
-            scoredSortedSet.add(message.getTime(), JsonUtil.objToJson(message));
+            scoredSortedSet.add(message.getTime(), JsonUtil.objToJson(new MessageVO(realMsg)));
         }
 
         //保存消息

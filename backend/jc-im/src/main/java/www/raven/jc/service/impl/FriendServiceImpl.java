@@ -51,18 +51,6 @@ public class FriendServiceImpl implements FriendService {
     private UserRpcService userRpcService;
     @Autowired
     private RedissonClient redissonClient;
-
-    @NotNull
-    static List<MessageVO> getMessageById(List<Message> collect) {
-        return collect.stream().map(message -> {
-            MessageVO messageVO = new MessageVO();
-            messageVO.setText(message.getContent());
-            messageVO.setTime(message.getTimestamp());
-            messageVO.setUserInfoDTO(message.getSender());
-            return messageVO;
-        }).collect(Collectors.toList());
-    }
-
     @Override
     public List<UserFriendVO> initUserFriendPage() {
         int userId = RequestUtil.getUserId(request);
@@ -112,18 +100,18 @@ public class FriendServiceImpl implements FriendService {
     @Override
     public List<MessageVO> getLatestFriendMsg(LatestFriendMsgModel model) {
         int userId = RequestUtil.getUserId(request);
-        RScoredSortedSet<Message> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + userId);
-        Collection<Message> messages = scoredSortedSet.readAll();
+        RScoredSortedSet<MessageVO> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + userId);
+        Collection<MessageVO> messages = scoredSortedSet.readAll();
         //获取所有id=roomId的消息
-        List<Message> collect = new ArrayList<>();
-        for (Message message : messages) {
-            if (message.getReceiverId().equals(String.valueOf(model.getFriendId()))) {
+        List<MessageVO> collect = new ArrayList<>();
+        for (MessageVO message : messages) {
+            if (message.getBelongId().equals(model.getFriendId())) {
                 collect.add(message);
                 //删除已经获取的离线消息
                 scoredSortedSet.remove(message);
             }
         }
-        return getMessageById(collect);
+        return collect;
     }
 
 }
