@@ -16,7 +16,6 @@ public class HandlerUtil {
 
     public static String combineMessage(MessageDTO messageDTO, UserInfoDTO data) {
         Map<Object, Object> map = new HashMap<>(2);
-        map.put("userInfo", data);
         map.put("message", messageDTO);
         map.put("type","CHAT");
         return JsonUtil.objToJson(map);

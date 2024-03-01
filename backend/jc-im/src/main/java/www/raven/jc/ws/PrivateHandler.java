@@ -9,7 +9,9 @@ import www.raven.jc.api.UserRpcService;
 import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
+import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.service.ChatService;
+import www.raven.jc.util.JsonUtil;
 
 /**
  * friend chat handler
@@ -41,7 +43,7 @@ public class PrivateHandler implements BaseHandler {
     public void onMessage(MessageDTO message, Session session) {
         TokenDTO tokenDTO = (TokenDTO) (session.getUserProperties().get("userDto"));
         UserInfoDTO data = userRpcService.getSingleInfo(tokenDTO.getUserId()).getData();
-        sendFriendMessage(HandlerUtil.combineMessage(message, data), data.getUserId(), message.getId());
-        chatService.saveFriendMsg(message, data, message.getId());
+        sendFriendMessage(JsonUtil.objToJson(message), data.getUserId(), message.getUserInfoDTO().getUserId());
+        chatService.saveFriendMsg(message, data, message.getUserInfoDTO().getUserId());
     }
 }

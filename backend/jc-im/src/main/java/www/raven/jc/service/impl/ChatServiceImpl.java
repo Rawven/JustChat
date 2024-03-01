@@ -4,9 +4,7 @@ import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
-import javax.websocket.Session;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
@@ -80,13 +78,14 @@ public class ChatServiceImpl implements ChatService {
             stream().map(UserRoom::getUserId).collect(Collectors.toList());
         //TODO 离线消息
 
-        Map<Integer, Integer> map = WebsocketService.GROUP_SESSION_POOL.get(roomId);
         //对离线用户进行离线信息保存
         userIds.forEach(
             id -> {
                 if (WebsocketService.SESSION_POOL.get(id) == null || !WebsocketService.SESSION_POOL.get(id).isOpen()) {
-                    RScoredSortedSet<Object> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + id);
-                    scoredSortedSet.add(timeStamp, JsonUtil.objToJson(new MessageVO(realMsg)));
+                    RScoredSortedSet<Object> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + id.toString());
+                    MessageVO vo = new MessageVO(realMsg);
+                    log.info("离线消息保存:{}", JsonUtil.objToJson(vo));
+                    scoredSortedSet.add(timeStamp,new MessageVO(realMsg));
                 }
             }
         );
@@ -95,10 +94,7 @@ public class ChatServiceImpl implements ChatService {
         messageDAO.getBaseMapper().save(realMsg);
         //更新聊天室的最后一条消息
         Assert.isTrue(roomDAO.getBaseMapper().updateById(new Room().setRoomId(roomId).setLastMsgId(realMsg.getMessageId().toString())) > 0, "更新失败");
-        RoomMsgEvent roomMsgEvent = new RoomMsgEvent(JsonUtil.objToJson(user), roomId, userIds, JsonUtil.objToJson(realMsg));
-        //通知user模块有新消息
-        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(roomMsgEvent), ImUserMqConstant.TAGS_CHAT_ROOM_MSG_RECORD));
-    }
+      }
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
@@ -113,7 +109,7 @@ public class ChatServiceImpl implements ChatService {
         //对离线用户进行离线信息保存
         if (WebsocketService.SESSION_POOL.get(friendId) == null || !WebsocketService.SESSION_POOL.get(friendId).isOpen()) {
             RScoredSortedSet<Object> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + user.getUserId());
-            scoredSortedSet.add(message.getTime(), JsonUtil.objToJson(new MessageVO(realMsg)));
+            scoredSortedSet.add(message.getTime(), new MessageVO(realMsg));
         }
 
         //保存消息
@@ -122,9 +118,6 @@ public class ChatServiceImpl implements ChatService {
         FriendChat friendChat = new FriendChat().setFixId(fixId)
             .setLastMsgId(realMsg.getMessageId().toString());
         Assert.isTrue(friendChatDAO.save(friendChat), "插入失败");
-        FriendMsgEvent friendMsgEvent = new FriendMsgEvent(user.getUserId(), friendId, JsonUtil.objToJson(realMsg));
-        //通知user模块有新消息
-        streamBridge.send("producer-out-0", MqUtil.createMsg(JsonUtil.objToJson(friendMsgEvent), ImUserMqConstant.TAGS_CHAT_FRIEND_MSG_RECORD));
-    }
+     }
 
 }

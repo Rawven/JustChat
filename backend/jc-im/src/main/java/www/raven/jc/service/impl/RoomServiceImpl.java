@@ -47,7 +47,6 @@ import www.raven.jc.service.RoomService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.RequestUtil;
 
-import static www.raven.jc.service.impl.FriendServiceImpl.getMessageById;
 
 /**
  * room service impl
@@ -213,7 +212,7 @@ public class RoomServiceImpl implements RoomService {
         List<Message> messages = new ArrayList<>(messageDAO.getMsgWithPagination(String.valueOf(model.getRoomId()), "room", pageRequest).getContent());
         //给messages排序 从小到大
         messages.sort(Comparator.comparingLong(o -> o.getTimestamp().getTime()));
-        return getMessageById(messages);
+        return  messages.stream().map(MessageVO::new).collect(Collectors.toList());
     }
 
     private List<DisplayRoomVO> buildRoomVO(Page<Room> chatRoomPage, List<UserInfoDTO> data) {
