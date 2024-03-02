@@ -160,12 +160,6 @@ public class WebsocketService {
         }
     }
 
-    /**
-     * send all message
-     *
-     * @param message message
-     */
-    //TODO
     public static void sendBatchMessage(String message, List<Integer> ids) {
         log.info("websocket:广播消息:" + message);
         for (Integer id : ids) {

@@ -30,7 +30,6 @@ import www.raven.jc.dao.RoomDAO;
 import www.raven.jc.dao.UserRoomDAO;
 import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
-import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.entity.model.LatestGroupMsgModel;
 import www.raven.jc.entity.model.PageGroupMsgModel;
 import www.raven.jc.entity.model.RoomModel;
@@ -98,6 +97,7 @@ public class RoomServiceImpl implements RoomService {
         if (rooms.isEmpty()) {
             return new ArrayList<>();
         }
+        //更新用户聊天室映射
         asyncService.updateRoomMap(userId,rooms);
         //获取所有聊天室的最后一条消息id
         List<ObjectId> idsMsg = rooms.stream()
@@ -106,10 +106,9 @@ public class RoomServiceImpl implements RoomService {
             .collect(Collectors.toList());
         //获取所有聊天室的最后一条消息
         List<Message> messages = messageDAO.getBatchIds(idsMsg);
-        //获取聊天室发最后一条信息的用户信息和聊天室创建者的用户信息
-        Set<Integer> idsSender = rooms.stream().map(Room::getFounderId).collect(Collectors.toSet());
-        //获取聊天室创建者的用户信息
-        RpcResult<List<UserInfoDTO>> batchInfo = userRpcService.getBatchInfo(new ArrayList<>(idsSender));
+        //获取聊天室聊天室创建者的用户信息
+        List<Integer> collect = rooms.stream().map(Room::getFounderId).collect(Collectors.toList());
+        RpcResult<List<UserInfoDTO>> batchInfo = userRpcService.getBatchInfo(collect);
         Assert.isTrue(batchInfo.isSuccess(), "user模块调用失败");
         Map<Integer, UserInfoDTO> map = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
         Map<String, Message> messageMap = messages.stream().collect(Collectors.toMap(message -> message.getMessageId().toString(), Function.identity()));

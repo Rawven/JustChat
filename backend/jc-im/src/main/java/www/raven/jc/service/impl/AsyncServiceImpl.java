@@ -5,10 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
-import www.raven.jc.constant.ImUserMqConstant;
+import www.raven.jc.constant.ImImMqConstant;
 import www.raven.jc.dao.RoomDAO;
 import www.raven.jc.entity.po.Room;
-import www.raven.jc.event.model.RoomApplyEvent;
+import www.raven.jc.event.RoomApplyEvent;
 import www.raven.jc.service.AsyncService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
@@ -32,7 +32,7 @@ public class AsyncServiceImpl implements AsyncService {
         Room room = roomDAO.getBaseMapper().selectById(roomId);
         Integer founderId = room.getFounderId();
         //通知user模块 插入一条申请记录
-        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new RoomApplyEvent(userId, founderId, roomId)), ImUserMqConstant.TAGS_CHAT_ROOM_APPLY));
+        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new RoomApplyEvent(userId, founderId, roomId)), ImImMqConstant.TAGS_CHAT_ROOM_APPLY));
     }
 
     @Override

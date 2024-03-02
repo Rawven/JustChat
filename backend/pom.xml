@@ -26,7 +26,7 @@
         <spring.cloud.version>2021.0.5</spring.cloud.version>
         <spring.boot.version>2.6.13</spring.boot.version>
         <lombok>1.18.28</lombok>
-        <jackson>2.15.2</jackson>
+        <jackson>2.16.1</jackson>
         <redisson>3.17.1</redisson>
         <mysql-connector.version>8.0.31</mysql-connector.version>
         <mybatis-plus.version>3.5.4</mybatis-plus.version>

@@ -1,4 +1,4 @@
-package www.raven.jc.event.model;
+package www.raven.jc.event;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
