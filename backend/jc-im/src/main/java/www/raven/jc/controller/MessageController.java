@@ -35,7 +35,6 @@ public class MessageController {
     @Autowired
     private FriendService friendService;
 
-    //TODO 离线消息 适配前端
     @PostMapping("/getLatestRoomHistory")
     public CommonResult<List<MessageVO>> getLatestRoomMsg(@RequestBody @Validated LatestGroupMsgModel model) {
         return CommonResult.operateSuccess("获取最新群聊信息成功", roomService.getLatestGroupMsg(model));

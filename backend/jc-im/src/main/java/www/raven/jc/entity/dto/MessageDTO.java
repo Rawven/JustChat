@@ -1,6 +1,5 @@
 package www.raven.jc.entity.dto;
 
-import java.util.Date;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import www.raven.jc.dto.UserInfoDTO;

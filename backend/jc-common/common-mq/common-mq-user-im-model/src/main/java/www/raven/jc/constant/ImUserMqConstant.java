@@ -13,11 +13,6 @@ public class ImUserMqConstant {
      */
     public static final String TAGS_USER_FRIEND_APPLY = "FRIEND_APPLY";
     public static final String TAGS_DELETE_NOTICE = "NOTICE_DELETE";
-    /**
-     * Chat模块
-     */
-    public static final String TAGS_CHAT_ROOM_APPLY = "ROOM_APPLY";
-    public static final String TAGS_CHAT_ROOM_MSG_RECORD = "ROOM_MSG_RECORD";
-    public static final String TAGS_CHAT_FRIEND_MSG_RECORD = "FRIEND_MSG_RECORD";
+
 
 }

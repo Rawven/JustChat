@@ -1,6 +1,5 @@
 package www.raven.jc.service.impl;
 
-import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import java.util.Date;
 import java.util.List;
@@ -14,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.api.UserRpcService;
 import www.raven.jc.constant.ApplyStatusConstant;
-import www.raven.jc.constant.ImUserMqConstant;
+import www.raven.jc.constant.ImImMqConstant;
 import www.raven.jc.constant.MessageConstant;
 import www.raven.jc.constant.OfflineMessagesConstant;
 import www.raven.jc.dao.FriendChatDAO;
@@ -23,13 +22,10 @@ import www.raven.jc.dao.RoomDAO;
 import www.raven.jc.dao.UserRoomDAO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
-import www.raven.jc.entity.po.FriendChat;
 import www.raven.jc.entity.po.Message;
-import www.raven.jc.entity.po.Room;
 import www.raven.jc.entity.po.UserRoom;
 import www.raven.jc.entity.vo.MessageVO;
-import www.raven.jc.event.model.FriendMsgEvent;
-import www.raven.jc.event.model.RoomMsgEvent;
+import www.raven.jc.event.SaveMsgEvent;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MongoUtil;
@@ -76,7 +72,6 @@ public class ChatServiceImpl implements ChatService {
                 new QueryWrapper<UserRoom>().eq("room_id", roomId).
                     eq("status", ApplyStatusConstant.APPLY_STATUS_AGREE)).
             stream().map(UserRoom::getUserId).collect(Collectors.toList());
-        //TODO 离线消息
 
         //对离线用户进行离线信息保存
         userIds.forEach(
@@ -89,12 +84,9 @@ public class ChatServiceImpl implements ChatService {
                 }
             }
         );
-
-        //保存进入历史消息db
-        messageDAO.getBaseMapper().save(realMsg);
-        //更新聊天室的最后一条消息
-        Assert.isTrue(roomDAO.getBaseMapper().updateById(new Room().setRoomId(roomId).setLastMsgId(realMsg.getMessageId().toString())) > 0, "更新失败");
-      }
+        //异步入历史消息库
+        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new SaveMsgEvent().setMessage(realMsg).setType("room")), ImImMqConstant.TAGS_SAVE_HISTORY_MSG));
+    }
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
@@ -111,13 +103,8 @@ public class ChatServiceImpl implements ChatService {
             RScoredSortedSet<Object> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + user.getUserId());
             scoredSortedSet.add(message.getTime(), new MessageVO(realMsg));
         }
-
-        //保存消息
-        messageDAO.getBaseMapper().save(realMsg);
-        //保存最后一条消息
-        FriendChat friendChat = new FriendChat().setFixId(fixId)
-            .setLastMsgId(realMsg.getMessageId().toString());
-        Assert.isTrue(friendChatDAO.save(friendChat), "插入失败");
+        //异步入历史消息库
+        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson( new SaveMsgEvent().setMessage(realMsg).setType("friend")), ImImMqConstant.TAGS_SAVE_HISTORY_MSG));
      }
 
 }

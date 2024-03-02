@@ -40,7 +40,7 @@ public class RoomController {
     @Autowired
     private UserRpcService userRpcService;
 
-    //TODO 分页
+    //TODO 分页 较难实现
     @GetMapping("/initUserMainPage")
     public CommonResult<List<UserRoomVO>> initUserMainPage() {
         return CommonResult.operateSuccess("获取房间列表成功", roomService.initUserMainPage());

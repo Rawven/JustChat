@@ -1,6 +1,5 @@
 package www.raven.jc.consumer;
 
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Assert;
 import java.util.HashMap;
 import java.util.List;
@@ -15,19 +14,25 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
 import www.raven.jc.api.UserRpcService;
+import www.raven.jc.constant.ImImMqConstant;
 import www.raven.jc.constant.ImUserMqConstant;
 import www.raven.jc.constant.JwtConstant;
+import www.raven.jc.constant.MessageConstant;
 import www.raven.jc.constant.NoticeConstant;
 import www.raven.jc.constant.SocialUserMqConstant;
+import www.raven.jc.dao.FriendChatDAO;
+import www.raven.jc.dao.MessageDAO;
 import www.raven.jc.dao.NoticeDAO;
+import www.raven.jc.dao.RoomDAO;
 import www.raven.jc.dto.UserInfoDTO;
+import www.raven.jc.entity.po.FriendChat;
 import www.raven.jc.entity.po.Notice;
+import www.raven.jc.entity.po.Room;
 import www.raven.jc.event.Event;
+import www.raven.jc.event.SaveMsgEvent;
 import www.raven.jc.event.model.DeleteNoticeEvent;
-import www.raven.jc.event.model.FriendMsgEvent;
-import www.raven.jc.event.model.MomentNoticeEvent;
-import www.raven.jc.event.model.RoomApplyEvent;
-import www.raven.jc.event.model.RoomMsgEvent;
+import www.raven.jc.event.MomentNoticeEvent;
+import www.raven.jc.event.RoomApplyEvent;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
@@ -50,6 +55,12 @@ public class NoticeEventListener {
     private UserRpcService userRpcService;
     @Autowired
     private NoticeDAO noticeDAO;
+    @Autowired
+    private MessageDAO messageDAO;
+    @Autowired
+    private RoomDAO roomDAO;
+    @Autowired
+    private FriendChatDAO friendChatDAO;
     @Bean
     public Consumer<Message<Event>> eventUserToIm() {
         return msg -> {
@@ -103,8 +114,11 @@ public class NoticeEventListener {
             String tags = Objects.requireNonNull(msg.getHeaders().get(HEADER_TAGS)).toString();
             //判断消息类型
             switch (tags) {
-                case ImUserMqConstant.TAGS_CHAT_ROOM_APPLY:
+                case ImImMqConstant.TAGS_CHAT_ROOM_APPLY:
                     eventUserJoinRoomApply(msg);
+                    break;
+                case ImImMqConstant.TAGS_SAVE_HISTORY_MSG:
+                    eventSaveMsg(msg);
                     break;
                 default:
                     log.info("--RocketMq 非法的消息，不处理");
@@ -112,6 +126,23 @@ public class NoticeEventListener {
             MqUtil.protectMsg(msg, redissonClient);
         };
     }
+
+    private void eventSaveMsg(Message<Event> msg) {
+        SaveMsgEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), SaveMsgEvent.class);
+        //保存进入历史消息db
+        messageDAO.getBaseMapper().save(payload.getMessage());
+        if(payload.getMessage().getType().equals(MessageConstant.ROOM)){
+            //更新群聊的最后一条消息
+            Assert.isTrue(roomDAO.getBaseMapper().updateById(new Room().setRoomId(Integer.valueOf(payload.getMessage().getReceiverId())).setLastMsgId(payload.getMessage().getMessageId().toString())) > 0, "更新失败");
+        }else if(payload.getMessage().getType().equals(MessageConstant.FRIEND)){
+            //更新好友的最后一条消息
+            FriendChat friendChat = new FriendChat().setFixId(payload.getMessage().getReceiverId())
+                .setLastMsgId(String.valueOf(payload.getMessage().getMessageId()));
+            Assert.isTrue(friendChatDAO.save(friendChat), "插入失败");
+        }
+
+    }
+
     private void eventMomentNoticeFriendEvent(Message<Event> msg) {
         MomentNoticeEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), MomentNoticeEvent.class);
         Integer userId = payload.getUserId();
@@ -155,7 +186,7 @@ public class NoticeEventListener {
         RBucket<String> founderBucket = redissonClient.getBucket(JwtConstant.TOKEN + founderId);
         if (founderBucket.isExists()) {
             HashMap<Object, Object> map = new HashMap<>(1);
-            map.put("type", ImUserMqConstant.TAGS_CHAT_ROOM_APPLY);
+            map.put("type", ImImMqConstant.TAGS_CHAT_ROOM_APPLY);
             WebsocketService.sendOneMessage(founderId, JsonUtil.objToJson(map));
             log.info("--RocketMq 已推送通知给founder");
         } else {
