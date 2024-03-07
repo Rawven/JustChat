@@ -19,7 +19,6 @@ import www.raven.jc.annotions.Auth;
 import www.raven.jc.constant.RoleConstant;
 import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
-import www.raven.jc.entity.vo.InfoVO;
 import www.raven.jc.entity.vo.RealAllInfoVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.UserService;
@@ -86,9 +85,9 @@ public class UserController {
     }
 
     @PostMapping("/defaultInfo")
-    public CommonResult<InfoVO> defaultInfo() {
+    public CommonResult<UserInfoDTO> defaultInfo() {
         int userId = RequestUtil.getUserId(request);
-        return CommonResult.operateSuccess("查找成功", userService.queryInfoWithSignature(userId));
+        return CommonResult.operateSuccess("查找成功", userService.querySingleInfo(userId));
     }
 
     @PostMapping("/getSingleInfo")

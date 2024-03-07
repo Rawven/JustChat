@@ -9,9 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RBucket;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import www.raven.jc.constant.UserConstant;
 import www.raven.jc.dao.RolesDAO;
 import www.raven.jc.dao.UserDAO;
 import www.raven.jc.dao.UserRoleDAO;
@@ -23,9 +26,9 @@ import www.raven.jc.entity.po.Role;
 import www.raven.jc.entity.po.User;
 import www.raven.jc.entity.po.UserRole;
 import www.raven.jc.entity.vo.AllInfoVO;
-import www.raven.jc.entity.vo.InfoVO;
 import www.raven.jc.entity.vo.RealAllInfoVO;
 import www.raven.jc.service.UserService;
+import www.raven.jc.util.JsonUtil;
 
 /**
  * info service impl
@@ -42,13 +45,20 @@ public class UserServiceImpl implements UserService {
     private UserDAO userDAO;
     @Autowired
     private UserRoleDAO userRoleDAO;
+    @Autowired
+    private RedissonClient redissonClient;
 
     @Override
     public UserInfoDTO querySingleInfo(Integer userId) {
+        if(redissonClient.getBucket(UserConstant.PREFIX +userId).isExists()){
+            return JsonUtil.jsonToObj(redissonClient.getBucket(UserConstant.PREFIX+userId).get().toString(),UserInfoDTO.class);
+        }
         User user = userDAO.getById(userId);
         Assert.notNull(user, "用户不存在");
         UserInfoDTO userInfoDTO = new UserInfoDTO();
         userInfoDTO.setUsername(user.getUsername()).setProfile(user.getProfile()).setUserId(user.getId());
+        RBucket<Object> bucket = redissonClient.getBucket(UserConstant.PREFIX + userId);
+        bucket.expire(UserConstant.EXPIRE_TIME);
         return userInfoDTO;
     }
 
@@ -101,6 +111,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateByColumn(Integer id, String column, String value) {
         Assert.isTrue(userDAO.getBaseMapper().update(new UpdateWrapper<User>().eq("id", id).set(column, value)) > 0, "更新失败");
+        redissonClient.getBucket(UserConstant.PREFIX + id).delete();
     }
 
     @Override
@@ -120,16 +131,6 @@ public class UserServiceImpl implements UserService {
         Assert.isTrue(rolesDAO.saveOrUpdateBatch(roles));
         Assert.isTrue(userRoleDAO.saveBatch(userRoles));
         return new UserAuthDTO().setUserId(realUser.getId()).setUsername(realUser.getUsername()).setPassword(realUser.getPassword());
-    }
-
-    @Override
-    public InfoVO queryInfoWithSignature(Integer userId) {
-        User user = userDAO.getById(userId);
-        Assert.notNull(user, "用户不存在");
-        return new InfoVO().setSignature(user.getSignature())
-            .setProfile(user.getProfile())
-            .setUserId(user.getId())
-            .setUsername(user.getUsername());
     }
 
     @Override
