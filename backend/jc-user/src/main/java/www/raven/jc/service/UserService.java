@@ -6,7 +6,6 @@ import www.raven.jc.dto.UserAuthDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.dto.UserRegisterDTO;
 import www.raven.jc.entity.vo.AllInfoVO;
-import www.raven.jc.entity.vo.InfoVO;
 import www.raven.jc.entity.vo.RealAllInfoVO;
 
 /**
@@ -41,14 +40,6 @@ public interface UserService {
      * @return {@link List}<{@link UserInfoDTO}>
      */
     List<UserInfoDTO> queryAllInfo();
-
-    /**
-     * default info
-     *
-     * @param userId user id
-     * @return {@link UserInfoDTO}
-     */
-    InfoVO queryInfoWithSignature(Integer userId);
 
     /**
      * query liked info list
