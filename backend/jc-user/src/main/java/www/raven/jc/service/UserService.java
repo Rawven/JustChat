@@ -5,8 +5,6 @@ import www.raven.jc.dto.RoleDTO;
 import www.raven.jc.dto.UserAuthDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.dto.UserRegisterDTO;
-import www.raven.jc.entity.vo.AllInfoVO;
-import www.raven.jc.entity.vo.RealAllInfoVO;
 
 /**
  * info service
@@ -51,13 +49,6 @@ public interface UserService {
      */
     List<UserInfoDTO> queryLikedInfoList(String column, String text);
 
-    /**
-     * query page user
-     *
-     * @param page page
-     * @return {@link List}<{@link AllInfoVO}>
-     */
-    RealAllInfoVO queryPageUser(Integer page);
 
     /**
      * query single info by column

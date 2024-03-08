@@ -7,19 +7,14 @@ import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import www.raven.jc.annotions.Auth;
-import www.raven.jc.constant.RoleConstant;
 import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
-import www.raven.jc.entity.vo.RealAllInfoVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.UserService;
 import www.raven.jc.util.RequestUtil;
@@ -100,11 +95,6 @@ public class UserController {
         return CommonResult.operateSuccess("查找成功", userService.queryAllInfo());
     }
 
-    @GetMapping("/admin/queryAllUser/{page}")
-    @Auth(value = RoleConstant.ADMIN_ROLE)
-    public CommonResult<RealAllInfoVO> queryAllUser(@PathVariable("page") @NotNull Integer page) {
-        return CommonResult.operateSuccess("查找成功", userService.queryPageUser(page));
-    }
 
     @PostMapping("/getBatchInfo")
     CommonResult<List<UserInfoDTO>> getBatchInfo(@RequestBody List<Integer> userIds) {

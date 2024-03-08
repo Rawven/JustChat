@@ -3,7 +3,6 @@ package www.raven.jc.service.impl;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +24,6 @@ import www.raven.jc.dto.UserRegisterDTO;
 import www.raven.jc.entity.po.Role;
 import www.raven.jc.entity.po.User;
 import www.raven.jc.entity.po.UserRole;
-import www.raven.jc.entity.vo.AllInfoVO;
-import www.raven.jc.entity.vo.RealAllInfoVO;
 import www.raven.jc.service.UserService;
 import www.raven.jc.util.JsonUtil;
 
@@ -144,21 +141,6 @@ public class UserServiceImpl implements UserService {
                 return userInfoDTO;
             }
         ).collect(Collectors.toList());
-    }
-
-    @Override
-    public RealAllInfoVO queryPageUser(Integer page) {
-        Long total = userDAO.getBaseMapper().selectCount(null);
-        Page<User> userPage = userDAO.getBaseMapper().selectPage(new Page<>(page, 8), null);
-        List<AllInfoVO> collect = userPage.getRecords().stream().map(
-            user -> {
-                AllInfoVO allInfoVO = new AllInfoVO();
-                allInfoVO.setUserId(user.getId()).setUsername(user.getUsername()).setProfile(user.getProfile())
-                    .setEmail(user.getEmail()).setSignature(user.getSignature());
-                return allInfoVO;
-            }
-        ).collect(Collectors.toList());
-        return new RealAllInfoVO().setTotal(Math.toIntExact(total)).setUsers(collect);
     }
 
     @Override
