@@ -15,7 +15,7 @@ import www.raven.jc.model.CommonSerializable;
 @Data
 @Accessors(chain = true)
 public class Like extends CommonSerializable {
-    private Integer id;
+    private String id;
     private Integer userId;
     private Long timestamp;
 }

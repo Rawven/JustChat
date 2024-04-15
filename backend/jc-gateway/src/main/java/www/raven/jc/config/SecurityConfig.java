@@ -55,6 +55,9 @@ public class SecurityConfig {
                         .pathMatchers(securityProperty.admins).hasRole(securityProperty.roleAdmin)
                         .anyExchange().authenticated()
                 )
+                .formLogin()
+                .and()
+                .exceptionHandling()
                 .accessDeniedHandler(defaultAccessDeniedHandler)
                 .authenticationEntryPoint(authenticationEntryPoint)
         ;

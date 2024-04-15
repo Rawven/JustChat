@@ -25,13 +25,4 @@ public class MomentVO implements Serializable {
     private List<CommentVO> comments;
     private Long timestamp;
 
-    public MomentVO(Moment moment) {
-        this.momentId = moment.getMomentId().toHexString();
-        this.userInfo = moment.getUserInfo();
-        this.content = moment.getContent();
-        this.img = moment.getImg();
-        this.likes = moment.getLikes();
-        this.comments = moment.getComments();
-        this.timestamp = moment.getTimestamp();
-    }
 }

@@ -17,7 +17,7 @@ import www.raven.jc.model.CommonSerializable;
 @Accessors(chain = true)
 public class Comment extends CommonSerializable {
     @TableId
-    private Integer id;
+    private String id;
     private Integer userId;
     private String content;
     private Long timestamp;

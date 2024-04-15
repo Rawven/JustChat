@@ -19,7 +19,7 @@ import www.raven.jc.model.CommonSerializable;
 @JsonSerialize
 public class Moment extends CommonSerializable {
     @TableId
-    private Integer id;
+    private String id;
     private Integer userId;
     private String content;
     private String img;
