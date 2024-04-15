@@ -3,8 +3,6 @@ package www.raven.jc.entity.vo;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import www.raven.jc.dto.UserInfoDTO;
-import www.raven.jc.entity.po.Comment;
-import www.raven.jc.entity.po.Like;
 import www.raven.jc.entity.po.Moment;
 
 import java.io.Serializable;
@@ -23,8 +21,8 @@ public class MomentVO implements Serializable {
     private UserInfoDTO userInfo;
     private String content;
     private String img;
-    private List<Like> likes;
-    private List<Comment> comments;
+    private List<LikeVO> likes;
+    private List<CommentVO> comments;
     private Long timestamp;
 
     public MomentVO(Moment moment) {

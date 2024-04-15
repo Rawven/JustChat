@@ -8,7 +8,6 @@ import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.api.UserRpcService;
@@ -43,6 +42,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -107,20 +107,21 @@ public class RoomServiceImpl implements RoomService {
         //获取所有聊天室的最后一条消息
         List<Message> messages = messageDAO.getBaseMapper().selectList(new QueryWrapper<Message>().in("id", idsMsg));
         //获取聊天室聊天室创建者的用户信息
-        List<Integer> collect = rooms.stream().map(Room::getFounderId).collect(Collectors.toList());
-        RpcResult<List<UserInfoDTO>> batchInfo = userRpcService.getBatchInfo(collect);
+        Set<Integer> collect = rooms.stream().map(Room::getFounderId).collect(Collectors.toSet());
+        messages.stream().map(Message::getSenderId).forEach(collect::add);
+        RpcResult<List<UserInfoDTO>> batchInfo = userRpcService.getBatchInfo(collect.stream().toList());
         Assert.isTrue(batchInfo.isSuccess(), "user模块调用失败");
-        Map<Integer, UserInfoDTO> map = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
+        Map<Integer, UserInfoDTO> userInfoMap = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
         Map<String, Message> messageMap = messages.stream().collect(Collectors.toMap(Message::getMessageId, Function.identity()));
         return rooms.stream().map(room -> {
             UserRoomVO userRoomVO = new UserRoomVO()
                     .setRoomId(room.getRoomId())
                     .setRoomName(room.getRoomName())
-                    .setRoomProfile(map.get(room.getFounderId()).getProfile());
+                    .setRoomProfile(userInfoMap.get(room.getFounderId()).getProfile());
             if (room.getLastMsgId() != null) {
                 Message message = messageMap.get(room.getLastMsgId());
                 userRoomVO.setLastMsg(JsonUtil.objToJson(message));
-                userRoomVO.setLastMsgSender(message.getSender().getUsername());
+                userRoomVO.setLastMsgSender(userInfoMap.get(message.getSenderId()).getUsername());
             } else {
                 userRoomVO.setLastMsg(""); // 或者一些默认值
                 userRoomVO.setLastMsgSender(""); // 或者一些默认值
@@ -210,7 +211,11 @@ public class RoomServiceImpl implements RoomService {
         Page<Message> messagePage = messageDAO.getBaseMapper().selectPage(new Page<>(model.getPage(), model.getSize()), new QueryWrapper<Message>().eq("belong_id", model.getRoomId()).orderByDesc("timestamp").last("limit 10"));
         //给messages排序 从小到大
         messagePage.getRecords().sort(Comparator.comparingLong(o -> o.getTimestamp().getTime()));
-        return messagePage.getRecords().stream().map(MessageVO::new).collect(Collectors.toList());
+        List<Integer> ids = messagePage.getRecords().stream().map( Message::getSenderId).toList();
+        RpcResult<List<UserInfoDTO>> batchInfo = userRpcService.getBatchInfo(ids);
+        Assert.isTrue(batchInfo.isSuccess(), "user模块调用失败");
+        Map<Integer, UserInfoDTO> map = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
+        return messagePage.getRecords().stream().map(vo -> new MessageVO(vo,map.get(vo.getSenderId()))).collect(Collectors.toList());
     }
 
     private List<DisplayRoomVO> buildRoomVO(Page<Room> chatRoomPage, List<UserInfoDTO> data) {

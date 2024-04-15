@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import www.raven.jc.model.CommonSerializable;
 
+import java.io.Serial;
 import java.util.List;
 
 /**
@@ -18,6 +19,7 @@ import java.util.List;
 @Data
 @Accessors(chain = true)
 public class UserRegisterDTO extends CommonSerializable {
+    @Serial
     private static final long serialVersionUID = 1L;
     private String username;
     private String password;

@@ -85,7 +85,7 @@ public class TimelineFeedServiceImpl implements TimelineFeedService {
     private List<RScoredSortedSet<Object>> getHisFriendMomentCache(Integer userId) {
         RpcResult<List<UserInfoDTO>> friendAndMeInfos = userRpcService.getFriendAndMeInfos(userId);
         Assert.isTrue(friendAndMeInfos.isSuccess(), "获取好友信息失败");
-        List<Integer> collect = friendAndMeInfos.getData().stream().map(UserInfoDTO::getUserId).collect(Collectors.toList());
+        List<Integer> collect = friendAndMeInfos.getData().stream().map(UserInfoDTO::getUserId).toList();
         return collect.stream().map(integer -> redissonClient.getScoredSortedSet(PREFIX + integer)).collect(Collectors.toList());
     }
 }

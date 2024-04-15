@@ -1,5 +1,6 @@
 package www.raven.jc.controller;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.FriendService;
 
-import javax.validation.constraints.NotNull;
 
 /**
  * friend controller

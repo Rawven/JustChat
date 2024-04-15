@@ -1,6 +1,7 @@
 package www.raven.jc.aop;
 
 import cn.hutool.core.util.StrUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -13,7 +14,6 @@ import www.raven.jc.constant.JwtConstant;
 import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.util.JwtUtil;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**

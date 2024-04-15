@@ -1,12 +1,10 @@
 package www.raven.jc.entity.po;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.model.CommonSerializable;
-
-import java.util.List;
 
 /**
  * comment
@@ -18,9 +16,10 @@ import java.util.List;
 @Data
 @Accessors(chain = true)
 public class Comment extends CommonSerializable {
-    private String id;
-    private UserInfoDTO userInfo;
+    @TableId
+    private Integer id;
+    private Integer userId;
     private String content;
     private Long timestamp;
-    private List<Reply> replies;
+    private String parentId;
 }

@@ -3,7 +3,6 @@ package www.raven.jc.entity.po;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.model.CommonSerializable;
 
 /**
@@ -16,6 +15,7 @@ import www.raven.jc.model.CommonSerializable;
 @Data
 @Accessors(chain = true)
 public class Like extends CommonSerializable {
-    private UserInfoDTO userInfo;
+    private Integer id;
+    private Integer userId;
     private Long timestamp;
 }

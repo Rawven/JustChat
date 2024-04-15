@@ -19,7 +19,6 @@ import www.raven.jc.entity.model.MomentModel;
 import www.raven.jc.entity.po.Comment;
 import www.raven.jc.entity.po.Like;
 import www.raven.jc.entity.po.Moment;
-import www.raven.jc.entity.po.Reply;
 import www.raven.jc.entity.vo.MomentVO;
 import www.raven.jc.event.model.MomentNoticeEvent;
 import www.raven.jc.result.RpcResult;

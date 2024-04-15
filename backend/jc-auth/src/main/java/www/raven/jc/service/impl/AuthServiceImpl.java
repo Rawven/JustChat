@@ -99,7 +99,7 @@ public class AuthServiceImpl implements AuthService {
                 .setUsername(registerModel.getUsername()).setRoleIds(roleIds).setProfile(registerModel.getProfile());
         RpcResult<UserAuthDTO> insert = userRpcService.insert(user);
         Assert.isTrue(insert.isSuccess(), "注册失败");
-        List<RoleDTO> list = roleIds.stream().map(roleId -> new RoleDTO().setValue(RoleConstant.MAP.get(roleId))).collect(Collectors.toList());
+        List<RoleDTO> list = roleIds.stream().map(roleId -> new RoleDTO().setValue(RoleConstant.MAP.get(roleId))).toList();
         return produceToken(insert.getData().getUserId(), list.stream().map(RoleDTO::getValue).collect(Collectors.toList()));
     }
 

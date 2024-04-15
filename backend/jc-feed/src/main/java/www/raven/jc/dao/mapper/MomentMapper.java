@@ -1,6 +1,6 @@
 package www.raven.jc.dao.mapper;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import www.raven.jc.entity.po.Moment;
 
 /**
@@ -9,5 +9,5 @@ import www.raven.jc.entity.po.Moment;
  * @author 刘家辉
  * @date 2024/02/21
  */
-public interface MomentMapper extends MongoRepository<Moment, String> {
+public interface MomentMapper extends BaseMapper<Moment> {
 }

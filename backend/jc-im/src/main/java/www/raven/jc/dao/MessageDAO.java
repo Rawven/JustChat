@@ -1,16 +1,9 @@
 package www.raven.jc.dao;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import www.raven.jc.dao.mapper.MessageMapper;
 import www.raven.jc.entity.po.Message;
-
-import java.util.List;
 
 /**
  * mongo service

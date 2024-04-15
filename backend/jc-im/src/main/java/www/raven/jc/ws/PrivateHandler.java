@@ -1,5 +1,6 @@
 package www.raven.jc.ws;
 
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
 
 import javax.websocket.Session;
+
 
 /**
  * friend chat handler

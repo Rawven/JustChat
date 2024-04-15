@@ -31,11 +31,12 @@ public class MessageVO extends CommonSerializable {
     private UserInfoDTO userInfoDTO;
     private Integer belongId;
 
-    public MessageVO(Message message) {
+    public MessageVO(Message message,UserInfoDTO userInfoDTO) {
         this.time = message.getTimestamp();
         this.text = message.getContent();
+        this.userInfoDTO = userInfoDTO;
         if (Objects.equals(message.getType(), MessageConstant.FRIEND)) {
-            this.belongId = MongoUtil.resolve(message.getReceiverId(), message.getSender().getUserId());
+            this.belongId = MongoUtil.resolve(message.getReceiverId(), message.getSenderId());
         } else if (Objects.equals(message.getType(), MessageConstant.ROOM)) {
             this.belongId = Integer.parseInt(message.getReceiverId());
         }

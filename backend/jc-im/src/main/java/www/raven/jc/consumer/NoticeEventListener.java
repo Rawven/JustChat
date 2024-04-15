@@ -135,7 +135,7 @@ public class NoticeEventListener {
         messageDAO.getBaseMapper().insert(payload.getMessage());
         if (payload.getMessage().getType().equals(MessageConstant.ROOM)) {
             //更新群聊的最后一条消息
-            Assert.isTrue(roomDAO.getBaseMapper().updateById(new Room().setRoomId(Integer.valueOf(payload.getMessage().getReceiverId())).setLastMsgId(payload.getMessage().getMessageId().toString())) > 0, "更新失败");
+            Assert.isTrue(roomDAO.getBaseMapper().updateById(new Room().setRoomId(Integer.valueOf(payload.getMessage().getReceiverId())).setLastMsgId(payload.getMessage().getMessageId())) > 0, "更新失败");
         } else if (payload.getMessage().getType().equals(MessageConstant.FRIEND)) {
             //更新好友的最后一条消息
             FriendChat friendChat = new FriendChat().setFixId(payload.getMessage().getReceiverId())
