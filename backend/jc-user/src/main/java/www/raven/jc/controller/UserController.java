@@ -1,9 +1,5 @@
 package www.raven.jc.controller;
 
-import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -18,6 +14,11 @@ import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.UserService;
 import www.raven.jc.util.RequestUtil;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * info controller

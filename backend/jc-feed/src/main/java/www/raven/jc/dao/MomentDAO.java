@@ -1,6 +1,5 @@
 package www.raven.jc.dao;
 
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -15,6 +14,8 @@ import www.raven.jc.entity.po.Comment;
 import www.raven.jc.entity.po.Like;
 import www.raven.jc.entity.po.Moment;
 import www.raven.jc.entity.po.Reply;
+
+import java.util.List;
 
 /**
  * moment dao
@@ -45,12 +46,12 @@ public class MomentDAO {
 
     public boolean like(String momentId, Like like) {
         return mongoTemplate.updateFirst(new Query(Criteria.where("_id").is(momentId)),
-            new Update().push("likes", like), COLLECTION_MOMENT).getModifiedCount() > 0;
+                new Update().push("likes", like), COLLECTION_MOMENT).getModifiedCount() > 0;
     }
 
     public boolean comment(String momentId, Comment comment) {
         return mongoTemplate.updateFirst(new Query(Criteria.where("_id").is(momentId)),
-            new Update().push("comments", comment), COLLECTION_MOMENT).getModifiedCount() > 0;
+                new Update().push("comments", comment), COLLECTION_MOMENT).getModifiedCount() > 0;
     }
 
     public boolean reply(String momentId, String commentId, Reply reply) {

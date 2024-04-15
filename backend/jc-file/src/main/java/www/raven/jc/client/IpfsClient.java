@@ -5,11 +5,12 @@ import io.ipfs.api.IPFS;
 import io.ipfs.api.MerkleNode;
 import io.ipfs.api.NamedStreamable;
 import io.ipfs.multihash.Multihash;
-import java.io.File;
-import java.io.IOException;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.multipart.MultipartFile;
 import www.raven.jc.exception.IpfsException;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * ipfs client

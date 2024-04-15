@@ -2,10 +2,6 @@ package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
@@ -32,6 +28,11 @@ import www.raven.jc.service.TimelineFeedService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 import www.raven.jc.util.RequestUtil;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * social service impl
@@ -63,17 +64,17 @@ public class SocialServiceImpl implements SocialService {
         Assert.isTrue(singleInfo.isSuccess(), "获取用户信息失败");
         UserInfoDTO data = singleInfo.getData();
         Moment moment = new Moment()
-            .setUserInfo(data)
-            .setImg(model.getImg())
-            .setContent(model.getText())
-            .setTimestamp(System.currentTimeMillis())
-            .setComments(new ArrayList<>())
-            .setLikes(new ArrayList<>());
+                .setUserInfo(data)
+                .setImg(model.getImg())
+                .setContent(model.getText())
+                .setTimestamp(System.currentTimeMillis())
+                .setComments(new ArrayList<>())
+                .setLikes(new ArrayList<>());
         Moment save = momentDAO.save(moment);
         Assert.isTrue(save.getMomentId() != null, "发布失败");
         timelineFeedService.insertMomentFeed(userId, save);
         handleEvent(save.getMomentId().toHexString(), userId, "发布了新的朋友圈",
-            SocialUserMqConstant.TAGS_MOMENT_NOTICE_MOMENT_FRIEND);
+                SocialUserMqConstant.TAGS_MOMENT_NOTICE_MOMENT_FRIEND);
     }
 
     @Override
@@ -91,7 +92,7 @@ public class SocialServiceImpl implements SocialService {
         Like like = new Like().setTimestamp(System.currentTimeMillis()).setUserInfo(data);
         Assert.isTrue(momentDAO.like(likeModel.getMomentId(), like), "点赞失败");
         handleEvent(likeModel.getMomentId(), likeModel.getMomentUserId(), "有人点赞了你的朋友圈",
-            SocialUserMqConstant.TAGS_MOMENT_INTERNAL_LIKE_RECORD);
+                SocialUserMqConstant.TAGS_MOMENT_INTERNAL_LIKE_RECORD);
     }
 
     @Override
@@ -102,16 +103,16 @@ public class SocialServiceImpl implements SocialService {
         UserInfoDTO data = singleInfo.getData();
         if (model.getCommentId() == null) {
             Comment comment = new Comment().setId(IdUtil.getSnowflakeNextIdStr())
-                .setTimestamp(System.currentTimeMillis())
-                .setUserInfo(data)
-                .setContent(model.getText())
-                .setReplies(new ArrayList<>());
+                    .setTimestamp(System.currentTimeMillis())
+                    .setUserInfo(data)
+                    .setContent(model.getText())
+                    .setReplies(new ArrayList<>());
             Assert.isTrue(momentDAO.comment(model.getMomentId(), comment), "评论失败");
         } else {
             Reply reply = new Reply().setUserInfo(data)
-                .setContent(model.getText())
-                .setTimestamp(System.currentTimeMillis())
-                .setParentId(model.getCommentId());
+                    .setContent(model.getText())
+                    .setTimestamp(System.currentTimeMillis())
+                    .setParentId(model.getCommentId());
             Assert.isTrue(momentDAO.reply(model.getMomentId(), model.getCommentId(), reply), "回复失败");
         }
         //发布更新事件
@@ -139,7 +140,7 @@ public class SocialServiceImpl implements SocialService {
 
     private void handleEvent(String momentId, Integer userId, String msg, String tag) {
         streamBridge.send("producer-out-1", MqUtil.createMsg(
-            JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(momentId).setUserId(userId).setMsg(msg)),
-            tag));
+                JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(momentId).setUserId(userId).setMsg(msg)),
+                tag));
     }
 }

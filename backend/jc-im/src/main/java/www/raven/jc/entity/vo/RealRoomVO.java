@@ -1,8 +1,9 @@
 package www.raven.jc.entity.vo;
 
-import java.util.List;
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import java.util.List;
 
 /**
  * room real vo

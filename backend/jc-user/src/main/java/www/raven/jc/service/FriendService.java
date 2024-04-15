@@ -1,7 +1,8 @@
 package www.raven.jc.service;
 
-import java.util.List;
 import www.raven.jc.dto.UserInfoDTO;
+
+import java.util.List;
 
 /**
  * friend service
@@ -25,7 +26,7 @@ public interface FriendService {
      * @param friendId friend id
      * @param noticeId notice id
      */
-    void agreeApplyFromFriend(int friendId,int noticeId);
+    void agreeApplyFromFriend(int friendId, int noticeId);
 
     /**
      * refuse apply from friend

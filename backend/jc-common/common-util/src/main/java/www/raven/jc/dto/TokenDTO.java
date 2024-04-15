@@ -1,8 +1,9 @@
 package www.raven.jc.dto;
 
-import java.util.List;
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import java.util.List;
 
 /**
  * token信息

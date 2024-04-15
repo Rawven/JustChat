@@ -1,6 +1,6 @@
 package www.raven.jc.dao.mapper;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import www.raven.jc.entity.po.Message;
 
 /**
@@ -9,5 +9,5 @@ import www.raven.jc.entity.po.Message;
  * @author 刘家辉
  * @date 2024/02/23
  */
-public interface MessageMapper extends MongoRepository<Message, String> {
+public interface MessageMapper extends BaseMapper<Message> {
 }

@@ -1,10 +1,11 @@
 package www.raven.jc.entity.model;
 
+import lombok.Data;
+import lombok.experimental.Accessors;
+
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import lombok.Data;
-import lombok.experimental.Accessors;
 
 /**
  * room model

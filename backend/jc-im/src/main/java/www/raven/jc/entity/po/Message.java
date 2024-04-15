@@ -1,12 +1,12 @@
 package www.raven.jc.entity.po;
 
-import java.util.Date;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.bson.types.ObjectId;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.MongoId;
 import www.raven.jc.dto.UserInfoDTO;
+
+import java.util.Date;
 
 /**
  * message
@@ -17,15 +17,11 @@ import www.raven.jc.dto.UserInfoDTO;
 @Data
 @Accessors(chain = true)
 public class Message {
-    /**
-     * 注意ObjectId的处理
-     */
-    @MongoId
-    private ObjectId messageId;
+    @TableId(value = "id", type = IdType.AUTO)
+    private String messageId;
     private UserInfoDTO sender;
     private String content;
     private String type;
-    @Indexed
     private String receiverId;
     private Date timestamp;
 }

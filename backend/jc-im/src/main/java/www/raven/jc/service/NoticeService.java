@@ -1,7 +1,8 @@
 package www.raven.jc.service;
 
-import java.util.List;
 import www.raven.jc.entity.vo.NoticeVO;
+
+import java.util.List;
 
 /**
  * notice service

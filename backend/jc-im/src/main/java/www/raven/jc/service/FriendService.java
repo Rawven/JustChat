@@ -1,10 +1,11 @@
 package www.raven.jc.service;
 
-import java.util.List;
 import www.raven.jc.entity.model.LatestFriendMsgModel;
 import www.raven.jc.entity.model.PagesFriendMsgModel;
 import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.entity.vo.UserFriendVO;
+
+import java.util.List;
 
 /**
  * friend service

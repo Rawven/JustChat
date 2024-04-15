@@ -1,15 +1,8 @@
 package www.raven.jc.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +24,14 @@ import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MongoUtil;
 import www.raven.jc.util.RequestUtil;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 /**
  * friend service impl
  *
@@ -50,6 +51,7 @@ public class FriendServiceImpl implements FriendService {
     private UserRpcService userRpcService;
     @Autowired
     private RedissonClient redissonClient;
+
     @Override
     public List<UserFriendVO> initUserFriendPage() {
         int userId = RequestUtil.getUserId(request);
@@ -65,26 +67,24 @@ public class FriendServiceImpl implements FriendService {
         }
         List<FriendChat> friendChats = friendChatDAO.getBaseMapper().selectList(new QueryWrapper<FriendChat>().in("fix_id", fixedFriendIds));
         //获取好友的最后一条消息id
-        List<ObjectId> idsMsg = friendChats.stream()
-            .map(chat -> new ObjectId(chat.getLastMsgId()))
-            .collect(Collectors.toList());
+        List<String> idsMsg = friendChats.stream().map(FriendChat::getLastMsgId).collect(Collectors.toList());
         //获取好友的最后一条消息
-        List<Message> messages = messageDAO.getBatchIds(idsMsg);
+        List<Message> messages = messageDAO.getBaseMapper().selectList(new QueryWrapper<Message>().in("id", idsMsg));
         //将好友id和好友的最后一条消息id对应起来
         Map<Integer, Message> messageMap = messages.stream()
-            .collect(Collectors.toMap(
-                message -> message.getSender().getUserId().equals(userId) ? MongoUtil.resolve(message.getReceiverId(), userId) : message.getSender().getUserId(),
-                Function.identity(),
-                (oldValue, newValue) -> newValue
-            ));
+                .collect(Collectors.toMap(
+                        message -> message.getSender().getUserId().equals(userId) ? MongoUtil.resolve(message.getReceiverId(), userId) : message.getSender().getUserId(),
+                        Function.identity(),
+                        (oldValue, newValue) -> newValue
+                ));
         return friends.stream().map(friend -> {
             Message message = messageMap.get(friend.getUserId());
             return new UserFriendVO()
-                .setFriendId(friend.getUserId())
-                .setFriendName(friend.getUsername())
-                .setFriendProfile(friend.getProfile())
-                .setLastMsg(message == null ? "" : JsonUtil.objToJson(message))
-                .setLastMsgSender(message == null ? "" : message.getSender().getUserId().equals(userId) ? "我" : friend.getUsername());
+                    .setFriendId(friend.getUserId())
+                    .setFriendName(friend.getUsername())
+                    .setFriendProfile(friend.getProfile())
+                    .setLastMsg(message == null ? "" : JsonUtil.objToJson(message))
+                    .setLastMsgSender(message == null ? "" : message.getSender().getUserId().equals(userId) ? "我" : friend.getUsername());
         }).collect(Collectors.toList());
     }
 
@@ -92,8 +92,8 @@ public class FriendServiceImpl implements FriendService {
     public List<MessageVO> getFriendMsgPages(PagesFriendMsgModel model) {
         int userId = RequestUtil.getUserId(request);
         String fixId = MongoUtil.concatenateIds(userId, model.getFriendId());
-        List<Message> messages = messageDAO.getMsgWithPagination(fixId, "friend", PageRequest.of(model.getPage(), model.getSize())).getContent();
-        return messages.stream().map(MessageVO::new).collect(Collectors.toList());
+        Page<Message> messagePage = messageDAO.getBaseMapper().selectPage(new Page<>(model.getPage(), model.getSize()), new QueryWrapper<Message>().eq("fix_id", fixId).orderByDesc("timestamp").last("limit 10"));
+        return  messagePage.getRecords().stream().map(MessageVO::new).collect(Collectors.toList());
     }
 
     @Override

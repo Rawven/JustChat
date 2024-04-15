@@ -1,7 +1,8 @@
 package www.raven.jc.entity.model;
 
-import javax.validation.constraints.NotBlank;
 import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
 
 /**
  * login model

@@ -1,8 +1,5 @@
 package www.raven.jc.controller;
 
-import java.util.List;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +18,10 @@ import www.raven.jc.entity.vo.UserRoomVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.FriendService;
 import www.raven.jc.service.RoomService;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * room controller
@@ -54,14 +55,14 @@ public class RoomController {
 
     @GetMapping("/queryIdRoomList/{page}/{size}")
     public CommonResult<RealRoomVO> queryRoomList(@PathVariable("page") @NotNull int page,
-        @PathVariable("size") @NotNull int size) {
+                                                  @PathVariable("size") @NotNull int size) {
         return CommonResult.operateSuccess("获取房间列表成功", roomService.queryListPage(page, size));
     }
 
     @GetMapping("/queryRelatedRoomList/{text}/{choice}/{page}")
     public CommonResult<RealRoomVO> queryRelatedRoomList(@PathVariable("text") @NotBlank String text,
-        @PathVariable("choice") @NotBlank int choice,
-        @PathVariable("page") @NotBlank int page) {
+                                                         @PathVariable("choice") @NotBlank int choice,
+                                                         @PathVariable("page") @NotBlank int page) {
         RealRoomVO rooms;
         //roomName查找
         if (choice == 1) {
@@ -87,8 +88,8 @@ public class RoomController {
 
     @GetMapping("/agreeToJoinRoom/{roomId}/{userId}/{noticeId}")
     public CommonResult<Void> agreeApply(@PathVariable("roomId") @NotBlank String roomId,
-        @PathVariable("userId") @NotBlank int userId,
-        @PathVariable("noticeId") @NotBlank int noticeId) {
+                                         @PathVariable("userId") @NotBlank int userId,
+                                         @PathVariable("noticeId") @NotBlank int noticeId) {
         roomService.agreeApply(Integer.valueOf(roomId), userId, noticeId);
         return CommonResult.operateSuccess("同意申请成功");
     }
@@ -101,7 +102,7 @@ public class RoomController {
      */
     @GetMapping("/refuseToJoinRoom/{roomId}/{userId}/{noticeId}")
     public CommonResult<Void> refuseApply(@PathVariable("noticeId") int noticeId,
-        @PathVariable("roomId") String roomId, @PathVariable("userId") int userId) {
+                                          @PathVariable("roomId") String roomId, @PathVariable("userId") int userId) {
         roomService.refuseApply(Integer.valueOf(roomId), userId, noticeId);
         return CommonResult.operateSuccess("拒绝申请成功");
     }

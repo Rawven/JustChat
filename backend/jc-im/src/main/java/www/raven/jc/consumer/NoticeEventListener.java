@@ -1,11 +1,6 @@
 package www.raven.jc.consumer;
 
 import cn.hutool.core.lang.Assert;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
@@ -29,14 +24,20 @@ import www.raven.jc.entity.po.FriendChat;
 import www.raven.jc.entity.po.Notice;
 import www.raven.jc.entity.po.Room;
 import www.raven.jc.event.Event;
-import www.raven.jc.event.SaveMsgEvent;
-import www.raven.jc.event.model.DeleteNoticeEvent;
 import www.raven.jc.event.MomentNoticeEvent;
 import www.raven.jc.event.RoomApplyEvent;
+import www.raven.jc.event.SaveMsgEvent;
+import www.raven.jc.event.model.DeleteNoticeEvent;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 import www.raven.jc.ws.WebsocketService;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static www.raven.jc.constant.MqConstant.HEADER_TAGS;
 
@@ -61,6 +62,7 @@ public class NoticeEventListener {
     private RoomDAO roomDAO;
     @Autowired
     private FriendChatDAO friendChatDAO;
+
     @Bean
     public Consumer<Message<Event>> eventUserToIm() {
         return msg -> {
@@ -72,7 +74,7 @@ public class NoticeEventListener {
             //判断消息类型
             switch (tags) {
                 case ImUserMqConstant.TAGS_DELETE_NOTICE:
-                     eventDeleteNotice(msg);
+                    eventDeleteNotice(msg);
                     break;
                 default:
                     log.info("--RocketMq 非法的消息，不处理");
@@ -130,14 +132,14 @@ public class NoticeEventListener {
     private void eventSaveMsg(Message<Event> msg) {
         SaveMsgEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), SaveMsgEvent.class);
         //保存进入历史消息db
-        messageDAO.getBaseMapper().save(payload.getMessage());
-        if(payload.getMessage().getType().equals(MessageConstant.ROOM)){
+        messageDAO.getBaseMapper().insert(payload.getMessage());
+        if (payload.getMessage().getType().equals(MessageConstant.ROOM)) {
             //更新群聊的最后一条消息
             Assert.isTrue(roomDAO.getBaseMapper().updateById(new Room().setRoomId(Integer.valueOf(payload.getMessage().getReceiverId())).setLastMsgId(payload.getMessage().getMessageId().toString())) > 0, "更新失败");
-        }else if(payload.getMessage().getType().equals(MessageConstant.FRIEND)){
+        } else if (payload.getMessage().getType().equals(MessageConstant.FRIEND)) {
             //更新好友的最后一条消息
             FriendChat friendChat = new FriendChat().setFixId(payload.getMessage().getReceiverId())
-                .setLastMsgId(String.valueOf(payload.getMessage().getMessageId()));
+                    .setLastMsgId(String.valueOf(payload.getMessage().getMessageId()));
             Assert.isTrue(friendChatDAO.save(friendChat), "插入失败");
         }
 
@@ -167,7 +169,6 @@ public class NoticeEventListener {
     }
 
 
-
     /**
      * 通知用户有人想要入群
      *
@@ -178,10 +179,10 @@ public class NoticeEventListener {
         log.info("--RocketMq receive join room apply event:{}", msg);
         Integer founderId = payload.getFounderId();
         Notice notice = new Notice().setUserId(founderId)
-            .setData(String.valueOf(payload.getRoomId()))
-            .setType(NoticeConstant.TYPE_JOIN_ROOM_APPLY)
-            .setTimestamp(System.currentTimeMillis())
-            .setSenderId(payload.getApplyId());
+                .setData(String.valueOf(payload.getRoomId()))
+                .setType(NoticeConstant.TYPE_JOIN_ROOM_APPLY)
+                .setTimestamp(System.currentTimeMillis())
+                .setSenderId(payload.getApplyId());
         Assert.isTrue(noticeDAO.save(notice), "保存通知失败");
         RBucket<String> founderBucket = redissonClient.getBucket(JwtConstant.TOKEN + founderId);
         if (founderBucket.isExists()) {
@@ -193,7 +194,6 @@ public class NoticeEventListener {
             log.info("--RocketMq founder不在线");
         }
     }
-
 
 
     private void eventDeleteNotice(Message<Event> msg) {

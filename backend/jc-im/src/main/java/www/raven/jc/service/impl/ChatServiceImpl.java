@@ -1,9 +1,6 @@
 package www.raven.jc.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
@@ -31,6 +28,10 @@ import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MongoUtil;
 import www.raven.jc.util.MqUtil;
 import www.raven.jc.ws.WebsocketService;
+
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * chat service impl
@@ -63,26 +64,26 @@ public class ChatServiceImpl implements ChatService {
         long timeStamp = message.getTime();
         String text = message.getText();
         Message realMsg = new Message()
-            .setContent(text)
-            .setTimestamp(new Date(timeStamp))
-            .setSender(user)
-            .setType(MessageConstant.ROOM)
-            .setReceiverId(String.valueOf(roomId));
+                .setContent(text)
+                .setTimestamp(new Date(timeStamp))
+                .setSender(user)
+                .setType(MessageConstant.ROOM)
+                .setReceiverId(String.valueOf(roomId));
         List<Integer> userIds = userRoomDAO.getBaseMapper().selectList(
-                new QueryWrapper<UserRoom>().eq("room_id", roomId).
-                    eq("status", ApplyStatusConstant.APPLY_STATUS_AGREE)).
-            stream().map(UserRoom::getUserId).collect(Collectors.toList());
+                        new QueryWrapper<UserRoom>().eq("room_id", roomId).
+                                eq("status", ApplyStatusConstant.APPLY_STATUS_AGREE)).
+                stream().map(UserRoom::getUserId).collect(Collectors.toList());
 
         //对离线用户进行离线信息保存
         userIds.forEach(
-            id -> {
-                if (WebsocketService.SESSION_POOL.get(id) == null || !WebsocketService.SESSION_POOL.get(id).isOpen()) {
-                    RScoredSortedSet<Object> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + id.toString());
-                    MessageVO vo = new MessageVO(realMsg);
-                    log.info("离线消息保存:{}", JsonUtil.objToJson(vo));
-                    scoredSortedSet.add(timeStamp,new MessageVO(realMsg));
+                id -> {
+                    if (WebsocketService.SESSION_POOL.get(id) == null || !WebsocketService.SESSION_POOL.get(id).isOpen()) {
+                        RScoredSortedSet<Object> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + id.toString());
+                        MessageVO vo = new MessageVO(realMsg);
+                        log.info("离线消息保存:{}", JsonUtil.objToJson(vo));
+                        scoredSortedSet.add(timeStamp, new MessageVO(realMsg));
+                    }
                 }
-            }
         );
         //异步入历史消息库
         streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new SaveMsgEvent().setMessage(realMsg).setType("room")), ImImMqConstant.TAGS_SAVE_HISTORY_MSG));
@@ -93,10 +94,10 @@ public class ChatServiceImpl implements ChatService {
     public void saveFriendMsg(MessageDTO message, UserInfoDTO user, Integer friendId) {
         String fixId = MongoUtil.concatenateIds(user.getUserId(), friendId);
         Message realMsg = new Message().setContent(message.getText())
-            .setTimestamp(new Date(message.getTime()))
-            .setSender(user)
-            .setType(MessageConstant.FRIEND)
-            .setReceiverId(fixId);
+                .setTimestamp(new Date(message.getTime()))
+                .setSender(user)
+                .setType(MessageConstant.FRIEND)
+                .setReceiverId(fixId);
 
         //对离线用户进行离线信息保存
         if (WebsocketService.SESSION_POOL.get(friendId) == null || !WebsocketService.SESSION_POOL.get(friendId).isOpen()) {
@@ -104,7 +105,7 @@ public class ChatServiceImpl implements ChatService {
             scoredSortedSet.add(message.getTime(), new MessageVO(realMsg));
         }
         //异步入历史消息库
-        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson( new SaveMsgEvent().setMessage(realMsg).setType("friend")), ImImMqConstant.TAGS_SAVE_HISTORY_MSG));
-     }
+        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new SaveMsgEvent().setMessage(realMsg).setType("friend")), ImImMqConstant.TAGS_SAVE_HISTORY_MSG));
+    }
 
 }

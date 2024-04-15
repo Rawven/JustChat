@@ -3,10 +3,6 @@ package www.raven.jc.service.impl;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
@@ -26,6 +22,11 @@ import www.raven.jc.entity.po.User;
 import www.raven.jc.entity.po.UserRole;
 import www.raven.jc.service.UserService;
 import www.raven.jc.util.JsonUtil;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * info service impl
@@ -47,8 +48,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserInfoDTO querySingleInfo(Integer userId) {
-        if(redissonClient.getBucket(UserConstant.PREFIX +userId).isExists()){
-            return JsonUtil.jsonToObj(redissonClient.getBucket(UserConstant.PREFIX+userId).get().toString(),UserInfoDTO.class);
+        if (redissonClient.getBucket(UserConstant.PREFIX + userId).isExists()) {
+            return JsonUtil.jsonToObj(redissonClient.getBucket(UserConstant.PREFIX + userId).get().toString(), UserInfoDTO.class);
         }
         User user = userDAO.getById(userId);
         Assert.notNull(user, "用户不存在");
@@ -84,11 +85,11 @@ public class UserServiceImpl implements UserService {
         }
         List<User> users = userDAO.getBaseMapper().selectBatchIds(userIds);
         return users.stream().map(
-            user -> {
-                UserInfoDTO userInfoDTO = new UserInfoDTO();
-                userInfoDTO.setUsername(user.getUsername()).setProfile(user.getProfile()).setUserId(user.getId());
-                return userInfoDTO;
-            }
+                user -> {
+                    UserInfoDTO userInfoDTO = new UserInfoDTO();
+                    userInfoDTO.setUsername(user.getUsername()).setProfile(user.getProfile()).setUserId(user.getId());
+                    return userInfoDTO;
+                }
         ).collect(Collectors.toList());
     }
 
@@ -96,11 +97,11 @@ public class UserServiceImpl implements UserService {
     public List<UserInfoDTO> queryAllInfo() {
         List<User> users = userDAO.getBaseMapper().selectList(null);
         return users.stream().map(
-            user -> {
-                UserInfoDTO userInfoDTO = new UserInfoDTO();
-                userInfoDTO.setUsername(user.getUsername()).setProfile(user.getProfile()).setUserId(user.getId());
-                return userInfoDTO;
-            }
+                user -> {
+                    UserInfoDTO userInfoDTO = new UserInfoDTO();
+                    userInfoDTO.setUsername(user.getUsername()).setProfile(user.getProfile()).setUserId(user.getId());
+                    return userInfoDTO;
+                }
         ).collect(Collectors.toList());
     }
 
@@ -115,9 +116,9 @@ public class UserServiceImpl implements UserService {
     @Transactional(rollbackFor = IllegalArgumentException.class)
     public UserAuthDTO insert(UserRegisterDTO user) {
         User realUser = new User().
-            setUsername(user.getUsername()).
-            setPassword(user.getPassword())
-            .setEmail(user.getEmail()).setProfile(user.getProfile());
+                setUsername(user.getUsername()).
+                setPassword(user.getPassword())
+                .setEmail(user.getEmail()).setProfile(user.getProfile());
         Assert.isTrue(userDAO.getBaseMapper().insert(realUser) > 0, "插入用户失败");
         List<Role> roles = rolesDAO.getBaseMapper().selectBatchIds(user.getRoleIds());
         List<UserRole> userRoles = new ArrayList<>();
@@ -135,11 +136,11 @@ public class UserServiceImpl implements UserService {
         List<User> users = userDAO.getBaseMapper().selectList(new QueryWrapper<User>().like(column, text));
         Assert.notEmpty(users, "没有找到相关用户");
         return users.stream().map(
-            user -> {
-                UserInfoDTO userInfoDTO = new UserInfoDTO();
-                userInfoDTO.setUsername(user.getUsername()).setProfile(user.getProfile()).setUserId(user.getId());
-                return userInfoDTO;
-            }
+                user -> {
+                    UserInfoDTO userInfoDTO = new UserInfoDTO();
+                    userInfoDTO.setUsername(user.getUsername()).setProfile(user.getProfile()).setUserId(user.getId());
+                    return userInfoDTO;
+                }
         ).collect(Collectors.toList());
     }
 
@@ -149,11 +150,11 @@ public class UserServiceImpl implements UserService {
         Assert.notEmpty(roleIds, "用户没有角色");
         List<Role> roles = rolesDAO.getBaseMapper().selectBatchIds(roleIds.stream().map(UserRole::getRoleId).collect(Collectors.toList()));
         return roles.stream().map(
-            role -> {
-                RoleDTO roleDTO = new RoleDTO();
-                roleDTO.setValue(role.getValue());
-                return roleDTO;
-            }
+                role -> {
+                    RoleDTO roleDTO = new RoleDTO();
+                    roleDTO.setValue(role.getValue());
+                    return roleDTO;
+                }
         ).collect(Collectors.toList());
     }
 

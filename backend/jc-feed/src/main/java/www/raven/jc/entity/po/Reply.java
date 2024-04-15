@@ -12,7 +12,8 @@ import www.raven.jc.model.CommonSerializable;
  * @author 刘家辉
  * @date 2024/02/14
  */
-@EqualsAndHashCode(callSuper = true) @Data
+@EqualsAndHashCode(callSuper = true)
+@Data
 @Accessors(chain = true)
 public class Reply extends CommonSerializable {
     private String id;

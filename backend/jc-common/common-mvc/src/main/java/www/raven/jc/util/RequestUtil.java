@@ -1,7 +1,8 @@
 package www.raven.jc.util;
 
-import javax.servlet.http.HttpServletRequest;
 import www.raven.jc.constant.JwtConstant;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * request util

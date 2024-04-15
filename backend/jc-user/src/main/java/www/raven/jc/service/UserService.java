@@ -1,10 +1,11 @@
 package www.raven.jc.service;
 
-import java.util.List;
 import www.raven.jc.dto.RoleDTO;
 import www.raven.jc.dto.UserAuthDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.dto.UserRegisterDTO;
+
+import java.util.List;
 
 /**
  * info service
@@ -58,6 +59,7 @@ public interface UserService {
      * @return {@link UserAuthDTO}
      */
     UserAuthDTO queryAuthSingleInfoByColumn(String column, String value);
+
     /**
      * query single info by column
      *

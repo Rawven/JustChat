@@ -5,10 +5,11 @@ import cn.hutool.core.convert.NumberWithFormat;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.jwt.JWTPayload;
 import cn.hutool.jwt.JWTUtil;
-import java.util.HashMap;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import www.raven.jc.dto.TokenDTO;
+
+import java.util.HashMap;
+import java.util.List;
 
 import static www.raven.jc.constant.JwtConstant.ROLE;
 import static www.raven.jc.constant.JwtConstant.TIME;
