@@ -1,6 +1,5 @@
 package www.raven.jc.api;
 
-import java.util.List;
 import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.RoleDTO;
 import www.raven.jc.dto.UserAuthDTO;
@@ -8,6 +7,8 @@ import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.dto.UserRegisterDTO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.result.RpcResult;
+
+import java.util.List;
 
 /**
  * account api

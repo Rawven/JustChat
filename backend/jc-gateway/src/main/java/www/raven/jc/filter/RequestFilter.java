@@ -1,7 +1,5 @@
 package www.raven.jc.filter;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -19,6 +17,9 @@ import www.raven.jc.constant.JwtConstant;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.result.ResultCode;
 import www.raven.jc.util.JsonUtil;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 /**
  * request filter
@@ -40,13 +41,14 @@ public class RequestFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+
         ServerHttpRequest request = exchange.getRequest();
         log.info("RequestFilter执行");
         log.info("收到一次请求");
-        log.info("Request Method: " + request.getMethodValue());
-        log.info("Request URI: " + request.getURI());
-        log.info("Request Headers: " + request.getHeaders());
-        log.info("Request Query Params: " + request.getQueryParams());
+        log.info("Request Method: {}", request.getMethod());
+        log.info("Request URI: {}", request.getURI());
+        log.info("Request Headers: {}", request.getHeaders());
+        log.info("Request Query Params: {}", request.getQueryParams());
         for (String path : securityProperty.getWordsArray()) {
             if (request.getURI().getPath().contains(path)) {
                 return chain.filter(exchange);

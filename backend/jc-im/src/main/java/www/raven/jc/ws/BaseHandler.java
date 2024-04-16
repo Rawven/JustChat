@@ -1,7 +1,9 @@
 package www.raven.jc.ws;
 
-import javax.websocket.Session;
 import www.raven.jc.entity.dto.MessageDTO;
+
+import jakarta.websocket.Session;
+
 
 /**
  * base handler

@@ -1,11 +1,12 @@
 package www.raven.jc.config;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * security property
@@ -30,7 +31,8 @@ public class SecurityProperty {
     @Value("${security.roles.admin}")
     public String roleAdmin;
 
-    @Getter private String[] wordsArray;
+    @Getter
+    private String[] wordsArray;
 
     @PostConstruct
     public void init() {

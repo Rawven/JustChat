@@ -1,6 +1,5 @@
 package www.raven.jc.controller;
 
-import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -23,7 +22,7 @@ public class UploadController {
     private IpfsClient ipfsClient;
 
     @PostMapping("/upload")
-    public CommonResult<String> upload(@RequestPart("file") @NotNull MultipartFile profile) {
+    public CommonResult<String> upload(@RequestPart("file") MultipartFile profile) {
         String upload = ipfsClient.upload(profile);
         return CommonResult.operateSuccess("上传成功", upload);
     }

@@ -2,13 +2,6 @@ package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
@@ -28,6 +21,14 @@ import www.raven.jc.service.NoticeService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.RequestUtil;
 import www.raven.jc.ws.WebsocketService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * notice service impl
@@ -58,18 +59,18 @@ public class NoticeServiceImpl implements NoticeService {
         RpcResult<List<UserInfoDTO>> usersResult = userRpcService.getBatchInfo(ids);
         Assert.isTrue(usersResult.isSuccess(), "获取用户信息失败");
         Map<Integer, UserInfoDTO> map = usersResult.getData().stream().map(
-            user -> new UserInfoDTO().setUserId(user.getUserId()).setUsername(user.getUsername()).setProfile(user.getProfile())
+                user -> new UserInfoDTO().setUserId(user.getUserId()).setUsername(user.getUsername()).setProfile(user.getProfile())
         ).collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
         return notices.stream().map(
-            notice -> {
-                NoticeVO noticeVO = new NoticeVO();
-                noticeVO.setNoticeId(notice.getId())
-                    .setType(notice.getType())
-                    .setData(notice.getData())
-                    .setTimestamp(notice.getTimestamp())
-                    .setSender(map.get(notice.getSenderId()));
-                return noticeVO;
-            }
+                notice -> {
+                    NoticeVO noticeVO = new NoticeVO();
+                    noticeVO.setNoticeId(notice.getId())
+                            .setType(notice.getType())
+                            .setData(notice.getData())
+                            .setTimestamp(notice.getTimestamp())
+                            .setSender(map.get(notice.getSenderId()));
+                    return noticeVO;
+                }
         ).collect(Collectors.toList());
     }
 
@@ -82,13 +83,13 @@ public class NoticeServiceImpl implements NoticeService {
         Assert.isTrue(userResult.isSuccess(), "用户不存在");
         UserInfoDTO friend = userResult.getData();
         Assert.isNull(noticeDAO.getBaseMapper().selectOne(new QueryWrapper<Notice>().
-            eq("user_id", friend.getUserId()).eq("sender_id", applierId).
-            eq("type", NoticeConstant.TYPE_ADD_FRIEND_APPLY)), "已经申请过了");
+                eq("user_id", friend.getUserId()).eq("sender_id", applierId).
+                eq("type", NoticeConstant.TYPE_ADD_FRIEND_APPLY)), "已经申请过了");
         Notice notice = new Notice().setUserId(friend.getUserId())
-            .setData("暂无")
-            .setType(NoticeConstant.TYPE_ADD_FRIEND_APPLY)
-            .setTimestamp(System.currentTimeMillis())
-            .setSenderId(applierId);
+                .setData("暂无")
+                .setType(NoticeConstant.TYPE_ADD_FRIEND_APPLY)
+                .setTimestamp(System.currentTimeMillis())
+                .setSenderId(applierId);
         Assert.isTrue(noticeDAO.save(notice), "添加失败");
 
         RBucket<String> friendBucket = redissonClient.getBucket(JwtConstant.TOKEN + friend.getUserId());

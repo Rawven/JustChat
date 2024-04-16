@@ -1,10 +1,5 @@
 package www.raven.jc.aop;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.stereotype.Component;
@@ -14,6 +9,12 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ResponseBody;
 import www.raven.jc.result.CommonResult;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author 刘家辉
@@ -36,8 +37,8 @@ public class ExceptionHandler {
     public CommonResult<Void> bindExceptionHandler(BindException e) {
         List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
         List<String> collect = fieldErrors.stream()
-            .map(DefaultMessageSourceResolvable::getDefaultMessage)
-            .collect(Collectors.toList());
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .collect(Collectors.toList());
         return CommonResult.operateFailure("请求参数异常：" + String.join(",", collect));
     }
 
@@ -53,8 +54,8 @@ public class ExceptionHandler {
     public CommonResult<Void> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
         List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
         List<String> collect = fieldErrors.stream()
-            .map(DefaultMessageSourceResolvable::getDefaultMessage)
-            .collect(Collectors.toList());
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .collect(Collectors.toList());
         return CommonResult.operateFailure("请求参数异常：" + String.join(",", collect));
     }
 
@@ -70,8 +71,8 @@ public class ExceptionHandler {
     public CommonResult<Void> constraintViolationExceptionHandler(ConstraintViolationException e) {
         Set<ConstraintViolation<?>> constraintViolations = e.getConstraintViolations();
         List<String> collect = constraintViolations.stream()
-            .map(ConstraintViolation::getMessage)
-            .collect(Collectors.toList());
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toList());
         return CommonResult.operateFailure("请求参数异常：" + String.join(",", collect));
     }
 

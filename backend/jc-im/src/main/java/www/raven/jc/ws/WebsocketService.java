@@ -1,16 +1,5 @@
 package www.raven.jc.ws;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CopyOnWriteArraySet;
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.server.PathParam;
-import javax.websocket.server.ServerEndpoint;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +9,18 @@ import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.JwtUtil;
+
+import jakarta.websocket.OnClose;
+import jakarta.websocket.OnError;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.OnOpen;
+import jakarta.websocket.Session;
+import jakarta.websocket.server.PathParam;
+import jakarta.websocket.server.ServerEndpoint;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * notification handler
@@ -48,16 +49,7 @@ public class WebsocketService {
     private static UserRpcService userRpcService;
     private static PrivateHandler privateHandler;
     private static RoomHandler roomHandler;
-
-    @Autowired
-    public void setPrivateHandler(PrivateHandler privateHandler) {
-        WebsocketService.privateHandler = privateHandler;
-    }
-
-    @Autowired
-    public void setRoomHandler(RoomHandler roomHandler) {
-        WebsocketService.roomHandler = roomHandler;
-    }
+    public BaseHandler baseHandler;
     /**
      * user id
      * 对应是哪个用户
@@ -68,10 +60,49 @@ public class WebsocketService {
      **/
     protected Session session;
     protected long lastActivityTime = System.currentTimeMillis();
-    public BaseHandler baseHandler;
 
+    public static void sendBatchMessage(String message, List<Integer> ids) {
+        log.info("websocket:广播消息:{}", message);
+        for (Integer id : ids) {
+            Session session = SESSION_POOL.get(id);
+            if (session != null && session.isOpen()) {
+                try {
+                    session.getAsyncRemote().sendText(message);
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                }
+            }
+        }
+    }
 
+    /**
+     * send one message
+     * send one message
+     *
+     * @param message message
+     * @param id      id
+     */
+    public static void sendOneMessage(Integer id, String message) {
+        Session session = SESSION_POOL.get(id);
+        if (session != null && session.isOpen()) {
+            try {
+                log.info("【websocket消息】 单点消息:{}", message);
+                session.getAsyncRemote().sendText(message);
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
+        }
+    }
 
+    @Autowired
+    public void setPrivateHandler(PrivateHandler privateHandler) {
+        WebsocketService.privateHandler = privateHandler;
+    }
+
+    @Autowired
+    public void setRoomHandler(RoomHandler roomHandler) {
+        WebsocketService.roomHandler = roomHandler;
+    }
 
     /**
      * 链接成功调用的方法
@@ -115,7 +146,7 @@ public class WebsocketService {
      */
     @OnMessage
     public void onMessage(String message) {
-        log.info("----WebSocket收到客户端发来的消息:" + message);
+        log.info("----WebSocket收到客户端发来的消息:{}", message);
         lastActivityTime = System.currentTimeMillis();
         MessageDTO messageDTO = JsonUtil.jsonToObj(message, MessageDTO.class);
         switch (messageDTO.getType()) {
@@ -139,9 +170,8 @@ public class WebsocketService {
      */
     @OnError
     public void onError(Session session, Throwable error) {
-        log.error("ws:发生错误");
-        log.error("Error occurred on connection, Session ID: " + session.getId());
-        log.error("Details: " + error.getMessage());
+        GROUP_SESSION_POOL.remove(this.userId);
+        log.error("--Websocket:内部错误");
         log.error("Stack trace: {}", (Object) error.getStackTrace());
     }
 
@@ -152,43 +182,10 @@ public class WebsocketService {
      * @param message message
      */
     public void sendAllMessage(String message) {
-        log.info("【websocket消息】广播消息:" + message);
+        log.info("【websocket消息】广播消息:{}", message);
         for (WebsocketService handler : webSockets) {
             if (handler.session.isOpen()) {
                 handler.session.getAsyncRemote().sendText(message);
-            }
-        }
-    }
-
-    public static void sendBatchMessage(String message, List<Integer> ids) {
-        log.info("websocket:广播消息:" + message);
-        for (Integer id : ids) {
-            Session session = SESSION_POOL.get(id);
-            if (session != null && session.isOpen()) {
-                try {
-                    session.getAsyncRemote().sendText(message);
-                } catch (Exception e) {
-                    log.error(e.getMessage());
-                }
-            }
-        }
-    }
-
-    /**
-     * send one message
-     * send one message
-     *
-     * @param message message
-     * @param id      id
-     */
-    public static void sendOneMessage(Integer id, String message) {
-        Session session = SESSION_POOL.get(id);
-        if (session != null && session.isOpen()) {
-            try {
-                log.info("【websocket消息】 单点消息:" + message);
-                session.getAsyncRemote().sendText(message);
-            } catch (Exception e) {
-                log.error(e.getMessage());
             }
         }
     }

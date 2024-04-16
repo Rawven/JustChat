@@ -1,9 +1,6 @@
 package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
@@ -19,6 +16,13 @@ import www.raven.jc.service.FriendService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 import www.raven.jc.util.RequestUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * friend service impl
@@ -41,14 +45,14 @@ public class FriendServiceImpl implements FriendService {
     @Override
     public List<UserInfoDTO> getFriendInfos(int userId) {
         return userDAO.getBaseMapper().selectUserByFriendId(userId).stream().map(
-            user -> new UserInfoDTO()
-                .setUserId(user.getId()).setUsername(user.getUsername()).setProfile(user.getProfile())
+                user -> new UserInfoDTO()
+                        .setUserId(user.getId()).setUsername(user.getUsername()).setProfile(user.getProfile())
         ).collect(Collectors.toList());
     }
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
-    public void agreeApplyFromFriend(int friendId,int noticeId) {
+    public void agreeApplyFromFriend(int friendId, int noticeId) {
         int userId = RequestUtil.getUserId(request);
         Friend friend = new Friend().setUserId((long) userId).setFriendId((long) friendId);
         Friend friend1 = new Friend().setUserId((long) friendId).setFriendId((long) userId);
@@ -64,10 +68,18 @@ public class FriendServiceImpl implements FriendService {
 
     @Override
     public List<UserInfoDTO> getFriendAndMeInfos(int userId) {
-        return userDAO.getBaseMapper().selectUsersAndFriends(userId).stream().map(
-            user -> new UserInfoDTO()
-                .setUserId(user.getId()).setUsername(user.getUsername()).setProfile(user.getProfile())
-        ).collect(Collectors.toList());
+        Collection<UserInfoDTO> values = userDAO.getBaseMapper().selectUsersAndFriends(userId).stream()
+                .map(user -> new UserInfoDTO()
+                        .setUserId(user.getId())
+                        .setUsername(user.getUsername())
+                        .setProfile(user.getProfile()))
+                .collect(Collectors.toMap(
+                        UserInfoDTO::getUserId,
+                        Function.identity(),
+                        (k, v) -> v
+                ))
+                .values();
+        return List.copyOf(values);
     }
 
 }

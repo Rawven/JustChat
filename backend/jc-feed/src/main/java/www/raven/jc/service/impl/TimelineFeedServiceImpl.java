@@ -1,9 +1,6 @@
 package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
-import java.time.Duration;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
@@ -19,6 +16,10 @@ import www.raven.jc.entity.po.Moment;
 import www.raven.jc.entity.vo.MomentVO;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.TimelineFeedService;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static www.raven.jc.constant.TimelineFeedConstant.PREFIX;
 
@@ -70,7 +71,7 @@ public class TimelineFeedServiceImpl implements TimelineFeedService {
             if (scoredSortedSet.size() > setProperty.maxSize) {
                 scoredSortedSet.pollFirst();
             }
-            scoredSortedSet.add(moment.getTimestamp(), moment.getMomentId());
+            scoredSortedSet.add(moment.getTimestamp(), moment.getId());
         });
     }
 
@@ -84,7 +85,7 @@ public class TimelineFeedServiceImpl implements TimelineFeedService {
     private List<RScoredSortedSet<Object>> getHisFriendMomentCache(Integer userId) {
         RpcResult<List<UserInfoDTO>> friendAndMeInfos = userRpcService.getFriendAndMeInfos(userId);
         Assert.isTrue(friendAndMeInfos.isSuccess(), "获取好友信息失败");
-        List<Integer> collect = friendAndMeInfos.getData().stream().map(UserInfoDTO::getUserId).collect(Collectors.toList());
+        List<Integer> collect = friendAndMeInfos.getData().stream().map(UserInfoDTO::getUserId).toList();
         return collect.stream().map(integer -> redissonClient.getScoredSortedSet(PREFIX + integer)).collect(Collectors.toList());
     }
 }

@@ -1,8 +1,9 @@
 package www.raven.jc.service;
 
-import java.util.List;
 import org.springframework.scheduling.annotation.Async;
 import www.raven.jc.entity.po.Room;
+
+import java.util.List;
 
 /**
  * chat async service
@@ -17,7 +18,7 @@ public interface AsyncService {
      * @param roomId room id
      * @param userId user id
      */
-    @Async("JcThreadPoolTaskExecutor")
+    @Async
     void sendNotice(Integer roomId, Integer userId);
 
     /**
@@ -26,7 +27,7 @@ public interface AsyncService {
      * @param userId user id
      * @param list   list
      */
-    @Async("JcThreadPoolTaskExecutor")
+    @Async
     void updateRoomMap(Integer userId, List<Room> list);
 
     /**
@@ -35,6 +36,6 @@ public interface AsyncService {
      * @param userId    user id
      * @param sessionId session id
      */
-    @Async("JcThreadPoolTaskExecutor")
+    @Async
     void updateFriendMap(Integer userId, String sessionId);
 }

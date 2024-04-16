@@ -1,12 +1,14 @@
 package www.raven.jc.entity.po;
 
-import java.util.Date;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import org.bson.types.ObjectId;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.MongoId;
-import www.raven.jc.dto.UserInfoDTO;
+import www.raven.jc.model.CommonSerializable;
+
+import java.util.Date;
 
 /**
  * message
@@ -14,18 +16,16 @@ import www.raven.jc.dto.UserInfoDTO;
  * @author 刘家辉
  * @date 2023/11/22
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Accessors(chain = true)
-public class Message {
-    /**
-     * 注意ObjectId的处理
-     */
-    @MongoId
-    private ObjectId messageId;
-    private UserInfoDTO sender;
+@TableName(value = "message",schema ="public")
+public class Message extends CommonSerializable {
+    @TableId(value = "id", type = IdType.AUTO)
+    private String messageId;
+    private Integer senderId;
     private String content;
     private String type;
-    @Indexed
     private String receiverId;
     private Date timestamp;
 }

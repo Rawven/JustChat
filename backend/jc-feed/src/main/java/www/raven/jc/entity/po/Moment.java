@@ -1,13 +1,11 @@
 package www.raven.jc.entity.po;
 
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import org.bson.types.ObjectId;
-import org.springframework.data.mongodb.core.mapping.MongoId;
-import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.model.CommonSerializable;
 
 /**
@@ -16,19 +14,16 @@ import www.raven.jc.model.CommonSerializable;
  * @author 刘家辉
  * @date 2024/01/24
  */
-@EqualsAndHashCode(callSuper = true) @Data
+@EqualsAndHashCode(callSuper = true)
+@Data
 @Accessors(chain = true)
 @JsonSerialize
+@TableName(value = "moment",schema ="public")
 public class Moment extends CommonSerializable {
-    /**
-     * 注意ObjectId的处理
-     */
-    @MongoId
-    private ObjectId momentId;
-    private UserInfoDTO userInfo;
+    @TableId
+    private String id;
+    private Integer userId;
     private String content;
     private String img;
-    private List<Like> likes;
-    private List<Comment> comments;
     private Long timestamp;
 }

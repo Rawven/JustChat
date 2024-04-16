@@ -1,9 +1,10 @@
 package www.raven.jc.ws;
 
-import javax.websocket.Session;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import jakarta.websocket.Session;
 
 /**
  * ws schedule
@@ -20,7 +21,7 @@ public class WsSchedule {
     private static final long EXPIRATION_TIME = 60 * 60 * 1000;
 
     /**
-     * 每隔1分钟执行一次检查
+     * 定期清理过期时间
      */
     @Scheduled(fixedRate = 60000)
     public void checkRoomWs() {

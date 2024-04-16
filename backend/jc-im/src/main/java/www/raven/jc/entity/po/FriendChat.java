@@ -12,9 +12,9 @@ import lombok.experimental.Accessors;
  * @author 刘家辉
  * @date 2024/01/21
  */
-@TableName("friend_chat")
 @Data
 @Accessors(chain = true)
+@TableName(value = "friend_chat",schema ="public")
 public class FriendChat {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;

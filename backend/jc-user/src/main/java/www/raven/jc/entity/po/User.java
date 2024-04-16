@@ -3,9 +3,10 @@ package www.raven.jc.entity.po;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.sql.Date;
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import java.sql.Date;
 
 /**
  * user
@@ -13,7 +14,7 @@ import lombok.experimental.Accessors;
  * @author 刘家辉
  * @date 2023/11/20
  */
-@TableName
+@TableName(value = "user",schema ="public")
 @Data
 @Accessors(chain = true)
 public class User {

@@ -1,6 +1,5 @@
 package www.raven.jc.controller;
 
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +16,8 @@ import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.service.FriendService;
 import www.raven.jc.service.RoomService;
+
+import java.util.List;
 
 /**
  * query controller

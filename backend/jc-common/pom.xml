@@ -18,7 +18,6 @@
         <module>common-redis</module>
         <module>common-mp</module>
         <module>common-mvc</module>
-        <module>common-threadPool</module>
     </modules>
 
     <dependencies>

@@ -1,9 +1,10 @@
 package www.raven.jc.event;
-import www.raven.jc.entity.po.Message;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import www.raven.jc.entity.po.Message;
 
 /**
  * user send msg event
