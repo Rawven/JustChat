@@ -122,6 +122,14 @@ public class SocialServiceImpl implements SocialService {
         handleEvent(model.getMomentId(), model.getMomentUserId(), "有人回复了你的评论", SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT);
     }
 
+    /**
+     * query moment
+     * TODO 自适应的timeline扩增（即不只是50个）
+     *
+     * @param page page
+     * @param size size
+     * @return {@link List}<{@link MomentVO}>
+     */
     @Override
     public List<MomentVO> queryMoment(int page, int size) {
         int userId = RequestUtil.getUserId(request);
@@ -132,30 +140,31 @@ public class SocialServiceImpl implements SocialService {
         //存在时间线
         if (scoredSortedSet.isExists()) {
             // 获取有序集合的所有元素
-            List<String> ids = scoredSortedSet.stream().collect(Collectors.toList());
-            List<Moment> moments = momentDAO.getBaseMapper().selectBatchIds(ids);
-            loadMomentAll(moments, momentVos, mapInfo, page, size);
+            long l = Math.multiplyFull(page, size);
+            List<String> pageIds = scoredSortedSet.stream().skip(l - 10).limit(size).toList();
+            List<Moment> moments = momentDAO.getBaseMapper().selectBatchIds(pageIds);
+            loadMomentAll(moments, momentVos, mapInfo);
         } else {
             RpcResult<List<UserInfoDTO>> friendInfos = userRpcService.getFriendAndMeInfos(userId);
             Assert.isTrue(friendInfos.isSuccess(), "获取好友信息失败");
             List<Integer> userIds = new ArrayList<>(friendInfos.getData().stream().map(UserInfoDTO::getUserId).toList());
             userIds.add(userId);
-            // 获取最新的10条朋友圈
-            List<Moment> moments = momentDAO.getBaseMapper().selectList(
-                    new QueryWrapper<Moment>().in("user_id", userIds).orderByDesc("timestamp").last("limit 10"));
-            loadMomentAll(moments, momentVos, mapInfo, page, size);
+            // 获取指定的十条数据
+            Page<Moment> momentPage = momentDAO.getBaseMapper().selectPage(
+                    new Page<>(page, size), new QueryWrapper<Moment>().in("user_id", userIds).orderByDesc("timestamp"));
+            loadMomentAll(momentPage.getRecords(), momentVos, mapInfo);
 
-            // 缓存最新的10条朋友圈id 若未有新的朋友圈则可减少一次拉取朋友圈的操作
-            timelineFeedService.addMomentTimelineFeeding(momentVos, userId);
+            // 对无时间线的用户进行时间线构建
+            timelineFeedService.buildMomentTimelineFeeding(userIds, userId);
         }
         return momentVos;
     }
 
-    private void loadMomentAll(List<Moment> moments, List<MomentVO> momentVos, Map<Integer, UserInfoDTO> mapInfo, int page, int size) {
+    private void loadMomentAll(List<Moment> moments, List<MomentVO> momentVos, Map<Integer, UserInfoDTO> mapInfo) {
         try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
             List<Callable<MomentVO>> tasks = moments.stream().<Callable<MomentVO>>map(moment -> () -> {
                 String id = moment.getId();
-                List<Comment> comments = commentDAO.getBaseMapper().selectPage(new Page<>(page, size), new QueryWrapper<Comment>().eq("moment_id", id)).getRecords();
+                List<Comment> comments = commentDAO.getBaseMapper().selectList(new QueryWrapper<Comment>().eq("moment_id", id));
                 List<Like> likes = likeDAO.getBaseMapper().selectList(new QueryWrapper<Like>().eq("moment_id", id));
                 List<CommentVO> commentVos = comments.stream().map(comment -> new CommentVO(comment, mapInfo.get(comment.getUserId()))).collect(Collectors.toList());
                 List<LikeVO> likeVos = likes.stream().map(like -> new LikeVO(like, mapInfo.get(like.getUserId()))).collect(Collectors.toList());

@@ -1,6 +1,7 @@
 package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
@@ -12,12 +13,12 @@ import www.raven.jc.constant.TimelineFeedConstant;
 import www.raven.jc.dao.MomentDAO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.Moment;
-import www.raven.jc.entity.vo.MomentVO;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.TimelineFeedService;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static www.raven.jc.constant.TimelineFeedConstant.PREFIX;
@@ -46,19 +47,17 @@ public class TimelineFeedServiceImpl implements TimelineFeedService {
      * add moment timeline feeding
      * 存储用户时间线（仅id）
      *
-     * @param collect collect
      * @param userId  user id
+     * @param userIds user ids
      */
     @Override
-    public void addMomentTimelineFeeding(List<MomentVO> collect, Integer userId) {
+    public void buildMomentTimelineFeeding(List<Integer> userIds, Integer userId) {
+        List<Moment> moments = momentDAO.getBaseMapper().selectList(
+                new QueryWrapper<Moment>().in("user_id", userIds).orderByDesc("timestamp").last("limit " + setProperty.maxSize));
         RScoredSortedSet<String> scoredSortedSet = redissonClient.getScoredSortedSet(TimelineFeedConstant.PREFIX + userId);
         scoredSortedSet.expire(Duration.ofDays(setProperty.expireDays));
-        collect.forEach(momentVO -> {
-            if (scoredSortedSet.size() >= setProperty.maxSize) {
-                scoredSortedSet.pollFirst(); // 删除时间最晚的元素
-            }
-            scoredSortedSet.add(momentVO.getTimestamp(), momentVO.getMomentId());
-        });
+        Map<String, Double> scores = moments.stream().collect(Collectors.toMap(Moment::getId, moment -> moment.getTimestamp().doubleValue()));
+        scoredSortedSet.addAll(scores);
     }
 
     @Override
