@@ -9,7 +9,7 @@ import www.raven.jc.constant.MessageConstant;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.Message;
 import www.raven.jc.model.CommonSerializable;
-import www.raven.jc.util.MongoUtil;
+import www.raven.jc.util.MessageUtil;
 
 import java.util.Date;
 import java.util.Objects;
@@ -36,7 +36,7 @@ public class MessageVO extends CommonSerializable {
         this.text = message.getContent();
         this.userInfoDTO = userInfoDTO;
         if (Objects.equals(message.getType(), MessageConstant.FRIEND)) {
-            this.belongId = MongoUtil.resolve(message.getReceiverId(), message.getSenderId());
+            this.belongId = MessageUtil.resolve(message.getReceiverId(), message.getSenderId());
         } else if (Objects.equals(message.getType(), MessageConstant.ROOM)) {
             this.belongId = Integer.parseInt(message.getReceiverId());
         }

@@ -6,7 +6,7 @@ package www.raven.jc.util;
  * @author 刘家辉
  * @date 2024/01/21
  */
-public class MongoUtil {
+public class MessageUtil {
     private static final int MAX_VALID_FIX_ID_LENGTH = 2;
 
     public static String concatenateIds(Integer userId, Integer friendId) {

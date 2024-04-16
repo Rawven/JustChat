@@ -121,7 +121,7 @@ public class SocialServiceImpl implements SocialService {
     @Override
     public List<MomentVO> queryMoment(int userId) {
         RScoredSortedSet<String> scoredSortedSet = redissonClient.getScoredSortedSet(TimelineFeedConstant.PREFIX + userId);
-        RpcResult<List<UserInfoDTO>> friendInfos1 = userRpcService.getFriendInfos(userId);
+        RpcResult<List<UserInfoDTO>> friendInfos1 = userRpcService.getFriendAndMeInfos(userId);
         Map<Integer, UserInfoDTO> mapInfo = friendInfos1.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, v -> v));
         List<MomentVO> momentVos = new ArrayList<>();
         //存在时间线

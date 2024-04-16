@@ -21,7 +21,6 @@ import www.raven.jc.override.TokenAuthenticationManager;
 
 import java.util.Collections;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * security config

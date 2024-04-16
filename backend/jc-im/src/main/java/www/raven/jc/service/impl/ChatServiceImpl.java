@@ -24,7 +24,7 @@ import www.raven.jc.entity.po.UserRoom;
 import www.raven.jc.event.SaveMsgEvent;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
-import www.raven.jc.util.MongoUtil;
+import www.raven.jc.util.MessageUtil;
 import www.raven.jc.util.MqUtil;
 import www.raven.jc.ws.WebsocketService;
 
@@ -90,7 +90,7 @@ public class ChatServiceImpl implements ChatService {
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void saveFriendMsg(MessageDTO message, UserInfoDTO user, Integer friendId) {
-        String fixId = MongoUtil.concatenateIds(user.getUserId(), friendId);
+        String fixId = MessageUtil.concatenateIds(user.getUserId(), friendId);
         Message realMsg = new Message().setContent(message.getText())
                 .setTimestamp(new Date(message.getTime()))
                 .setSenderId(user.getUserId())

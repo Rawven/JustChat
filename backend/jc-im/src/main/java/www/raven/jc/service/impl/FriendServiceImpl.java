@@ -21,7 +21,7 @@ import www.raven.jc.entity.vo.UserFriendVO;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.FriendService;
 import www.raven.jc.util.JsonUtil;
-import www.raven.jc.util.MongoUtil;
+import www.raven.jc.util.MessageUtil;
 import www.raven.jc.util.RequestUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -64,7 +64,7 @@ public class FriendServiceImpl implements FriendService {
         List<Integer> ids = friends.stream().map(UserInfoDTO::getUserId).toList();
         List<String> fixedFriendIds = new ArrayList<>();
         for (Integer friendId : ids) {
-            fixedFriendIds.add(MongoUtil.concatenateIds(userId, friendId));
+            fixedFriendIds.add(MessageUtil.concatenateIds(userId, friendId));
         }
         List<FriendChat> friendChats = friendChatDAO.getBaseMapper().selectList(new QueryWrapper<FriendChat>().in("fix_id", fixedFriendIds));
         //获取好友的最后一条消息id
@@ -76,7 +76,7 @@ public class FriendServiceImpl implements FriendService {
         //将好友id和好友的最后一条消息id对应起来
         Map<Integer, Message> messageMap = messages.stream()
                 .collect(Collectors.toMap(
-                        message -> message.getSenderId().equals(userId) ? MongoUtil.resolve(message.getReceiverId(), userId) : message.getSenderId(),
+                        message -> message.getSenderId().equals(userId) ? MessageUtil.resolve(message.getReceiverId(), userId) : message.getSenderId(),
                         Function.identity(),
                         (oldValue, newValue) -> newValue
                 ));
@@ -94,7 +94,7 @@ public class FriendServiceImpl implements FriendService {
     @Override
     public List<MessageVO> getFriendMsgPages(PagesFriendMsgModel model) {
         int userId = RequestUtil.getUserId(request);
-        String fixId = MongoUtil.concatenateIds(userId, model.getFriendId());
+        String fixId = MessageUtil.concatenateIds(userId, model.getFriendId());
         Page<Message> messagePage = messageDAO.getBaseMapper().selectPage(new Page<>(model.getPage(), model.getSize()), new QueryWrapper<Message>().eq("fix_id", fixId).orderByDesc("timestamp").last("limit 10"));
         RpcResult<List<UserInfoDTO>> batchInfo = userRpcService.getBatchInfo(List.of(model.getFriendId(), userId));
         Map<Integer, UserInfoDTO> map = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));

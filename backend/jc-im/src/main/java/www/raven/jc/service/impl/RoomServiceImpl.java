@@ -3,6 +3,7 @@ package www.raven.jc.service.impl;
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
@@ -35,7 +36,6 @@ import www.raven.jc.service.RoomService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.RequestUtil;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -105,7 +105,7 @@ public class RoomServiceImpl implements RoomService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         //获取所有聊天室的最后一条消息
-        List<Message> messages = messageDAO.getBaseMapper().selectList(new QueryWrapper<Message>().in("id", idsMsg));
+        List<Message> messages = idsMsg.isEmpty() ? new ArrayList<>() : messageDAO.getBaseMapper().selectList(new QueryWrapper<Message>().in("id", idsMsg));
         //获取聊天室聊天室创建者的用户信息
         Set<Integer> collect = rooms.stream().map(Room::getFounderId).collect(Collectors.toSet());
         messages.stream().map(Message::getSenderId).forEach(collect::add);
@@ -208,14 +208,14 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public List<MessageVO> getGroupMsgPages(PageGroupMsgModel model) {
-        Page<Message> messagePage = messageDAO.getBaseMapper().selectPage(new Page<>(model.getPage(), model.getSize()), new QueryWrapper<Message>().eq("belong_id", model.getRoomId()).orderByDesc("timestamp").last("limit 10"));
+        Page<Message> messagePage = messageDAO.getBaseMapper().selectPage(new Page<>(model.getPage(), model.getSize()), new QueryWrapper<Message>().eq("receiver_id", model.getRoomId().toString()).orderByDesc("timestamp").last("limit 10"));
         //给messages排序 从小到大
         messagePage.getRecords().sort(Comparator.comparingLong(o -> o.getTimestamp().getTime()));
-        List<Integer> ids = messagePage.getRecords().stream().map( Message::getSenderId).toList();
+        List<Integer> ids = messagePage.getRecords().stream().map(Message::getSenderId).toList();
         RpcResult<List<UserInfoDTO>> batchInfo = userRpcService.getBatchInfo(ids);
         Assert.isTrue(batchInfo.isSuccess(), "user模块调用失败");
         Map<Integer, UserInfoDTO> map = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
-        return messagePage.getRecords().stream().map(vo -> new MessageVO(vo,map.get(vo.getSenderId()))).collect(Collectors.toList());
+        return messagePage.getRecords().stream().map(vo -> new MessageVO(vo, map.get(vo.getSenderId()))).collect(Collectors.toList());
     }
 
     private List<DisplayRoomVO> buildRoomVO(Page<Room> chatRoomPage, List<UserInfoDTO> data) {

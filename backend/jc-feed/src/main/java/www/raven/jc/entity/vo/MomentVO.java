@@ -3,7 +3,6 @@ package www.raven.jc.entity.vo;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import www.raven.jc.dto.UserInfoDTO;
-import www.raven.jc.entity.po.Moment;
 
 import java.io.Serializable;
 import java.util.List;

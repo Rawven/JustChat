@@ -8,8 +8,8 @@
     <select id="selectUserByFriendId" resultType="www.raven.jc.entity.po.User">
         SELECT u.*
         FROM user u
-                 JOIN friend f ON u.id = f.user_id
-        WHERE f.friend_id = #{friendId}
+        INNER JOIN friend f on user.id = f.user_id
+        WHERE f.user_id = #{friend_id};
     </select>
 
     <select id="selectUsersAndFriends" resultType="www.raven.jc.entity.po.User">
