@@ -54,7 +54,7 @@ public class RequestFilter implements GlobalFilter, Ordered {
                 return chain.filter(exchange);
             }
         }
-        long time = Long.parseLong(Objects.requireNonNull(request.getHeaders().get(JwtConstant.TIME)).get(0));
+        long time = Long.parseLong(Objects.requireNonNull(request.getHeaders().get(JwtConstant.TIME)).getFirst());
         if (time < System.currentTimeMillis()) {
             // 获取响应对象
             ServerHttpResponse response = exchange.getResponse();

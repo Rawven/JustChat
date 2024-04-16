@@ -95,6 +95,7 @@
 <script>
 import {Host, ipfsHost} from "@/main";
 import {ChatRound, InfoFilled} from "@element-plus/icons-vue";
+import {ElMessage} from "element-plus";
 
 export default {
   name: 'ChatRoom',
@@ -148,13 +149,24 @@ export default {
     this.socket.onmessage = (event) => {
       console.log('WebSocket message received:', event.data);
       const data = JSON.parse(event.data);
-      const msg = {
-        time: Date.now(),
-        text: data.message.text,
-        user: data.message.userInfoDTO.username,
-        profile: data.message.userInfoDTO.profile
-      };
-      this.messages.push(msg);
+      if (data.type === "FRIEND_APPLY") {
+        this.applyNoticeIsNew = true;
+        ElMessage.success('您有新的好友申请');
+      } else if (data.type === "ROOM_APPLY") {
+        this.applyNoticeIsNew = true;
+        ElMessage.success('您有新的群聊申请');
+      } else if (data.type === "RECORD_MOMENT_FRIEND" || data.type === "RECORD_MOMENT") {
+        this.momentNoticeIsNew = true;
+        ElMessage.success('您有新的朋友圈消息');
+      } else if(data.type === "CHAT"){
+        const msg = {
+          time: Date.now(),
+          text: data.text,
+          user: data.userInfo.username,
+          profile: data.userInfo.profile
+        };
+        this.messages.push(msg);
+      }
     };
 
     this.socket.onclose = () => {
@@ -205,7 +217,7 @@ export default {
           belongId: this.theRoom.roomId,
           text: this.message,
           type: "room",
-          userInfoDTO:{
+          userInfo:{
             userId: userInfo.userId,
             username: userInfo.username,
             profile: userInfo.profile

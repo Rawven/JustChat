@@ -1,17 +1,15 @@
 package www.raven.jc.ws;
 
 
+import jakarta.websocket.Session;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import www.raven.jc.api.UserRpcService;
-import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
-
-import jakarta.websocket.Session;
 
 
 /**
@@ -29,7 +27,6 @@ public class PrivateHandler implements BaseHandler {
     private UserRpcService userRpcService;
 
     public static void sendFriendMessage(String message, int userId, int friendId) {
-        log.info("----WebSocket 广播消息:{}", message);
         Session mySession = WebsocketService.SESSION_POOL.get(userId);
         if (mySession != null && mySession.isOpen()) {
             mySession.getAsyncRemote().sendText(message);
@@ -42,9 +39,8 @@ public class PrivateHandler implements BaseHandler {
 
     @Override
     public void onMessage(MessageDTO message, Session session) {
-        TokenDTO tokenDTO = (TokenDTO) (session.getUserProperties().get("userDto"));
-        UserInfoDTO data = userRpcService.getSingleInfo(tokenDTO.getUserId()).getData();
-        sendFriendMessage(JsonUtil.objToJson(message), data.getUserId(), message.getUserInfoDTO().getUserId());
-        chatService.saveFriendMsg(message, data, message.getUserInfoDTO().getUserId());
+        UserInfoDTO data = userRpcService.getSingleInfo(message.getUserInfo().getUserId()).getData();
+        sendFriendMessage(JsonUtil.objToJson(message), data.getUserId(), message.getBelongId());
+        chatService.saveFriendMsg(message, data, message.getBelongId());
     }
 }

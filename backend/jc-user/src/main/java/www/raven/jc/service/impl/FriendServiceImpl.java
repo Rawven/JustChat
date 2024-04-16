@@ -1,9 +1,10 @@
 package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.constant.ImUserMqConstant;
@@ -16,8 +17,6 @@ import www.raven.jc.service.FriendService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 import www.raven.jc.util.RequestUtil;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.Collection;
 import java.util.List;
@@ -40,7 +39,8 @@ public class FriendServiceImpl implements FriendService {
     @Autowired
     private HttpServletRequest request;
     @Autowired
-    private StreamBridge streamBridge;
+    private RocketMQTemplate rocketMQTemplate;
+
 
     @Override
     public List<UserInfoDTO> getFriendInfos(int userId) {
@@ -58,12 +58,12 @@ public class FriendServiceImpl implements FriendService {
         Friend friend1 = new Friend().setUserId((long) friendId).setFriendId((long) userId);
         boolean b = friendDAO.saveBatch(List.of(friend, friend1));
         Assert.isTrue(b, "成为好友失败");
-        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new DeleteNoticeEvent(noticeId)), ImUserMqConstant.TAGS_DELETE_NOTICE));
+        MqUtil.sendMsg(rocketMQTemplate, ImUserMqConstant.TAGS_DELETE_NOTICE, MqUtil.createMsg(JsonUtil.objToJson(new DeleteNoticeEvent(noticeId))));
     }
 
     @Override
     public void refuseApplyFromFriend(int noticeId) {
-        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new DeleteNoticeEvent(noticeId)), ImUserMqConstant.TAGS_DELETE_NOTICE));
+        MqUtil.sendMsg(rocketMQTemplate, ImUserMqConstant.TAGS_DELETE_NOTICE, MqUtil.createMsg(JsonUtil.objToJson(new DeleteNoticeEvent(noticeId))));
     }
 
     @Override

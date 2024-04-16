@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import www.raven.jc.api.UserRpcService;
 import www.raven.jc.config.ScoredSortedSetProperty;
@@ -42,8 +41,6 @@ public class TimelineFeedServiceImpl implements TimelineFeedService {
     private MomentDAO momentDAO;
     @Autowired
     private RedissonClient redissonClient;
-    @Autowired
-    private StreamBridge streamBridge;
 
     /**
      * add moment timeline feeding
@@ -77,7 +74,7 @@ public class TimelineFeedServiceImpl implements TimelineFeedService {
 
     /**
      * get his friend moment cache
-     * 获取好友的朋友圈缓存
+     * 获取自己以及好友的朋友圈缓存
      *
      * @param userId user id
      * @return {@link List}<{@link RScoredSortedSet}<{@link Object}>>

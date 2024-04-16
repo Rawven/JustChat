@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.api.UserRpcService;
@@ -67,8 +66,6 @@ public class RoomServiceImpl implements RoomService {
     @Autowired
     private MessageDAO messageDAO;
     @Autowired
-    private StreamBridge streamBridge;
-    @Autowired
     private RedissonClient redissonClient;
     @Autowired
     private AsyncService asyncService;
@@ -112,7 +109,7 @@ public class RoomServiceImpl implements RoomService {
         RpcResult<List<UserInfoDTO>> batchInfo = userRpcService.getBatchInfo(collect.stream().toList());
         Assert.isTrue(batchInfo.isSuccess(), "user模块调用失败");
         Map<Integer, UserInfoDTO> userInfoMap = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
-        Map<String, Message> messageMap = messages.stream().collect(Collectors.toMap(Message::getMessageId, Function.identity()));
+        Map<String, Message> messageMap = messages.stream().collect(Collectors.toMap(Message::getId, Function.identity()));
         return rooms.stream().map(room -> {
             UserRoomVO userRoomVO = new UserRoomVO()
                     .setRoomId(room.getRoomId())
@@ -194,15 +191,17 @@ public class RoomServiceImpl implements RoomService {
         RScoredSortedSet<MessageVO> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + userId);
         Collection<MessageVO> messages = scoredSortedSet.readAll();
         //获取所有id=roomId的消息
-        List<MessageVO> collect = new ArrayList<>();
-        for (MessageVO message : messages) {
-            if (message.getBelongId().equals(model.getRoomId())) {
-                collect.add(message);
-                //删除已经获取的离线消息
-                scoredSortedSet.remove(message);
-            }
-        }
-        return collect;
+        List<Message> collect = new ArrayList<>();
+        List<MessageVO> messageVOS = new ArrayList<>();
+//        for (Message message : messages) {
+//            if (message.getBelongId().equals(model.getRoomId())) {
+//                collect.add(message);
+//                //删除已经获取的离线消息
+//                scoredSortedSet.remove(message);
+//            }
+//        }
+        //TODO
+        return messageVOS;
 
     }
 

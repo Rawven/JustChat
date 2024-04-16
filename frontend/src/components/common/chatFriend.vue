@@ -154,10 +154,10 @@ export default {
       } else if (data.type === "RECORD_MOMENT_FRIEND" || data.type === "RECORD_MOMENT") {
         this.momentNoticeIsNew = true;
         ElMessage.success('您有新的朋友圈消息');
-      } else if(data.type === "CHAT"){
+      } else if(data.type === "friend"){
         const msg = {
           time: Date.now(),
-          text: data.message.text,
+          text: data.text,
           user: data.userInfo.username,
           profile: data.userInfo.profile
         };
@@ -240,7 +240,7 @@ export default {
           belongId: this.theFriend.friendId,
           text: this.message,
           type: "friend",
-          userInfoDTO:{
+          userInfo:{
             userId: userInfo.userId,
             username: userInfo.username,
             profile: userInfo.profile

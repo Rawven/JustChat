@@ -1,5 +1,6 @@
 package www.raven.jc.ws;
 
+import jakarta.websocket.Session;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -8,8 +9,8 @@ import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.service.ChatService;
+import www.raven.jc.util.JsonUtil;
 
-import jakarta.websocket.Session;
 import java.util.Map;
 
 /**
@@ -47,7 +48,7 @@ public class RoomHandler implements BaseHandler {
         UserInfoDTO data = userRpcService.getSingleInfo(tokenDTO.getUserId()).getData();
         try {
             //这里直接遍历更快
-            sendRoomMessage(HandlerUtil.combineMessage(message, data), message.getBelongId());
+            sendRoomMessage(JsonUtil.objToJson(message), message.getBelongId());
         } catch (Exception e) {
             log.error(String.valueOf(e));
         }

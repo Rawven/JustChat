@@ -33,9 +33,9 @@ public class SocialController {
     @Autowired
     private HttpServletRequest request;
 
-    @GetMapping("/queryMoment")
-    public CommonResult<List<MomentVO>> queryMoment() {
-        return CommonResult.operateSuccess("查询成功", socialService.queryMoment(RequestUtil.getUserId(request)));
+    @GetMapping("/queryMoment/{page}/{size}")
+    public CommonResult<List<MomentVO>> queryMoment( @PathVariable("page") int page, @PathVariable("size") int size) {
+        return CommonResult.operateSuccess("查询成功", socialService.queryMoment(page,size));
     }
 
     @PostMapping("/releaseMoment")

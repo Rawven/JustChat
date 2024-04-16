@@ -44,11 +44,10 @@ public interface SocialService {
 
     /**
      * query moment
-     * query moment
-     *
-     * @param userId user id
+     * @param page page
+     * @param size size
      * @return {@link List}<{@link MomentVO}>
      */
-    List<MomentVO> queryMoment(int userId);
+    List<MomentVO> queryMoment(int page, int size);
 
 }

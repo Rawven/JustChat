@@ -6,6 +6,25 @@ dubbo:
     group: dubbo
     parameters:
       namespace: d7a1b125-8d08-47f5-bb6c-2020abe9f6f8
+  application:
+    qos-enable: false
+rocketmq:
+  name-server: 10.21.32.221:9876
+  producer:
+    # 发送同一类消息的设置为同一个group，保证唯一
+    group: testGroup
+    # 发送消息超时时间，默认3000
+    sendMessageTimeout: 10000
+    # 发送消息失败重试次数，默认2
+    retryTimesWhenSendFailed: 2
+    # 异步消息重试此处，默认2
+    retryTimesWhenSendAsyncFailed: 2
+    # 消息最大长度，默认1024 * 1024 * 4(默认4M)
+    maxMessageSize: 4096
+    # 压缩消息阈值，默认4k(1024 * 4)
+    compressMessageBodyThreshold: 4096
+    # 是否在内部发送失败时重试另一个broker，默认false
+    retryNextServer: false
 spring:
   threads:
     virtual:
@@ -22,50 +41,6 @@ spring:
   application:
     name: JC-Chat
   cloud:
-    stream:
-      function:
-        definition: eventUserToIm;eventFeedToIm;eventImToIm;
-      rocketmq:
-        bindings:
-          eventFeedToIm-in-0:
-            consumer:
-              messageModel: BROADCASTING
-          eventUserToIm-in-0:
-            consumer:
-              messageModel: BROADCASTING
-          eventImToIm-in-0:
-            consumer:
-              messageModel: BROADCASTING
-          producer-out-1:
-            producer:
-              sync: false
-              group: output-1
-          producer-out-0:
-            producer:
-              sync: false
-              group: output-0
-        binder:
-          name-server: 10.21.32.221:9876
-      bindings:
-        producer-out-1:
-          destination: eventImToIm
-        producer-out-0:
-          destination: eventImToIm
-        eventUserToIm-in-0:
-          consumer:
-            max-attempts: 3
-          destination: eventUserToIm
-          group: im-module
-        eventFeedToIm-in-0:
-          consumer:
-            max-attempts: 3
-          destination: eventFeedToIm
-          group: im-module
-        eventImToIm-in-0:
-          consumer:
-            max-attempts: 3
-          destination: eventImToIm
-          group: im-module
     nacos:
       discovery:
         server-addr: 10.21.32.154:8848
