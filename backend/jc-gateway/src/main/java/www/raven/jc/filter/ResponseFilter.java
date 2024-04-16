@@ -84,7 +84,7 @@ public class ResponseFilter implements GlobalFilter, Ordered {
                                     log.info("加载Response字节流异常，失败原因：{}", Throwables.getStackTraceAsString(e));
                                 }
                             });
-                            logResponse(list.get(0));
+                            logResponse(list.getFirst());
                             String responseData = JOINER.join(list);
                             byte[] uppedContent = new String(responseData.getBytes(), StandardCharsets.UTF_8).getBytes();
                             originalResponse.getHeaders().setContentLength(uppedContent.length);

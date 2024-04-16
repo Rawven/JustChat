@@ -1,6 +1,7 @@
 package www.raven.jc.aop;
 
 import cn.hutool.core.util.StrUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
@@ -90,7 +90,7 @@ public class HttpAspect {
         if (argList.isEmpty()) {
             return null;
         } else if (argList.size() == 1) {
-            return argList.get(0);
+            return argList.getFirst();
         } else {
             return argList;
         }

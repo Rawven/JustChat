@@ -2,10 +2,10 @@ package www.raven.jc.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.api.UserRpcService;
@@ -53,7 +53,7 @@ public class ChatServiceImpl implements ChatService {
     @Autowired
     private UserRpcService userRpcService;
     @Autowired
-    private StreamBridge streamBridge;
+    private RocketMQTemplate rocketMQTemplate;
     @Autowired
     private RedissonClient redissonClient;
 
@@ -84,7 +84,7 @@ public class ChatServiceImpl implements ChatService {
                 }
         );
         //异步入历史消息数据库
-        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new SaveMsgEvent().setMessage(realMsg).setType("room")), ImImMqConstant.TAGS_SAVE_HISTORY_MSG));
+        MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_SAVE_HISTORY_MSG, MqUtil.createMsg(JsonUtil.objToJson(new SaveMsgEvent().setMessage(realMsg).setType("room"))));
     }
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
@@ -103,7 +103,7 @@ public class ChatServiceImpl implements ChatService {
             scoredSortedSet.add(message.getTime(), realMsg);
         }
         //异步入历史消息库
-        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new SaveMsgEvent().setMessage(realMsg).setType("friend")), ImImMqConstant.TAGS_SAVE_HISTORY_MSG));
+        MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_SAVE_HISTORY_MSG, MqUtil.createMsg(JsonUtil.objToJson(new SaveMsgEvent().setMessage(realMsg).setType("friend"))));
     }
 
 }

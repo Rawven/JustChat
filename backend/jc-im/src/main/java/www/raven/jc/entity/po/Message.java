@@ -19,10 +19,10 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Accessors(chain = true)
-@TableName(value = "message",schema ="public")
+@TableName(value = "message", schema = "public")
 public class Message extends CommonSerializable {
     @TableId(value = "id", type = IdType.AUTO)
-    private String messageId;
+    private String id;
     private Integer senderId;
     private String content;
     private String type;

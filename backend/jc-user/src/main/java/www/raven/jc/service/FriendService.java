@@ -29,7 +29,7 @@ public interface FriendService {
     void agreeApplyFromFriend(int friendId, int noticeId);
 
     /**
-     * refuse apply from friend
+     * refused to apply from friend
      *
      * @param noticeId notice id
      */

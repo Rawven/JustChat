@@ -1,13 +1,15 @@
 package www.raven.jc.consumer;
 
 import cn.hutool.core.lang.Assert;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.common.message.MessageExt;
+import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
+import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.messaging.Message;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import www.raven.jc.api.UserRpcService;
 import www.raven.jc.constant.ImImMqConstant;
 import www.raven.jc.constant.ImUserMqConstant;
@@ -23,7 +25,6 @@ import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.FriendChat;
 import www.raven.jc.entity.po.Notice;
 import www.raven.jc.entity.po.Room;
-import www.raven.jc.event.Event;
 import www.raven.jc.event.MomentNoticeEvent;
 import www.raven.jc.event.RoomApplyEvent;
 import www.raven.jc.event.SaveMsgEvent;
@@ -33,13 +34,10 @@ import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 import www.raven.jc.ws.WebsocketService;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
-
-import static www.raven.jc.constant.MqConstant.HEADER_TAGS;
 
 /**
  * message consumer
@@ -47,9 +45,10 @@ import static www.raven.jc.constant.MqConstant.HEADER_TAGS;
  * @author 刘家辉
  * @date 2023/12/08
  */
-@Service
+@Component
 @Slf4j
-public class NoticeEventListener {
+@RocketMQMessageListener(consumerGroup = "im-consumer-group", topic = "JustChat", selectorExpression = ImImMqConstant.TAGS_SAVE_HISTORY_MSG)
+public class NoticeEventListener implements RocketMQListener<MessageExt> {
     @Autowired
     private RedissonClient redissonClient;
     @Autowired
@@ -63,90 +62,58 @@ public class NoticeEventListener {
     @Autowired
     private FriendChatDAO friendChatDAO;
 
-    @Bean
-    public Consumer<Message<Event>> eventUserToIm() {
-        return msg -> {
-            //判断是否重复消息
-            if (MqUtil.checkMsgIsvalid(msg, redissonClient)) {
-                return;
-            }
-            String tags = Objects.requireNonNull(msg.getHeaders().get(HEADER_TAGS)).toString();
-            //判断消息类型
-            switch (tags) {
-                case ImUserMqConstant.TAGS_DELETE_NOTICE:
-                    eventDeleteNotice(msg);
-                    break;
-                default:
-                    log.info("--RocketMq 非法的消息，不处理");
-            }
-            MqUtil.protectMsg(msg, redissonClient);
-        };
+    @Override
+    public void onMessage(MessageExt messageExt) {
+        log.info("--RocketMq receive event:{}", messageExt.toString());
+        if (MqUtil.checkMsgIsvalid(messageExt, redissonClient)) {
+            return;
+        }
+        byte[] body = messageExt.getBody();
+        String message = new String(body, StandardCharsets.UTF_8);
+        log.info("--RocketMq receive event:{}", message);
+
+        switch (messageExt.getTags()) {
+            case ImImMqConstant.TAGS_CHAT_ROOM_APPLY:
+                eventUserJoinRoomApply(message);
+                break;
+            case ImImMqConstant.TAGS_SAVE_HISTORY_MSG:
+                eventSaveMsg(message);
+                break;
+            case SocialUserMqConstant.TAGS_MOMENT_NOTICE_MOMENT_FRIEND:
+                eventMomentNoticeFriendEvent(message);
+                break;
+            case SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT:
+                eventMomentNoticeLikeOrCommentEvent(message);
+                break;
+            case ImUserMqConstant.TAGS_DELETE_NOTICE:
+                eventDeleteNotice(message);
+                break;
+            default:
+                log.info("--RocketMq 非法的消息，不处理");
+        }
+
+        MqUtil.protectMsg(messageExt, redissonClient);
     }
 
-    @Bean
-    public Consumer<Message<Event>> eventFeedToIm() {
-        return msg -> {
-            //判断是否重复消息
-            if (MqUtil.checkMsgIsvalid(msg, redissonClient)) {
-                return;
-            }
-            String tags = Objects.requireNonNull(msg.getHeaders().get(HEADER_TAGS)).toString();
-            //判断消息类型
-            switch (tags) {
-                case SocialUserMqConstant.TAGS_MOMENT_NOTICE_MOMENT_FRIEND:
-                    eventMomentNoticeFriendEvent(msg);
-                    break;
-                case SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT:
-                    eventMomentNoticeLikeOrCommentEvent(msg);
-                    break;
-                default:
-                    log.info("--RocketMq 非法的消息，不处理");
-            }
-            MqUtil.protectMsg(msg, redissonClient);
-        };
-    }
-
-    @Bean
-    public Consumer<Message<Event>> eventImToIm() {
-        return msg -> {
-            //判断是否重复消息
-            if (MqUtil.checkMsgIsvalid(msg, redissonClient)) {
-                return;
-            }
-            String tags = Objects.requireNonNull(msg.getHeaders().get(HEADER_TAGS)).toString();
-            //判断消息类型
-            switch (tags) {
-                case ImImMqConstant.TAGS_CHAT_ROOM_APPLY:
-                    eventUserJoinRoomApply(msg);
-                    break;
-                case ImImMqConstant.TAGS_SAVE_HISTORY_MSG:
-                    eventSaveMsg(msg);
-                    break;
-                default:
-                    log.info("--RocketMq 非法的消息，不处理");
-            }
-            MqUtil.protectMsg(msg, redissonClient);
-        };
-    }
-
-    private void eventSaveMsg(Message<Event> msg) {
-        SaveMsgEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), SaveMsgEvent.class);
+    private void eventSaveMsg(String msg) {
+        SaveMsgEvent payload = JsonUtil.jsonToObj(msg, SaveMsgEvent.class);
         //保存进入历史消息db
         messageDAO.getBaseMapper().insert(payload.getMessage());
         if (payload.getMessage().getType().equals(MessageConstant.ROOM)) {
             //更新群聊的最后一条消息
-            Assert.isTrue(roomDAO.getBaseMapper().updateById(new Room().setRoomId(Integer.valueOf(payload.getMessage().getReceiverId())).setLastMsgId(payload.getMessage().getMessageId())) > 0, "更新失败");
+            Assert.isTrue(roomDAO.getBaseMapper().updateById(new Room().setRoomId(Integer.valueOf(payload.getMessage().getReceiverId())).setLastMsgId(payload.getMessage().getId())) > 0, "更新失败");
         } else if (payload.getMessage().getType().equals(MessageConstant.FRIEND)) {
-            //更新好友的最后一条消息
-            FriendChat friendChat = new FriendChat().setFixId(payload.getMessage().getReceiverId())
-                    .setLastMsgId(String.valueOf(payload.getMessage().getMessageId()));
-            Assert.isTrue(friendChatDAO.save(friendChat), "插入失败");
+            //更新好友的最后一条消息id
+            FriendChat friendChat = friendChatDAO.getBaseMapper().selectOne(new QueryWrapper<FriendChat>().eq("fix_id", payload.getMessage().getReceiverId()));
+            Assert.notNull(friendChat, "好友不存在");
+            int i = friendChatDAO.getBaseMapper().updateById(friendChat.setLastMsgId(payload.getMessage().getId()));
+            Assert.isTrue(i > 0, "更新失败");
         }
 
     }
 
-    private void eventMomentNoticeFriendEvent(Message<Event> msg) {
-        MomentNoticeEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), MomentNoticeEvent.class);
+    private void eventMomentNoticeFriendEvent(String msg) {
+        MomentNoticeEvent payload = JsonUtil.jsonToObj(msg, MomentNoticeEvent.class);
         Integer userId = payload.getUserId();
         RpcResult<List<UserInfoDTO>> friendInfos = userRpcService.getFriendInfos(userId);
         Assert.isTrue(friendInfos.isSuccess(), "获取好友列表失败");
@@ -158,8 +125,8 @@ public class NoticeEventListener {
         WebsocketService.sendBatchMessage(JsonUtil.objToJson(map), idsFriend);
     }
 
-    private void eventMomentNoticeLikeOrCommentEvent(Message<Event> msg) {
-        MomentNoticeEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), MomentNoticeEvent.class);
+    private void eventMomentNoticeLikeOrCommentEvent(String msg) {
+        MomentNoticeEvent payload = JsonUtil.jsonToObj(msg, MomentNoticeEvent.class);
         Integer userId = payload.getUserId();
         HashMap<Object, Object> map = new HashMap<>(3);
         map.put("momentId", payload.getMomentId());
@@ -174,8 +141,8 @@ public class NoticeEventListener {
      *
      * @param msg msg
      */
-    public void eventUserJoinRoomApply(Message<Event> msg) {
-        RoomApplyEvent payload = JsonUtil.jsonToObj(msg.getPayload().getData(), RoomApplyEvent.class);
+    public void eventUserJoinRoomApply(String msg) {
+        RoomApplyEvent payload = JsonUtil.jsonToObj(msg, RoomApplyEvent.class);
         log.info("--RocketMq receive join room apply event:{}", msg);
         Integer founderId = payload.getFounderId();
         Notice notice = new Notice().setUserId(founderId)
@@ -196,8 +163,10 @@ public class NoticeEventListener {
     }
 
 
-    private void eventDeleteNotice(Message<Event> msg) {
-        DeleteNoticeEvent event = JsonUtil.jsonToObj(msg.getPayload().getData(), DeleteNoticeEvent.class);
+    private void eventDeleteNotice(String msg) {
+        DeleteNoticeEvent event = JsonUtil.jsonToObj(msg, DeleteNoticeEvent.class);
         Assert.isTrue(noticeDAO.removeById(event.getNoticeId()), "删除失败");
     }
+
+
 }

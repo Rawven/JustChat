@@ -6,10 +6,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import www.raven.jc.api.UserRpcService;
 import www.raven.jc.constant.SocialUserMqConstant;
@@ -55,6 +55,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SocialServiceImpl implements SocialService {
 
+    private static final String NOT_REPLY = "0";
+
     @Autowired
     private HttpServletRequest request;
     @Autowired
@@ -68,7 +70,7 @@ public class SocialServiceImpl implements SocialService {
     @Autowired
     private RedissonClient redissonClient;
     @Autowired
-    private StreamBridge streamBridge;
+    private RocketMQTemplate rocketMQTemplate;
     @Autowired
     private TimelineFeedService timelineFeedService;
 
@@ -111,7 +113,7 @@ public class SocialServiceImpl implements SocialService {
                 .setUserId(userId)
                 .setContent(model.getText())
                 .setMomentId(model.getMomentId());
-        if (!Objects.equals(model.getCommentId(), "0")) {
+        if (!Objects.equals(model.getCommentId(), NOT_REPLY)) {
             comment.setParentId(model.getCommentId());
         }
         int insert = commentDAO.getBaseMapper().insert(comment);
@@ -142,6 +144,7 @@ public class SocialServiceImpl implements SocialService {
             List<Moment> moments = momentDAO.getBaseMapper().selectList(
                     new QueryWrapper<Moment>().in("user_id", userIds).orderByDesc("timestamp").last("limit 10"));
             loadMomentAll(moments, momentVos, mapInfo, page, size);
+
             // 缓存最新的10条朋友圈id 若未有新的朋友圈则可减少一次拉取朋友圈的操作
             timelineFeedService.addMomentTimelineFeeding(momentVos, userId);
         }
@@ -150,7 +153,6 @@ public class SocialServiceImpl implements SocialService {
 
     private void loadMomentAll(List<Moment> moments, List<MomentVO> momentVos, Map<Integer, UserInfoDTO> mapInfo, int page, int size) {
         try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-
             List<Callable<MomentVO>> tasks = moments.stream().<Callable<MomentVO>>map(moment -> () -> {
                 String id = moment.getId();
                 List<Comment> comments = commentDAO.getBaseMapper().selectPage(new Page<>(page, size), new QueryWrapper<Comment>().eq("moment_id", id)).getRecords();
@@ -177,8 +179,7 @@ public class SocialServiceImpl implements SocialService {
     }
 
     private void handleEvent(String momentId, Integer userId, String msg, String tag) {
-        streamBridge.send("producer-out-1", MqUtil.createMsg(
-                JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(momentId).setUserId(userId).setMsg(msg)),
-                tag));
+        MqUtil.sendMsg(rocketMQTemplate, tag, MqUtil.createMsg(
+                JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(momentId).setUserId(userId).setMsg(msg))));
     }
 }

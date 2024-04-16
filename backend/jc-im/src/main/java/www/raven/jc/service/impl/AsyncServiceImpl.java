@@ -1,7 +1,8 @@
 package www.raven.jc.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import www.raven.jc.constant.ImImMqConstant;
 import www.raven.jc.dao.RoomDAO;
@@ -22,18 +23,20 @@ import java.util.List;
  * @date 2024/02/23
  */
 @Service
+@Slf4j
 public class AsyncServiceImpl implements AsyncService {
     @Autowired
     private RoomDAO roomDAO;
     @Autowired
-    private StreamBridge streamBridge;
+    private RocketMQTemplate rocketMQTemplate;
 
     @Override
     public void sendNotice(Integer roomId, Integer userId) {
         Room room = roomDAO.getBaseMapper().selectById(roomId);
         Integer founderId = room.getFounderId();
         //通知user模块 插入一条申请记录
-        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new RoomApplyEvent(userId, founderId, roomId)), ImImMqConstant.TAGS_CHAT_ROOM_APPLY));
+        MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_CHAT_ROOM_APPLY, MqUtil.createMsg(JsonUtil.objToJson(new RoomApplyEvent(userId, founderId, roomId))));
+//        streamBridge.send("producer-out-1", MqUtil.createMsg(JsonUtil.objToJson(new RoomApplyEvent(userId, founderId, roomId)), ImImMqConstant.TAGS_CHAT_ROOM_APPLY));
     }
 
     @Override
