@@ -18,7 +18,10 @@ import www.raven.jc.util.MqUtil;
 import www.raven.jc.util.RequestUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -65,10 +68,18 @@ public class FriendServiceImpl implements FriendService {
 
     @Override
     public List<UserInfoDTO> getFriendAndMeInfos(int userId) {
-        return userDAO.getBaseMapper().selectUsersAndFriends(userId).stream().map(
-                user -> new UserInfoDTO()
-                        .setUserId(user.getId()).setUsername(user.getUsername()).setProfile(user.getProfile())
-        ).collect(Collectors.toList());
+        Collection<UserInfoDTO> values = userDAO.getBaseMapper().selectUsersAndFriends(userId).stream()
+                .map(user -> new UserInfoDTO()
+                        .setUserId(user.getId())
+                        .setUsername(user.getUsername())
+                        .setProfile(user.getProfile()))
+                .collect(Collectors.toMap(
+                        UserInfoDTO::getUserId,
+                        Function.identity(),
+                        (k, v) -> v
+                ))
+                .values();
+        return List.copyOf(values);
     }
 
 }

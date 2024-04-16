@@ -332,7 +332,7 @@ export default {
         }).then(response => {
           this.feedData = response.data.data;
         })
-      }, 5000);
+      }, 5);
     },
     togglePopover(id) {
       this.nowComment = id;
@@ -344,7 +344,8 @@ export default {
             momentId: momentId,
             text: text,
             momentUserId: momentUserId,
-            momentTimeStamp: momentTimeStamp
+            momentTimeStamp: momentTimeStamp,
+            commentId: "0"
           },
           {
             headers: {
@@ -364,7 +365,7 @@ export default {
           this.feedData = response.data.data;
         })
 
-      }, 2000)
+      }, 5)
     },
 
     submitNestedComment(momentId, text, momentUserId, commentId, momentTimeStamp) {

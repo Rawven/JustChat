@@ -70,7 +70,7 @@ public class FriendServiceImpl implements FriendService {
         //获取好友的最后一条消息id
         List<String> idsMsg = friendChats.stream().map(FriendChat::getLastMsgId).collect(Collectors.toList());
         //获取好友的最后一条消息
-        List<Message> messages = messageDAO.getBaseMapper().selectList(new QueryWrapper<Message>().in("id", idsMsg));
+        List<Message> messages = idsMsg.isEmpty()?new ArrayList<>():messageDAO.getBaseMapper().selectList(new QueryWrapper<Message>().in("id", idsMsg));
 
 
         //将好友id和好友的最后一条消息id对应起来

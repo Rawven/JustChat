@@ -37,6 +37,7 @@ import www.raven.jc.util.RequestUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -109,7 +110,7 @@ public class SocialServiceImpl implements SocialService {
                 .setUserId(userId)
                 .setContent(model.getText())
                 .setMomentId(model.getMomentId());
-        if (model.getCommentId() != null) {
+        if (!Objects.equals(model.getCommentId(), "0")) {
             comment.setParentId(model.getCommentId());
         }
         int insert = commentDAO.getBaseMapper().insert(comment);
@@ -160,7 +161,6 @@ public class SocialServiceImpl implements SocialService {
                         .setTimestamp(moment.getTimestamp())
                         .setUserInfo(mapInfo.get(moment.getUserId()));
             }).collect(Collectors.toList());
-
             List<Future<MomentVO>> futures = executor.invokeAll(tasks);
             for (Future<MomentVO> future : futures) {
                 momentVos.add(future.get());

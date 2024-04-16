@@ -9,12 +9,12 @@ import www.raven.jc.entity.po.Like;
 @Accessors(chain = true)
 public class LikeVO {
     private String id;
-    private UserInfoDTO userInfoDTO;
+    private UserInfoDTO userInfo;
     private Long timestamp;
 
     public LikeVO(Like like, UserInfoDTO userInfoDTO) {
         this.id = like.getId();
-        this.userInfoDTO = userInfoDTO;
+        this.userInfo = userInfoDTO;
         this.timestamp = like.getTimestamp();
     }
 }
