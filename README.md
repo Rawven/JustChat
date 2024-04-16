@@ -3,10 +3,10 @@
 
 | 前端         | 后端                 | 数据库 | 中间件 |        
 | ------------ | -------------------- | ------ | ------ |
-| Vue          | spring-gateway       | mysql  | rocketMq|
+| Vue          | spring-gateway       |postgres| rocketMq|
 | element-plus | spring-boot          | redis  | nacos |
 |              | dubbo                | ipfs   |       |
-|              |                      | mongodb|       |
+|              |                      |        |       |
 --------
 目前功能： 
   1. 登录注册/个人信息crud
