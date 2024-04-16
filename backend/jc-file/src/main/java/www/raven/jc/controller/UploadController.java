@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import www.raven.jc.client.IpfsClient;
 import www.raven.jc.result.CommonResult;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * upload controller
@@ -24,7 +24,7 @@ public class UploadController {
     private IpfsClient ipfsClient;
 
     @PostMapping("/upload")
-    public CommonResult<String> upload(@RequestPart("file") @NotNull MultipartFile profile) {
+    public CommonResult<String> upload(@RequestPart("file") MultipartFile profile) {
         String upload = ipfsClient.upload(profile);
         return CommonResult.operateSuccess("上传成功", upload);
     }

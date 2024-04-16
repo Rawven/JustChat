@@ -35,7 +35,7 @@ import www.raven.jc.service.RoomService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.RequestUtil;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;

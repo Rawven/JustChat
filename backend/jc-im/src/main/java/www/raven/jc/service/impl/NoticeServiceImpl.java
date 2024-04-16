@@ -22,7 +22,7 @@ import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.RequestUtil;
 import www.raven.jc.ws.WebsocketService;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

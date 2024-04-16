@@ -14,7 +14,7 @@ import java.sql.Date;
  * @author 刘家辉
  * @date 2023/11/20
  */
-@TableName
+@TableName(value = "user",schema ="public")
 @Data
 @Accessors(chain = true)
 public class User {

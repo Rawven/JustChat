@@ -17,7 +17,7 @@ import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 import www.raven.jc.util.RequestUtil;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 

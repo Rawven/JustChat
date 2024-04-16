@@ -41,10 +41,11 @@ public class RequestFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+
         ServerHttpRequest request = exchange.getRequest();
         log.info("RequestFilter执行");
         log.info("收到一次请求");
-        log.info("Request Method: {}", request.getMethodValue());
+        log.info("Request Method: {}", request.getMethod());
         log.info("Request URI: {}", request.getURI());
         log.info("Request Headers: {}", request.getHeaders());
         log.info("Request Query Params: {}", request.getQueryParams());

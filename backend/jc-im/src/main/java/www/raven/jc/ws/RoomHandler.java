@@ -9,7 +9,7 @@ import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.service.ChatService;
 
-import javax.websocket.Session;
+import jakarta.websocket.Session;
 import java.util.Map;
 
 /**

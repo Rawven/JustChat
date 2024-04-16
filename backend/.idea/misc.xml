@@ -14,13 +14,9 @@
     </option>
     <option name="ignoredFiles">
       <set>
-        <option value="$PROJECT_DIR$/admin/pom.xml" />
-        <option value="$PROJECT_DIR$/common-User/pom.xml" />
-        <option value="$PROJECT_DIR$/common/common-api-user/pom.xml" />
-        <option value="$PROJECT_DIR$/common/common-base/pom.xml" />
-        <option value="$PROJECT_DIR$/jc-common/common-api/common-api-im/pom.xml" />
+        <option value="$PROJECT_DIR$/jc-common/common-threadPool/pom.xml" />
       </set>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" project-jdk-name="jbr-17" project-jdk-type="JavaSDK" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" project-jdk-name="corretto-21" project-jdk-type="JavaSDK" />
 </project>

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.FriendService;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 
 /**

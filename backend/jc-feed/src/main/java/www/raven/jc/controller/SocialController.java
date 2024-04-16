@@ -16,7 +16,7 @@ import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.SocialService;
 import www.raven.jc.util.RequestUtil;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**

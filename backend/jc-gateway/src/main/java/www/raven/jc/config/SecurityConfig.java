@@ -21,6 +21,7 @@ import www.raven.jc.override.TokenAuthenticationManager;
 
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * security config
@@ -59,6 +60,8 @@ public class SecurityConfig {
                 .and()
                 .exceptionHandling()
                 .accessDeniedHandler(defaultAccessDeniedHandler)
+                .and()
+                .exceptionHandling()
                 .authenticationEntryPoint(authenticationEntryPoint)
         ;
         return http.build();
@@ -95,5 +98,6 @@ public class SecurityConfig {
         managers.add(tokenAuthenticationManager);
         return new DelegatingReactiveAuthenticationManager(managers);
     }
+
 
 }

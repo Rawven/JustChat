@@ -71,7 +71,7 @@ public class TimelineFeedServiceImpl implements TimelineFeedService {
             if (scoredSortedSet.size() > setProperty.maxSize) {
                 scoredSortedSet.pollFirst();
             }
-            scoredSortedSet.add(moment.getTimestamp(), moment.getMomentId());
+            scoredSortedSet.add(moment.getTimestamp(), moment.getId());
         });
     }
 

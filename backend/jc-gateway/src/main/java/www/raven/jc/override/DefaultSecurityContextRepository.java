@@ -19,7 +19,7 @@ import www.raven.jc.constant.JwtConstant;
 import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.util.JwtUtil;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 

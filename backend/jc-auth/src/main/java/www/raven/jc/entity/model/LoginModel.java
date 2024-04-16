@@ -2,7 +2,7 @@ package www.raven.jc.entity.model;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * login model

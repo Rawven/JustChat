@@ -7,10 +7,13 @@ dubbo:
     parameters:
       namespace: d7a1b125-8d08-47f5-bb6c-2020abe9f6f8
 spring:
-  data:
-    mongodb:
-      uri: mongodb://10.21.32.192:27017/jc
-      auto-index-creation: true
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: jdbc:postgresql://10.21.32.192:5432/postgres
+    username: postgres
+    password: 123456
   redis:
     address: redis://10.21.32.221:6379
     password: 123456
@@ -45,10 +48,6 @@ spring:
     nacos:
       discovery:
         server-addr: 10.21.32.154:8848
-  datasource:
-    url: jdbc:mysql://10.21.32.154:3306/JC_chat?useUnicode=true&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false
-    username: root
-    password: root
 server:
   port: 8071
 redis:

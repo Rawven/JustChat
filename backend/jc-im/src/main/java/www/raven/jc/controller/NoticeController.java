@@ -11,7 +11,7 @@ import www.raven.jc.entity.vo.NoticeVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.NoticeService;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 /**

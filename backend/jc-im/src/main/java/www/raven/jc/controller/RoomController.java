@@ -19,8 +19,8 @@ import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.FriendService;
 import www.raven.jc.service.RoomService;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 /**

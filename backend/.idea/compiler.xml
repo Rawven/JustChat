@@ -20,7 +20,6 @@
         <module name="social" />
         <module name="common-mq-feed-im-model" />
         <module name="common-aop" />
-        <module name="common-threadPool" />
         <module name="common-mp" />
         <module name="jc-user" />
         <module name="common-redis" />
@@ -48,6 +47,7 @@
       <module name="common" target="11" />
       <module name="common-api-im" target="11" />
       <module name="common-base" target="11" />
+      <module name="common-threadPool" target="21" />
       <module name="common-User" target="11" />
       <module name="file" target="11" />
       <module name="gateway" target="11" />

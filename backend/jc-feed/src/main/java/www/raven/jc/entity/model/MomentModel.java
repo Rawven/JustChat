@@ -3,7 +3,7 @@ package www.raven.jc.entity.model;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * moment model

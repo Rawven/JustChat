@@ -1,6 +1,7 @@
 package www.raven.jc.entity.po;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,6 +18,7 @@ import www.raven.jc.model.CommonSerializable;
 @Data
 @Accessors(chain = true)
 @JsonSerialize
+@TableName(value = "moment",schema ="public")
 public class Moment extends CommonSerializable {
     @TableId
     private String id;

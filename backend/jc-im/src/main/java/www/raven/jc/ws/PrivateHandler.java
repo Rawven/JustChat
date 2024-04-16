@@ -11,7 +11,7 @@ import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.service.ChatService;
 import www.raven.jc.util.JsonUtil;
 
-import javax.websocket.Session;
+import jakarta.websocket.Session;
 
 
 /**

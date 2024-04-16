@@ -20,7 +20,7 @@ public interface TimelineFeedService {
      * @param collect collect
      * @param userId  user id
      */
-    @Async("JcThreadPoolTaskExecutor")
+    @Async
     void addMomentTimelineFeeding(List<MomentVO> collect, Integer userId);
 
     /**
@@ -29,6 +29,6 @@ public interface TimelineFeedService {
      * @param userId user id
      * @param moment moment
      */
-    @Async("JcThreadPoolTaskExecutor")
+    @Async
     void insertMomentFeed(Integer userId, Moment moment);
 }

@@ -11,6 +11,12 @@ dubbo:
     qos-host: localhost
     qos-port: 8091
 spring:
+  threads:
+    virtual:
+      enabled: true
+  web:
+    resources:
+      add-mappings: false
   redis:
     address: redis://10.21.32.221:6379
     password: 123456
@@ -39,7 +45,7 @@ spring:
   datasource:
     url: jdbc:postgresql://10.21.32.192:5432/postgres
     username: postgres
-    password: root
+    password: 123456
 server:
   port: 8080
 jwt:

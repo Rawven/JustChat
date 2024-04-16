@@ -13,7 +13,7 @@ import www.raven.jc.constant.JwtConstant;
 import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.util.JwtUtil;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**

@@ -1,5 +1,6 @@
 package www.raven.jc.controller;
 
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +16,6 @@ import www.raven.jc.entity.vo.TokenVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.AuthService;
 
-import javax.validation.constraints.NotBlank;
 
 /**
  * account controller
