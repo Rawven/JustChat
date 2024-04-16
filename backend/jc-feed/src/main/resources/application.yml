@@ -7,9 +7,9 @@ dubbo:
     parameters:
       namespace: d7a1b125-8d08-47f5-bb6c-2020abe9f6f8
 spring:
-#  threads:
-#    virtual:
-#      enabled: true
+  #  threads:
+  #    virtual:
+  #      enabled: true
   datasource:
     url: jdbc:postgresql://10.21.32.192:5432/postgres
     username: postgres

@@ -77,7 +77,7 @@ public class TimelineFeedServiceImpl implements TimelineFeedService {
 
     /**
      * get his friend moment cache
-     * 获取好友的朋友圈缓存
+     * 获取自己以及好友的朋友圈缓存
      *
      * @param userId user id
      * @return {@link List}<{@link RScoredSortedSet}<{@link Object}>>
