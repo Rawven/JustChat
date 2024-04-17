@@ -3,6 +3,7 @@ package www.raven.jc.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
@@ -24,7 +25,6 @@ import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MessageUtil;
 import www.raven.jc.util.RequestUtil;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -70,7 +70,7 @@ public class FriendServiceImpl implements FriendService {
         //获取好友的最后一条消息id
         List<String> idsMsg = friendChats.stream().map(FriendChat::getLastMsgId).collect(Collectors.toList());
         //获取好友的最后一条消息
-        List<Message> messages = idsMsg.isEmpty()?new ArrayList<>():messageDAO.getBaseMapper().selectList(new QueryWrapper<Message>().in("id", idsMsg));
+        List<Message> messages = idsMsg.isEmpty() ? new ArrayList<>() : messageDAO.getBaseMapper().selectList(new QueryWrapper<Message>().in("id", idsMsg));
 
 
         //将好友id和好友的最后一条消息id对应起来
@@ -100,7 +100,7 @@ public class FriendServiceImpl implements FriendService {
         Map<Integer, UserInfoDTO> map = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
         return messagePage.getRecords().stream().map(message -> {
             UserInfoDTO user = map.get(message.getSenderId());
-            return new MessageVO(message,user);
+            return new MessageVO(message, user);
         }).collect(Collectors.toList());
     }
 
@@ -108,7 +108,8 @@ public class FriendServiceImpl implements FriendService {
     public List<MessageVO> getLatestFriendMsg(LatestFriendMsgModel model) {
         int userId = RequestUtil.getUserId(request);
         RScoredSortedSet<Message> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + userId);
-        Collection<Message> messages = scoredSortedSet.readAll();
+        Collection<Message> messages = scoredSortedSet.readAll().stream().filter(message ->
+                Objects.equals(message.getSenderId(), model.getFriendId())).toList();
         //获取所有id=roomId的消息
         RpcResult<List<UserInfoDTO>> batchInfo = userRpcService.getBatchInfo(List.of(model.getFriendId(), userId));
         Map<Integer, UserInfoDTO> map = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
@@ -116,7 +117,7 @@ public class FriendServiceImpl implements FriendService {
         for (Message message : messages) {
             if (Objects.equals(message.getReceiverId(), String.valueOf(model.getFriendId()))) {
                 UserInfoDTO user = map.get(message.getSenderId());
-                collect.add(new MessageVO(message,user));
+                collect.add(new MessageVO(message, user));
             }
         }
         //删除已经获取的离线消息

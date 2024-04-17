@@ -189,7 +189,8 @@ public class RoomServiceImpl implements RoomService {
     public List<MessageVO> getLatestGroupMsg(LatestGroupMsgModel model) {
         int userId = RequestUtil.getUserId(request);
         RScoredSortedSet<Message> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + userId);
-        Collection<Message> messages = scoredSortedSet.readAll();
+        Collection<Message> messages = scoredSortedSet.readAll().stream().filter(
+                message -> message.getReceiverId().equals(model.getRoomId().toString())).toList();
         List<Integer> ids = messages.stream().map(Message::getSenderId).toList();
         RpcResult<List<UserInfoDTO>> batchInfo = userRpcService.getBatchInfo(ids);
         Map<Integer, UserInfoDTO> map = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));

@@ -138,7 +138,7 @@ public class SocialServiceImpl implements SocialService {
         Map<Integer, UserInfoDTO> mapInfo = friendInfos1.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, v -> v));
         List<MomentVO> momentVos = new ArrayList<>();
         //存在时间线
-        if (scoredSortedSet.isExists()) {
+        if (scoredSortedSet.isExists() && scoredSortedSet.size() > page * size) {
             // 获取有序集合的所有元素
             long l = Math.multiplyFull(page, size);
             List<String> pageIds = scoredSortedSet.stream().skip(l - 10).limit(size).toList();
@@ -155,7 +155,7 @@ public class SocialServiceImpl implements SocialService {
             loadMomentAll(momentPage.getRecords(), momentVos, mapInfo);
 
             // 对无时间线的用户进行时间线构建
-            timelineFeedService.buildMomentTimelineFeeding(userIds, userId);
+            timelineFeedService.buildMomentTimelineFeeding((long) page * size, userIds, userId);
         }
         return momentVos;
     }

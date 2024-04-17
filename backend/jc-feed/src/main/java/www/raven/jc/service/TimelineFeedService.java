@@ -19,7 +19,7 @@ public interface TimelineFeedService {
      * @param userId user id
      */
     @Async
-    void buildMomentTimelineFeeding(List<Integer> userIds, Integer userId);
+    void buildMomentTimelineFeeding(Long capacity, List<Integer> userIds, Integer userId);
 
     /**
      * handle moment event
