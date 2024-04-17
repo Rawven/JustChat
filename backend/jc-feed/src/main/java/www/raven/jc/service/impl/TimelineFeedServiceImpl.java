@@ -1,6 +1,10 @@
 package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
+import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
@@ -12,13 +16,8 @@ import www.raven.jc.constant.TimelineFeedConstant;
 import www.raven.jc.dao.MomentDAO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.Moment;
-import www.raven.jc.entity.vo.MomentVO;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.TimelineFeedService;
-
-import java.time.Duration;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static www.raven.jc.constant.TimelineFeedConstant.PREFIX;
 
@@ -46,19 +45,21 @@ public class TimelineFeedServiceImpl implements TimelineFeedService {
      * add moment timeline feeding
      * 存储用户时间线（仅id）
      *
-     * @param collect collect
      * @param userId  user id
+     * @param userIds user ids
      */
     @Override
-    public void addMomentTimelineFeeding(List<MomentVO> collect, Integer userId) {
+    public void buildMomentTimelineFeeding(Long capacity, List<Integer> userIds,
+        Integer userId) {
+
+        List<Moment> moments = momentDAO.getBaseMapper().selectList(
+            momentDAO.lambdaQuery().in(Moment::getUserId, userIds).orderByDesc(Moment::getTimestamp).
+                last("limit " + calculateNeedCapacity(capacity)
+                ));
         RScoredSortedSet<String> scoredSortedSet = redissonClient.getScoredSortedSet(TimelineFeedConstant.PREFIX + userId);
         scoredSortedSet.expire(Duration.ofDays(setProperty.expireDays));
-        collect.forEach(momentVO -> {
-            if (scoredSortedSet.size() >= setProperty.maxSize) {
-                scoredSortedSet.pollFirst(); // 删除时间最晚的元素
-            }
-            scoredSortedSet.add(momentVO.getTimestamp(), momentVO.getMomentId());
-        });
+        Map<String, Double> scores = moments.stream().collect(Collectors.toMap(Moment::getId, moment -> moment.getTimestamp().doubleValue()));
+        scoredSortedSet.addAll(scores);
     }
 
     @Override
@@ -72,6 +73,10 @@ public class TimelineFeedServiceImpl implements TimelineFeedService {
         });
     }
 
+    private Long calculateNeedCapacity(Long capacity) {
+        return (long) Math.ceil(capacity * 1.0 / setProperty.maxSize) * setProperty.maxSize;
+    }
+
     /**
      * get his friend moment cache
      * 获取自己以及好友的朋友圈缓存
@@ -79,7 +84,8 @@ public class TimelineFeedServiceImpl implements TimelineFeedService {
      * @param userId user id
      * @return {@link List}<{@link RScoredSortedSet}<{@link Object}>>
      */
-    private List<RScoredSortedSet<Object>> getHisFriendMomentCache(Integer userId) {
+    private List<RScoredSortedSet<Object>> getHisFriendMomentCache(
+        Integer userId) {
         RpcResult<List<UserInfoDTO>> friendAndMeInfos = userRpcService.getFriendAndMeInfos(userId);
         Assert.isTrue(friendAndMeInfos.isSuccess(), "获取好友信息失败");
         List<Integer> collect = friendAndMeInfos.getData().stream().map(UserInfoDTO::getUserId).toList();

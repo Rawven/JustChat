@@ -1,5 +1,6 @@
 package www.raven.jc.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,9 +15,7 @@ import www.raven.jc.entity.model.MomentModel;
 import www.raven.jc.entity.vo.MomentVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.SocialService;
-import www.raven.jc.util.RequestUtil;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -34,8 +33,8 @@ public class SocialController {
     private HttpServletRequest request;
 
     @GetMapping("/queryMoment/{page}/{size}")
-    public CommonResult<List<MomentVO>> queryMoment( @PathVariable("page") int page, @PathVariable("size") int size) {
-        return CommonResult.operateSuccess("查询成功", socialService.queryMoment(page,size));
+    public CommonResult<List<MomentVO>> queryMoment(@PathVariable("page") int page, @PathVariable("size") int size) {
+        return CommonResult.operateSuccess("查询成功", socialService.queryMoment(page, size));
     }
 
     @PostMapping("/releaseMoment")

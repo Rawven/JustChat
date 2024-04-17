@@ -53,7 +53,7 @@ server:
   port: 8071
 redis:
   sorted-set:
-    max-size: 15
+    max-size: 50
     expire-days: 3
 jwt:
   key: 爱你老妈

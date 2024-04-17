@@ -188,20 +188,20 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public List<MessageVO> getLatestGroupMsg(LatestGroupMsgModel model) {
         int userId = RequestUtil.getUserId(request);
-        RScoredSortedSet<MessageVO> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + userId);
-        Collection<MessageVO> messages = scoredSortedSet.readAll();
+        RScoredSortedSet<Message> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + userId);
+        Collection<Message> messages = scoredSortedSet.readAll().stream().filter(
+                message -> message.getReceiverId().equals(model.getRoomId().toString())).toList();
+        List<Integer> ids = messages.stream().map(Message::getSenderId).toList();
+        RpcResult<List<UserInfoDTO>> batchInfo = userRpcService.getBatchInfo(ids);
+        Map<Integer, UserInfoDTO> map = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
         //获取所有id=roomId的消息
-        List<Message> collect = new ArrayList<>();
-        List<MessageVO> messageVOS = new ArrayList<>();
-//        for (Message message : messages) {
-//            if (message.getBelongId().equals(model.getRoomId())) {
-//                collect.add(message);
-//                //删除已经获取的离线消息
-//                scoredSortedSet.remove(message);
-//            }
-//        }
-        //TODO
-        return messageVOS;
+        List<MessageVO> messageVos = new ArrayList<>();
+        for (Message message : messages) {
+            UserInfoDTO user = map.get(message.getSenderId());
+            messageVos.add(new MessageVO(message, user));
+        }
+        scoredSortedSet.removeAll(messages);
+        return messageVos;
 
     }
 
