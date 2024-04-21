@@ -75,8 +75,10 @@ public class MessageServiceImpl implements MessageService {
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Async
     @Override
-    public void saveRoomMsg(UserInfoDTO user, MessageDTO message,
+    public void saveRoomMsg(MessageDTO message,
         Integer roomId) {
+
+        UserInfoDTO user = userRpcService.getSingleInfo(message.getUserInfo().getUserId()).getData();
         long timeStamp = message.getTime();
         String text = message.getText();
         Message realMsg = new Message()
@@ -105,8 +107,10 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public void saveFriendMsg(MessageDTO message, UserInfoDTO user,
+    public void saveFriendMsg(MessageDTO message,
         Integer friendId) {
+
+        UserInfoDTO user = userRpcService.getSingleInfo(message.getUserInfo().getUserId()).getData();
         String fixId = MessageUtil.concatenateIds(user.getUserId(), friendId);
         Message realMsg = new Message().setContent(message.getText())
             .setTimestamp(new Date(message.getTime()))
