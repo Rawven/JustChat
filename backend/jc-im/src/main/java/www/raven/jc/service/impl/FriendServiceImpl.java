@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import www.raven.jc.api.UserRpcService;
 import www.raven.jc.dao.FriendChatDAO;
@@ -44,8 +43,6 @@ public class FriendServiceImpl implements FriendService {
     private MessageDAO messageDAO;
     @Resource
     private UserRpcService userRpcService;
-    @Resource
-    private RedissonClient redissonClient;
 
     @Override
     public List<UserFriendVO> initUserFriendPage() {

@@ -13,9 +13,11 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import www.raven.jc.api.UserRpcService;
+import www.raven.jc.config.ImProperty;
+import www.raven.jc.constant.MessageConstant;
 import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.util.JsonUtil;
@@ -37,17 +39,19 @@ public class WebsocketService {
      */
     public static final Map<Integer, Session> SESSION_POOL = new HashMap<>();
     /**
-     * 用来存群聊关系
-     */
-    public static final Map<Integer, Map<Integer, Integer>> GROUP_SESSION_POOL = new HashMap<>();
-    /**
      * concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
      * 虽然@Component默认是单例模式的，但springboot还是会为每个websocket连接初始化一个bean，所以可以用一个静态set保存起来。
      */
     public static CopyOnWriteArraySet<WebsocketService> webSockets = new CopyOnWriteArraySet<>();
-    private static UserRpcService userRpcService;
+
+    private static RedissonClient redissonClient;
+
+    private static ImProperty imProperty;
+
     private static PrivateHandler privateHandler;
+
     private static RoomHandler roomHandler;
+
     public BaseHandler baseHandler;
     /**
      * user id
@@ -58,7 +62,26 @@ public class WebsocketService {
      * 与某个客户端的连接会话，需要通过它来给客户端发送数据
      **/
     protected Session session;
+
     protected long lastActivityTime = System.currentTimeMillis();
+
+    /**
+     * send one message
+     *
+     * @param message message
+     * @param id      id
+     */
+    public static void sendOneMessage(Integer id, String message) {
+        Session session = SESSION_POOL.get(id);
+        if (session != null && session.isOpen()) {
+            try {
+                log.info("-Websocket: 单点消息:{}", message);
+                session.getAsyncRemote().sendText(message);
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
+        }
+    }
 
     public static void sendBatchMessage(String message, List<Integer> ids) {
         log.info("websocket:广播消息:{}", message);
@@ -72,35 +95,6 @@ public class WebsocketService {
                 }
             }
         }
-    }
-
-    /**
-     * send one message
-     * send one message
-     *
-     * @param message message
-     * @param id      id
-     */
-    public static void sendOneMessage(Integer id, String message) {
-        Session session = SESSION_POOL.get(id);
-        if (session != null && session.isOpen()) {
-            try {
-                log.info("【websocket消息】 单点消息:{}", message);
-                session.getAsyncRemote().sendText(message);
-            } catch (Exception e) {
-                log.error(e.getMessage());
-            }
-        }
-    }
-
-    @Autowired
-    public void setPrivateHandler(PrivateHandler privateHandler) {
-        WebsocketService.privateHandler = privateHandler;
-    }
-
-    @Autowired
-    public void setRoomHandler(RoomHandler roomHandler) {
-        WebsocketService.roomHandler = roomHandler;
     }
 
     /**
@@ -123,6 +117,7 @@ public class WebsocketService {
         }
         webSockets.add(this);
         SESSION_POOL.put(this.userId, session);
+        redissonClient.getBucket("ws:" + this.userId).set(imProperty.getWsTopic());
         log.info("ws: 有新的连接,用户id为{},总数为:{}", this.userId, webSockets.size());
     }
 
@@ -132,10 +127,9 @@ public class WebsocketService {
      */
     @OnClose
     public void onClose() {
-        Integer userId1 = this.userId;
         webSockets.remove(this);
-        GROUP_SESSION_POOL.remove(userId1);
-        log.info("ws:用户id {} 连接断开，总数为:{}", userId1, webSockets.size());
+        SESSION_POOL.remove(this.userId);
+        log.info("ws:用户id {} 连接断开，总数为:{}", this.userId, webSockets.size());
     }
 
     /**
@@ -150,10 +144,10 @@ public class WebsocketService {
         lastActivityTime = System.currentTimeMillis();
         MessageDTO messageDTO = JsonUtil.jsonToObj(message, MessageDTO.class);
         switch (messageDTO.getType()) {
-            case "friend":
+            case MessageConstant.FRIEND:
                 setBaseHandler(privateHandler);
                 break;
-            case "room":
+            case MessageConstant.ROOM:
                 setBaseHandler(roomHandler);
                 break;
             default:
@@ -170,7 +164,7 @@ public class WebsocketService {
      */
     @OnError
     public void onError(Session session, Throwable error) {
-        GROUP_SESSION_POOL.remove(this.userId);
+        SESSION_POOL.remove(this.userId);
         log.error("--Websocket:内部错误");
         log.error("Stack trace: {}", (Object) error.getStackTrace());
     }
@@ -182,7 +176,7 @@ public class WebsocketService {
      * @param message message
      */
     public void sendAllMessage(String message) {
-        log.info("【websocket消息】广播消息:{}", message);
+        log.info("--Websocket: 广播消息:{}", message);
         for (WebsocketService handler : webSockets) {
             if (handler.session.isOpen()) {
                 handler.session.getAsyncRemote().sendText(message);
@@ -198,5 +192,25 @@ public class WebsocketService {
     @Override
     public boolean equals(Object obj) {
         return super.equals(obj);
+    }
+
+    @Autowired
+    public void setPrivateHandler(PrivateHandler privateHandler) {
+        WebsocketService.privateHandler = privateHandler;
+    }
+
+    @Autowired
+    public void setRoomHandler(RoomHandler roomHandler) {
+        WebsocketService.roomHandler = roomHandler;
+    }
+
+    @Autowired
+    public void setRedissonClient(RedissonClient redissonClient) {
+        WebsocketService.redissonClient = redissonClient;
+    }
+
+    @Autowired
+    public void setImProperty(ImProperty imProperty) {
+        WebsocketService.imProperty = imProperty;
     }
 }

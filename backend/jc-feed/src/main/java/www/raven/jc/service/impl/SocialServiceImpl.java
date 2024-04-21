@@ -19,6 +19,7 @@ import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import www.raven.jc.api.UserRpcService;
 import www.raven.jc.constant.SocialUserMqConstant;
@@ -72,6 +73,8 @@ public class SocialServiceImpl implements SocialService {
     private RocketMQTemplate rocketMQTemplate;
     @Autowired
     private TimelineFeedService timelineFeedService;
+    @Value("${mq.out_topic}")
+    private String outTopic;
 
     @Override
     public void releaseMoment(MomentModel model) {
@@ -189,7 +192,7 @@ public class SocialServiceImpl implements SocialService {
 
     private void handleEvent(String momentId, Integer userId, String msg,
         String tag) {
-        MqUtil.sendMsg(rocketMQTemplate, tag, MqUtil.createMsg(
+        MqUtil.sendMsg(rocketMQTemplate, tag, outTopic, MqUtil.createMsg(
             JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(momentId).setUserId(userId).setMsg(msg))));
     }
 }

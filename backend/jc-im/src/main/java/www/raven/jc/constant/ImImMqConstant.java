@@ -10,4 +10,6 @@ public class ImImMqConstant {
     public static final String TAGS_SAVE_HISTORY_MSG = "SAVE_HISTORY_MSG";
 
     public static final String TAGS_CHAT_ROOM_APPLY = "ROOM_APPLY";
+
+    public static final String TAGS_SEND_MESSAGE = "SEND_MESSAGE";
 }
