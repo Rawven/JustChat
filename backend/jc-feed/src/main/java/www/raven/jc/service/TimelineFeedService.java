@@ -15,7 +15,9 @@ public interface TimelineFeedService {
     /**
      * add moment cache
      *
-     * @param userId user id
+     * @param userId   user id
+     * @param capacity capacity
+     * @param userIds  user ids
      */
     @Async
     void buildMomentTimelineFeeding(Long capacity, List<Integer> userIds,

@@ -19,6 +19,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.api.UserRpcService;
+import www.raven.jc.config.ImProperty;
 import www.raven.jc.constant.ApplyStatusConstant;
 import www.raven.jc.constant.ImImMqConstant;
 import www.raven.jc.constant.MessageConstant;
@@ -68,6 +69,8 @@ public class MessageServiceImpl implements MessageService {
     private RedissonClient redissonClient;
     @Autowired
     private HttpServletRequest request;
+    @Autowired
+    private ImProperty imProperty;
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Async
@@ -98,7 +101,7 @@ public class MessageServiceImpl implements MessageService {
             }
         );
         //异步入历史消息数据库
-        MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_SAVE_HISTORY_MSG, MqUtil.createMsg(JsonUtil.objToJson(new SaveMsgEvent().setMessage(realMsg).setType("room"))));
+        MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_SAVE_HISTORY_MSG, imProperty.getInTopic(), MqUtil.createMsg(JsonUtil.objToJson(new SaveMsgEvent().setMessage(realMsg).setType("room"))));
     }
 
     @Override
@@ -116,7 +119,7 @@ public class MessageServiceImpl implements MessageService {
             scoredSortedSet.add(message.getTime(), realMsg);
         }
         //异步入历史消息库
-        MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_SAVE_HISTORY_MSG, MqUtil.createMsg(JsonUtil.objToJson(new SaveMsgEvent().setMessage(realMsg).setType("friend"))));
+        MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_SAVE_HISTORY_MSG, imProperty.getInTopic(), MqUtil.createMsg(JsonUtil.objToJson(new SaveMsgEvent().setMessage(realMsg).setType("friend"))));
     }
 
     @Override
@@ -143,7 +146,7 @@ public class MessageServiceImpl implements MessageService {
         Room room = roomDAO.getBaseMapper().selectById(roomId);
         Integer founderId = room.getFounderId();
         //通知user模块 插入一条申请记录
-        MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_CHAT_ROOM_APPLY, MqUtil.createMsg(JsonUtil.objToJson(new RoomApplyEvent(userId, founderId, roomId))));
+        MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_CHAT_ROOM_APPLY, imProperty.getInTopic(), MqUtil.createMsg(JsonUtil.objToJson(new RoomApplyEvent(userId, founderId, roomId))));
     }
 
     @Override

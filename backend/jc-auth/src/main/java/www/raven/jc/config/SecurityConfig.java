@@ -9,6 +9,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * security config
+ *
+ * @author 刘家辉
+ * @date 2024/04/21
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {

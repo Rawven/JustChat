@@ -56,12 +56,12 @@ public class FriendServiceImpl implements FriendService {
         Friend friend1 = new Friend().setUserId((long) friendId).setFriendId((long) userId);
         boolean b = friendDAO.saveBatch(List.of(friend, friend1));
         Assert.isTrue(b, "成为好友失败");
-        MqUtil.sendMsg(rocketMQTemplate, ImUserMqConstant.TAGS_DELETE_NOTICE, MqUtil.createMsg(JsonUtil.objToJson(new DeleteNoticeEvent(noticeId))));
+        MqUtil.sendMsg(rocketMQTemplate, ImUserMqConstant.TAGS_DELETE_NOTICE, "JustChat", MqUtil.createMsg(JsonUtil.objToJson(new DeleteNoticeEvent(noticeId))));
     }
 
     @Override
     public void refuseApplyFromFriend(int noticeId) {
-        MqUtil.sendMsg(rocketMQTemplate, ImUserMqConstant.TAGS_DELETE_NOTICE, MqUtil.createMsg(JsonUtil.objToJson(new DeleteNoticeEvent(noticeId))));
+        MqUtil.sendMsg(rocketMQTemplate, ImUserMqConstant.TAGS_DELETE_NOTICE, "JustChat", MqUtil.createMsg(JsonUtil.objToJson(new DeleteNoticeEvent(noticeId))));
     }
 
     @Override

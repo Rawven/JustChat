@@ -189,7 +189,7 @@ public class SocialServiceImpl implements SocialService {
 
     private void handleEvent(String momentId, Integer userId, String msg,
         String tag) {
-        MqUtil.sendMsg(rocketMQTemplate, tag, MqUtil.createMsg(
+        MqUtil.sendMsg(rocketMQTemplate, tag, "JustChat", MqUtil.createMsg(
             JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(momentId).setUserId(userId).setMsg(msg))));
     }
 }

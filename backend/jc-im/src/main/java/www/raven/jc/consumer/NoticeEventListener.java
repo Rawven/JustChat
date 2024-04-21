@@ -46,7 +46,7 @@ import www.raven.jc.ws.WebsocketService;
  */
 @Component
 @Slf4j
-@RocketMQMessageListener(consumerGroup = "im-consumer-group", topic = "JustChat", selectorExpression = ImImMqConstant.TAGS_SAVE_HISTORY_MSG)
+@RocketMQMessageListener(consumerGroup = "im-consumer-group", topic = "${mq.in_topic}")
 public class NoticeEventListener implements RocketMQListener<MessageExt> {
     @Autowired
     private RedissonClient redissonClient;

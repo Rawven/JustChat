@@ -158,7 +158,7 @@ export default {
       } else if (data.type === "RECORD_MOMENT_FRIEND" || data.type === "RECORD_MOMENT") {
         this.momentNoticeIsNew = true;
         ElMessage.success('您有新的朋友圈消息');
-      } else if(data.type === "CHAT"){
+      } else if(data.type === "room"){
         const msg = {
           time: Date.now(),
           text: data.text,

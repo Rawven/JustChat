@@ -1,12 +1,11 @@
 package www.raven.jc.config;
 
 import jakarta.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * security property

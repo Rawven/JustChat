@@ -53,6 +53,11 @@ server:
 jwt:
   key: 爱你老妈
   expire: 604800000
+mq:
+  ws_topic: ws_1
+  in_topic: JustChat
+ws:
+  id: ws_1
 logging:
   level:
     www.raven.jc.api.*: DEBUG

@@ -25,9 +25,10 @@ import static www.raven.jc.constant.MqConstant.HEAD;
 @Slf4j
 public class MqUtil {
 
-    public static void sendMsg(RocketMQTemplate rocketMQTemplate, String tag,
+    public static void sendMsg(RocketMQTemplate rocketMQTemplate, String topic,
+        String tag,
         Message<String> message) {
-        rocketMQTemplate.asyncSend("JustChat:" + tag, message, new SendCallback() {
+        rocketMQTemplate.asyncSend(topic + ":" + tag, message, new SendCallback() {
             @Override
             public void onSuccess(
                 org.apache.rocketmq.client.producer.SendResult sendResult) {

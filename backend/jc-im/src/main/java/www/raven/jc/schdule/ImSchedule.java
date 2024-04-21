@@ -20,10 +20,14 @@ import www.raven.jc.ws.WebsocketService;
 @Component
 public class ImSchedule {
 
-    //默认WebSocket连接过期时间为1小时
+    /**
+     * 默认WebSocket连接过期时间为1小时
+     */
     private static final long WS_EXPIRATION_TIME = 60 * 60 * 1000;
 
-    //默认离线消息过期时间为7天
+    /**
+     * 默认离线消息过期时间为7天
+     */
     private static final long OFFLINE_MESSAGE_EXPIRATION_TIME = 7 * 24 * 60 * 60 * 1000;
 
     @Autowired
