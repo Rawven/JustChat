@@ -46,7 +46,7 @@ import www.raven.jc.ws.WebsocketService;
  */
 @Component
 @Slf4j
-@RocketMQMessageListener(consumerGroup = "im-consumer-group", topic = "${mq.in_topic}")
+@RocketMQMessageListener(consumerGroup = "${mq.in_consumer_group}", topic = "${mq.in_topic}")
 public class NoticeEventListener implements RocketMQListener<MessageExt> {
     @Autowired
     private RedissonClient redissonClient;
@@ -63,11 +63,11 @@ public class NoticeEventListener implements RocketMQListener<MessageExt> {
 
     @Override
     public void onMessage(MessageExt messageExt) {
-        log.info("--RocketMq receive event:{}", messageExt.toString());
         if (MqUtil.checkMsgIsvalid(messageExt, redissonClient)) {
             return;
         }
         byte[] body = messageExt.getBody();
+
         String message = new String(body, StandardCharsets.UTF_8);
         log.info("--RocketMq receive event:{}", message);
 

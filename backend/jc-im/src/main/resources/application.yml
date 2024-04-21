@@ -55,9 +55,9 @@ jwt:
   expire: 604800000
 mq:
   ws_topic: ws_1
+  ws_consumer_group: ws_group
   in_topic: JustChat
-ws:
-  id: ws_1
+  in_consumer_group: in_group
 logging:
   level:
     www.raven.jc.api.*: DEBUG

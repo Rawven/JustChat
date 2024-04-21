@@ -40,7 +40,6 @@ spring:
   application:
     name: JC-User
   cloud:
-
     nacos:
       discovery:
         server-addr: 10.21.32.154:8848
@@ -48,6 +47,8 @@ spring:
     url: jdbc:postgresql://10.21.32.192:5432/postgres
     username: postgres
     password: 123456
+mq:
+  out_topic: JustChat
 server:
   port: 8080
 jwt:

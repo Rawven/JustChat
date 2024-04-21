@@ -25,26 +25,26 @@ import www.raven.jc.ws.RoomHandler;
  */
 @Component
 @Slf4j
-@RocketMQMessageListener(consumerGroup = "im-group", topic = "${mq.ws_topic}", selectorExpression = ImImMqConstant.TAGS_SEND_MESSAGE)
+@RocketMQMessageListener(consumerGroup = "${mq.ws_consumer_group}", topic = "${mq.ws_topic}", selectorExpression = ImImMqConstant.TAGS_SEND_MESSAGE)
 public class WsListener implements RocketMQListener<MessageExt> {
     @Autowired
     private RedissonClient redissonClient;
 
     @Override
     public void onMessage(MessageExt messageExt) {
-        log.info("--RocketMq receive event:{}", messageExt.toString());
         if (MqUtil.checkMsgIsvalid(messageExt, redissonClient)) {
             return;
         }
         byte[] body = messageExt.getBody();
         String message = new String(body, StandardCharsets.UTF_8);
         log.info("--RocketMq receive event:{}", message);
-
         MessageDTO dto = JsonUtil.jsonToObj(message, MessageDTO.class);
         if (Objects.equals(dto.getType(), MessageConstant.FRIEND)) {
             PrivateHandler.sendFriendMessage(dto);
         } else if (Objects.equals(dto.getType(), MessageConstant.ROOM)) {
             RoomHandler.sendRoomMessage(dto);
+        } else {
+            log.info("--RocketMq 非法的消息，不处理");
         }
         MqUtil.protectMsg(messageExt, redissonClient);
     }

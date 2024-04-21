@@ -98,7 +98,7 @@ public class NoticeServiceImpl implements NoticeService {
         if (friendBucket.isExists()) {
             WebsocketService.sendOneMessage(friend.getUserId(), JsonUtil.objToJson(map));
         } else {
-            log.info("--sse receiver不在线");
+            log.info("receiver不在线");
         }
     }
 
