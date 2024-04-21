@@ -1,5 +1,9 @@
 package www.raven.jc.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -14,11 +18,6 @@ import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.UserService;
 import www.raven.jc.util.RequestUtil;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import java.util.List;
 
 /**
  * info controller
@@ -43,7 +42,8 @@ public class UserController {
      * @return {@link CommonResult}<{@link Boolean}>
      */
     @PostMapping("/checkUserExit")
-    CommonResult<Boolean> checkUserExit(@RequestBody @NotBlank String username) {
+    CommonResult<Boolean> checkUserExit(
+        @RequestBody @NotBlank String username) {
         return CommonResult.operateSuccess("查找成功", userService.checkUserExit(username));
     }
 
@@ -60,21 +60,24 @@ public class UserController {
     }
 
     @PostMapping("/setProfile")
-    public CommonResult<Void> setProfile(@RequestParam("profile") @NotNull String profile) {
+    public CommonResult<Void> setProfile(
+        @RequestParam("profile") @NotNull String profile) {
         int userId = RequestUtil.getUserId(request);
         userService.updateByColumn(userId, "profile", profile);
         return CommonResult.operateSuccess("设置头像成功");
     }
 
     @PostMapping("/setSignature")
-    public CommonResult<Void> setSignature(@RequestParam("signature") @NotNull String signature) {
+    public CommonResult<Void> setSignature(
+        @RequestParam("signature") @NotNull String signature) {
         int userId = RequestUtil.getUserId(request);
         userService.updateByColumn(userId, "signature", signature);
         return CommonResult.operateSuccess("设置签名成功");
     }
 
     @PostMapping("/setUsername")
-    public CommonResult<Void> setUsername(@RequestParam("username") @NotNull String username) {
+    public CommonResult<Void> setUsername(
+        @RequestParam("username") @NotNull String username) {
         int userId = RequestUtil.getUserId(request);
         userService.updateByColumn(userId, "username", username);
         return CommonResult.operateSuccess("重命名成功");
@@ -87,7 +90,8 @@ public class UserController {
     }
 
     @PostMapping("/getSingleInfo")
-    public CommonResult<UserInfoDTO> getSingleInfo(@RequestBody @NotNull Integer userId) {
+    public CommonResult<UserInfoDTO> getSingleInfo(
+        @RequestBody @NotNull Integer userId) {
         return CommonResult.operateSuccess("查找成功", userService.querySingleInfo(userId));
     }
 
@@ -96,14 +100,15 @@ public class UserController {
         return CommonResult.operateSuccess("查找成功", userService.queryAllInfo());
     }
 
-
     @PostMapping("/getBatchInfo")
-    CommonResult<List<UserInfoDTO>> getBatchInfo(@RequestBody List<Integer> userIds) {
+    CommonResult<List<UserInfoDTO>> getBatchInfo(
+        @RequestBody List<Integer> userIds) {
         return CommonResult.operateSuccess("查找成功", userService.queryBatchInfo(userIds));
     }
 
     @PostMapping("/getRelatedInfoList")
-    public CommonResult<List<UserInfoDTO>> getRelatedInfoList(@RequestBody @Validated QueryUserInfoDTO userInfoDTO) {
+    public CommonResult<List<UserInfoDTO>> getRelatedInfoList(
+        @RequestBody @Validated QueryUserInfoDTO userInfoDTO) {
         return CommonResult.operateSuccess("查找成功", userService.queryLikedInfoList(userInfoDTO.getColumn(), userInfoDTO.getText()));
     }
 }

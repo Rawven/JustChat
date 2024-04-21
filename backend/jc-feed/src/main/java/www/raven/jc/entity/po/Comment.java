@@ -16,7 +16,7 @@ import www.raven.jc.model.CommonSerializable;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Accessors(chain = true)
-@TableName(value = "comment",schema ="public")
+@TableName(value = "comment", schema = "public")
 public class Comment extends CommonSerializable {
     @TableId
     private String id;

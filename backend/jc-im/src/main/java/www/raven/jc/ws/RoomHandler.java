@@ -1,6 +1,7 @@
 package www.raven.jc.ws;
 
 import jakarta.websocket.Session;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -8,10 +9,8 @@ import www.raven.jc.api.UserRpcService;
 import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
-import www.raven.jc.service.ChatService;
+import www.raven.jc.service.MessageService;
 import www.raven.jc.util.JsonUtil;
-
-import java.util.Map;
 
 /**
  * web socket service
@@ -23,7 +22,7 @@ import java.util.Map;
 @Component
 public class RoomHandler implements BaseHandler {
     @Autowired
-    private ChatService chatService;
+    private MessageService chatService;
 
     @Autowired
     private UserRpcService userRpcService;

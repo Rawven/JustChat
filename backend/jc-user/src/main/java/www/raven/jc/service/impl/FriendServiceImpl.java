@@ -2,6 +2,10 @@ package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +21,6 @@ import www.raven.jc.service.FriendService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 import www.raven.jc.util.RequestUtil;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * friend service impl
@@ -41,12 +40,11 @@ public class FriendServiceImpl implements FriendService {
     @Autowired
     private RocketMQTemplate rocketMQTemplate;
 
-
     @Override
     public List<UserInfoDTO> getFriendInfos(int userId) {
         return userDAO.getBaseMapper().selectUserByFriendId(userId).stream().map(
-                user -> new UserInfoDTO()
-                        .setUserId(user.getId()).setUsername(user.getUsername()).setProfile(user.getProfile())
+            user -> new UserInfoDTO()
+                .setUserId(user.getId()).setUsername(user.getUsername()).setProfile(user.getProfile())
         ).collect(Collectors.toList());
     }
 
@@ -69,16 +67,16 @@ public class FriendServiceImpl implements FriendService {
     @Override
     public List<UserInfoDTO> getFriendAndMeInfos(int userId) {
         Collection<UserInfoDTO> values = userDAO.getBaseMapper().selectUsersAndFriends(userId).stream()
-                .map(user -> new UserInfoDTO()
-                        .setUserId(user.getId())
-                        .setUsername(user.getUsername())
-                        .setProfile(user.getProfile()))
-                .collect(Collectors.toMap(
-                        UserInfoDTO::getUserId,
-                        Function.identity(),
-                        (k, v) -> v
-                ))
-                .values();
+            .map(user -> new UserInfoDTO()
+                .setUserId(user.getId())
+                .setUsername(user.getUsername())
+                .setProfile(user.getProfile()))
+            .collect(Collectors.toMap(
+                UserInfoDTO::getUserId,
+                Function.identity(),
+                (k, v) -> v
+            ))
+            .values();
         return List.copyOf(values);
     }
 

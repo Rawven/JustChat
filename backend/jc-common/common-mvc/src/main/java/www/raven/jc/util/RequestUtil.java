@@ -1,9 +1,7 @@
 package www.raven.jc.util;
 
-import www.raven.jc.constant.JwtConstant;
-
 import jakarta.servlet.http.HttpServletRequest;
-
+import www.raven.jc.constant.JwtConstant;
 
 /**
  * request util

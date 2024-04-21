@@ -22,7 +22,8 @@ public class UploadController {
     private IpfsClient ipfsClient;
 
     @PostMapping("/upload")
-    public CommonResult<String> upload(@RequestPart("file") MultipartFile profile) {
+    public CommonResult<String> upload(
+        @RequestPart("file") MultipartFile profile) {
         String upload = ipfsClient.upload(profile);
         return CommonResult.operateSuccess("上传成功", upload);
     }

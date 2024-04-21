@@ -1,5 +1,6 @@
 package www.raven.jc.handler;
 
+import java.nio.charset.Charset;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.HttpStatus;
@@ -11,8 +12,6 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.util.JsonUtil;
-
-import java.nio.charset.Charset;
 
 /**
  * default authentication entry point
@@ -26,14 +25,15 @@ import java.nio.charset.Charset;
 public class DefaultAuthenticationEntryPoint implements ServerAuthenticationEntryPoint {
 
     @Override
-    public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException ex) {
+    public Mono<Void> commence(ServerWebExchange exchange,
+        AuthenticationException ex) {
         return Mono.defer(() -> Mono.just(exchange.getResponse())).flatMap(response -> {
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
             response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
             DataBufferFactory dataBufferFactory = response.bufferFactory();
             String result = JsonUtil.objToJson(CommonResult.operateFailure("未认证"));
             DataBuffer buffer = dataBufferFactory.wrap(result.getBytes(
-                    Charset.defaultCharset()));
+                Charset.defaultCharset()));
             return response.writeWith(Mono.just(buffer));
         });
     }

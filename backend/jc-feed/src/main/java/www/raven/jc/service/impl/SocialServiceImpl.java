@@ -5,6 +5,15 @@ import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.redisson.api.RScoredSortedSet;
@@ -34,16 +43,6 @@ import www.raven.jc.service.TimelineFeedService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 import www.raven.jc.util.RequestUtil;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 /**
  * social service impl
@@ -78,15 +77,15 @@ public class SocialServiceImpl implements SocialService {
     public void releaseMoment(MomentModel model) {
         int userId = RequestUtil.getUserId(request);
         Moment moment = new Moment()
-                .setUserId(userId)
-                .setImg(model.getImg())
-                .setContent(model.getText())
-                .setTimestamp(System.currentTimeMillis());
+            .setUserId(userId)
+            .setImg(model.getImg())
+            .setContent(model.getText())
+            .setTimestamp(System.currentTimeMillis());
         int insert = momentDAO.getBaseMapper().insert(moment);
         Assert.isTrue(insert > 0, "发布失败");
         timelineFeedService.insertMomentFeed(userId, moment);
         handleEvent(moment.getId(), userId, "发布了新的朋友圈",
-                SocialUserMqConstant.TAGS_MOMENT_NOTICE_MOMENT_FRIEND);
+            SocialUserMqConstant.TAGS_MOMENT_NOTICE_MOMENT_FRIEND);
     }
 
     @Override
@@ -102,17 +101,17 @@ public class SocialServiceImpl implements SocialService {
         int insert = likeDAO.getBaseMapper().insert(like);
         Assert.isTrue(insert > 0, "点赞失败");
         handleEvent(likeModel.getMomentId(), likeModel.getMomentUserId(), "有人点赞了你的朋友圈",
-                SocialUserMqConstant.TAGS_MOMENT_INTERNAL_LIKE_RECORD);
+            SocialUserMqConstant.TAGS_MOMENT_INTERNAL_LIKE_RECORD);
     }
 
     @Override
     public void commentMoment(CommentModel model) {
         int userId = RequestUtil.getUserId(request);
         Comment comment = new Comment().setId(IdUtil.getSnowflakeNextIdStr())
-                .setTimestamp(System.currentTimeMillis())
-                .setUserId(userId)
-                .setContent(model.getText())
-                .setMomentId(model.getMomentId());
+            .setTimestamp(System.currentTimeMillis())
+            .setUserId(userId)
+            .setContent(model.getText())
+            .setMomentId(model.getMomentId());
         if (!Objects.equals(model.getCommentId(), NOT_REPLY)) {
             comment.setParentId(model.getCommentId());
         }
@@ -151,7 +150,7 @@ public class SocialServiceImpl implements SocialService {
             userIds.add(userId);
             // 获取指定的十条数据
             Page<Moment> momentPage = momentDAO.getBaseMapper().selectPage(
-                    new Page<>(page, size), new QueryWrapper<Moment>().in("user_id", userIds).orderByDesc("timestamp"));
+                new Page<>(page, size), new QueryWrapper<Moment>().in("user_id", userIds).orderByDesc("timestamp"));
             loadMomentAll(momentPage.getRecords(), momentVos, mapInfo);
 
             // 对无时间线的用户进行时间线构建
@@ -160,7 +159,8 @@ public class SocialServiceImpl implements SocialService {
         return momentVos;
     }
 
-    private void loadMomentAll(List<Moment> moments, List<MomentVO> momentVos, Map<Integer, UserInfoDTO> mapInfo) {
+    private void loadMomentAll(List<Moment> moments, List<MomentVO> momentVos,
+        Map<Integer, UserInfoDTO> mapInfo) {
         try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
             List<Callable<MomentVO>> tasks = moments.stream().<Callable<MomentVO>>map(moment -> () -> {
                 String id = moment.getId();
@@ -169,13 +169,13 @@ public class SocialServiceImpl implements SocialService {
                 List<CommentVO> commentVos = comments.stream().map(comment -> new CommentVO(comment, mapInfo.get(comment.getUserId()))).collect(Collectors.toList());
                 List<LikeVO> likeVos = likes.stream().map(like -> new LikeVO(like, mapInfo.get(like.getUserId()))).collect(Collectors.toList());
                 return new MomentVO()
-                        .setMomentId(id)
-                        .setLikes(likeVos)
-                        .setComments(commentVos)
-                        .setImg(moment.getImg())
-                        .setContent(moment.getContent())
-                        .setTimestamp(moment.getTimestamp())
-                        .setUserInfo(mapInfo.get(moment.getUserId()));
+                    .setMomentId(id)
+                    .setLikes(likeVos)
+                    .setComments(commentVos)
+                    .setImg(moment.getImg())
+                    .setContent(moment.getContent())
+                    .setTimestamp(moment.getTimestamp())
+                    .setUserInfo(mapInfo.get(moment.getUserId()));
             }).collect(Collectors.toList());
             List<Future<MomentVO>> futures = executor.invokeAll(tasks);
             for (Future<MomentVO> future : futures) {
@@ -187,8 +187,9 @@ public class SocialServiceImpl implements SocialService {
         }
     }
 
-    private void handleEvent(String momentId, Integer userId, String msg, String tag) {
+    private void handleEvent(String momentId, Integer userId, String msg,
+        String tag) {
         MqUtil.sendMsg(rocketMQTemplate, tag, MqUtil.createMsg(
-                JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(momentId).setUserId(userId).setMsg(msg))));
+            JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(momentId).setUserId(userId).setMsg(msg))));
     }
 }

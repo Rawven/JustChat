@@ -10,5 +10,6 @@ import java.time.Duration;
  */
 public class OfflineMessagesConstant {
     public static final String PREFIX = "offline_message_";
+    public static final String PREFIX_MATCH = "offline_message_*";
     public static final Duration EXPIRE_DAYS = Duration.ofDays(7);
 }

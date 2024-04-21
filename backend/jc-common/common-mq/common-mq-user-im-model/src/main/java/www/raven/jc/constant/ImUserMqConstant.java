@@ -14,5 +14,4 @@ public class ImUserMqConstant {
     public static final String TAGS_USER_FRIEND_APPLY = "FRIEND_APPLY";
     public static final String TAGS_DELETE_NOTICE = "NOTICE_DELETE";
 
-
 }

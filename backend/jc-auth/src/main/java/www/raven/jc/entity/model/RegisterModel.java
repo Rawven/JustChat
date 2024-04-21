@@ -1,9 +1,8 @@
 package www.raven.jc.entity.model;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.experimental.Accessors;
-
-import jakarta.validation.constraints.NotBlank;
 
 /**
  * register model

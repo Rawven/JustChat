@@ -16,7 +16,6 @@ import www.raven.jc.entity.vo.TokenVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.AuthService;
 
-
 /**
  * account controller
  *
@@ -32,17 +31,20 @@ public class AuthController {
     private JwtProperty jwtProperty;
 
     @PostMapping("/login")
-    public CommonResult<TokenVO> login(@RequestBody @Validated LoginModel loginModel) {
+    public CommonResult<TokenVO> login(
+        @RequestBody @Validated LoginModel loginModel) {
         return CommonResult.operateSuccess("登录成功", authService.login(loginModel));
     }
 
     @PostMapping("/register")
-    public CommonResult<TokenVO> register(@RequestBody @Validated RegisterModel registerModel) {
+    public CommonResult<TokenVO> register(
+        @RequestBody @Validated RegisterModel registerModel) {
         return CommonResult.operateSuccess("注册成功", authService.registerCommonRole(registerModel));
     }
 
     @GetMapping("/logout/{token}")
-    public CommonResult<Void> logout(@PathVariable("token") @NotBlank String token) {
+    public CommonResult<Void> logout(
+        @PathVariable("token") @NotBlank String token) {
         authService.logout(token);
         return CommonResult.operateSuccess("登出成功");
     }

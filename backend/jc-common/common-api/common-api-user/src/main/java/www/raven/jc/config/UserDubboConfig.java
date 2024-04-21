@@ -2,7 +2,6 @@ package www.raven.jc.config;
 
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.spring.ReferenceBean;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import www.raven.jc.api.UserRpcService;

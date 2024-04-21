@@ -1,6 +1,5 @@
 package www.raven.jc.ws;
 
-
 import jakarta.websocket.Session;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,9 +7,8 @@ import org.springframework.stereotype.Component;
 import www.raven.jc.api.UserRpcService;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
-import www.raven.jc.service.ChatService;
+import www.raven.jc.service.MessageService;
 import www.raven.jc.util.JsonUtil;
-
 
 /**
  * friend chat handler
@@ -22,11 +20,12 @@ import www.raven.jc.util.JsonUtil;
 @Component
 public class PrivateHandler implements BaseHandler {
     @Autowired
-    private ChatService chatService;
+    private MessageService chatService;
     @Autowired
     private UserRpcService userRpcService;
 
-    public static void sendFriendMessage(String message, int userId, int friendId) {
+    public static void sendFriendMessage(String message, int userId,
+        int friendId) {
         Session mySession = WebsocketService.SESSION_POOL.get(userId);
         if (mySession != null && mySession.isOpen()) {
             mySession.getAsyncRemote().sendText(message);

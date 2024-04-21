@@ -6,5 +6,5 @@ import www.raven.jc.dao.mapper.LikeMapper;
 import www.raven.jc.entity.po.Like;
 
 @Repository
-public class LikeDAO  extends ServiceImpl<LikeMapper, Like>{
+public class LikeDAO extends ServiceImpl<LikeMapper, Like> {
 }

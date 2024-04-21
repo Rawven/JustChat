@@ -26,7 +26,8 @@ public class CommonResult<T> {
         this.message = message;
     }
 
-    private CommonResult(Integer code, boolean isSuccess, String message, T data) {
+    private CommonResult(Integer code, boolean isSuccess, String message,
+        T data) {
         this.code = code;
         this.isSuccess = isSuccess;
         this.message = message;
@@ -43,36 +44,38 @@ public class CommonResult<T> {
 
     public static <T> CommonResult<T> operateSuccess(String message, T data) {
         return new CommonResult<>(
-                ResultCode.SUCCESS_CODE,
-                true,
-                message,
-                data
+            ResultCode.SUCCESS_CODE,
+            true,
+            message,
+            data
         );
     }
 
     public static <T> CommonResult<T> operateFailure(String message, T data) {
         return new CommonResult<>(
-                ResultCode.FAIL_CODE,
-                false,
-                message,
-                data
+            ResultCode.FAIL_CODE,
+            false,
+            message,
+            data
         );
     }
 
-    public static <T> CommonResult<T> operateFailure(Integer code, String message) {
+    public static <T> CommonResult<T> operateFailure(Integer code,
+        String message) {
         return new CommonResult<>(
-                code,
-                false,
-                message
+            code,
+            false,
+            message
         );
     }
 
-    public static <T> CommonResult<T> operateFailure(Integer code, String message, T data) {
+    public static <T> CommonResult<T> operateFailure(Integer code,
+        String message, T data) {
         return new CommonResult<>(
-                code,
-                false,
-                message,
-                data
+            code,
+            false,
+            message,
+            data
         );
     }
 }

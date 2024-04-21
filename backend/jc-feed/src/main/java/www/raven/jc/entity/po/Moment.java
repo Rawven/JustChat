@@ -18,7 +18,7 @@ import www.raven.jc.model.CommonSerializable;
 @Data
 @Accessors(chain = true)
 @JsonSerialize
-@TableName(value = "moment",schema ="public")
+@TableName(value = "moment", schema = "public")
 public class Moment extends CommonSerializable {
     @TableId
     private String id;

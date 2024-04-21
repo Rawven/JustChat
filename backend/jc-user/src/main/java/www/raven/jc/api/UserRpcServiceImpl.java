@@ -1,7 +1,7 @@
 package www.raven.jc.api;
 
+import java.util.List;
 import org.apache.dubbo.config.annotation.DubboService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.RoleDTO;
@@ -11,8 +11,6 @@ import www.raven.jc.dto.UserRegisterDTO;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.FriendService;
 import www.raven.jc.service.UserService;
-
-import java.util.List;
 
 /**
  * user dubbo impl
@@ -38,7 +36,8 @@ public class UserRpcServiceImpl implements UserRpcService {
     }
 
     @Override
-    public RpcResult<List<UserInfoDTO>> getRelatedInfoList(QueryUserInfoDTO userInfoDTO) {
+    public RpcResult<List<UserInfoDTO>> getRelatedInfoList(
+        QueryUserInfoDTO userInfoDTO) {
         return RpcResult.operateSuccess("查找成功", userService.queryLikedInfoList(userInfoDTO.getColumn(), userInfoDTO.getText()));
     }
 

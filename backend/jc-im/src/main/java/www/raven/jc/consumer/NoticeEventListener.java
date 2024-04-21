@@ -2,6 +2,10 @@ package www.raven.jc.consumer;
 
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
@@ -33,11 +37,6 @@ import www.raven.jc.result.RpcResult;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 import www.raven.jc.ws.WebsocketService;
-
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * message consumer
@@ -135,7 +134,6 @@ public class NoticeEventListener implements RocketMQListener<MessageExt> {
         WebsocketService.sendOneMessage(userId, JsonUtil.objToJson(map));
     }
 
-
     /**
      * 通知用户有人想要入群
      *
@@ -146,10 +144,10 @@ public class NoticeEventListener implements RocketMQListener<MessageExt> {
         log.info("--RocketMq receive join room apply event:{}", msg);
         Integer founderId = payload.getFounderId();
         Notice notice = new Notice().setUserId(founderId)
-                .setData(String.valueOf(payload.getRoomId()))
-                .setType(NoticeConstant.TYPE_JOIN_ROOM_APPLY)
-                .setTimestamp(System.currentTimeMillis())
-                .setSenderId(payload.getApplyId());
+            .setData(String.valueOf(payload.getRoomId()))
+            .setType(NoticeConstant.TYPE_JOIN_ROOM_APPLY)
+            .setTimestamp(System.currentTimeMillis())
+            .setSenderId(payload.getApplyId());
         Assert.isTrue(noticeDAO.save(notice), "保存通知失败");
         RBucket<String> founderBucket = redissonClient.getBucket(JwtConstant.TOKEN + founderId);
         if (founderBucket.isExists()) {
@@ -162,11 +160,9 @@ public class NoticeEventListener implements RocketMQListener<MessageExt> {
         }
     }
 
-
     private void eventDeleteNotice(String msg) {
         DeleteNoticeEvent event = JsonUtil.jsonToObj(msg, DeleteNoticeEvent.class);
         Assert.isTrue(noticeDAO.removeById(event.getNoticeId()), "删除失败");
     }
-
 
 }

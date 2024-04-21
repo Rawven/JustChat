@@ -4,6 +4,10 @@ import com.alibaba.cloud.commons.lang.StringUtils;
 import com.alibaba.nacos.shaded.com.google.common.base.Joiner;
 import com.alibaba.nacos.shaded.com.google.common.base.Throwables;
 import com.alibaba.nacos.shaded.com.google.common.collect.Lists;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -20,11 +24,6 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import www.raven.jc.util.JsonUtil;
-
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.ORIGINAL_RESPONSE_CONTENT_TYPE_ATTR;
 
@@ -60,7 +59,9 @@ public class ResponseFilter implements GlobalFilter, Ordered {
     }
 
     @Override
-    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+    @SuppressWarnings("all")
+    public Mono<Void> filter(ServerWebExchange exchange,
+        GatewayFilterChain chain) {
         ServerHttpResponse originalResponse = exchange.getResponse();
         DataBufferFactory bufferFactory = originalResponse.bufferFactory();
         ServerHttpResponseDecorator response = new ServerHttpResponseDecorator(originalResponse) {
@@ -96,7 +97,8 @@ public class ResponseFilter implements GlobalFilter, Ordered {
             }
 
             @Override
-            public Mono<Void> writeAndFlushWith(Publisher<? extends Publisher<? extends DataBuffer>> body) {
+            public Mono<Void> writeAndFlushWith(
+                Publisher<? extends Publisher<? extends DataBuffer>> body) {
                 return writeWith(Flux.from(body).flatMapSequential(p -> p));
             }
         };

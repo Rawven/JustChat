@@ -11,20 +11,19 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig  {
+public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-
-
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+        HttpSecurity http) throws Exception {
         http.authorizeHttpRequests((requests) -> requests
-                        .anyRequest().permitAll()
-                ).csrf(AbstractHttpConfigurer::disable);
+            .anyRequest().permitAll()
+        ).csrf(AbstractHttpConfigurer::disable);
 
         return http.build();
     }

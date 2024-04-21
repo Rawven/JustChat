@@ -1,15 +1,5 @@
 package www.raven.jc.ws;
 
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import www.raven.jc.api.UserRpcService;
-import www.raven.jc.dto.TokenDTO;
-import www.raven.jc.entity.dto.MessageDTO;
-import www.raven.jc.util.JsonUtil;
-import www.raven.jc.util.JwtUtil;
-
 import jakarta.websocket.OnClose;
 import jakarta.websocket.OnError;
 import jakarta.websocket.OnMessage;
@@ -21,6 +11,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import www.raven.jc.api.UserRpcService;
+import www.raven.jc.dto.TokenDTO;
+import www.raven.jc.entity.dto.MessageDTO;
+import www.raven.jc.util.JsonUtil;
+import www.raven.jc.util.JwtUtil;
 
 /**
  * notification handler
@@ -108,7 +107,8 @@ public class WebsocketService {
      * 链接成功调用的方法
      */
     @OnOpen
-    public void onOpen(Session session, @PathParam(value = "token") String token) {
+    public void onOpen(Session session,
+        @PathParam(value = "token") String token) {
         TokenDTO verify = JwtUtil.parseToken(token, "爱你老妈");
         session.getUserProperties().put("userDto", verify);
         this.userId = verify.getUserId();

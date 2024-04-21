@@ -1,5 +1,7 @@
 package www.raven.jc.entity.vo;
 
+import java.util.Date;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,9 +12,6 @@ import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.po.Message;
 import www.raven.jc.model.CommonSerializable;
 import www.raven.jc.util.MessageUtil;
-
-import java.util.Date;
-import java.util.Objects;
 
 /**
  * message vo
@@ -31,7 +30,7 @@ public class MessageVO extends CommonSerializable {
     private UserInfoDTO userInfoDTO;
     private Integer belongId;
 
-    public MessageVO(Message message,UserInfoDTO userInfoDTO) {
+    public MessageVO(Message message, UserInfoDTO userInfoDTO) {
         this.time = message.getTimestamp();
         this.text = message.getContent();
         this.userInfoDTO = userInfoDTO;

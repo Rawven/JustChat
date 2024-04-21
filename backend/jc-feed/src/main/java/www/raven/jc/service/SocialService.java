@@ -1,11 +1,10 @@
 package www.raven.jc.service;
 
+import java.util.List;
 import www.raven.jc.entity.model.CommentModel;
 import www.raven.jc.entity.model.LikeModel;
 import www.raven.jc.entity.model.MomentModel;
 import www.raven.jc.entity.vo.MomentVO;
-
-import java.util.List;
 
 /**
  * social service
@@ -44,6 +43,7 @@ public interface SocialService {
 
     /**
      * query moment
+     *
      * @param page page
      * @param size size
      * @return {@link List}<{@link MomentVO}>

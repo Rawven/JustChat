@@ -22,7 +22,8 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>21</java.version>
-        <spring.cloud.alibaba.version>2023.0.0.0-RC1</spring.cloud.alibaba.version>
+        <spring.cloud.alibaba.version>2023.0.0.0-RC1
+        </spring.cloud.alibaba.version>
         <spring.cloud.version>2023.0.1</spring.cloud.version>
         <spring.boot.version>3.2.4</spring.boot.version>
         <lombok>1.18.28</lombok>

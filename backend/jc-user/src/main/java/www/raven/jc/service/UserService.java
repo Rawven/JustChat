@@ -1,11 +1,10 @@
 package www.raven.jc.service;
 
+import java.util.List;
 import www.raven.jc.dto.RoleDTO;
 import www.raven.jc.dto.UserAuthDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.dto.UserRegisterDTO;
-
-import java.util.List;
 
 /**
  * info service
@@ -50,7 +49,6 @@ public interface UserService {
      */
     List<UserInfoDTO> queryLikedInfoList(String column, String text);
 
-
     /**
      * query single info by column
      *
@@ -68,7 +66,6 @@ public interface UserService {
      * @return {@link UserAuthDTO}
      */
     UserInfoDTO querySingleInfoByColumn(String column, String value);
-
 
     /**
      * query roles by id
