@@ -39,10 +39,6 @@ public class WebsocketService {
      */
     public static final Map<Integer, Session> SESSION_POOL = new HashMap<>();
     /**
-     * 用来存群聊关系
-     */
-    public static final Map<Integer, Map<Integer, Integer>> GROUP_SESSION_POOL = new HashMap<>();
-    /**
      * concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
      * 虽然@Component默认是单例模式的，但springboot还是会为每个websocket连接初始化一个bean，所以可以用一个静态set保存起来。
      */
@@ -131,10 +127,9 @@ public class WebsocketService {
      */
     @OnClose
     public void onClose() {
-        Integer userId1 = this.userId;
         webSockets.remove(this);
-        GROUP_SESSION_POOL.remove(userId1);
-        log.info("ws:用户id {} 连接断开，总数为:{}", userId1, webSockets.size());
+        SESSION_POOL.remove(this.userId);
+        log.info("ws:用户id {} 连接断开，总数为:{}", this.userId, webSockets.size());
     }
 
     /**
@@ -169,7 +164,7 @@ public class WebsocketService {
      */
     @OnError
     public void onError(Session session, Throwable error) {
-        GROUP_SESSION_POOL.remove(this.userId);
+        SESSION_POOL.remove(this.userId);
         log.error("--Websocket:内部错误");
         log.error("Stack trace: {}", (Object) error.getStackTrace());
     }

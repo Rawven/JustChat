@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -151,16 +150,6 @@ public class MessageServiceImpl implements MessageService {
         Integer founderId = room.getFounderId();
         //通知user模块 插入一条申请记录
         MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_CHAT_ROOM_APPLY, imProperty.getInTopic(), MqUtil.createMsg(JsonUtil.objToJson(new RoomApplyEvent(userId, founderId, roomId))));
-    }
-
-    @Override
-    public void updateRoomMap(Integer userId, List<Room> list) {
-        list.forEach(room -> {
-            if (!WebsocketService.GROUP_SESSION_POOL.containsKey(room.getRoomId())) {
-                WebsocketService.GROUP_SESSION_POOL.put(room.getRoomId(), new HashMap<>(10));
-            }
-            WebsocketService.GROUP_SESSION_POOL.get(room.getRoomId()).put(userId, 1);
-        });
     }
 
     @Override

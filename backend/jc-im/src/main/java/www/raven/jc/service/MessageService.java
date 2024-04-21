@@ -3,7 +3,6 @@ package www.raven.jc.service;
 import java.util.List;
 import org.springframework.scheduling.annotation.Async;
 import www.raven.jc.entity.dto.MessageDTO;
-import www.raven.jc.entity.po.Room;
 import www.raven.jc.entity.vo.MessageVO;
 
 /**
@@ -23,30 +22,11 @@ public interface MessageService {
     void sendNotice(Integer roomId, Integer userId);
 
     /**
-     * update session id
-     *
-     * @param userId user id
-     * @param list   list
-     */
-    @Async
-    void updateRoomMap(Integer userId, List<Room> list);
-
-    /**
-     * update session id
-     *
-     * @param userId    user id
-     * @param sessionId session id
-     */
-    @Async
-    void updateFriendMap(Integer userId, String sessionId);
-
-    /**
      * save room msg
      * save msg
      *
      * @param message message
      * @param roomId  room id
-     * @param user    user
      */
     @Async
     void saveRoomMsg(MessageDTO message, Integer roomId);
@@ -56,7 +36,6 @@ public interface MessageService {
      *
      * @param message  message
      * @param friendId friend id
-     * @param user     user
      */
     @Async
     void saveFriendMsg(MessageDTO message, Integer friendId);
