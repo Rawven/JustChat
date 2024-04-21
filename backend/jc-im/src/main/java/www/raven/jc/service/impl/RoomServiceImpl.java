@@ -4,22 +4,27 @@ import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.api.UserRpcService;
 import www.raven.jc.constant.ApplyStatusConstant;
-import www.raven.jc.constant.OfflineMessagesConstant;
 import www.raven.jc.dao.MessageDAO;
 import www.raven.jc.dao.NoticeDAO;
 import www.raven.jc.dao.RoomDAO;
 import www.raven.jc.dao.UserRoomDAO;
 import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
-import www.raven.jc.entity.model.LatestGroupMsgModel;
 import www.raven.jc.entity.model.PageGroupMsgModel;
 import www.raven.jc.entity.model.RoomModel;
 import www.raven.jc.entity.po.Message;
@@ -30,21 +35,10 @@ import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.entity.vo.RealRoomVO;
 import www.raven.jc.entity.vo.UserRoomVO;
 import www.raven.jc.result.RpcResult;
-import www.raven.jc.service.AsyncService;
+import www.raven.jc.service.MessageService;
 import www.raven.jc.service.RoomService;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.RequestUtil;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 
 /**
  * room service impl
@@ -68,7 +62,7 @@ public class RoomServiceImpl implements RoomService {
     @Autowired
     private RedissonClient redissonClient;
     @Autowired
-    private AsyncService asyncService;
+    private MessageService messageService;
     @Autowired
     private NoticeDAO noticeDAO;
 
@@ -76,13 +70,13 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public void createRoom(RoomModel roomModel) {
         Room room = new Room().setRoomName(roomModel.getName())
-                .setRoomDescription(roomModel.getDescription())
-                .setMaxPeople(roomModel.getMaxPeople()).
-                setFounderId(Integer.parseInt(request.getHeader("userId")));
+            .setRoomDescription(roomModel.getDescription())
+            .setMaxPeople(roomModel.getMaxPeople()).
+            setFounderId(Integer.parseInt(request.getHeader("userId")));
         Assert.isTrue(roomDAO.getBaseMapper().insert(room) > 0, "创建失败");
         Assert.isTrue(userRoomDAO.getBaseMapper().
-                        insert(new UserRoom().setRoomId(room.getRoomId()).setUserId(room.getFounderId()).setStatus(ApplyStatusConstant.APPLY_STATUS_AGREE)) > 0,
-                "创建失败");
+                insert(new UserRoom().setRoomId(room.getRoomId()).setUserId(room.getFounderId()).setStatus(ApplyStatusConstant.APPLY_STATUS_AGREE)) > 0,
+            "创建失败");
     }
 
     @Override
@@ -95,12 +89,12 @@ public class RoomServiceImpl implements RoomService {
             return new ArrayList<>();
         }
         //更新用户聊天室映射
-        asyncService.updateRoomMap(userId, rooms);
+        messageService.updateRoomMap(userId, rooms);
         //获取所有聊天室的最后一条消息id
         List<String> idsMsg = rooms.stream()
-                .map(Room::getLastMsgId)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+            .map(Room::getLastMsgId)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
         //获取所有聊天室的最后一条消息
         List<Message> messages = idsMsg.isEmpty() ? new ArrayList<>() : messageDAO.getBaseMapper().selectList(new QueryWrapper<Message>().in("id", idsMsg));
         //获取聊天室聊天室创建者的用户信息
@@ -112,9 +106,9 @@ public class RoomServiceImpl implements RoomService {
         Map<String, Message> messageMap = messages.stream().collect(Collectors.toMap(Message::getId, Function.identity()));
         return rooms.stream().map(room -> {
             UserRoomVO userRoomVO = new UserRoomVO()
-                    .setRoomId(room.getRoomId())
-                    .setRoomName(room.getRoomName())
-                    .setRoomProfile(userInfoMap.get(room.getFounderId()).getProfile());
+                .setRoomId(room.getRoomId())
+                .setRoomName(room.getRoomName())
+                .setRoomProfile(userInfoMap.get(room.getFounderId()).getProfile());
             if (room.getLastMsgId() != null) {
                 Message message = messageMap.get(room.getLastMsgId());
                 userRoomVO.setLastMsg(JsonUtil.objToJson(message));
@@ -136,7 +130,8 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public RealRoomVO queryUserNameRoomList(String column, String text, int page) {
+    public RealRoomVO queryUserNameRoomList(String column, String text,
+        int page) {
         Long total = roomDAO.getBaseMapper().selectCount(null);
         List<UserInfoDTO> queryList = userRpcService.getRelatedInfoList(new QueryUserInfoDTO().setColumn(column).setText(text)).getData();
         List<Integer> userIds = queryList.stream().map(UserInfoDTO::getUserId).collect(Collectors.toList());
@@ -149,19 +144,19 @@ public class RoomServiceImpl implements RoomService {
     public void applyToJoinRoom(Integer roomId) {
         int userId = RequestUtil.getUserId(request);
         Assert.isNull(userRoomDAO.getBaseMapper().selectOne(new QueryWrapper<UserRoom>().eq("user_id", userId).eq("room_id", roomId)),
-                "您已经申请过这个聊天室了");
+            "您已经申请过这个聊天室了");
         UserRoom userRoom = new UserRoom().setUserId(userId).setRoomId(roomId)
-                .setStatus(ApplyStatusConstant.APPLY_STATUS_APPLY);
+            .setStatus(ApplyStatusConstant.APPLY_STATUS_APPLY);
         int insert = userRoomDAO.getBaseMapper().insert(userRoom);
         Assert.isTrue(insert > 0, "插入失败");
-        asyncService.sendNotice(roomId, userId);
+        messageService.sendNotice(roomId, userId);
     }
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void agreeApply(Integer roomId, Integer userId, int noticeId) {
         int update = userRoomDAO.getBaseMapper().update(new UserRoom().setStatus(ApplyStatusConstant.APPLY_STATUS_AGREE),
-                new QueryWrapper<UserRoom>().eq("user_id", userId).eq("room_id", roomId));
+            new QueryWrapper<UserRoom>().eq("user_id", userId).eq("room_id", roomId));
         Assert.isTrue(update > 0, "更新失败");
         Assert.isTrue(noticeDAO.getBaseMapper().deleteById(noticeId) > 0, "删除失败");
     }
@@ -169,7 +164,7 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public void refuseApply(Integer roomId, Integer userId, int noticeId) {
         int update = userRoomDAO.getBaseMapper().update(new UserRoom().setStatus(ApplyStatusConstant.APPLY_STATUS_REFUSE),
-                new QueryWrapper<UserRoom>().eq("user_id", userId).eq("room_id", roomId));
+            new QueryWrapper<UserRoom>().eq("user_id", userId).eq("room_id", roomId));
         Assert.isTrue(update > 0, "更新失败");
         Assert.isTrue(noticeDAO.getBaseMapper().deleteById(noticeId) > 0, "删除失败");
     }
@@ -186,26 +181,6 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public List<MessageVO> getLatestGroupMsg(LatestGroupMsgModel model) {
-        int userId = RequestUtil.getUserId(request);
-        RScoredSortedSet<Message> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + userId);
-        Collection<Message> messages = scoredSortedSet.readAll().stream().filter(
-                message -> message.getReceiverId().equals(model.getRoomId().toString())).toList();
-        List<Integer> ids = messages.stream().map(Message::getSenderId).toList();
-        RpcResult<List<UserInfoDTO>> batchInfo = userRpcService.getBatchInfo(ids);
-        Map<Integer, UserInfoDTO> map = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
-        //获取所有id=roomId的消息
-        List<MessageVO> messageVos = new ArrayList<>();
-        for (Message message : messages) {
-            UserInfoDTO user = map.get(message.getSenderId());
-            messageVos.add(new MessageVO(message, user));
-        }
-        scoredSortedSet.removeAll(messages);
-        return messageVos;
-
-    }
-
-    @Override
     public List<MessageVO> getGroupMsgPages(PageGroupMsgModel model) {
         Page<Message> messagePage = messageDAO.getBaseMapper().selectPage(new Page<>(model.getPage(), model.getSize()), new QueryWrapper<Message>().eq("receiver_id", model.getRoomId().toString()).orderByDesc("timestamp").last("limit 10"));
         //给messages排序 从小到大
@@ -217,15 +192,16 @@ public class RoomServiceImpl implements RoomService {
         return messagePage.getRecords().stream().map(vo -> new MessageVO(vo, map.get(vo.getSenderId()))).collect(Collectors.toList());
     }
 
-    private List<DisplayRoomVO> buildRoomVO(Page<Room> chatRoomPage, List<UserInfoDTO> data) {
+    private List<DisplayRoomVO> buildRoomVO(Page<Room> chatRoomPage,
+        List<UserInfoDTO> data) {
         Assert.isTrue(chatRoomPage.getTotal() > 0);
         Map<Integer, UserInfoDTO> map = data.stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
         return chatRoomPage.getRecords().stream().map(room -> new DisplayRoomVO()
-                .setRoomId(room.getRoomId())
-                .setRoomName(room.getRoomName())
-                .setFounderName(map.get(room.getFounderId()).getUsername())
-                .setRoomDescription(room.getRoomDescription())
-                .setMaxPeople(room.getMaxPeople())
+            .setRoomId(room.getRoomId())
+            .setRoomName(room.getRoomName())
+            .setFounderName(map.get(room.getFounderId()).getUsername())
+            .setRoomDescription(room.getRoomDescription())
+            .setMaxPeople(room.getMaxPeople())
         ).collect(Collectors.toList());
     }
 

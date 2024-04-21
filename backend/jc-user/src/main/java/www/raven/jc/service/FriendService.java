@@ -1,8 +1,7 @@
 package www.raven.jc.service;
 
-import www.raven.jc.dto.UserInfoDTO;
-
 import java.util.List;
+import www.raven.jc.dto.UserInfoDTO;
 
 /**
  * friend service

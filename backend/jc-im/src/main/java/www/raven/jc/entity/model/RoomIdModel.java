@@ -1,9 +1,8 @@
 package www.raven.jc.entity.model;
 
-import lombok.Data;
-
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 /**
  * room id model

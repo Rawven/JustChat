@@ -14,7 +14,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-@TableName(value = "friend_chat",schema ="public")
+@TableName(value = "friend_chat", schema = "public")
 public class FriendChat {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;

@@ -1,9 +1,8 @@
 package www.raven.jc.service;
 
+import java.util.List;
 import org.springframework.scheduling.annotation.Async;
 import www.raven.jc.entity.po.Moment;
-
-import java.util.List;
 
 /**
  * async service
@@ -19,7 +18,8 @@ public interface TimelineFeedService {
      * @param userId user id
      */
     @Async
-    void buildMomentTimelineFeeding(Long capacity, List<Integer> userIds, Integer userId);
+    void buildMomentTimelineFeeding(Long capacity, List<Integer> userIds,
+        Integer userId);
 
     /**
      * handle moment event

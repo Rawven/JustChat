@@ -1,5 +1,6 @@
 package www.raven.jc.handler;
 
+import java.nio.charset.Charset;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.http.HttpStatus;
@@ -12,8 +13,6 @@ import reactor.core.publisher.Mono;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.util.JsonUtil;
 
-import java.nio.charset.Charset;
-
 /**
  * default access denied handler
  *
@@ -24,16 +23,17 @@ import java.nio.charset.Charset;
 public class DefaultAccessDeniedHandler implements ServerAccessDeniedHandler {
 
     @Override
-    public Mono<Void> handle(ServerWebExchange exchange, AccessDeniedException denied) {
+    public Mono<Void> handle(ServerWebExchange exchange,
+        AccessDeniedException denied) {
         return Mono.defer(() -> Mono.just(exchange.getResponse()))
-                .flatMap(response -> {
-                    response.setStatusCode(HttpStatus.OK);
-                    response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-                    DataBufferFactory dataBufferFactory = response.bufferFactory();
-                    String result = JsonUtil.objToJson(CommonResult.operateFailure("您权限不足"));
-                    DataBuffer buffer = dataBufferFactory.wrap(result.getBytes(
-                            Charset.defaultCharset()));
-                    return response.writeWith(Mono.just(buffer));
-                });
+            .flatMap(response -> {
+                response.setStatusCode(HttpStatus.OK);
+                response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+                DataBufferFactory dataBufferFactory = response.bufferFactory();
+                String result = JsonUtil.objToJson(CommonResult.operateFailure("您权限不足"));
+                DataBuffer buffer = dataBufferFactory.wrap(result.getBytes(
+                    Charset.defaultCharset()));
+                return response.writeWith(Mono.just(buffer));
+            });
     }
 }

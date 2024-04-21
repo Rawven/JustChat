@@ -2,6 +2,8 @@ package www.raven.jc.override;
 
 import cn.hutool.core.lang.Assert;
 import jakarta.annotation.Resource;
+import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +21,6 @@ import www.raven.jc.config.JwtProperty;
 import www.raven.jc.constant.JwtConstant;
 import www.raven.jc.dto.TokenDTO;
 import www.raven.jc.util.JwtUtil;
-
-import java.util.List;
-import java.util.Objects;
 
 /**
  * default security context repository
@@ -43,7 +42,8 @@ public class DefaultSecurityContextRepository implements ServerSecurityContextRe
     private RedissonClient redissonClient;
 
     @Override
-    public Mono<Void> save(ServerWebExchange exchange, SecurityContext context) {
+    public Mono<Void> save(ServerWebExchange exchange,
+        SecurityContext context) {
         return Mono.empty();
     }
 
@@ -60,7 +60,7 @@ public class DefaultSecurityContextRepository implements ServerSecurityContextRe
         request.mutate().header(JwtConstant.TIME, String.valueOf(dto.getExpireTime())).header(JwtConstant.USER_ID, dto.getUserId().toString()).build();
         Authentication auth = new UsernamePasswordAuthenticationToken(dto.getUserId(), null, AuthorityUtils.createAuthorityList(dto.getRole().toArray(new String[0])));
         return tokenAuthenticationManager.authenticate(
-                auth
+            auth
         ).map(SecurityContextImpl::new);
     }
 }

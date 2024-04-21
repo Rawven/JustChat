@@ -1,6 +1,10 @@
 package www.raven.jc.service.impl;
 
 import cn.hutool.core.lang.Assert;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
@@ -22,11 +26,6 @@ import www.raven.jc.entity.vo.TokenVO;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.AuthService;
 import www.raven.jc.util.JwtUtil;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * account service impl
@@ -92,11 +91,12 @@ public class AuthServiceImpl implements AuthService {
         Assert.isTrue(voidCommonResult.isSuccess(), "登出失败");
     }
 
-    private TokenVO register(RegisterModel registerModel, List<Integer> roleIds) {
+    private TokenVO register(RegisterModel registerModel,
+        List<Integer> roleIds) {
         Assert.isFalse(userRpcService.checkUserExit(registerModel.getUsername()).getData(), "用户名已存在");
         UserRegisterDTO user = new UserRegisterDTO();
         user.setEmail(registerModel.getEmail()).setPassword(passwordEncoder.encode(registerModel.getPassword()))
-                .setUsername(registerModel.getUsername()).setRoleIds(roleIds).setProfile(registerModel.getProfile());
+            .setUsername(registerModel.getUsername()).setRoleIds(roleIds).setProfile(registerModel.getProfile());
         RpcResult<UserAuthDTO> insert = userRpcService.insert(user);
         Assert.isTrue(insert.isSuccess(), "注册失败");
         List<RoleDTO> list = roleIds.stream().map(roleId -> new RoleDTO().setValue(RoleConstant.MAP.get(roleId))).toList();

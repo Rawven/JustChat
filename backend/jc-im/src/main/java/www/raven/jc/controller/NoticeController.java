@@ -1,5 +1,7 @@
 package www.raven.jc.controller;
 
+import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,9 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import www.raven.jc.entity.vo.NoticeVO;
 import www.raven.jc.result.CommonResult;
 import www.raven.jc.service.NoticeService;
-
-import jakarta.validation.constraints.NotNull;
-import java.util.List;
 
 /**
  * notice controller
@@ -34,7 +33,8 @@ public class NoticeController {
     }
 
     @GetMapping("/addFriendApply/{friendName}")
-    public CommonResult<Void> addFriendApply(@PathVariable("friendName") @NotNull String friendName) {
+    public CommonResult<Void> addFriendApply(
+        @PathVariable("friendName") @NotNull String friendName) {
         noticeService.addFriendApply(friendName);
         return CommonResult.operateSuccess("添加好友申请成功");
     }

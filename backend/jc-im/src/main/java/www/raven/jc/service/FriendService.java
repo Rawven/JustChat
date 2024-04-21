@@ -1,11 +1,9 @@
 package www.raven.jc.service;
 
-import www.raven.jc.entity.model.LatestFriendMsgModel;
+import java.util.List;
 import www.raven.jc.entity.model.PagesFriendMsgModel;
 import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.entity.vo.UserFriendVO;
-
-import java.util.List;
 
 /**
  * friend service
@@ -29,11 +27,4 @@ public interface FriendService {
      */
     List<MessageVO> getFriendMsgPages(PagesFriendMsgModel model);
 
-    /**
-     * get latest friend msg
-     *
-     * @param model model
-     * @return {@link List}<{@link MessageVO}>
-     */
-    List<MessageVO> getLatestFriendMsg(LatestFriendMsgModel model);
 }

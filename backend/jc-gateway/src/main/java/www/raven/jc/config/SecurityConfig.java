@@ -1,5 +1,7 @@
 package www.raven.jc.config;
 
+import java.util.Collections;
+import java.util.LinkedList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,9 +20,6 @@ import www.raven.jc.handler.DefaultAccessDeniedHandler;
 import www.raven.jc.handler.DefaultAuthenticationEntryPoint;
 import www.raven.jc.override.DefaultSecurityContextRepository;
 import www.raven.jc.override.TokenAuthenticationManager;
-
-import java.util.Collections;
-import java.util.LinkedList;
 
 /**
  * security config
@@ -44,24 +43,26 @@ public class SecurityConfig {
     private SecurityProperty securityProperty;
 
     @Bean
-    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
+    @SuppressWarnings("all")
+    public SecurityWebFilterChain springSecurityFilterChain(
+        ServerHttpSecurity http) {
         http.cors(corsSpec -> corsSpec.configurationSource(corsConfigurationSource()))
-                .authenticationManager(reactiveAuthenticationManager())
-                .securityContextRepository(defaultSecurityContextRepository)
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers(securityProperty.auth).permitAll()
-                        .pathMatchers(securityProperty.users).hasAnyRole(securityProperty.roleUser, securityProperty.roleAdmin)
-                        .pathMatchers(securityProperty.admins).hasRole(securityProperty.roleAdmin)
-                        .anyExchange().authenticated()
-                )
-                .formLogin()
-                .and()
-                .exceptionHandling()
-                .accessDeniedHandler(defaultAccessDeniedHandler)
-                .and()
-                .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint)
+            .authenticationManager(reactiveAuthenticationManager())
+            .securityContextRepository(defaultSecurityContextRepository)
+            .csrf(ServerHttpSecurity.CsrfSpec::disable)
+            .authorizeExchange(exchanges -> exchanges
+                .pathMatchers(securityProperty.auth).permitAll()
+                .pathMatchers(securityProperty.users).hasAnyRole(securityProperty.roleUser, securityProperty.roleAdmin)
+                .pathMatchers(securityProperty.admins).hasRole(securityProperty.roleAdmin)
+                .anyExchange().authenticated()
+            )
+            .formLogin()
+            .and()
+            .exceptionHandling()
+            .accessDeniedHandler(defaultAccessDeniedHandler)
+            .and()
+            .exceptionHandling()
+            .authenticationEntryPoint(authenticationEntryPoint)
         ;
         return http.build();
     }
@@ -97,6 +98,5 @@ public class SecurityConfig {
         managers.add(tokenAuthenticationManager);
         return new DelegatingReactiveAuthenticationManager(managers);
     }
-
 
 }

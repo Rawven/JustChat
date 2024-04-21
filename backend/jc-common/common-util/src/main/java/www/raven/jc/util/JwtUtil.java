@@ -5,11 +5,10 @@ import cn.hutool.core.convert.NumberWithFormat;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.jwt.JWTPayload;
 import cn.hutool.jwt.JWTUtil;
-import lombok.extern.slf4j.Slf4j;
-import www.raven.jc.dto.TokenDTO;
-
 import java.util.HashMap;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import www.raven.jc.dto.TokenDTO;
 
 import static www.raven.jc.constant.JwtConstant.ROLE;
 import static www.raven.jc.constant.JwtConstant.TIME;
@@ -24,7 +23,8 @@ import static www.raven.jc.constant.JwtConstant.USER_ID;
 @Slf4j
 public class JwtUtil {
 
-    public static String createToken(int userId, List<String> roles, String key, Long expireTime) {
+    public static String createToken(int userId, List<String> roles, String key,
+        Long expireTime) {
         HashMap<String, Object> map = new HashMap<>(3);
         map.put(USER_ID, userId);
         map.put(ROLE, roles);

@@ -12,6 +12,6 @@ import www.raven.jc.entity.po.Message;
  * @date 2023/12/17
  */
 @Repository
-public class MessageDAO extends ServiceImpl<MessageMapper,Message> {
+public class MessageDAO extends ServiceImpl<MessageMapper, Message> {
 
 }

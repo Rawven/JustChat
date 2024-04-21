@@ -16,7 +16,7 @@ public class CommentVO {
     private Long timestamp;
     private String parentId;
 
-    public CommentVO(Comment comment,UserInfoDTO infoDTO) {
+    public CommentVO(Comment comment, UserInfoDTO infoDTO) {
         this.id = comment.getId();
         this.userInfo = infoDTO;
         this.content = comment.getContent();

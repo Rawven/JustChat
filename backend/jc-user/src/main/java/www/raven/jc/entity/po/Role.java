@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
  * @author 刘家辉
  * @date 2023/11/28
  */
-@TableName(value = "roles",schema ="public")
+@TableName(value = "roles", schema = "public")
 @Data
 @Accessors(chain = true)
 public class Role {

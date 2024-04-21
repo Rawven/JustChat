@@ -15,7 +15,7 @@ import www.raven.jc.model.CommonSerializable;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Accessors(chain = true)
-@TableName(value = "like",schema ="public")
+@TableName(value = "like", schema = "public")
 public class Like extends CommonSerializable {
     private String id;
     private Integer userId;

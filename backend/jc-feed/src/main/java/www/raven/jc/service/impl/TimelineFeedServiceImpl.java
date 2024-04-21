@@ -51,11 +51,11 @@ public class TimelineFeedServiceImpl implements TimelineFeedService {
     @Override
     public void buildMomentTimelineFeeding(Long capacity, List<Integer> userIds,
         Integer userId) {
-
         List<Moment> moments = momentDAO.getBaseMapper().selectList(
             momentDAO.lambdaQuery().in(Moment::getUserId, userIds).orderByDesc(Moment::getTimestamp).
                 last("limit " + calculateNeedCapacity(capacity)
                 ));
+
         RScoredSortedSet<String> scoredSortedSet = redissonClient.getScoredSortedSet(TimelineFeedConstant.PREFIX + userId);
         scoredSortedSet.expire(Duration.ofDays(setProperty.expireDays));
         Map<String, Double> scores = moments.stream().collect(Collectors.toMap(Moment::getId, moment -> moment.getTimestamp().doubleValue()));

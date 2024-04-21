@@ -5,12 +5,11 @@ import io.ipfs.api.IPFS;
 import io.ipfs.api.MerkleNode;
 import io.ipfs.api.NamedStreamable;
 import io.ipfs.multihash.Multihash;
+import java.io.File;
+import java.io.IOException;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.multipart.MultipartFile;
 import www.raven.jc.exception.IpfsException;
-
-import java.io.File;
-import java.io.IOException;
 
 /**
  * ipfs client
@@ -61,7 +60,8 @@ public class IpfsClient {
      * @param file   原文件
      * @return 文件
      */
-    private File addIdentification(MultipartFile file, String prefix, String suffix) {
+    private File addIdentification(MultipartFile file, String prefix,
+        String suffix) {
         File f;
         try {
             f = File.createTempFile(prefix + System.currentTimeMillis(), suffix);

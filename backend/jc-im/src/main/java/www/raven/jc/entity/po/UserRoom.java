@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
  * @author 刘家辉
  * @date 2023/12/04
  */
-@TableName(value = "user_room",schema = "public")
+@TableName(value = "user_room", schema = "public")
 @Data
 @Accessors(chain = true)
 public class UserRoom {
