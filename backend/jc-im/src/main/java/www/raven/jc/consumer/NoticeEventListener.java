@@ -63,7 +63,7 @@ public class NoticeEventListener implements RocketMQListener<MessageExt> {
 
     @Override
     public void onMessage(MessageExt messageExt) {
-        if (MqUtil.checkMsgIsvalid(messageExt, redissonClient)) {
+        if (MqUtil.checkMsgValid(messageExt, redissonClient)) {
             return;
         }
         byte[] body = messageExt.getBody();

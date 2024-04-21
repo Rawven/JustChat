@@ -13,7 +13,5 @@ public class MqConstant {
     public final static long EXPIRE_TIME = 10;
 
     public static final String HEAD = "rocketMq_msg_";
-    public static final String HEADER_KEYS = "ROCKET_KEYS";
-    public static final String HEADER_TAGS = "ROCKET_TAGS";
 
 }

@@ -1,8 +1,6 @@
 package www.raven.jc.util;
 
 import cn.hutool.core.util.IdUtil;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.producer.SendCallback;
@@ -11,7 +9,7 @@ import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.redisson.api.RedissonClient;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.support.GenericMessage;
+import org.springframework.messaging.support.MessageBuilder;
 import www.raven.jc.constant.MqConstant;
 
 import static www.raven.jc.constant.MqConstant.HEAD;
@@ -43,13 +41,12 @@ public class MqUtil {
     }
 
     public static Message<String> createMsg(String data) {
-        Map<String, Object> headers = new HashMap<>(1);
-        headers.put(MessageConst.PROPERTY_KEYS, IdUtil.getSnowflakeNextIdStr());
-        return new GenericMessage<>(
-            data, headers);
+        return MessageBuilder
+            .withPayload(data)
+            .setHeader(MessageConst.PROPERTY_KEYS, IdUtil.getSnowflakeNextIdStr()).build();
     }
 
-    public static boolean checkMsgIsvalid(MessageExt msg,
+    public static boolean checkMsgValid(MessageExt msg,
         RedissonClient redissonClient) {
         Object id = msg.getKeys();
         if (id == null || redissonClient.getBucket(HEAD + id).isExists()) {
