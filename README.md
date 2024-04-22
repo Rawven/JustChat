@@ -1,11 +1,11 @@
 仿微信项目 
 技术栈
 
-| 前端         | 后端                 | 数据库 | 中间件 |分布式任务调度平台|     
-| ------------ | -------------------- | ------ | ------ | xxl-job          |
+| 前端         | 后端                 | 数据库 | 中间件 |
+| ------------ | -------------------- | ------ | ------ |
 | Vue          | spring-gateway       |postgres| rocketMq|
 | element-plus | spring-boot          | redis  | nacos |
-|              | dubbo                | ipfs   |       |
+|              | dubbo                | ipfs   | xxl-job|
 --------
 目前功能： 
   1. 登录注册/个人信息crud
