@@ -59,6 +59,8 @@
     <file url="file://$PROJECT_DIR$/jc-common/common-api/common-api-user/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/jc-common/common-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/jc-common/common-api/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-job/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jc-common/common-job/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/jc-common/common-mp/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/jc-common/common-mp/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/jc-common/common-mq/common-mq-base/src/main/java" charset="UTF-8" />
