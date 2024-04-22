@@ -10,6 +10,7 @@ import jakarta.websocket.server.ServerEndpoint;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArraySet;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,12 @@ public class WebsocketService {
      */
     public static final Map<Integer, Session> SESSION_POOL = new HashMap<>();
     /**
+     * 心跳辅助map
+     */
+    public static final Map<Session, Integer> HEARTBEAT_MAP = new HashMap<>();
+
+    public static final String HEARTBEAT = "ping";
+    /**
      * concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
      * 虽然@Component默认是单例模式的，但springboot还是会为每个websocket连接初始化一个bean，所以可以用一个静态set保存起来。
      */
@@ -62,8 +69,6 @@ public class WebsocketService {
      * 与某个客户端的连接会话，需要通过它来给客户端发送数据
      **/
     protected Session session;
-
-    protected long lastActivityTime = System.currentTimeMillis();
 
     /**
      * send one message
@@ -140,8 +145,11 @@ public class WebsocketService {
      */
     @OnMessage
     public void onMessage(String message) {
+        if (Objects.equals(message, HEARTBEAT)) {
+            HEARTBEAT_MAP.put(this.session, 0);
+            return;
+        }
         log.info("----WebSocket收到客户端发来的消息:{}", message);
-        lastActivityTime = System.currentTimeMillis();
         MessageDTO messageDTO = JsonUtil.jsonToObj(message, MessageDTO.class);
         switch (messageDTO.getType()) {
             case MessageConstant.FRIEND:

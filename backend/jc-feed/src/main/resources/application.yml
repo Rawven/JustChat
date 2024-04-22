@@ -50,7 +50,7 @@ spring:
       discovery:
         server-addr: 10.21.32.154:8848
 mq:
-  out_topic: JustChat
+  out_topic: ToIM
 server:
   port: 8071
 redis:

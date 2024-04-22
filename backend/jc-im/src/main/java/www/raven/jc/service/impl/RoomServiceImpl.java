@@ -88,8 +88,6 @@ public class RoomServiceImpl implements RoomService {
         if (rooms.isEmpty()) {
             return new ArrayList<>();
         }
-        //更新用户聊天室映射
-        messageService.updateRoomMap(userId, rooms);
         //获取所有聊天室的最后一条消息id
         List<String> idsMsg = rooms.stream()
             .map(Room::getLastMsgId)

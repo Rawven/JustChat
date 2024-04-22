@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import www.raven.jc.api.UserRpcService;
 import www.raven.jc.constant.SocialUserMqConstant;
-import www.raven.jc.constant.TimelineFeedConstant;
 import www.raven.jc.dao.CommentDAO;
 import www.raven.jc.dao.LikeDAO;
 import www.raven.jc.dao.MomentDAO;
@@ -126,7 +125,6 @@ public class SocialServiceImpl implements SocialService {
 
     /**
      * query moment
-     * TODO 自适应的timeline扩增（即不只是50个）
      *
      * @param page page
      * @param size size
@@ -135,15 +133,15 @@ public class SocialServiceImpl implements SocialService {
     @Override
     public List<MomentVO> queryMoment(int page, int size) {
         int userId = RequestUtil.getUserId(request);
-        RScoredSortedSet<String> scoredSortedSet = redissonClient.getScoredSortedSet(TimelineFeedConstant.PREFIX + userId);
+        RScoredSortedSet<String> feeding = timelineFeedService.getMomentTimelineFeeding(userId);
         RpcResult<List<UserInfoDTO>> friendInfos1 = userRpcService.getFriendAndMeInfos(userId);
         Map<Integer, UserInfoDTO> mapInfo = friendInfos1.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, v -> v));
         List<MomentVO> momentVos = new ArrayList<>();
         //存在时间线
-        if (scoredSortedSet.isExists() && scoredSortedSet.size() > page * size) {
+        if (feeding != null && feeding.size() > page * size) {
             // 获取有序集合的所有元素
             long l = Math.multiplyFull(page, size);
-            List<String> pageIds = scoredSortedSet.stream().skip(l - 10).limit(size).toList();
+            List<String> pageIds = feeding.stream().skip(l - 10).limit(size).toList();
             List<Moment> moments = momentDAO.getBaseMapper().selectBatchIds(pageIds);
             loadMomentAll(moments, momentVos, mapInfo);
         } else {
@@ -155,7 +153,6 @@ public class SocialServiceImpl implements SocialService {
             Page<Moment> momentPage = momentDAO.getBaseMapper().selectPage(
                 new Page<>(page, size), new QueryWrapper<Moment>().in("user_id", userIds).orderByDesc("timestamp"));
             loadMomentAll(momentPage.getRecords(), momentVos, mapInfo);
-
             // 对无时间线的用户进行时间线构建
             timelineFeedService.buildMomentTimelineFeeding((long) page * size, userIds, userId);
         }

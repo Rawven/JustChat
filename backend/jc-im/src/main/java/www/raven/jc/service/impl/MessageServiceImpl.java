@@ -151,9 +151,4 @@ public class MessageServiceImpl implements MessageService {
         //通知user模块 插入一条申请记录
         MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_CHAT_ROOM_APPLY, imProperty.getInTopic(), MqUtil.createMsg(JsonUtil.objToJson(new RoomApplyEvent(userId, founderId, roomId))));
     }
-
-    @Override
-    public void updateFriendMap(Integer userId, String sessionId) {
-
-    }
 }

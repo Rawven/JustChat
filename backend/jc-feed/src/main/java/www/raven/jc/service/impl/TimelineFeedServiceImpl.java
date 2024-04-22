@@ -55,7 +55,6 @@ public class TimelineFeedServiceImpl implements TimelineFeedService {
             momentDAO.lambdaQuery().in(Moment::getUserId, userIds).orderByDesc(Moment::getTimestamp).
                 last("limit " + calculateNeedCapacity(capacity)
                 ));
-
         RScoredSortedSet<String> scoredSortedSet = redissonClient.getScoredSortedSet(TimelineFeedConstant.PREFIX + userId);
         scoredSortedSet.expire(Duration.ofDays(setProperty.expireDays));
         Map<String, Double> scores = moments.stream().collect(Collectors.toMap(Moment::getId, moment -> moment.getTimestamp().doubleValue()));
@@ -71,6 +70,17 @@ public class TimelineFeedServiceImpl implements TimelineFeedService {
             }
             scoredSortedSet.add(moment.getTimestamp(), moment.getId());
         });
+    }
+
+    @Override
+    public RScoredSortedSet<String> getMomentTimelineFeeding(Integer userId) {
+        RScoredSortedSet<String> scoredSortedSet = redissonClient.getScoredSortedSet(TimelineFeedConstant.PREFIX + userId);
+        if (scoredSortedSet.isExists()) {
+            //refresh expire time
+            scoredSortedSet.expire(Duration.ofDays(setProperty.expireDays));
+            return scoredSortedSet;
+        }
+        return null;
     }
 
     private Long calculateNeedCapacity(Long capacity) {

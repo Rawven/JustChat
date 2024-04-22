@@ -1,6 +1,7 @@
 package www.raven.jc.service;
 
 import java.util.List;
+import org.redisson.api.RScoredSortedSet;
 import org.springframework.scheduling.annotation.Async;
 import www.raven.jc.entity.po.Moment;
 
@@ -31,4 +32,12 @@ public interface TimelineFeedService {
      */
     @Async
     void insertMomentFeed(Integer userId, Moment moment);
+
+    /**
+     * get moment timeline feeding
+     *
+     * @param userId user id
+     * @return {@link RScoredSortedSet}<{@link String}>
+     */
+    RScoredSortedSet<String> getMomentTimelineFeeding(Integer userId);
 }

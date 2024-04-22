@@ -144,6 +144,10 @@ export default {
 
     this.socket.onmessage = (event) => {
       console.log('WebSocket message received:', event.data);
+      if(event.data === "ping"){
+        this.socket.send("ping");
+        return
+      }
       const data = JSON.parse(event.data);
       if (data.type === "FRIEND_APPLY") {
         this.applyNoticeIsNew = true;
@@ -176,6 +180,7 @@ export default {
   ,
 
   methods: {
+
     ipfsHost() {
       return ipfsHost
     },
