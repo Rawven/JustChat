@@ -148,6 +148,10 @@ export default {
 
     this.socket.onmessage = (event) => {
       console.log('WebSocket message received:', event.data);
+      if(event.data === "ping"){
+        this.socket.send("ping");
+        return
+      }
       const data = JSON.parse(event.data);
       if (data.type === "FRIEND_APPLY") {
         this.applyNoticeIsNew = true;
@@ -179,6 +183,7 @@ export default {
   },
 
   methods: {
+
     getOffline() {
       let token = localStorage.getItem("token");
       this.realAxios.post(`http://` + Host + `:7000/chat/message/getLatestRoomHistory`, {
@@ -222,7 +227,7 @@ export default {
             username: userInfo.username,
             profile: userInfo.profile
           }};
-        this.$global.ws.send(JSON.stringify(msg));
+        this.socket.send(JSON.stringify(msg));
         this.message = '';
       }
     }
