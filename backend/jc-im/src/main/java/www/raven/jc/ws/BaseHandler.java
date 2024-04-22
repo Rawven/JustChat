@@ -28,6 +28,14 @@ public interface BaseHandler {
      */
     void onMessage(MessageDTO message, Session session);
 
+    /**
+     * send
+     *
+     * @param redissonClient   redisson client
+     * @param ids              ids
+     * @param message          message
+     * @param rocketMQTemplate rocket mqtemplate
+     */
     default void send(RedissonClient redissonClient, List<Integer> ids,
         MessageDTO message,
         RocketMQTemplate rocketMQTemplate) {

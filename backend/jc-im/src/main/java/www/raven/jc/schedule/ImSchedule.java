@@ -1,4 +1,4 @@
-package www.raven.jc.schdule;
+package www.raven.jc.schedule;
 
 import jakarta.websocket.Session;
 import lombok.extern.slf4j.Slf4j;
