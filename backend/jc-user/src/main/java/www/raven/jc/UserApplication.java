@@ -1,5 +1,6 @@
 package www.raven.jc;
 
+import com.ctrip.framework.apollo.spring.annotation.EnableApolloConfig;
 import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @EnableDubbo
 @EnableDiscoveryClient
 @EnableAspectJAutoProxy
+@EnableApolloConfig
 @MapperScan("www.raven.jc.dao.mapper")
 public class UserApplication {
     public static void main(String[] args) {

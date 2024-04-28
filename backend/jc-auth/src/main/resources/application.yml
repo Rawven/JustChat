@@ -1,41 +1,8 @@
-dubbo:
-  protocol:
-    name: dubbo
-  registry:
-    address: nacos://10.21.32.154:8848
-    group: dubbo
-    parameters:
-      namespace: d7a1b125-8d08-47f5-bb6c-2020abe9f6f8
-spring:
-  threads:
-    virtual:
+app:
+  id: Jc-Auth
+apollo:
+  bootstrap:
+    enabled: true
+    eagerLoad:
       enabled: true
-  web:
-    resources:
-      add-mappings: false
-  servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
-      enabled: true
-  redis:
-    address: redis://10.21.32.221:6379
-    password: 123456
-  application:
-    name: JC-Auth
-  cloud:
-    nacos:
-      discovery:
-        server-addr: 10.21.32.154:8848
-  datasource:
-    url: jdbc:mysql://10.21.32.154:3306/JustChat?useUnicode=true&rewriteBatchedStatements=true&characterEncoding=utf-8&useSSL=false&rewriteBatchedStatements=true
-    username: root
-    password: root
-server:
-  port: 8082
-jwt:
-  key: 爱你老妈
-  expire: 604800000
-logging:
-  level:
-    www.raven.jc.api.*: DEBUG
+  config-service: http://10.21.32.192:8080

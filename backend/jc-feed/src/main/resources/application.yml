@@ -1,62 +1,8 @@
-dubbo:
-  protocol:
-    name: dubbo
-  registry:
-    address: nacos://10.21.32.154:8848
-    group: dubbo
-    parameters:
-      namespace: d7a1b125-8d08-47f5-bb6c-2020abe9f6f8
-rocketmq:
-  name-server: 10.21.32.221:9876
-  producer:
-    # 发送同一类消息的设置为同一个group，保证唯一
-    group: testGroup
-    # 发送消息超时时间，默认3000
-    sendMessageTimeout: 10000
-    # 发送消息失败重试次数，默认2
-    retryTimesWhenSendFailed: 2
-    # 异步消息重试此处，默认2
-    retryTimesWhenSendAsyncFailed: 2
-    # 消息最大长度，默认1024 * 1024 * 4(默认4M)
-    maxMessageSize: 4096
-    # 压缩消息阈值，默认4k(1024 * 4)
-    compressMessageBodyThreshold: 4096
-    # 是否在内部发送失败时重试另一个broker，默认false
-    retryNextServer: false
-spring:
-  #  threads:
-  #    virtual:
-  #      enabled: true
-  datasource:
-    url: jdbc:postgresql://10.21.32.192:5432/postgres
-    username: postgres
-    password: 123456
-  redis:
-    address: redis://10.21.32.221:6379
-    password: 123456
-  cache:
-    type: redis
-    #指定存活时间（ms）
-    redis.time-to-live: 86400000
-    #是否缓存空值，可以防止缓存穿透
-    redis.cache-null-values: true
-  cloud:
-    nacos:
-      discovery:
-        server-addr: 10.21.32.154:8848
-  application:
-    name: JC-Social
-    nacos:
-      discovery:
-        server-addr: 10.21.32.154:8848
-mq:
-  out_topic: ToIM
-server:
-  port: 8071
-redis:
-  sorted-set:
-    max-size: 50
-    expire-days: 3
-jwt:
-  key: 爱你老妈
-  expire: 604800000
+app:
+  id: Jc-Feed
+apollo:
+  bootstrap:
+    enabled: true
+    eagerLoad:
+      enabled: true
+  config-service: http://10.21.32.192:8080

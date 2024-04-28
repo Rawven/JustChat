@@ -1,19 +1,8 @@
-spring:
-  servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+app:
+  id: Jc-File
+apollo:
+  bootstrap:
+    enabled: true
+    eagerLoad:
       enabled: true
-  application:
-    name: JC-File
-  cloud:
-    nacos:
-      discovery:
-        server-addr: 10.21.32.154:8848
-server:
-  port: 8888
-Ipfs:
-  api: /ip4/127.0.0.1/tcp/5001
-jwt:
-  key: 爱你老妈
-  expire: 604800000
+  config-service: http://10.21.32.192:8080

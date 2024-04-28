@@ -37,6 +37,7 @@
         <log>1.4.7</log>
         <dubbo>3.3.0-beta.2</dubbo>
         <xxl-job>2.4.1</xxl-job>
+        <apollo>2.2.0</apollo>
     </properties>
     <dependencyManagement>
         <dependencies>

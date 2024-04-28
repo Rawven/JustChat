@@ -34,6 +34,7 @@ public class ImSchedule {
      * 默认离线消息过期时间为7天
      */
     private static final long OFFLINE_MESSAGE_EXPIRATION_TIME = 7 * 24 * 60 * 60 * 1000;
+
     @Autowired
     private RedissonClient redissonClient;
 
@@ -84,5 +85,4 @@ public class ImSchedule {
             set.removeRangeByScore(0, true, currentTime - OFFLINE_MESSAGE_EXPIRATION_TIME, true);
         }
     }
-
 }
