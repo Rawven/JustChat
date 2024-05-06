@@ -8,7 +8,6 @@
       <directory url="file://$PROJECT_DIR$/common/common-mq/common-mq-social-user-model/src/main/resources/archetype-resources" includeSubdirectories="true" />
       <directory url="file://$PROJECT_DIR$/jc-common/common-api/common-api-im/src/main/resources/archetype-resources" includeSubdirectories="true" />
       <directory url="file://$PROJECT_DIR$/jc-common/common-api/common-api-user/src/main/resources/archetype-resources" includeSubdirectories="true" />
-      <directory url="file://$PROJECT_DIR$/jc-common/common-job/src/main/resources/archetype-resources" includeSubdirectories="true" />
     </excludeFromCompile>
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
@@ -49,7 +48,6 @@
       <module name="common" target="11" />
       <module name="common-api-im" target="11" />
       <module name="common-base" target="11" />
-      <module name="common-threadPool" target="21" />
       <module name="common-User" target="11" />
       <module name="file" target="11" />
       <module name="gateway" target="11" />

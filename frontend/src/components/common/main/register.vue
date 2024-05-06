@@ -36,6 +36,7 @@
 
 <script>
 import {Host} from "@/main";
+import {md5} from "js-md5";
 
 export default {
   name: 'userRegister',
@@ -47,6 +48,11 @@ export default {
   },
   data() {
     return {
+      md5:'',
+      url:{
+        previewUrl:'',
+        uploadUrl:'',
+      },
       user: {
         username: '',
         email: '',
@@ -65,23 +71,51 @@ export default {
   },
   methods: {
     uploadFile(param) {
-      const formData = new FormData()
-      formData.append('file', param.file)
-      const url = 'http://' + Host + ':7000/file/upload'
-      this.realAxios.post(url, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        }
-      }).then(response => {
-        this.user.profile = response.data.data;
-        this.$message.success('文件上传成功');
-      })
+       this.getPreSignedUrl(param.file)
+          .then(() => {
+            console.log(this.url)
+             this.realAxios.put(this.url.uploadUrl,  param.file, {
+               headers: {
+                 "Content-Type": "image/jpeg",
+               },
+            });
+          })
+          .then(() => {
+            this.$message.success('上传成功 下面的报错是代码问题 不用管');
+          })
+    },
+
+    getPreSignedUrl(file) {
+      return new Promise((resolve, reject) => {
+        const fileReader = new FileReader();
+        fileReader.readAsArrayBuffer(file);
+        fileReader.onload = (e) => {
+          const data = md5(e.target.result);
+          console.log(data);
+          this.realAxios
+              .post('http://' + Host + ':7000/file/getPreSignedUrl', {
+                md5: data,
+              }, {
+                headers: {
+                  'token': localStorage.getItem("token"),
+                },
+              })
+              .then((response) => {
+                this.url = response.data.data;
+                resolve();
+              })
+              .catch((err) => {
+                reject(err);
+              });
+        };
+      });
     },
     register() {
       // 表单校验
       this.$refs.registerForm.validate((valid) => {
         if (valid) {
           // 发送注册请求
+          this.user.profile = this.url.previewUrl;
           this.realAxios.post(`http://` + Host + `:7000/auth/register`, this.user)
               .then(response => {
                 localStorage.setItem("token", response.data.data.token);

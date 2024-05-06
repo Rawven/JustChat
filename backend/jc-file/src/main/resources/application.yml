@@ -12,8 +12,11 @@ spring:
         server-addr: 10.21.32.154:8848
 server:
   port: 8888
-Ipfs:
-  api: /ip4/127.0.0.1/tcp/5001
+minio:
+    endpoint: http://10.21.32.192:9000
+    accessKey: admin
+    secretKey: admin123456
+    bucket: raven
 jwt:
   key: 爱你老妈
   expire: 604800000
