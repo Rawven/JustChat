@@ -5,7 +5,7 @@
 | ------------ | -------------------- | ------ | ------ |
 | Vue          | spring-gateway       |postgres| rocketMq|
 | element-plus | spring-boot          | redis  | nacos |
-|              | dubbo                | ipfs   | xxl-job|
+|              | dubbo                | minio   | xxl-job|
 --------
 目前功能： 
   1. 登录注册/个人信息crud
