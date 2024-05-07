@@ -13,10 +13,11 @@ spring:
 server:
   port: 8888
 minio:
-    endpoint: http://10.21.32.192:9000
-    accessKey: admin
-    secretKey: admin123456
-    bucket: raven
+  expose-domain: http://10.21.32.192:9000
+  domain: http://10.21.32.192:9000
+  access-key: admin
+  secret-key: admin123456
+  bucket: raven
 jwt:
   key: 爱你老妈
   expire: 604800000

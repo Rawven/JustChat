@@ -51,7 +51,7 @@ export default {
       md5:'',
       url:{
         previewUrl:'',
-        uploadUrl:'',
+        uploadUrl:[],
       },
       user: {
         username: '',
@@ -59,6 +59,8 @@ export default {
         password: '',
         profile: '',
       },
+      chunks:'',
+      chunkSize :30 * 1024 * 1024,
       rules: {
         // Add validation rules if needed
         username: [{required: true, message: 'Please enter your username', trigger: 'blur'}],
@@ -71,38 +73,78 @@ export default {
   },
   methods: {
     uploadFile(param) {
-       this.getPreSignedUrl(param.file)
-          .then(() => {
-            console.log(this.url)
-             this.realAxios.put(this.url.uploadUrl,  param.file, {
-               headers: {
-                 "Content-Type": "image/jpeg",
-               },
-            });
-          })
-          .then(() => {
-            this.$message.success('上传成功 下面的报错是代码问题 不用管');
-          })
-    },
-
-    getPreSignedUrl(file) {
       return new Promise((resolve, reject) => {
         const fileReader = new FileReader();
-        fileReader.readAsArrayBuffer(file);
+        fileReader.readAsArrayBuffer(param.file);
         fileReader.onload = (e) => {
+          const fileSize = e.target.result.byteLength;
           const data = md5(e.target.result);
-          console.log(data);
+
+          // 判断是否需要分片上传
+          const isChunked = fileSize > this.chunkSize;
+          const url = isChunked
+              ? `http://${Host}:7000/file/getPresignedUrlByChunk`
+              : `http://${Host}:7000/file/getPreSignedUrl`;
+          const requestData = isChunked
+              ? { md5: data, chunkSize: Math.ceil(fileSize / this.chunkSize) }
+              : { md5: data };
+
           this.realAxios
-              .post('http://' + Host + ':7000/file/getPreSignedUrl', {
-                md5: data,
-              }, {
+              .post(url, requestData, {
                 headers: {
-                  'token': localStorage.getItem("token"),
+                  token: localStorage.getItem("token"),
                 },
               })
               .then((response) => {
-                this.url = response.data.data;
-                resolve();
+                this.url = response.data.data
+                const uploadUrls = response.data.data.uploadUrl;
+                if (isChunked) {
+                  // 分片上传
+                  const chunks = Math.ceil(fileSize / this.chunkSize);
+                  const uploadPromises = [];
+                  for (let i = 0; i < chunks; i++) {
+                    const start = i * this.chunkSize;
+                    const end = Math.min((i + 1) * this.chunkSize, fileSize);
+                    const chunk = param.file.slice(start, end);
+                    uploadPromises.push(
+                        this.realAxios.put(uploadUrls[i], chunk, {
+                          headers: {
+                            "Content-Type": "application/octet-stream",
+                          },
+                        })
+                    );
+                  }
+                  Promise.all(uploadPromises)
+                      .then(() => {
+                        this.realAxios
+                            .post(`http://${Host}:7000/file/chunkMerge`, {
+                              md5: data,
+                              chunkSize: chunks,
+                            })
+                            .then(() => {
+                              this.$message.success("上传成功");
+                            })
+                        resolve();
+                      })
+                      .catch((err) => {
+                        reject(err);
+                      });
+                } else {
+                  // 不分片上传
+                  this.realAxios
+                      .put(uploadUrls[0], param.file, {
+                        headers: {
+                          "Content-Type": "image/jpeg",
+                        },
+                      })
+                      .then(() => {
+                        this.$message.success("上传成功");
+                        resolve();
+                      })
+                      .catch((err) => {
+                        reject(err);
+                      });
+                }
               })
               .catch((err) => {
                 reject(err);

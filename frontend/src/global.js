@@ -1,10 +1,13 @@
+import {md5} from "js-md5";
+import {Host} from "@/main";
+
 export default {
     ws: {},
     id:0,
-    setWs: function (newWs) {
+    setWs(newWs) {
         this.ws = newWs
     },
-    setId: function (newId) {
+    setId(newId) {
         this.id = newId
     },
 }
