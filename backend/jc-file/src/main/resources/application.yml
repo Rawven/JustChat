@@ -1,4 +1,7 @@
 spring:
+  redis:
+    address: redis://10.21.32.221:6379
+    password: 123456
   servlet:
     multipart:
       max-file-size: 10MB

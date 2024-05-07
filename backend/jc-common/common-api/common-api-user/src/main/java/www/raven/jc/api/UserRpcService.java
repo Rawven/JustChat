@@ -16,7 +16,7 @@ import www.raven.jc.result.RpcResult;
  * @date 2023/11/23
  */
 public interface UserRpcService {
-    
+
     /**
      * get single info
      *
