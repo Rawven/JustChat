@@ -9,10 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
@@ -161,30 +157,24 @@ public class SocialServiceImpl implements SocialService {
 
     private void loadMomentAll(List<Moment> moments, List<MomentVO> momentVos,
         Map<Integer, UserInfoDTO> mapInfo) {
-        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            List<Callable<MomentVO>> tasks = moments.stream().<Callable<MomentVO>>map(moment -> () -> {
-                String id = moment.getId();
-                List<Comment> comments = commentDAO.getBaseMapper().selectList(new QueryWrapper<Comment>().eq("moment_id", id));
-                List<Like> likes = likeDAO.getBaseMapper().selectList(new QueryWrapper<Like>().eq("moment_id", id));
-                List<CommentVO> commentVos = comments.stream().map(comment -> new CommentVO(comment, mapInfo.get(comment.getUserId()))).collect(Collectors.toList());
-                List<LikeVO> likeVos = likes.stream().map(like -> new LikeVO(like, mapInfo.get(like.getUserId()))).collect(Collectors.toList());
-                return new MomentVO()
-                    .setMomentId(id)
-                    .setLikes(likeVos)
-                    .setComments(commentVos)
-                    .setImg(moment.getImg())
-                    .setContent(moment.getContent())
-                    .setTimestamp(moment.getTimestamp())
-                    .setUserInfo(mapInfo.get(moment.getUserId()));
-            }).collect(Collectors.toList());
-            List<Future<MomentVO>> futures = executor.invokeAll(tasks);
-            for (Future<MomentVO> future : futures) {
-                momentVos.add(future.get());
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            // 处理异常
-            log.error("loadMomentAll error", e);
-        }
+        List<String> momentIds = moments.stream().map(Moment::getId).collect(Collectors.toList());
+        //TODO 理论上需要补充点赞和评论的分页接口 以后有时间再补充
+        List<Comment> comments = commentDAO.getBaseMapper().selectPage(new Page<>(1, 10), new QueryWrapper<Comment>().in("moment_id", momentIds)).getRecords();
+        List<Like> likes = likeDAO.getBaseMapper().selectPage(new Page<>(1, 10), new QueryWrapper<Like>().in("moment_id", momentIds)).getRecords();
+        Map<String, List<Comment>> commentMap = comments.stream().collect(Collectors.groupingBy(Comment::getMomentId));
+        Map<String, List<Like>> likeMap = likes.stream().collect(Collectors.groupingBy(Like::getMomentId));
+        moments.forEach(moment -> {
+            List<CommentVO> commentVos = commentMap.getOrDefault(moment.getId(), new ArrayList<>()).stream().map(comment -> new CommentVO(comment, mapInfo.get(comment.getUserId()))).collect(Collectors.toList());
+            List<LikeVO> likeVos = likeMap.getOrDefault(moment.getId(), new ArrayList<>()).stream().map(like -> new LikeVO(like, mapInfo.get(like.getUserId()))).collect(Collectors.toList());
+            momentVos.add(new MomentVO()
+                .setMomentId(moment.getId())
+                .setLikes(likeVos)
+                .setComments(commentVos)
+                .setImg(moment.getImg())
+                .setContent(moment.getContent())
+                .setTimestamp(moment.getTimestamp())
+                .setUserInfo(mapInfo.get(moment.getUserId())));
+        });
     }
 
     private void handleEvent(String momentId, Integer userId, String msg,
