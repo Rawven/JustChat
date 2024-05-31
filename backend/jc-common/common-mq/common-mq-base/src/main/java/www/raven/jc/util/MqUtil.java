@@ -23,10 +23,11 @@ import static www.raven.jc.constant.MqConstant.HEAD;
 @Slf4j
 public class MqUtil {
 
-    public static void sendMsg(RocketMQTemplate rocketMQTemplate, String topic,
+    public static <T> void sendMsg(RocketMQTemplate rocketMQTemplate,
+        String topic,
         String tag,
-        Message<String> message) {
-        rocketMQTemplate.asyncSend(topic + ":" + tag, message, new SendCallback() {
+        T data) {
+        rocketMQTemplate.asyncSend(topic + ":" + tag, createMsg(data), new SendCallback() {
             @Override
             public void onSuccess(
                 org.apache.rocketmq.client.producer.SendResult sendResult) {
@@ -40,9 +41,9 @@ public class MqUtil {
         });
     }
 
-    public static Message<String> createMsg(String data) {
+    public static <T> Message<String> createMsg(T data) {
         return MessageBuilder
-            .withPayload(data)
+            .withPayload(JsonUtil.objToJson(data))
             .setHeader(MessageConst.PROPERTY_KEYS, IdUtil.getSnowflakeNextIdStr()).build();
     }
 

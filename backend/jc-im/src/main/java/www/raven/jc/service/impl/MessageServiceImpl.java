@@ -102,7 +102,7 @@ public class MessageServiceImpl implements MessageService {
             }
         );
         //异步入历史消息数据库
-        MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_SAVE_HISTORY_MSG, imProperty.getInTopic(), MqUtil.createMsg(JsonUtil.objToJson(new SaveMsgEvent().setMessage(realMsg).setType("room"))));
+        MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_SAVE_HISTORY_MSG, imProperty.getInTopic(), JsonUtil.objToJson(new SaveMsgEvent().setMessage(realMsg).setType("room")));
     }
 
     @Override
@@ -122,7 +122,7 @@ public class MessageServiceImpl implements MessageService {
             scoredSortedSet.add(message.getTime(), realMsg);
         }
         //异步入历史消息库
-        MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_SAVE_HISTORY_MSG, imProperty.getInTopic(), MqUtil.createMsg(JsonUtil.objToJson(new SaveMsgEvent().setMessage(realMsg).setType("friend"))));
+        MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_SAVE_HISTORY_MSG, imProperty.getInTopic(), JsonUtil.objToJson(new SaveMsgEvent().setMessage(realMsg).setType("friend")));
     }
 
     @Override
@@ -149,6 +149,6 @@ public class MessageServiceImpl implements MessageService {
         Room room = roomDAO.getBaseMapper().selectById(roomId);
         Integer founderId = room.getFounderId();
         //通知user模块 插入一条申请记录
-        MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_CHAT_ROOM_APPLY, imProperty.getInTopic(), MqUtil.createMsg(JsonUtil.objToJson(new RoomApplyEvent(userId, founderId, roomId))));
+        MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_CHAT_ROOM_APPLY, imProperty.getInTopic(), JsonUtil.objToJson(new RoomApplyEvent(userId, founderId, roomId)));
     }
 }

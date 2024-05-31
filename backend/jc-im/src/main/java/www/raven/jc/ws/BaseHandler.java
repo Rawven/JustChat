@@ -47,7 +47,7 @@ public interface BaseHandler {
         }
         for (Map.Entry<String, List<Integer>> entry : map.entrySet()) {
             MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_SEND_MESSAGE, entry.getKey(),
-                MqUtil.createMsg(JsonUtil.objToJson(new WsMsg().setMessage(JsonUtil.objToJson(message)).setTo(entry.getValue()))));
+                new WsMsg().setMessage(JsonUtil.objToJson(message)).setTo(entry.getValue()));
         }
     }
 }

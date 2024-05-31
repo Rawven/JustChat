@@ -36,7 +36,6 @@ import www.raven.jc.event.model.MomentNoticeEvent;
 import www.raven.jc.result.RpcResult;
 import www.raven.jc.service.SocialService;
 import www.raven.jc.service.TimelineFeedService;
-import www.raven.jc.util.JsonUtil;
 import www.raven.jc.util.MqUtil;
 import www.raven.jc.util.RequestUtil;
 
@@ -179,7 +178,6 @@ public class SocialServiceImpl implements SocialService {
 
     private void handleEvent(String momentId, Integer userId, String msg,
         String tag) {
-        MqUtil.sendMsg(rocketMQTemplate, tag, outTopic, MqUtil.createMsg(
-            JsonUtil.objToJson(new MomentNoticeEvent().setMomentId(momentId).setUserId(userId).setMsg(msg))));
+        MqUtil.sendMsg(rocketMQTemplate, tag, outTopic, new MomentNoticeEvent().setMomentId(momentId).setUserId(userId).setMsg(msg));
     }
 }
