@@ -2,14 +2,11 @@ package www.raven.jc.consumer;
 
 import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
-import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +31,8 @@ import www.raven.jc.event.RoomApplyEvent;
 import www.raven.jc.event.SaveMsgEvent;
 import www.raven.jc.event.model.DeleteNoticeEvent;
 import www.raven.jc.result.RpcResult;
+import www.raven.jc.template.AbstractMQListener;
 import www.raven.jc.util.JsonUtil;
-import www.raven.jc.util.MqUtil;
 import www.raven.jc.ws.WebsocketService;
 
 /**
@@ -47,7 +44,7 @@ import www.raven.jc.ws.WebsocketService;
 @Component
 @Slf4j
 @RocketMQMessageListener(consumerGroup = "${mq.in_consumer_group}", topic = "${mq.in_topic}")
-public class NoticeEventListener implements RocketMQListener<MessageExt> {
+public class NoticeEventListener extends AbstractMQListener {
     @Autowired
     private RedissonClient redissonClient;
     @Autowired
@@ -61,17 +58,13 @@ public class NoticeEventListener implements RocketMQListener<MessageExt> {
     @Autowired
     private FriendChatDAO friendChatDAO;
 
+    public NoticeEventListener(RedissonClient redissonClient) {
+        super(redissonClient);
+    }
+
     @Override
-    public void onMessage(MessageExt messageExt) {
-        if (MqUtil.checkMsgValid(messageExt, redissonClient)) {
-            return;
-        }
-        byte[] body = messageExt.getBody();
-
-        String message = new String(body, StandardCharsets.UTF_8);
-        log.info("--RocketMq receive event:{}", message);
-
-        switch (messageExt.getTags()) {
+    public void onMessage0(String message, String tags) {
+        switch (tags) {
             case ImImMqConstant.TAGS_CHAT_ROOM_APPLY:
                 eventUserJoinRoomApply(message);
                 break;
@@ -90,8 +83,6 @@ public class NoticeEventListener implements RocketMQListener<MessageExt> {
             default:
                 log.info("--RocketMq 非法的消息，不处理");
         }
-
-        MqUtil.protectMsg(messageExt, redissonClient);
     }
 
     private void eventSaveMsg(String msg) {

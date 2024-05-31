@@ -17,7 +17,6 @@ public class CommonResult<T> {
     boolean isSuccess;
     private Integer code;
     private String message;
-
     private T data;
 
     private CommonResult(Integer code, boolean isSuccess, String message) {

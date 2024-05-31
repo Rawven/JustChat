@@ -32,6 +32,7 @@ public class JwtUtil {
         return JWTUtil.createToken(map, key.getBytes());
     }
 
+    @SuppressWarnings("unchecked")
     public static TokenDTO parseToken(String token, String key) {
         Assert.isTrue(JWTUtil.verify(token, key.getBytes()), "token验证失败");
         JWTPayload payload = JWTUtil.parseToken(token).getPayload();

@@ -2,7 +2,6 @@ package www.raven.jc.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -17,15 +16,6 @@ public class JsonUtil {
 
     static {
         OBJECT_MAPPER = new ObjectMapper();
-    }
-
-    public static Map jsonToMap(String json) {
-        try {
-            return OBJECT_MAPPER.readValue(json, Map.class);
-        } catch (JsonProcessingException e) {
-            log.error("JsonUtil jsonToMap error:{}", e.getMessage());
-            throw new RuntimeException(e);
-        }
     }
 
     public static <T> T jsonToObj(String json, Class<T> clazz) {

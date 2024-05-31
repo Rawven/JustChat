@@ -1,16 +1,12 @@
 package www.raven.jc.consumer;
 
-import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
-import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.redisson.api.RedissonClient;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import www.raven.jc.constant.ImImMqConstant;
+import www.raven.jc.template.AbstractMQListener;
 import www.raven.jc.util.JsonUtil;
-import www.raven.jc.util.MqUtil;
 import www.raven.jc.ws.WebsocketService;
 import www.raven.jc.ws.WsMsg;
 
@@ -23,21 +19,16 @@ import www.raven.jc.ws.WsMsg;
 @Component
 @Slf4j
 @RocketMQMessageListener(consumerGroup = "${mq.ws_consumer_group}", topic = "${mq.ws_topic}", selectorExpression = ImImMqConstant.TAGS_SEND_MESSAGE)
-public class WsListener implements RocketMQListener<MessageExt> {
-    @Autowired
-    private RedissonClient redissonClient;
+public class WsListener extends AbstractMQListener {
+
+    public WsListener(RedissonClient redissonClient) {
+        super(redissonClient);
+    }
 
     @Override
-    public void onMessage(MessageExt messageExt) {
-        if (MqUtil.checkMsgValid(messageExt, redissonClient)) {
-            return;
-        }
-        byte[] body = messageExt.getBody();
-        String message = new String(body, StandardCharsets.UTF_8);
-        log.info("--RocketMq receive event:{}", message);
+    public void onMessage0(String message, String tags) {
         WsMsg wsMsg = JsonUtil.jsonToObj(message, WsMsg.class);
         WebsocketService.sendBatchMessage(wsMsg.getMessage(), wsMsg.getTo());
-        MqUtil.protectMsg(messageExt, redissonClient);
     }
 
 }

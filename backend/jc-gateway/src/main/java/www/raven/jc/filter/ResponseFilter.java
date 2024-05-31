@@ -46,7 +46,7 @@ public class ResponseFilter implements GlobalFilter, Ordered {
         int index = str.indexOf("\"data\"");
         String realStr = str.substring(0, index - 1);
         sb.append(realStr).append("}");
-        Map<String, Object> commonResult = JsonUtil.jsonToMap(sb.toString());
+        Map<String, Object> commonResult = JsonUtil.jsonToObj(sb.toString(), Map.class);
         log.info("该请求的返回");
         log.info("Response Code: {}", commonResult.get("code"));
         log.info("Response Message: {}", commonResult.get("message"));
