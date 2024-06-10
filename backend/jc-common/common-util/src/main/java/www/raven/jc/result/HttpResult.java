@@ -13,19 +13,19 @@ import lombok.experimental.Accessors;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-public class CommonResult<T> {
+public class HttpResult<T> {
     boolean isSuccess;
     private Integer code;
     private String message;
     private T data;
 
-    private CommonResult(Integer code, boolean isSuccess, String message) {
+    private HttpResult(Integer code, boolean isSuccess, String message) {
         this.code = code;
         this.isSuccess = isSuccess;
         this.message = message;
     }
 
-    private CommonResult(Integer code, boolean isSuccess, String message,
+    private HttpResult(Integer code, boolean isSuccess, String message,
         T data) {
         this.code = code;
         this.isSuccess = isSuccess;
@@ -33,16 +33,16 @@ public class CommonResult<T> {
         this.data = data;
     }
 
-    public static CommonResult<Void> operateFailure(String message) {
-        return new CommonResult<>(ResultCode.FAIL_CODE, false, message);
+    public static HttpResult<Void> operateFailure(String message) {
+        return new HttpResult<>(ResultCode.FAIL_CODE, false, message);
     }
 
-    public static CommonResult<Void> operateSuccess(String message) {
-        return new CommonResult<>(ResultCode.SUCCESS_CODE, true, message);
+    public static HttpResult<Void> operateSuccess(String message) {
+        return new HttpResult<>(ResultCode.SUCCESS_CODE, true, message);
     }
 
-    public static <T> CommonResult<T> operateSuccess(String message, T data) {
-        return new CommonResult<>(
+    public static <T> HttpResult<T> operateSuccess(String message, T data) {
+        return new HttpResult<>(
             ResultCode.SUCCESS_CODE,
             true,
             message,
@@ -50,8 +50,8 @@ public class CommonResult<T> {
         );
     }
 
-    public static <T> CommonResult<T> operateFailure(String message, T data) {
-        return new CommonResult<>(
+    public static <T> HttpResult<T> operateFailure(String message, T data) {
+        return new HttpResult<>(
             ResultCode.FAIL_CODE,
             false,
             message,
@@ -59,18 +59,18 @@ public class CommonResult<T> {
         );
     }
 
-    public static <T> CommonResult<T> operateFailure(Integer code,
+    public static <T> HttpResult<T> operateFailure(Integer code,
         String message) {
-        return new CommonResult<>(
+        return new HttpResult<>(
             code,
             false,
             message
         );
     }
 
-    public static <T> CommonResult<T> operateFailure(Integer code,
+    public static <T> HttpResult<T> operateFailure(Integer code,
         String message, T data) {
-        return new CommonResult<>(
+        return new HttpResult<>(
             code,
             false,
             message,

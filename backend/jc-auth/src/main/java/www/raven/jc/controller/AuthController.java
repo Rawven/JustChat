@@ -13,7 +13,7 @@ import www.raven.jc.config.JwtProperty;
 import www.raven.jc.entity.model.LoginModel;
 import www.raven.jc.entity.model.RegisterModel;
 import www.raven.jc.entity.vo.TokenVO;
-import www.raven.jc.result.CommonResult;
+import www.raven.jc.result.HttpResult;
 import www.raven.jc.service.AuthService;
 
 /**
@@ -31,27 +31,27 @@ public class AuthController {
     private JwtProperty jwtProperty;
 
     @PostMapping("/login")
-    public CommonResult<TokenVO> login(
+    public HttpResult<TokenVO> login(
         @RequestBody @Validated LoginModel loginModel) {
-        return CommonResult.operateSuccess("登录成功", authService.login(loginModel));
+        return HttpResult.operateSuccess("登录成功", authService.login(loginModel));
     }
 
     @PostMapping("/register")
-    public CommonResult<TokenVO> register(
+    public HttpResult<TokenVO> register(
         @RequestBody @Validated RegisterModel registerModel) {
-        return CommonResult.operateSuccess("注册成功", authService.registerCommonRole(registerModel));
+        return HttpResult.operateSuccess("注册成功", authService.registerCommonRole(registerModel));
     }
 
     @GetMapping("/logout/{token}")
-    public CommonResult<Void> logout(
+    public HttpResult<Void> logout(
         @PathVariable("token") @NotBlank String token) {
         authService.logout(token);
-        return CommonResult.operateSuccess("登出成功");
+        return HttpResult.operateSuccess("登出成功");
     }
 
     @PostMapping("/refresh")
-    public CommonResult<TokenVO> refresh(@RequestBody @NotBlank String token) {
-        return CommonResult.operateSuccess("刷新成功", authService.refreshToken(token));
+    public HttpResult<TokenVO> refresh(@RequestBody @NotBlank String token) {
+        return HttpResult.operateSuccess("刷新成功", authService.refreshToken(token));
     }
 
 }

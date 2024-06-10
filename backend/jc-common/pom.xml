@@ -13,7 +13,6 @@
 
     <modules>
         <module>common-mq</module>
-        <module>common-aop</module>
         <module>common-api</module>
         <module>common-util</module>
         <module>common-redis</module>

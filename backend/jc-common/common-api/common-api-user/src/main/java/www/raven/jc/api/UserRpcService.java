@@ -6,7 +6,7 @@ import www.raven.jc.dto.RoleDTO;
 import www.raven.jc.dto.UserAuthDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.dto.UserRegisterDTO;
-import www.raven.jc.result.CommonResult;
+import www.raven.jc.result.HttpResult;
 import www.raven.jc.result.RpcResult;
 
 /**
@@ -21,14 +21,14 @@ public interface UserRpcService {
      * get single info
      *
      * @param userId user id
-     * @return {@link CommonResult}<{@link UserInfoDTO}>
+     * @return {@link HttpResult}<{@link UserInfoDTO}>
      */
     RpcResult<UserInfoDTO> getSingleInfo(Integer userId);
 
     /**
      * get all info
      *
-     * @return {@link CommonResult}<{@link List}<{@link UserInfoDTO}>>
+     * @return {@link HttpResult}<{@link List}<{@link UserInfoDTO}>>
      */
     RpcResult<List<UserInfoDTO>> getAllInfo();
 
@@ -36,7 +36,7 @@ public interface UserRpcService {
      * get related info list
      *
      * @param userInfoDTO user info dto
-     * @return {@link CommonResult}<{@link List}<{@link UserInfoDTO}>>
+     * @return {@link HttpResult}<{@link List}<{@link UserInfoDTO}>>
      */
     RpcResult<List<UserInfoDTO>> getRelatedInfoList(
         QueryUserInfoDTO userInfoDTO);
@@ -45,7 +45,7 @@ public interface UserRpcService {
      * insert
      *
      * @param user user
-     * @return {@link CommonResult}<{@link UserAuthDTO}>
+     * @return {@link HttpResult}<{@link UserAuthDTO}>
      */
     RpcResult<UserAuthDTO> insert(UserRegisterDTO user);
 
@@ -53,7 +53,7 @@ public interface UserRpcService {
      * get user to auth
      *
      * @param username username
-     * @return {@link CommonResult}<{@link UserAuthDTO}>
+     * @return {@link HttpResult}<{@link UserAuthDTO}>
      */
     RpcResult<UserAuthDTO> getUserToAuth(String username);
 
@@ -61,7 +61,7 @@ public interface UserRpcService {
      * get roles by id
      *
      * @param userId user id
-     * @return {@link CommonResult}<{@link List}<{@link RoleDTO}>>
+     * @return {@link HttpResult}<{@link List}<{@link RoleDTO}>>
      */
     RpcResult<List<RoleDTO>> getRolesById(Integer userId);
 
@@ -69,7 +69,7 @@ public interface UserRpcService {
      * check user exit
      *
      * @param username username
-     * @return {@link CommonResult}<{@link Boolean}>
+     * @return {@link HttpResult}<{@link Boolean}>
      */
     RpcResult<Boolean> checkUserExit(String username);
 
@@ -77,7 +77,7 @@ public interface UserRpcService {
      * get batch info
      *
      * @param userIds user ids
-     * @return {@link CommonResult}<{@link List}<{@link UserInfoDTO}>>
+     * @return {@link HttpResult}<{@link List}<{@link UserInfoDTO}>>
      */
     RpcResult<List<UserInfoDTO>> getBatchInfo(List<Integer> userIds);
 
@@ -85,7 +85,7 @@ public interface UserRpcService {
      * user logout
      *
      * @param userId user id
-     * @return {@link CommonResult}<{@link Void}>
+     * @return {@link HttpResult}<{@link Void}>
      */
     RpcResult<Void> saveLogOutTime(Integer userId);
 

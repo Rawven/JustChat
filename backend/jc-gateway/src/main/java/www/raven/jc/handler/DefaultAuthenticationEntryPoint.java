@@ -10,7 +10,7 @@ import org.springframework.security.web.server.ServerAuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-import www.raven.jc.result.CommonResult;
+import www.raven.jc.result.HttpResult;
 import www.raven.jc.util.JsonUtil;
 
 /**
@@ -31,7 +31,7 @@ public class DefaultAuthenticationEntryPoint implements ServerAuthenticationEntr
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
             response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
             DataBufferFactory dataBufferFactory = response.bufferFactory();
-            String result = JsonUtil.objToJson(CommonResult.operateFailure("未认证"));
+            String result = JsonUtil.objToJson(HttpResult.operateFailure("未认证"));
             DataBuffer buffer = dataBufferFactory.wrap(result.getBytes(
                 Charset.defaultCharset()));
             return response.writeWith(Mono.just(buffer));

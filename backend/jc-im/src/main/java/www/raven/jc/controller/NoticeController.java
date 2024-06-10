@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import www.raven.jc.entity.vo.NoticeVO;
-import www.raven.jc.result.CommonResult;
+import www.raven.jc.result.HttpResult;
 import www.raven.jc.service.NoticeService;
 
 /**
@@ -28,14 +28,14 @@ public class NoticeController {
     private NoticeService noticeService;
 
     @GetMapping("/getNotice")
-    public CommonResult<List<NoticeVO>> getNotice() {
-        return CommonResult.operateSuccess("查找成功", noticeService.loadNotice());
+    public HttpResult<List<NoticeVO>> getNotice() {
+        return HttpResult.operateSuccess("查找成功", noticeService.loadNotice());
     }
 
     @GetMapping("/addFriendApply/{friendName}")
-    public CommonResult<Void> addFriendApply(
+    public HttpResult<Void> addFriendApply(
         @PathVariable("friendName") @NotNull String friendName) {
         noticeService.addFriendApply(friendName);
-        return CommonResult.operateSuccess("添加好友申请成功");
+        return HttpResult.operateSuccess("添加好友申请成功");
     }
 }

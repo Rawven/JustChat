@@ -18,7 +18,7 @@ import www.raven.jc.entity.bo.GetUrlBO;
 import www.raven.jc.entity.bo.UploadBO;
 import www.raven.jc.entity.vo.ChunkVO;
 import www.raven.jc.entity.vo.GetUrlVO;
-import www.raven.jc.result.CommonResult;
+import www.raven.jc.result.HttpResult;
 import www.raven.jc.service.FileService;
 
 @RestController
@@ -33,56 +33,56 @@ public class FileController {
      *
      * @param file file
      * @param md5  md5
-     * @return {@link CommonResult }<{@link Void }>
+     * @return {@link HttpResult }<{@link Void }>
      */
     @PostMapping("/upload/{md5}")
-    public CommonResult<Void> upload(
+    public HttpResult<Void> upload(
         @RequestParam("file") @NotNull MultipartFile file,
         @PathVariable("md5") @NotNull String md5) throws IOException {
         fileService.upload(UploadBO.builder().file(file).md5(md5).build());
-        return CommonResult.operateSuccess("上传文件成功");
+        return HttpResult.operateSuccess("上传文件成功");
     }
 
     /**
      * 向客户端提供预签名链接以实现客户端直传
      *
      * @param getUrlBO get url bo
-     * @return {@link CommonResult }<{@link GetUrlVO }>
+     * @return {@link HttpResult }<{@link GetUrlVO }>
      */
     @PostMapping("/getPresignedUrl")
-    public CommonResult<GetUrlVO> getPresignedUrl(
+    public HttpResult<GetUrlVO> getPresignedUrl(
         @RequestBody GetUrlBO getUrlBO) {
-        return CommonResult.operateSuccess("获取预签名url成功", fileService.getPresignedUrl(getUrlBO));
+        return HttpResult.operateSuccess("获取预签名url成功", fileService.getPresignedUrl(getUrlBO));
     }
 
     /**
      * 返回客户端分片上传所需的预签名链接
      *
      * @param chunkUploadBO chunk upload bo
-     * @return {@link CommonResult }<{@link ChunkVO }>
+     * @return {@link HttpResult }<{@link ChunkVO }>
      */
     @PostMapping("/getPresignedUrlByChunk")
-    public CommonResult<ChunkVO> getPresignedUrlByChunk(
+    public HttpResult<ChunkVO> getPresignedUrlByChunk(
         @RequestBody ChunkUploadBO chunkUploadBO) {
-        return CommonResult.operateSuccess("请求分片上传文件成功", fileService.getPresignedUrlForChunk(chunkUploadBO));
+        return HttpResult.operateSuccess("请求分片上传文件成功", fileService.getPresignedUrlForChunk(chunkUploadBO));
     }
 
     /**
      * 客户端上传完分片后，服务端合并分片
      *
      * @param chunkMergeBO chunk merge bo
-     * @return {@link CommonResult }<{@link Void }>
+     * @return {@link HttpResult }<{@link Void }>
      */
     @PostMapping("/chunkMerge")
-    public CommonResult<Void> chunkMerge(
+    public HttpResult<Void> chunkMerge(
         @RequestBody ChunkMergeBO chunkMergeBO) {
         fileService.chunkCompose(chunkMergeBO);
-        return CommonResult.operateSuccess("合并文件成功");
+        return HttpResult.operateSuccess("合并文件成功");
     }
 
     @GetMapping("/{objectName}")
-    public CommonResult<String> getUrl(
+    public HttpResult<String> getUrl(
         @PathVariable("objectName") @NotNull String objectName) {
-        return CommonResult.operateSuccess("获取url成功", fileService.getUrl(objectName));
+        return HttpResult.operateSuccess("获取url成功", fileService.getUrl(objectName));
     }
 }

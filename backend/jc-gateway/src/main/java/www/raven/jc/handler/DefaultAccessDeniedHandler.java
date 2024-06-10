@@ -10,7 +10,7 @@ import org.springframework.security.web.server.authorization.ServerAccessDeniedH
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-import www.raven.jc.result.CommonResult;
+import www.raven.jc.result.HttpResult;
 import www.raven.jc.util.JsonUtil;
 
 /**
@@ -30,7 +30,7 @@ public class DefaultAccessDeniedHandler implements ServerAccessDeniedHandler {
                 response.setStatusCode(HttpStatus.OK);
                 response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
                 DataBufferFactory dataBufferFactory = response.bufferFactory();
-                String result = JsonUtil.objToJson(CommonResult.operateFailure("您权限不足"));
+                String result = JsonUtil.objToJson(HttpResult.operateFailure("您权限不足"));
                 DataBuffer buffer = dataBufferFactory.wrap(result.getBytes(
                     Charset.defaultCharset()));
                 return response.writeWith(Mono.just(buffer));

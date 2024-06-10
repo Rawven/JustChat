@@ -16,7 +16,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import www.raven.jc.config.SecurityProperty;
 import www.raven.jc.constant.JwtConstant;
-import www.raven.jc.result.CommonResult;
+import www.raven.jc.result.HttpResult;
 import www.raven.jc.result.ResultCode;
 import www.raven.jc.util.JsonUtil;
 
@@ -61,7 +61,7 @@ public class RequestFilter implements GlobalFilter, Ordered {
             // 设置响应的状态码和内容类型
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
             response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-            CommonResult<Object> result = CommonResult.operateFailure(ResultCode.TOKEN_EXPIRED_CODE, "Token expired, please reapply for a token");
+            HttpResult<Object> result = HttpResult.operateFailure(ResultCode.TOKEN_EXPIRED_CODE, "Token expired, please reapply for a token");
             // 返回响应
             String responseBody = JsonUtil.objToJson(result);
             // 返回响应

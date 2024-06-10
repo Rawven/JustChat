@@ -13,7 +13,6 @@
     <url>http://maven.apache.org</url>
     <modules>
         <module>common-api-user</module>
-        <module>common-api-base</module>
     </modules>
     <dependencies>
         <dependency>

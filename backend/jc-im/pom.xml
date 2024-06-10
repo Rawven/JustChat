@@ -42,7 +42,7 @@
         </dependency>
         <dependency>
             <groupId>www.Raven</groupId>
-            <artifactId>common-aop</artifactId>
+            <artifactId>common-mvc</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>

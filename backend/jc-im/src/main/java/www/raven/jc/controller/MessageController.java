@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import www.raven.jc.entity.model.PageGroupMsgModel;
 import www.raven.jc.entity.model.PagesFriendMsgModel;
 import www.raven.jc.entity.vo.MessageVO;
-import www.raven.jc.result.CommonResult;
+import www.raven.jc.result.HttpResult;
 import www.raven.jc.service.FriendService;
 import www.raven.jc.service.MessageService;
 import www.raven.jc.service.RoomService;
@@ -35,19 +35,19 @@ public class MessageController {
     private FriendService friendService;
 
     @GetMapping("/getLatestOffline")
-    public CommonResult<List<MessageVO>> getLatestOfflineMsg() {
-        return CommonResult.operateSuccess("获取最新离线信息成功", messageService.getLatestOffline());
+    public HttpResult<List<MessageVO>> getLatestOfflineMsg() {
+        return HttpResult.operateSuccess("获取最新离线信息成功", messageService.getLatestOffline());
     }
 
     @PostMapping("/queryRoomMsgPages")
-    public CommonResult<List<MessageVO>> getGroupMsgHistory(
+    public HttpResult<List<MessageVO>> getGroupMsgHistory(
         @RequestBody @Validated PageGroupMsgModel model) {
-        return CommonResult.operateSuccess("获取历史群聊信息成功", roomService.getGroupMsgPages(model));
+        return HttpResult.operateSuccess("获取历史群聊信息成功", roomService.getGroupMsgPages(model));
     }
 
     @PostMapping("/queryFriendMsgPages")
-    public CommonResult<List<MessageVO>> getFriendMsgHistory(
+    public HttpResult<List<MessageVO>> getFriendMsgHistory(
         @RequestBody @Validated PagesFriendMsgModel model) {
-        return CommonResult.operateSuccess("获取历史私聊信息成功", friendService.getFriendMsgPages(model));
+        return HttpResult.operateSuccess("获取历史私聊信息成功", friendService.getFriendMsgPages(model));
     }
 }

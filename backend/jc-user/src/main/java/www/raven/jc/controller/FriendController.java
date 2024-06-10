@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import www.raven.jc.result.CommonResult;
+import www.raven.jc.result.HttpResult;
 import www.raven.jc.service.FriendService;
 
 /**
@@ -26,19 +26,19 @@ public class FriendController {
     private FriendService friendService;
 
     @GetMapping("/agreeToBeFriend/{friendId}/{noticeId}")
-    public CommonResult<Void> agreeApplyFriend(
+    public HttpResult<Void> agreeApplyFriend(
         @PathVariable("friendId") @NotNull int friendId,
         @PathVariable("noticeId") @NotNull int noticeId) {
         friendService.agreeApplyFromFriend(friendId, noticeId);
-        return CommonResult.operateSuccess("成为好友成功");
+        return HttpResult.operateSuccess("成为好友成功");
     }
 
     @GetMapping("/refuseToBeFriend/{friendId}/{noticeId}")
-    public CommonResult<Void> refuseApplyFriend(
+    public HttpResult<Void> refuseApplyFriend(
         @PathVariable("friendId") int friendId,
         @PathVariable("noticeId") @NotNull int noticeId) {
         friendService.refuseApplyFromFriend(noticeId);
-        return CommonResult.operateSuccess("拒绝好友成功");
+        return HttpResult.operateSuccess("拒绝好友成功");
     }
 
 }

@@ -14,7 +14,7 @@ import www.raven.jc.entity.model.CommentModel;
 import www.raven.jc.entity.model.LikeModel;
 import www.raven.jc.entity.model.MomentModel;
 import www.raven.jc.entity.vo.MomentVO;
-import www.raven.jc.result.CommonResult;
+import www.raven.jc.result.HttpResult;
 import www.raven.jc.service.SocialService;
 
 /**
@@ -32,36 +32,36 @@ public class SocialController {
     private HttpServletRequest request;
 
     @GetMapping("/queryMoment/{page}/{size}")
-    public CommonResult<List<MomentVO>> queryMoment(
+    public HttpResult<List<MomentVO>> queryMoment(
         @PathVariable("page") int page, @PathVariable("size") int size) {
-        return CommonResult.operateSuccess("查询成功", socialService.queryMoment(page, size));
+        return HttpResult.operateSuccess("查询成功", socialService.queryMoment(page, size));
     }
 
     @PostMapping("/releaseMoment")
-    public CommonResult<Void> releaseMoment(
+    public HttpResult<Void> releaseMoment(
         @RequestBody @Validated MomentModel model) {
         socialService.releaseMoment(model);
-        return CommonResult.operateSuccess("发布成功");
+        return HttpResult.operateSuccess("发布成功");
     }
 
     @PostMapping("/deleteMoment/{momentId}")
-    public CommonResult<Void> deleteMoment(
+    public HttpResult<Void> deleteMoment(
         @PathVariable("momentId") @Validated String momentId) {
         socialService.deleteMoment(momentId);
-        return CommonResult.operateSuccess("删除成功");
+        return HttpResult.operateSuccess("删除成功");
     }
 
     @PostMapping("/likeMoment")
-    public CommonResult<Void> likeMoment(
+    public HttpResult<Void> likeMoment(
         @RequestBody @Validated LikeModel model) {
         socialService.likeMoment(model);
-        return CommonResult.operateSuccess("点赞成功");
+        return HttpResult.operateSuccess("点赞成功");
     }
 
     @PostMapping("/commentMoment")
-    public CommonResult<Void> commentMoment(
+    public HttpResult<Void> commentMoment(
         @RequestBody @Validated CommentModel model) {
         socialService.commentMoment(model);
-        return CommonResult.operateSuccess("评论成功");
+        return HttpResult.operateSuccess("评论成功");
     }
 }
