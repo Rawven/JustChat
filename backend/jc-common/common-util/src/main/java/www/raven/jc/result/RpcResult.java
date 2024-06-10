@@ -2,7 +2,7 @@ package www.raven.jc.result;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import www.raven.jc.model.CommonSerializable;
+import www.raven.jc.serializable.CommonSerializable;
 
 /**
  * api result

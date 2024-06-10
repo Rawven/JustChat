@@ -19,7 +19,6 @@
         <module name="auth" />
         <module name="social" />
         <module name="common-mq-feed-im-model" />
-        <module name="common-aop" />
         <module name="common-mp" />
         <module name="jc-user" />
         <module name="common-redis" />
@@ -29,7 +28,6 @@
         <module name="common-ws" />
         <module name="file" />
         <module name="common-job" />
-        <module name="common-api-base" />
         <module name="chat" />
         <module name="common-mq-base" />
         <module name="common-api-user" />
@@ -46,6 +44,8 @@
       <module name="auth" target="11" />
       <module name="chat" target="11" />
       <module name="common" target="11" />
+      <module name="common-aop" target="21" />
+      <module name="common-api-base" target="21" />
       <module name="common-api-im" target="11" />
       <module name="common-base" target="11" />
       <module name="common-User" target="11" />

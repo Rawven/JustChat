@@ -33,8 +33,10 @@ spring:
           uri: lb://JC-Chat
           predicates:
             - Path=/chat/**
-          filters: # 过滤器
-            - StripPrefix=1 # 去掉路径中的第一级  -
+        - id: wsServer
+          uri: lb:ws://JC-Chat
+          predicates:
+            - Path=/ws/**
         - id: social
           uri: lb://JC-Social
           predicates:

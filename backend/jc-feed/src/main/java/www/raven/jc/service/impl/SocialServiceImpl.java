@@ -78,8 +78,7 @@ public class SocialServiceImpl implements SocialService {
             .setImg(model.getImg())
             .setContent(model.getText())
             .setTimestamp(System.currentTimeMillis());
-        int insert = momentDAO.getBaseMapper().insert(moment);
-        Assert.isTrue(insert > 0, "发布失败");
+        Assert.isTrue(momentDAO.getBaseMapper().insert(moment) > 0, "发布失败");
         timelineFeedService.insertMomentFeed(userId, moment);
         handleEvent(moment.getId(), userId, "发布了新的朋友圈",
             SocialUserMqConstant.TAGS_MOMENT_NOTICE_MOMENT_FRIEND);
@@ -87,16 +86,14 @@ public class SocialServiceImpl implements SocialService {
 
     @Override
     public void deleteMoment(String momentId) {
-        int id = momentDAO.getBaseMapper().delete(new QueryWrapper<Moment>().eq("id", momentId));
-        Assert.isTrue(id > 0, "删除失败");
+        Assert.isTrue(momentDAO.getBaseMapper().delete(new QueryWrapper<Moment>().eq("id", momentId)) > 0, "删除失败");
     }
 
     @Override
     public void likeMoment(LikeModel likeModel) {
         int userId = RequestUtil.getUserId(request);
         Like like = new Like().setId(IdUtil.getSnowflakeNextIdStr()).setMomentId(likeModel.getMomentId()).setTimestamp(System.currentTimeMillis()).setUserId(userId);
-        int insert = likeDAO.getBaseMapper().insert(like);
-        Assert.isTrue(insert > 0, "点赞失败");
+        Assert.isTrue(likeDAO.getBaseMapper().insert(like) > 0, "点赞失败");
         handleEvent(likeModel.getMomentId(), likeModel.getMomentUserId(), "有人点赞了你的朋友圈",
             SocialUserMqConstant.TAGS_MOMENT_INTERNAL_LIKE_RECORD);
     }
@@ -112,8 +109,7 @@ public class SocialServiceImpl implements SocialService {
         if (!Objects.equals(model.getCommentId(), NOT_REPLY)) {
             comment.setParentId(model.getCommentId());
         }
-        int insert = commentDAO.getBaseMapper().insert(comment);
-        Assert.isTrue(insert > 0, "评论失败");
+        Assert.isTrue(commentDAO.getBaseMapper().insert(comment) > 0, "评论失败");
         //发布更新事件
         handleEvent(model.getMomentId(), model.getMomentUserId(), "有人回复了你的评论", SocialUserMqConstant.TAGS_MOMENT_NOTICE_WITH_LIKE_OR_COMMENT);
     }
@@ -132,13 +128,13 @@ public class SocialServiceImpl implements SocialService {
         RpcResult<List<UserInfoDTO>> friendInfos1 = userRpcService.getFriendAndMeInfos(userId);
         Map<Integer, UserInfoDTO> mapInfo = friendInfos1.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, v -> v));
         List<MomentVO> momentVos = new ArrayList<>();
+        List<Moment> moments;
         //存在时间线
         if (feeding != null && feeding.size() > page * size) {
             // 获取有序集合的所有元素
             long l = Math.multiplyFull(page, size);
             List<String> pageIds = feeding.stream().skip(l - 10).limit(size).toList();
-            List<Moment> moments = momentDAO.getBaseMapper().selectBatchIds(pageIds);
-            loadMomentAll(moments, momentVos, mapInfo);
+            moments = momentDAO.getBaseMapper().selectBatchIds(pageIds);
         } else {
             RpcResult<List<UserInfoDTO>> friendInfos = userRpcService.getFriendAndMeInfos(userId);
             Assert.isTrue(friendInfos.isSuccess(), "获取好友信息失败");
@@ -147,10 +143,11 @@ public class SocialServiceImpl implements SocialService {
             // 获取指定的十条数据
             Page<Moment> momentPage = momentDAO.getBaseMapper().selectPage(
                 new Page<>(page, size), new QueryWrapper<Moment>().in("user_id", userIds).orderByDesc("timestamp"));
-            loadMomentAll(momentPage.getRecords(), momentVos, mapInfo);
+            moments = momentPage.getRecords();
             // 对无时间线的用户进行时间线构建
             timelineFeedService.buildMomentTimelineFeeding((long) page * size, userIds, userId);
         }
+        loadMomentAll(moments, momentVos, mapInfo);
         return momentVos;
     }
 
