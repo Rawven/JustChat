@@ -83,7 +83,7 @@ public class MessageServiceImpl implements MessageService {
 
         UserInfoDTO user = userRpcService.getSingleInfo(message.getUserInfo().getUserId()).getData();
         long timeStamp = message.getTime();
-        String text = message.getText();
+        String text = (String) message.getText();
         Message realMsg = new Message()
             .setContent(text)
             .setTimestamp(new Date(timeStamp))
@@ -123,7 +123,7 @@ public class MessageServiceImpl implements MessageService {
 
         UserInfoDTO user = userRpcService.getSingleInfo(message.getUserInfo().getUserId()).getData();
         String fixId = MessageUtil.concatenateIds(user.getUserId(), friendId);
-        Message realMsg = new Message().setContent(message.getText())
+        Message realMsg = new Message().setContent((String) message.getText())
             .setTimestamp(new Date(message.getTime()))
             .setSenderId(user.getUserId())
             .setType(MessageConstant.FRIEND)
@@ -141,7 +141,8 @@ public class MessageServiceImpl implements MessageService {
         messageAckDAO.getBaseMapper().insert(new MessageAck().setMessageId(realMsg.getId())
             .setSenderId(friendId)
             .setReceiverId(user.getUserId())
-            .setIfAck(false));
+            .setIfAck(false)
+            .setCreateTime(message.getTime()));
         //异步入历史消息库
         MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_SAVE_HISTORY_MSG, imProperty.getInTopic(), JsonUtil.objToJson(new SaveMsgEvent().setMessage(realMsg).setType("friend")));
     }
@@ -161,6 +162,15 @@ public class MessageServiceImpl implements MessageService {
             messageVos.add(new MessageVO(message, user));
         }
         return messageVos;
+    }
+
+    @Override
+    public List<MessageAck> getDoneMessageAck() {
+        int userId = RequestUtil.getUserId(request);
+        List<MessageAck> acks = messageAckDAO.getBaseMapper().selectList(new QueryWrapper<MessageAck>().eq("sender_id", userId).eq("if_ack", true));
+        //删除已经确认的Ack
+        messageAckDAO.getBaseMapper().delete(new QueryWrapper<MessageAck>().eq("sender_id", userId).eq("if_ack", true));
+        return acks;
     }
 
     @Override

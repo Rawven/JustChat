@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import www.raven.jc.entity.model.PageGroupMsgModel;
 import www.raven.jc.entity.model.PagesFriendMsgModel;
+import www.raven.jc.entity.po.MessageAck;
 import www.raven.jc.entity.vo.MessageVO;
 import www.raven.jc.result.HttpResult;
 import www.raven.jc.service.FriendService;
@@ -49,5 +50,15 @@ public class MessageController {
     public HttpResult<List<MessageVO>> getFriendMsgHistory(
         @RequestBody @Validated PagesFriendMsgModel model) {
         return HttpResult.operateSuccess("获取历史私聊信息成功", friendService.getFriendMsgPages(model));
+    }
+
+    /**
+     * 供轮询拉取的已读回执接口
+     *
+     * @return {@link HttpResult }<{@link List }<{@link MessageAck }>>
+     */
+    @GetMapping("/getDoneMessageAck")
+    public HttpResult<List<MessageAck>> getDoneMessageAck() {
+        return HttpResult.operateSuccess("获取消息已读状态成功", messageService.getDoneMessageAck());
     }
 }

@@ -3,6 +3,7 @@ package www.raven.jc.service;
 import java.util.List;
 import org.springframework.scheduling.annotation.Async;
 import www.raven.jc.entity.dto.MessageDTO;
+import www.raven.jc.entity.po.MessageAck;
 import www.raven.jc.entity.vo.MessageVO;
 
 /**
@@ -46,4 +47,12 @@ public interface MessageService {
      * @return list
      */
     List<MessageVO> getLatestOffline();
+
+    /**
+     * get message ack
+     *
+     * @return {@link List }<{@link MessageAck }>
+     */
+    List<MessageAck> getDoneMessageAck();
+
 }

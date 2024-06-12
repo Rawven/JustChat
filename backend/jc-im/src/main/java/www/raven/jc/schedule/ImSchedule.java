@@ -1,5 +1,6 @@
 package www.raven.jc.schedule;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import jakarta.websocket.Session;
 import java.io.IOException;
@@ -12,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import www.raven.jc.constant.OfflineMessagesConstant;
+import www.raven.jc.dao.MessageAckDAO;
+import www.raven.jc.entity.po.MessageAck;
 import www.raven.jc.ws.WebsocketService;
 
 import static www.raven.jc.ws.WebsocketService.HEARTBEAT;
@@ -36,6 +39,8 @@ public class ImSchedule {
     private static final long OFFLINE_MESSAGE_EXPIRATION_TIME = 7 * 24 * 60 * 60 * 1000;
     @Autowired
     private RedissonClient redissonClient;
+    @Autowired
+    private MessageAckDAO messageAckDAO;
 
     /**
      * 执行心跳机制
@@ -85,4 +90,12 @@ public class ImSchedule {
         }
     }
 
+    @XxlJob(value = "deleteMessageAckHandler")
+    public void checkOfflineMessageAck() {
+        log.info(">>>>>>>>>>> xxl-job--清理过期的已读回执");
+        long currentTime = System.currentTimeMillis();
+        //删除七天前的已读回执
+        messageAckDAO.getBaseMapper().delete(new QueryWrapper<MessageAck>().
+            lt("create_time", currentTime - OFFLINE_MESSAGE_EXPIRATION_TIME));
+    }
 }

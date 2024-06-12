@@ -23,4 +23,5 @@ public class MessageAck {
     private Integer receiverId;
     private Integer roomId;
     private Boolean ifAck;
+    private Long createTime;
 }
