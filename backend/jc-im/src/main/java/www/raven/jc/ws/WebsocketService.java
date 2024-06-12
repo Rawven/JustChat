@@ -59,6 +59,8 @@ public class WebsocketService {
 
     private static RoomHandler roomHandler;
 
+    private static AckHandler ackHandler;
+
     public BaseHandler baseHandler;
     /**
      * user id
@@ -158,6 +160,10 @@ public class WebsocketService {
             case MessageConstant.ROOM:
                 setBaseHandler(roomHandler);
                 break;
+            case MessageConstant.MSG_ACK:
+                setBaseHandler(ackHandler);
+                log.info("收到消息回执");
+                break;
             default:
                 log.error("未知信息");
         }
@@ -210,6 +216,11 @@ public class WebsocketService {
     @Autowired
     public void setRoomHandler(RoomHandler roomHandler) {
         WebsocketService.roomHandler = roomHandler;
+    }
+
+    @Autowired
+    public void setAckHandler(AckHandler ackHandler) {
+        WebsocketService.ackHandler = ackHandler;
     }
 
     @Autowired

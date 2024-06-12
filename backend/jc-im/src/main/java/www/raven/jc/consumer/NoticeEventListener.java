@@ -58,6 +58,9 @@ public class NoticeEventListener extends AbstractMQListener {
     @Autowired
     private FriendChatDAO friendChatDAO;
 
+    @Autowired
+    private
+
     public NoticeEventListener(RedissonClient redissonClient) {
         super(redissonClient);
     }

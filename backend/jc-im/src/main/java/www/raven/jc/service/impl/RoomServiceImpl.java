@@ -153,7 +153,9 @@ public class RoomServiceImpl implements RoomService {
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Override
     public void agreeApply(Integer roomId, Integer userId, int noticeId) {
-        int update = userRoomDAO.getBaseMapper().update(new UserRoom().setStatus(ApplyStatusConstant.APPLY_STATUS_AGREE),
+        Room room = roomDAO.getBaseMapper().selectById(roomId);
+        Message message = messageDAO.getBaseMapper().selectById(room.getLastMsgId());
+        int update = userRoomDAO.getBaseMapper().update(new UserRoom().setLastAckTime(message.getTimestamp().toString()).setStatus(ApplyStatusConstant.APPLY_STATUS_AGREE),
             new QueryWrapper<UserRoom>().eq("user_id", userId).eq("room_id", roomId));
         Assert.isTrue(update > 0, "更新失败");
         Assert.isTrue(noticeDAO.getBaseMapper().deleteById(noticeId) > 0, "删除失败");

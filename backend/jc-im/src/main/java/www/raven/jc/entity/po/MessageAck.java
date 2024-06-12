@@ -3,24 +3,24 @@ package www.raven.jc.entity.po;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.util.Date;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 /**
- * user room
+ * message ack
  *
  * @author 刘家辉
- * @date 2023/12/04
+ * @date 2024/06/12
  */
-@TableName(value = "user_room", schema = "public")
 @Data
 @Accessors(chain = true)
-public class UserRoom {
+@TableName(value = "message_ack", schema = "public")
+public class MessageAck {
     @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
-    private Integer userId;
+    private String id;
+    private String messageId;
+    private Integer senderId;
+    private Integer receiverId;
     private Integer roomId;
-    private int status;
-    private Date lastAckTime;
+    private Boolean ifAck;
 }

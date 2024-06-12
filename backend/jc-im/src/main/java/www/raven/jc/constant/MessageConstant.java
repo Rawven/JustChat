@@ -9,4 +9,5 @@ package www.raven.jc.constant;
 public class MessageConstant {
     public static final String FRIEND = "friend";
     public static final String ROOM = "room";
+    public static final String MSG_ACK = "msg_ack";
 }

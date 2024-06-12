@@ -24,12 +24,14 @@ import www.raven.jc.constant.ImImMqConstant;
 import www.raven.jc.constant.MessageConstant;
 import www.raven.jc.constant.OfflineMessagesConstant;
 import www.raven.jc.dao.FriendChatDAO;
+import www.raven.jc.dao.MessageAckDAO;
 import www.raven.jc.dao.MessageDAO;
 import www.raven.jc.dao.RoomDAO;
 import www.raven.jc.dao.UserRoomDAO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.entity.dto.MessageDTO;
 import www.raven.jc.entity.po.Message;
+import www.raven.jc.entity.po.MessageAck;
 import www.raven.jc.entity.po.Room;
 import www.raven.jc.entity.po.UserRoom;
 import www.raven.jc.entity.vo.MessageVO;
@@ -70,6 +72,8 @@ public class MessageServiceImpl implements MessageService {
     private HttpServletRequest request;
     @Autowired
     private ImProperty imProperty;
+    @Autowired
+    private MessageAckDAO messageAckDAO;
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
     @Async
@@ -101,7 +105,15 @@ public class MessageServiceImpl implements MessageService {
                 }
             }
         );
-        //异步入历史消息数据库
+        //对所有群成员插入Ack记录
+        userIds.forEach(
+            id -> {
+                messageAckDAO.getBaseMapper().insert(new MessageAck().setMessageId(realMsg.getId())
+                    .setSenderId(user.getUserId())
+                    .setReceiverId(id)
+                    .setIfAck(false));
+            }
+        );
         MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_SAVE_HISTORY_MSG, imProperty.getInTopic(), JsonUtil.objToJson(new SaveMsgEvent().setMessage(realMsg).setType("room")));
     }
 
@@ -121,6 +133,15 @@ public class MessageServiceImpl implements MessageService {
             RScoredSortedSet<Object> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + user.getUserId());
             scoredSortedSet.add(message.getTime(), realMsg);
         }
+        messageAckDAO.getBaseMapper().insert(new MessageAck().setMessageId(realMsg.getId())
+            .setSenderId(user.getUserId())
+            .setReceiverId(friendId)
+            .setIfAck(false));
+        //插入Ack记录
+        messageAckDAO.getBaseMapper().insert(new MessageAck().setMessageId(realMsg.getId())
+            .setSenderId(friendId)
+            .setReceiverId(user.getUserId())
+            .setIfAck(false));
         //异步入历史消息库
         MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_SAVE_HISTORY_MSG, imProperty.getInTopic(), JsonUtil.objToJson(new SaveMsgEvent().setMessage(realMsg).setType("friend")));
     }
@@ -134,13 +155,11 @@ public class MessageServiceImpl implements MessageService {
         List<Integer> ids = messages.stream().map(Message::getSenderId).toList();
         RpcResult<List<UserInfoDTO>> batchInfo = userRpcService.getBatchInfo(ids);
         Map<Integer, UserInfoDTO> map = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
-        //获取所有id=roomId的消息
         List<MessageVO> messageVos = new ArrayList<>();
         for (Message message : messages) {
             UserInfoDTO user = map.get(message.getSenderId());
             messageVos.add(new MessageVO(message, user));
         }
-        scoredSortedSet.removeAll(messages);
         return messageVos;
     }
 
