@@ -14,7 +14,7 @@ import www.raven.jc.dto.UserInfoDTO;
 @Accessors(chain = true)
 public class MessageDTO {
     private Long time;
-    private Object text;
+    private String text;
     private UserInfoDTO userInfo;
     private Integer belongId;
     private String type;

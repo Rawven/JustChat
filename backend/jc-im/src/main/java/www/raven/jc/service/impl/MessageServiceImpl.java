@@ -14,7 +14,6 @@ import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import www.raven.jc.api.UserRpcService;
@@ -76,14 +75,12 @@ public class MessageServiceImpl implements MessageService {
     private MessageAckDAO messageAckDAO;
 
     @Transactional(rollbackFor = IllegalArgumentException.class)
-    @Async
     @Override
     public void saveRoomMsg(MessageDTO message,
         Integer roomId) {
-
         UserInfoDTO user = userRpcService.getSingleInfo(message.getUserInfo().getUserId()).getData();
         long timeStamp = message.getTime();
-        String text = (String) message.getText();
+        String text = message.getText();
         Message realMsg = new Message()
             .setContent(text)
             .setTimestamp(new Date(timeStamp))
@@ -94,7 +91,6 @@ public class MessageServiceImpl implements MessageService {
                 new QueryWrapper<UserRoom>().eq("room_id", roomId).
                     eq("status", ApplyStatusConstant.APPLY_STATUS_AGREE)).
             stream().map(UserRoom::getUserId).toList();
-
         //对离线用户进行离线信息保存
         userIds.forEach(
             id -> {
@@ -105,14 +101,13 @@ public class MessageServiceImpl implements MessageService {
                 }
             }
         );
-        //对所有群成员插入Ack记录
+        //对所有群成员插入Ack记录 在前端收到消息时需刻意阻塞一段时间(500ms？)再发送Ack 不然还未插入Ack记录就发送Ack了
+        //不过现在有MQ缓冲了
         userIds.forEach(
-            id -> {
-                messageAckDAO.getBaseMapper().insert(new MessageAck().setMessageId(realMsg.getId())
-                    .setSenderId(user.getUserId())
-                    .setReceiverId(id)
-                    .setIfAck(false));
-            }
+            id -> messageAckDAO.getBaseMapper().insert(new MessageAck().setMessageId(realMsg.getId())
+                .setSenderId(user.getUserId())
+                .setReceiverId(id)
+                .setIfAck(false))
         );
         MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_SAVE_HISTORY_MSG, imProperty.getInTopic(), JsonUtil.objToJson(new SaveMsgEvent().setMessage(realMsg).setType("room")));
     }
