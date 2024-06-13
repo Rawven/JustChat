@@ -9,10 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import www.raven.jc.dao.MessageAckDAO;
+import www.raven.jc.dao.MessageReadAckDAO;
 import www.raven.jc.dao.UserRoomDAO;
 import www.raven.jc.entity.dto.MessageDTO;
-import www.raven.jc.entity.po.MessageAck;
+import www.raven.jc.entity.po.MessageReadAck;
 import www.raven.jc.entity.po.UserRoom;
 import www.raven.jc.util.JsonUtil;
 
@@ -24,11 +24,11 @@ import www.raven.jc.util.JsonUtil;
  */
 @Slf4j
 @Component
-public class AckHandler implements BaseHandler {
+public class ReadAckHandler implements BaseHandler {
     @Autowired
     private UserRoomDAO userRoomDAO;
     @Autowired
-    private MessageAckDAO messageAckDAO;
+    private MessageReadAckDAO messageReadAckDAO;
 
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
@@ -45,10 +45,10 @@ public class AckHandler implements BaseHandler {
         userRoom.setLastAckTime(new Date(message.getTime()));
         userRoomDAO.getBaseMapper().updateById(userRoom);
         //批量更新Ack
-        List<MessageAck> messageAcks = messageAckDAO.list(new QueryWrapper<MessageAck>().eq("receiver_id", message.getBelongId())
+        List<MessageReadAck> messageReadAcks = messageReadAckDAO.list(new QueryWrapper<MessageReadAck>().eq("receiver_id", message.getBelongId())
             .eq("room_id", message.getBelongId()).in("message_id", msgIds));
-        messageAcks.forEach(messageAck -> messageAck.setIfAck(true));
-        if (messageAckDAO.updateBatchById(messageAcks)) {
+        messageReadAcks.forEach(messageAck -> messageAck.setIfRead(true));
+        if (messageReadAckDAO.updateBatchById(messageReadAcks)) {
             session.getAsyncRemote().sendText("ack: success");
             return;
         }

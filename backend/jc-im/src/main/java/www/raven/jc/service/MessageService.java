@@ -2,8 +2,8 @@ package www.raven.jc.service;
 
 import java.util.List;
 import org.springframework.scheduling.annotation.Async;
-import www.raven.jc.entity.dto.MessageDTO;
-import www.raven.jc.entity.po.MessageAck;
+import www.raven.jc.entity.po.Message;
+import www.raven.jc.entity.po.MessageReadAck;
 import www.raven.jc.entity.vo.MessageVO;
 
 /**
@@ -23,23 +23,24 @@ public interface MessageService {
     void sendNotice(Integer roomId, Integer userId);
 
     /**
-     * save room msg
-     * save msg
+     * save offline message
      *
      * @param message message
-     * @param roomId  room id
+     * @param userIds user ids
      */
-    @Async
-    void saveRoomMsg(MessageDTO message, Integer roomId);
+    default void saveOfflineMessage(Message message, List<Integer> userIds) {
+        saveOfflineMessage(message, userIds, null);
+    }
 
     /**
-     * save friend msg
+     * save offline message
      *
-     * @param message  message
-     * @param friendId friend id
+     * @param message message
+     * @param userIds user ids
+     * @param metaId  meta id
      */
-    @Async
-    void saveFriendMsg(MessageDTO message, Integer friendId);
+    void saveOfflineMessage(Message message, List<Integer> userIds,
+        Integer metaId);
 
     /**
      * get latest offline
@@ -51,8 +52,8 @@ public interface MessageService {
     /**
      * get message ack
      *
-     * @return {@link List }<{@link MessageAck }>
+     * @return {@link List }<{@link MessageReadAck }>
      */
-    List<MessageAck> getDoneMessageAck();
+    List<MessageReadAck> getReadMessageAck();
 
 }

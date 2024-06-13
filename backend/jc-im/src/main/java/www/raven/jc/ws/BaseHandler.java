@@ -36,7 +36,7 @@ public interface BaseHandler {
      * @param message          message
      * @param rocketMQTemplate rocket mqtemplate
      */
-    default void send(RedissonClient redissonClient, List<Integer> ids,
+    default void broadcast(RedissonClient redissonClient, List<Integer> ids,
         MessageDTO message,
         RocketMQTemplate rocketMQTemplate) {
         Map<String, List<Integer>> map = new HashMap<>();

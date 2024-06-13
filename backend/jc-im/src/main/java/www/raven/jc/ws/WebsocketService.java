@@ -59,7 +59,8 @@ public class WebsocketService {
 
     private static RoomHandler roomHandler;
 
-    private static AckHandler ackHandler;
+    private static ReadAckHandler readAckHandler;
+    private static DeliveredAckHandler deliveredAckHandler;
 
     public BaseHandler baseHandler;
     /**
@@ -156,13 +157,19 @@ public class WebsocketService {
         switch (messageDTO.getType()) {
             case MessageConstant.FRIEND:
                 setBaseHandler(privateHandler);
+                log.info("收到好友消息");
                 break;
             case MessageConstant.ROOM:
                 setBaseHandler(roomHandler);
+                log.info("收到群消息");
                 break;
-            case MessageConstant.MSG_ACK:
-                setBaseHandler(ackHandler);
-                log.info("收到消息回执");
+            case MessageConstant.MSG_DELIVERED_ACK:
+                setBaseHandler(readAckHandler);
+                log.info("收到送达回执");
+                break;
+            case MessageConstant.MSG_READ_ACK:
+                setBaseHandler(readAckHandler);
+                log.info("收到已读回执");
                 break;
             default:
                 log.error("未知信息");
@@ -219,8 +226,14 @@ public class WebsocketService {
     }
 
     @Autowired
-    public void setAckHandler(AckHandler ackHandler) {
-        WebsocketService.ackHandler = ackHandler;
+    public void setReadAckHandler(ReadAckHandler readAckHandler) {
+        WebsocketService.readAckHandler = readAckHandler;
+    }
+
+    @Autowired
+    public void setDeliveredAckHandler(
+        DeliveredAckHandler deliveredAckHandler) {
+        WebsocketService.deliveredAckHandler = deliveredAckHandler;
     }
 
     @Autowired

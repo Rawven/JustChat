@@ -14,14 +14,14 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-@TableName(value = "message_ack", schema = "public")
-public class MessageAck {
+@TableName(value = "message_read_ack", schema = "public")
+public class MessageReadAck {
     @TableId(value = "id", type = IdType.AUTO)
     private String id;
     private String messageId;
     private Integer senderId;
     private Integer receiverId;
     private Integer roomId;
-    private Boolean ifAck;
+    private Boolean ifRead;
     private Long createTime;
 }

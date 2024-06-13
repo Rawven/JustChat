@@ -13,8 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import www.raven.jc.constant.OfflineMessagesConstant;
-import www.raven.jc.dao.MessageAckDAO;
-import www.raven.jc.entity.po.MessageAck;
+import www.raven.jc.dao.MessageReadAckDAO;
+import www.raven.jc.entity.po.MessageReadAck;
 import www.raven.jc.ws.WebsocketService;
 
 import static www.raven.jc.ws.WebsocketService.HEARTBEAT;
@@ -40,7 +40,7 @@ public class ImSchedule {
     @Autowired
     private RedissonClient redissonClient;
     @Autowired
-    private MessageAckDAO messageAckDAO;
+    private MessageReadAckDAO messageReadAckDAO;
 
     /**
      * 执行心跳机制
@@ -95,7 +95,7 @@ public class ImSchedule {
         log.info(">>>>>>>>>>> xxl-job--清理过期的已读回执");
         long currentTime = System.currentTimeMillis();
         //删除七天前的已读回执
-        messageAckDAO.getBaseMapper().delete(new QueryWrapper<MessageAck>().
+        messageReadAckDAO.getBaseMapper().delete(new QueryWrapper<MessageReadAck>().
             lt("create_time", currentTime - OFFLINE_MESSAGE_EXPIRATION_TIME));
     }
 }

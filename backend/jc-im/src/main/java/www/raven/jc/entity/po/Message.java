@@ -7,7 +7,7 @@ import java.util.Date;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import www.raven.jc.model.CommonSerializable;
+import www.raven.jc.serializable.CommonSerializable;
 
 /**
  * message
