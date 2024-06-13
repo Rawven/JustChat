@@ -90,7 +90,7 @@
 </template>
 
 <script>
-import {Host, ipfsHost} from "@/main";
+import {Host, ipfsHost, MSG_DELIVERED_ACK} from "@/main";
 import {ChatRound, InfoFilled} from "@element-plus/icons-vue";
 import {ElMessage} from "element-plus";
 
@@ -167,6 +167,19 @@ export default {
         };
         this.messages.push(msg);
       }
+      //发送msg_deliver_ack
+      let userInfo =JSON.parse(localStorage.getItem("userData"));
+      const msg = {
+        time: Date.now(),
+        belongId: this.theRoom.roomId,
+        text: this.message,
+        type: MSG_DELIVERED_ACK,
+        userInfo:{
+          userId: userInfo.userId,
+          username: userInfo.username,
+          profile: userInfo.profile
+        }};
+      this.socket.send(JSON.stringify(msg));
     };
 
     this.socket.onclose = () => {
@@ -235,6 +248,19 @@ export default {
 
             this.messages.sort((a, b) => b.time - a.time);
             this.page++;
+            //发送msg_deliver_ack
+            let userInfo =JSON.parse(localStorage.getItem("userData"));
+            const msg = {
+              time: Date.now(),
+              belongId: this.theRoom.roomId,
+              text: this.message,
+              type: MSG_DELIVERED_ACK,
+              userInfo:{
+                userId: userInfo.userId,
+                username: userInfo.username,
+                profile: userInfo.profile
+              }};
+            this.socket.send(JSON.stringify(msg));
           })
     },
     sendMessage() {

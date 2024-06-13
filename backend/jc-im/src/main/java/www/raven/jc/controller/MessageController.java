@@ -35,6 +35,9 @@ public class MessageController {
     @Autowired
     private FriendService friendService;
 
+    /**
+     * 拉取全量离线消息接口
+     */
     @GetMapping("/getLatestOffline")
     public HttpResult<List<MessageVO>> getLatestOfflineMsg() {
         return HttpResult.operateSuccess("获取最新离线信息成功", messageService.getLatestOffline());

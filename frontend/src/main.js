@@ -19,6 +19,8 @@ export const Host = "localhost"
 
 app.config.globalProperties.$global = global;
 export const ipfsHost = "http://localhost:8083/ipfs/"
+export const MSG_DELIVERED_ACK = "msg_delivered_ack"
+export const MSG_READ_ACK = "msg_read_ack"
 app.use(createPinia())
 app.use(router)
 app.use(ElementPlus)
