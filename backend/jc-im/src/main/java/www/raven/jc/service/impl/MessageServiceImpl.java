@@ -80,12 +80,12 @@ public class MessageServiceImpl implements MessageService {
             }
         );
         //对所有群成员插入ReadAck回执
-        List<MessageReadAck> acks = userIds.stream().map(id -> new MessageReadAck().setMessageId(message.getId())
+        List<MessageReadAck> ackList = userIds.stream().map(id -> new MessageReadAck().setMessageId(message.getId())
             .setSenderId(message.getSenderId())
             .setReceiverId(id)
             .setRoomId(metaId)
             .setIfRead(false)).toList();
-        boolean b = messageReadAckDAO.saveBatch(acks);
+        boolean b = messageReadAckDAO.saveBatch(ackList);
         Assert.isTrue(b, "save ack fail");
     }
 
@@ -108,10 +108,10 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public List<MessageReadAck> getReadMessageAck() {
         int userId = RequestUtil.getUserId(request);
-        List<MessageReadAck> acks = messageReadAckDAO.getBaseMapper().selectList(new QueryWrapper<MessageReadAck>().eq("sender_id", userId).eq("if_ack", true));
+        List<MessageReadAck> readAckList = messageReadAckDAO.getBaseMapper().selectList(new QueryWrapper<MessageReadAck>().eq("sender_id", userId).eq("if_ack", true));
         //删除已经确认的Ack
         messageReadAckDAO.getBaseMapper().delete(new QueryWrapper<MessageReadAck>().eq("sender_id", userId).eq("if_ack", true));
-        return acks;
+        return readAckList;
     }
 
     @Override

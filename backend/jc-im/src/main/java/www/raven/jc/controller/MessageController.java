@@ -54,8 +54,6 @@ public class MessageController {
 
     /**
      * 供轮询拉取的已读回执接口
-     *
-     * @return {@link HttpResult }<{@link List }<{@link MessageReadAck }>>
      */
     @GetMapping("/getReadMessageAck")
     public HttpResult<List<MessageReadAck>> getReadMessageAck() {

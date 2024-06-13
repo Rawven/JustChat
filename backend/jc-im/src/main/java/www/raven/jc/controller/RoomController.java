@@ -40,13 +40,13 @@ public class RoomController {
     @Autowired
     private UserRpcService userRpcService;
 
-    //TODO 分页 较难实现
+    //TODO 分页 懒得实现
     @GetMapping("/initUserMainPage")
     public HttpResult<List<UserRoomVO>> initUserMainPage() {
         return HttpResult.operateSuccess("获取房间列表成功", roomService.initUserMainPage());
     }
 
-    //TODO 分页
+    //TODO 分页 懒得实现
     @GetMapping("/initUserFriendPage")
     public HttpResult<List<UserFriendVO>> initUserFriendPage() {
         return HttpResult.operateSuccess("获取好友列表成功", friendService.initUserFriendPage());

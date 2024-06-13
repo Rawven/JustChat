@@ -8,7 +8,7 @@ import org.redisson.api.RedissonClient;
 import www.raven.jc.util.MqUtil;
 
 /**
- * abstract mqlistener
+ * 通用MQListener模板
  *
  * @author 刘家辉
  * @date 2024/06/01
@@ -33,5 +33,8 @@ public abstract class AbstractMQListener implements RocketMQListener<MessageExt>
         MqUtil.protectMsg(messageExt, redissonClient);
     }
 
+    /**
+     * 实际的消息处理逻辑
+     */
     public abstract void onMessage0(String message1, String tags);
 }

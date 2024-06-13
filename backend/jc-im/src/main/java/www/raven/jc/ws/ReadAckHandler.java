@@ -45,14 +45,14 @@ public class ReadAckHandler implements BaseHandler {
         userRoom.setLastAckTime(new Date(message.getTime()));
         userRoomDAO.getBaseMapper().updateById(userRoom);
         //批量更新Ack
-        List<MessageReadAck> messageReadAcks = messageReadAckDAO.list(new QueryWrapper<MessageReadAck>().eq("receiver_id", message.getBelongId())
+        List<MessageReadAck> readAckList = messageReadAckDAO.list(new QueryWrapper<MessageReadAck>().eq("receiver_id", message.getBelongId())
             .eq("room_id", message.getBelongId()).in("message_id", msgIds));
-        messageReadAcks.forEach(messageAck -> messageAck.setIfRead(true));
-        if (messageReadAckDAO.updateBatchById(messageReadAcks)) {
+        readAckList.forEach(messageAck -> messageAck.setIfRead(true));
+        if (messageReadAckDAO.updateBatchById(readAckList)) {
             session.getAsyncRemote().sendText("ack: success");
-            return;
+        } else {
+            session.getAsyncRemote().sendText("ack: fail");
+            throw new RuntimeException("ack fail");
         }
-        session.getAsyncRemote().sendText("ack: fail");
-        throw new RuntimeException("ack fail");
     }
 }

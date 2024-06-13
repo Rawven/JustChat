@@ -1,11 +1,10 @@
 package www.raven.jc.dto;
 
-import java.io.Serial;
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import www.raven.jc.model.CommonSerializable;
+import www.raven.jc.serializable.CommonSerializable;
 
 /**
  * user register dto
@@ -18,8 +17,6 @@ import www.raven.jc.model.CommonSerializable;
 @Data
 @Accessors(chain = true)
 public class UserRegisterDTO extends CommonSerializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
     private String username;
     private String password;
     private String email;
