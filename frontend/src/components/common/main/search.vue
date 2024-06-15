@@ -5,12 +5,15 @@
     </el-aside>
     <el-main>
       <el-header>
-        <h3 class="font-semibold tracking-tight text-2xl font-serif text-[#b3a7df]">聊天室大厅</h3>
+        <h3 class="font-semibold tracking-tight text-2xl font-serif text-[#b3a7df]">
+          聊天室大厅</h3>
         <div class="flex space-x-4">
           <el-row>
             <el-radio-group v-model="radio" class="radio" text>
-              <el-radio-button :label="0" border>根据用户名搜索</el-radio-button>
-              <el-radio-button :label="1" border>根据房间名搜索</el-radio-button>
+              <el-radio-button :label="0" border>根据用户名搜索
+              </el-radio-button>
+              <el-radio-button :label="1" border>根据房间名搜索
+              </el-radio-button>
             </el-radio-group>
           </el-row>
           <el-input
@@ -23,7 +26,8 @@
       </el-header>
       <el-main class="aa-main">
         <el-aside>
-          <el-card class="mt-6 border rounded-md shadow-sm bg-[#000000] text-[#b3a7df] p-6">
+          <el-card
+              class="mt-6 border rounded-md shadow-sm bg-[#000000] text-[#b3a7df] p-6">
             <input
                 v-model="createRoom.name"
                 aria-label="Chat room name"
@@ -58,7 +62,8 @@
                class="flex flex-row items-start space-x-6 p-6 bg-[#1a202c] rounded-lg shadow-md border-2 border-green-500"
           >
             <div class="flex flex-col space-y-4">
-              <h3 class="font-semibold tracking-tight text-xl font-serif text-[#b3a7df]">{{ room.roomId }}
+              <h3 class="font-semibold tracking-tight text-xl font-serif text-[#b3a7df]">
+                {{ room.roomId }}
                 {{ room.roomName }} {{ room.roomDescription }}</h3>
               <p class="text-md text-[#4a5568] font-serif">
                 Founded by +{{ room.founderName }}.

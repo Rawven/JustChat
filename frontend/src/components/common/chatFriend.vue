@@ -1,19 +1,24 @@
 <template>
   <el-container class="chatFriend-container">
-    <el-header class="flex items-center justify-between p-4 bg-white border-b border-gray-200 header ">
+    <el-header
+        class="flex items-center justify-between p-4 bg-white border-b border-gray-200 header ">
       <div class="flex items-center space-x-4">
         <div>
           <h2 class="text-lg font-semibold">{{ this.theFriend.friendName }}</h2>
         </div>
 
-        <el-button class="button" plain type="primary" @click="addMsg">消息漫游-分页加载-</el-button>
+        <el-button class="button" plain type="primary" @click="addMsg">
+          消息漫游-分页加载-
+        </el-button>
       </div>
     </el-header>
-    <el-main class="flex-1 p-4 space-y-4  main-content" style="overflow-y: auto;" >
+    <el-main class="flex-1 p-4 space-y-4  main-content"
+             style="overflow-y: auto;">
       <div v-for="(message, index) in messages" :key="index">
         <div v-if="isMe(message)">
           <div class="flex flex-col items-end space-y-2">
-            <div class="rounded-lg border shadow-sm bg-green-50 text-green-700" data-v0-t="card">
+            <div class="rounded-lg border shadow-sm bg-green-50 text-green-700"
+                 data-v0-t="card">
               <div class="p-6">
                 <p class="font-medium text-lg font-serif">{{ message.text }}</p>
               </div>
@@ -32,21 +37,29 @@
                 @confirm="addApplyFriend(message.user)"
             >
               <template #reference>
-                <img :src="ipfsHost()+message.profile" alt="User Avatar" class="avatar">
+                <img :src="ipfsHost()+message.profile" alt="User Avatar"
+                     class="avatar">
               </template>
             </el-popconfirm>
-            <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full mt-2">
+            <span
+                class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full mt-2">
           <span
               class="flex h-full w-full items-center justify-center rounded-full bg-muted font-medium text-lg font-serif">{{
               message.user
             }}</span>
         </span>
-            <div class="rounded-lg border shadow-sm bg-blue-50 text-blue-700" data-v0-t="card">
+            <div class="rounded-lg border shadow-sm bg-blue-50 text-blue-700"
+                 data-v0-t="card">
               <div class="p-6">
-                <p v-if="message.offline" class="text-xs text-gray-500"><el-text>{{ message.text }}</el-text> <el-icon  color="#409EFC">
-                  <ChatRound/>
-                </el-icon></p>
-                <p v-else class="font-medium text-lg font-serif">{{ message.text }}</p>
+                <p v-if="message.offline" class="text-xs text-gray-500">
+                  <el-text>{{ message.text }}</el-text>
+                  <el-icon color="#409EFC">
+                    <ChatRound/>
+                  </el-icon>
+                </p>
+                <p v-else class="font-medium text-lg font-serif">{{
+                    message.text
+                  }}</p>
               </div>
             </div>
           </div>
@@ -144,7 +157,7 @@ export default {
 
     this.socket.onmessage = (event) => {
       console.log('WebSocket message received:', event.data);
-      if(event.data === "ping"){
+      if (event.data === "ping") {
         this.socket.send("ping");
         return
       }
@@ -158,7 +171,7 @@ export default {
       } else if (data.type === "RECORD_MOMENT_FRIEND" || data.type === "RECORD_MOMENT") {
         this.momentNoticeIsNew = true;
         ElMessage.success('您有新的朋友圈消息');
-      } else if(data.type === "friend"){
+      } else if (data.type === "friend") {
         const msg = {
           time: Date.now(),
           text: data.text,
@@ -168,17 +181,18 @@ export default {
         this.messages.push(msg);
       }
       //发送msg_deliver_ack
-      let userInfo =JSON.parse(localStorage.getItem("userData"));
+      let userInfo = JSON.parse(localStorage.getItem("userData"));
       const msg = {
         time: Date.now(),
         belongId: this.theRoom.roomId,
         text: this.message,
         type: MSG_DELIVERED_ACK,
-        userInfo:{
+        userInfo: {
           userId: userInfo.userId,
           username: userInfo.username,
           profile: userInfo.profile
-        }};
+        }
+      };
       this.socket.send(JSON.stringify(msg));
     };
 
@@ -205,34 +219,28 @@ export default {
     },
     addMsg() {
       let token = localStorage.getItem("token");
-      this.realAxios.post(`http://` + Host + `:7000/chat/message/queryFriendMsgPages`, {
-        friendId: this.theFriend.friendId,
-        page: this.page,
-        size: 15
-      }, {
+      this.realAxios.get(`http://` + Host + `:7000/chat/message/queryFriendMsgPages/${this.theFriend.friendId}/
+      ${this.page}/${15}`, {
         headers: {
           'token': token
         }
-      })
-          .then(response => {
-            const newMessages = response.data.data.map(messageVO => ({
-              time: new Date(messageVO.time).getTime(), // 将Date对象转换为时间戳
-              text: messageVO.text,
-              user: messageVO.userInfoDTO.username,
-              profile: messageVO.userInfoDTO.profile
-            }));
+      }).then(response => {
+        const newMessages = response.data.data.map(messageVO => ({
+          time: new Date(messageVO.time).getTime(), // 将Date对象转换为时间戳
+          text: messageVO.text,
+          user: messageVO.userInfoDTO.username,
+          profile: messageVO.userInfoDTO.profile
+        }));
 
-            // 使用 push 方法将新的消息添加到数组中
-            this.messages.push(...newMessages);
-            this.messages.sort((a, b) => a.time - b.time);
-            this.page++;
-          });
+        // 使用 push 方法将新的消息添加到数组中
+        this.messages.push(...newMessages);
+        this.messages.sort((a, b) => a.time - b.time);
+        this.page++;
+      });
     }
     , getOffline() {
       let token = localStorage.getItem("token");
-      this.realAxios.post(`http://` + Host + `:7000/chat/message/getLatestFriendHistory`, {
-        friendId: this.theFriend.friendId,
-      }, {
+      this.realAxios.get(`http://` + Host + `:7000/chat/message/getLatestFriendHistory/${this.theFriend.friendId}`, {
         headers: {
           'token': token
         }
@@ -249,39 +257,41 @@ export default {
             this.messages.sort((a, b) => b.time - a.time);
             this.page++;
             //发送msg_deliver_ack
-            let userInfo =JSON.parse(localStorage.getItem("userData"));
+            let userInfo = JSON.parse(localStorage.getItem("userData"));
             const msg = {
               time: Date.now(),
               belongId: this.theRoom.roomId,
               text: this.message,
               type: MSG_DELIVERED_ACK,
-              userInfo:{
+              userInfo: {
                 userId: userInfo.userId,
                 username: userInfo.username,
                 profile: userInfo.profile
-              }};
+              }
+            };
             this.socket.send(JSON.stringify(msg));
           })
     },
     sendMessage() {
       if (this.message) {
-        let userInfo =JSON.parse(localStorage.getItem("userData"));
+        let userInfo = JSON.parse(localStorage.getItem("userData"));
         const msg = {
           time: Date.now(),
           belongId: this.theFriend.friendId,
           text: this.message,
           type: "friend",
-          userInfo:{
+          userInfo: {
             userId: userInfo.userId,
             username: userInfo.username,
             profile: userInfo.profile
-          }};
+          }
+        };
         this.$global.ws.send(JSON.stringify(msg));
         this.message = '';
       }
     },
     addApplyFriend(username) {
-      this.realAxios.get(`http://` + Host + `:7000/user/notice/addFriendApply/${username}`, {
+      this.realAxios.post(`http://` + Host + `:7000/user/notice/addFriendApply`, {friendName: username}, {
         headers: {
           'token': localStorage.getItem("token")
         },

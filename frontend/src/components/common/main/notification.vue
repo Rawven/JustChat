@@ -4,8 +4,10 @@
       <JcAside></JcAside>
     </el-aside>
     <el-main>
-      <el-header class="flex items-center justify-between p-6 bg-white dark:bg-gray-800 shadow-md">
-        <a class="flex items-center gap-2 font-semibold text-gray-900 dark:text-gray-100" href="#">
+      <el-header
+          class="flex items-center justify-between p-6 bg-white dark:bg-gray-800 shadow-md">
+        <a class="flex items-center gap-2 font-semibold text-gray-900 dark:text-gray-100"
+           href="#">
           <svg
               class="h-6 w-6"
               fill="none"
@@ -23,25 +25,38 @@
           </svg>
           <el-link href="/mainPage">My Website</el-link>
         </a>
-        <el-menu active-text-color="hover:underline" background-color="transparent" class="flex gap-4" mode="horizontal"
+        <el-menu active-text-color="hover:underline"
+                 background-color="transparent" class="flex gap-4"
+                 mode="horizontal"
                  text-color="text-gray-900">
-          <el-menu-item class="text-gray-900 dark:text-gray-100" index="1">Friends</el-menu-item>
-          <el-menu-item class="text-gray-900 dark:text-gray-100" index="2">Groups</el-menu-item>
+          <el-menu-item class="text-gray-900 dark:text-gray-100" index="1">
+            Friends
+          </el-menu-item>
+          <el-menu-item class="text-gray-900 dark:text-gray-100" index="2">
+            Groups
+          </el-menu-item>
         </el-menu>
       </el-header>
       <el-main class="elN">
         <el-row :gutter="16">
           <el-col :span="24">
             <el-card class="h-full" shadow="hover">
-              <el-row class="text-2xl font-semibold text-gray-900 dark:text-gray-100">Friend Requests</el-row>
-              <el-table :data="tableDatas.filter (item => item.type === 'add_friend_apply')" style="width: 100%">
+              <el-row
+                  class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                Friend Requests
+              </el-row>
+              <el-table
+                  :data="tableDatas.filter (item => item.type === 'add_friend_apply')"
+                  style="width: 100%">
                 <el-table-column label="Date" width="180">
                   <template #default="scope">
                     <div style="display: flex; align-items: center">
                       <el-icon>
                         <timer/>
                       </el-icon>
-                      <span style="margin-left: 10px">{{ timestampToTime(scope.row.timestamp) }}</span>
+                      <span style="margin-left: 10px">{{
+                          timestampToTime(scope.row.timestamp)
+                        }}</span>
                     </div>
                   </template>
                 </el-table-column>
@@ -49,14 +64,17 @@
                   <template #default="scope">
                     <el-popover placement="top" trigger="hover" width="auto">
                       <template #reference>
-                        <el-tag>{{ scope.row.sender.username }} 申请成为你的好友</el-tag>
+                        <el-tag>{{ scope.row.sender.username }}
+                          申请成为你的好友
+                        </el-tag>
                       </template>
                     </el-popover>
                   </template>
                 </el-table-column>
                 <el-table-column label="Operations">
                   <template #default="scope">
-                    <el-button plain size="small" type="primary" @click="handleFriendAgree(scope.row)"
+                    <el-button plain size="small" type="primary"
+                               @click="handleFriendAgree(scope.row)"
                     >Agree
                     </el-button
                     >
@@ -74,23 +92,34 @@
           </el-col>
           <el-col :span="24">
             <el-card class="h-full" shadow="hover">
-              <el-row class="text-2xl font-semibold text-gray-900 dark:text-gray-100">Room Requests</el-row>
-              <el-table :data="tableDatas.filter (item => item.type === 'join_room_apply')" style="width: 100%">
-                <el-table-column label="Date" style="margin-right: 10px;" width="180">
+              <el-row
+                  class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                Room Requests
+              </el-row>
+              <el-table
+                  :data="tableDatas.filter (item => item.type === 'join_room_apply')"
+                  style="width: 100%">
+                <el-table-column label="Date" style="margin-right: 10px;"
+                                 width="180">
                   <template #default="scope">
                     <div style="display: flex; align-items: center">
                       <el-icon>
                         <timer/>
                       </el-icon>
-                      <span style="margin-left: 10px">{{ timestampToTime(scope.row.timestamp) }}</span>
+                      <span style="margin-left: 10px">{{
+                          timestampToTime(scope.row.timestamp)
+                        }}</span>
                     </div>
                   </template>
                 </el-table-column>
-                <el-table-column label="Message" style="margin-right: 10px;" width="300">
+                <el-table-column label="Message" style="margin-right: 10px;"
+                                 width="300">
                   <template #default="scope">
                     <el-popover placement="top" trigger="hover" width="auto">
                       <template #reference>
-                        <el-tag>{{ scope.row.sender.username }} 申请成为加入你的群聊 {{ scope.row.data }}</el-tag>
+                        <el-tag>{{ scope.row.sender.username }} 申请成为加入你的群聊
+                          {{ scope.row.data }}
+                        </el-tag>
                       </template>
                     </el-popover>
                   </template>
@@ -98,7 +127,8 @@
                 <el-table-column label="Operations" style="margin-right: 10px;">
                   <template #default="scope">
                     <el-button plain size="small" style="margin-right: 10px;"
-                               type="primary" @click="handleRoomAgree(scope.row)"
+                               type="primary"
+                               @click="handleRoomAgree(scope.row)"
                     >Agree
                     </el-button
                     >
@@ -170,9 +200,12 @@ export default {
     },
     handleFriendAgree(data) {
       this.realAxios({
-        method: 'get',
-        url: `http://` + Host + `:7000/user/friend/agreeToBeFriend/${data.sender.userId}/${data.noticeId}`,
-        data: {},
+        method: 'post',
+        url: `http://` + Host + `:7000/user/friend/agreeToBeFriend`,
+        data: {
+          friendId: data.sender.userId,
+          noticeId: data.noticeId
+        },
         headers: {
           'token': localStorage.getItem("token")
         }
@@ -192,9 +225,12 @@ export default {
     },
     handleFriendReject(data) {
       this.realAxios({
-        method: 'get',
-        url: `http://` + Host + `:7000/user/friend/refuseToBeFriend/${data.sender.userId}/${data.noticeId}`,
-        data: {},
+        method: 'post',
+        url: `http://` + Host + `:7000/user/friend/refuseToBeFriend`,
+        data: {
+          friendId: data.sender.userId,
+          noticeId: data.noticeId
+        },
         headers: {
           'token': localStorage.getItem("token")
         }
@@ -235,14 +271,19 @@ export default {
       })
     },
     handleRoomReject(data) {
-      this.realAxios({
-        method: 'get',
-        url: `http://` + Host + `:7000/chat/common/refuseToJoinRoom/${data.data}/${data.sender.userId}/${data.noticeId}`,
-        data: {},
-        headers: {
-          'token': localStorage.getItem("token")
-        }
-      }).then(() => {
+      this.realAxios.post(
+          `http://` + Host + `:7000/chat/common/refuseToJoinRoom`,
+          {
+            noticeId: data.noticeId,
+            userId: data.sender.userId,
+            roomId: data.data
+          },
+          {
+            headers: {
+              'token': localStorage.getItem("token")
+            }
+          }
+      ).then(() => {
         this.$message({
           message: 'Reject Success',
           type: 'success'

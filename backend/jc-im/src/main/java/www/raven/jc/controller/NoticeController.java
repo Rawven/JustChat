@@ -5,10 +5,12 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import www.raven.jc.entity.model.AddFriendApplyModel;
 import www.raven.jc.entity.vo.NoticeVO;
 import www.raven.jc.result.HttpResult;
 import www.raven.jc.service.NoticeService;
@@ -32,10 +34,10 @@ public class NoticeController {
         return HttpResult.operateSuccess("查找成功", noticeService.loadNotice());
     }
 
-    @GetMapping("/addFriendApply/{friendName}")
+    @PostMapping("/addFriendApply")
     public HttpResult<Void> addFriendApply(
-        @PathVariable("friendName") @NotNull String friendName) {
-        noticeService.addFriendApply(friendName);
+        @RequestBody @NotNull AddFriendApplyModel model) {
+        noticeService.addFriendApply(model.getFriendName());
         return HttpResult.operateSuccess("添加好友申请成功");
     }
 }

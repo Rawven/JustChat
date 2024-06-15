@@ -52,7 +52,15 @@
 </template>
 
 <script>
-import {Avatar, Bell, Close, House, PictureFilled, Plus, User} from "@element-plus/icons-vue";
+import {
+  Avatar,
+  Bell,
+  Close,
+  House,
+  PictureFilled,
+  Plus,
+  User
+} from "@element-plus/icons-vue";
 import {defineComponent} from "vue";
 import router from "@/router";
 import {ElMessage} from "element-plus";

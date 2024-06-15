@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import www.raven.jc.api.UserRpcService;
+import www.raven.jc.entity.model.AgreeApplyModel;
 import www.raven.jc.entity.model.RoomIdModel;
 import www.raven.jc.entity.model.RoomModel;
 import www.raven.jc.entity.vo.RealRoomVO;
@@ -89,27 +90,17 @@ public class RoomController {
         return HttpResult.operateSuccess("申请加入房间成功");
     }
 
-    @GetMapping("/agreeToJoinRoom/{roomId}/{userId}/{noticeId}")
+    @PostMapping("/agreeToJoinRoom")
     public HttpResult<Void> agreeApply(
-        @PathVariable("roomId") @NotBlank String roomId,
-        @PathVariable("userId") @NotBlank int userId,
-        @PathVariable("noticeId") @NotBlank int noticeId) {
-        roomService.agreeApply(Integer.valueOf(roomId), userId, noticeId);
+        @RequestBody @Validated AgreeApplyModel agreeApplyModel) {
+        roomService.agreeApply(agreeApplyModel.getRoomId(), agreeApplyModel.getUserId(), agreeApplyModel.getNoticeId());
         return HttpResult.operateSuccess("同意申请成功");
     }
 
-    /**
-     * refuse apply
-     *
-     * @param noticeId notice id
-     * @return {@link HttpResult}<{@link Void}>
-     */
-    @GetMapping("/refuseToJoinRoom/{roomId}/{userId}/{noticeId}")
+    @PostMapping("/refuseToJoinRoom")
     public HttpResult<Void> refuseApply(
-        @PathVariable("noticeId") int noticeId,
-        @PathVariable("roomId") String roomId,
-        @PathVariable("userId") int userId) {
-        roomService.refuseApply(Integer.valueOf(roomId), userId, noticeId);
+        @RequestBody @Validated AgreeApplyModel agreeApplyModel) {
+        roomService.refuseApply(agreeApplyModel.getRoomId(), agreeApplyModel.getUserId(), agreeApplyModel.getNoticeId());
         return HttpResult.operateSuccess("拒绝申请成功");
     }
 

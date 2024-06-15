@@ -4,10 +4,12 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import www.raven.jc.entity.model.ApplyFriendModel;
 import www.raven.jc.result.HttpResult;
 import www.raven.jc.service.FriendService;
 
@@ -25,19 +27,17 @@ public class FriendController {
     @Autowired
     private FriendService friendService;
 
-    @GetMapping("/agreeToBeFriend/{friendId}/{noticeId}")
+    @PostMapping("/agreeToBeFriend")
     public HttpResult<Void> agreeApplyFriend(
-        @PathVariable("friendId") @NotNull int friendId,
-        @PathVariable("noticeId") @NotNull int noticeId) {
-        friendService.agreeApplyFromFriend(friendId, noticeId);
+        @RequestBody @NotNull ApplyFriendModel model) {
+        friendService.agreeApplyFromFriend(model.getFriendId(), model.getNoticeId());
         return HttpResult.operateSuccess("成为好友成功");
     }
 
-    @GetMapping("/refuseToBeFriend/{friendId}/{noticeId}")
+    @GetMapping("/refuseToBeFriend")
     public HttpResult<Void> refuseApplyFriend(
-        @PathVariable("friendId") int friendId,
-        @PathVariable("noticeId") @NotNull int noticeId) {
-        friendService.refuseApplyFromFriend(noticeId);
+        @RequestBody @NotNull ApplyFriendModel model) {
+        friendService.refuseApplyFromFriend(model.getNoticeId());
         return HttpResult.operateSuccess("拒绝好友成功");
     }
 

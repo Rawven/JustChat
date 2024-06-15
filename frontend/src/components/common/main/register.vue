@@ -4,7 +4,8 @@
       <el-header>
         <el-text class="title">来注册一个账号吧👆👨</el-text>
       </el-header>
-      <el-form ref="registerForm" :model="user" :rules="rules" label-width="80px">
+      <el-form ref="registerForm" :model="user" :rules="rules"
+               label-width="80px">
         <el-form-item label="Username" prop="username">
           <el-input v-model="user.username" required></el-input>
         </el-form-item>
@@ -48,10 +49,10 @@ export default {
   },
   data() {
     return {
-      md5:'',
-      url:{
-        previewUrl:'',
-        uploadUrl:[],
+      md5: '',
+      url: {
+        previewUrl: '',
+        uploadUrl: [],
       },
       user: {
         username: '',
@@ -59,15 +60,23 @@ export default {
         password: '',
         profile: '',
       },
-      chunks:'',
-      chunkSize :30 * 1024 * 1024,
+      chunks: '',
+      chunkSize: 30 * 1024 * 1024,
       rules: {
         // Add validation rules if needed
-        username: [{required: true, message: 'Please enter your username', trigger: 'blur'}],
+        username: [{
+          required: true,
+          message: 'Please enter your username',
+          trigger: 'blur'
+        }],
         email: [
           {required: true, message: 'Please enter your email', trigger: 'blur'},
         ],
-        password: [{required: true, message: 'Please enter your password', trigger: 'blur'}],
+        password: [{
+          required: true,
+          message: 'Please enter your password',
+          trigger: 'blur'
+        }],
       },
     };
   },
@@ -86,8 +95,8 @@ export default {
               ? `http://${Host}:7000/file/getPresignedUrlByChunk`
               : `http://${Host}:7000/file/getPreSignedUrl`;
           const requestData = isChunked
-              ? { md5: data, chunkSize: Math.ceil(fileSize / this.chunkSize) }
-              : { md5: data };
+              ? {md5: data, chunkSize: Math.ceil(fileSize / this.chunkSize)}
+              : {md5: data};
 
           this.realAxios
               .post(url, requestData, {
@@ -163,7 +172,7 @@ export default {
                 localStorage.setItem("token", response.data.data.token);
                 // 注册成功后可以进行相关的处理，例如跳转到登录页面
                 this.$message.success('注册成功');
-                this.realAxios.post('http://' + Host + ':7000/user/common/defaultInfo', {}, {
+                this.realAxios.get('http://' + Host + ':7000/user/common/defaultInfo', {
                   headers: {
                     'token': localStorage.getItem("token")
                   }
