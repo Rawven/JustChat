@@ -8,20 +8,27 @@
           style="width: 200px; height: 200px"
       ></el-image>
       <br>
-      <el-text class="text-center" style="font-size: 20px; font-weight: bold">？</el-text>
-      <el-form ref="loginForm" :model="user" :rules="rules" class="login-form" label-width="80px">
+      <el-text class="text-center" style="font-size: 20px; font-weight: bold">
+        ？
+      </el-text>
+      <el-form ref="loginForm" :model="user" :rules="rules" class="login-form"
+               label-width="80px">
         <el-form-item label="用户名" prop="username">
-          <el-input v-model="user.username" prefix-icon="el-icon-user"></el-input>
+          <el-input v-model="user.username"
+                    prefix-icon="el-icon-user"></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input v-model="user.password" prefix-icon="el-icon-lock" type="password"></el-input>
+          <el-input v-model="user.password" prefix-icon="el-icon-lock"
+                    type="password"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button plain type="success" @click="login">Login</el-button>
         </el-form-item>
       </el-form>
 
-      <el-button class="button" plain type="primary" @click="toRegister">还没有账号？</el-button>
+      <el-button class="button" plain type="primary" @click="toRegister">
+        还没有账号？
+      </el-button>
     </el-card>
   </el-container>
 </template>
@@ -48,8 +55,16 @@ export default {
       },
       rules: {
         // Add validation rules if needed
-        username: [{required: true, message: 'Please enter your username', trigger: 'blur'}],
-        password: [{required: true, message: 'Please enter your password', trigger: 'blur'}],
+        username: [{
+          required: true,
+          message: 'Please enter your username',
+          trigger: 'blur'
+        }],
+        password: [{
+          required: true,
+          message: 'Please enter your password',
+          trigger: 'blur'
+        }],
       },
     };
   },

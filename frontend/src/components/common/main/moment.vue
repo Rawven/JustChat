@@ -18,7 +18,8 @@
           <path d="m12 19-7-7 7-7"></path>
           <path d="M19 12H5"></path>
         </svg>
-        <div class="flex-grow text-center font-semibold text-gray-700">朋友圈</div>
+        <div class="flex-grow text-center font-semibold text-gray-700">朋友圈
+        </div>
         <svg
             class="text-gray-600"
             fill="none"
@@ -32,7 +33,8 @@
             xmlns="http://www.w3.org/2000/svg"
             @click="create = true"
         >
-          <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path>
+          <path
+              d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path>
           <circle cx="12" cy="13" r="3"></circle>
         </svg>
         <el-drawer
@@ -45,7 +47,8 @@
             <el-header>
               <el-text class="title">来发布你的朋友圈吧👆👨</el-text>
             </el-header>
-            <el-form ref="releaseForm" :model="data" :rules="rules" label-width="80px">
+            <el-form ref="releaseForm" :model="data" :rules="rules"
+                     label-width="80px">
               <el-form-item label="Text" prop="text">
                 <el-input v-model="data.text" required></el-input>
               </el-form-item>
@@ -54,7 +57,8 @@
                   :http-request="uploadFile"
                   action=""
                   class="upload-demo">
-                <el-button plain size="small" type="primary">点击上传</el-button>
+                <el-button plain size="small" type="primary">点击上传
+                </el-button>
                 <template #tip>
                   <div class="el-upload__tip">
                     jpg/png files with a size less than 500KB.
@@ -73,12 +77,18 @@
         <!--      -->
         <div v-for="moment in feedData" :key="moment.momentId">
           <div class="flex items-center space-x-3">
-      <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
-        <img :src="ipfsHost()+moment.userInfo.profile" alt="user profile" class="aspect-square h-full w-full"/>
+      <span
+          class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
+        <img :src="ipfsHost()+moment.userInfo.profile" alt="user profile"
+             class="aspect-square h-full w-full"/>
       </span>
             <div>
-              <div class="font-semibold text-gray-700">{{ moment.userInfo.username }}</div>
-              <div class="text-sm text-gray-500">{{ timestampToTime(moment.timestamp) }}</div>
+              <div class="font-semibold text-gray-700">
+                {{ moment.userInfo.username }}
+              </div>
+              <div class="text-sm text-gray-500">
+                {{ timestampToTime(moment.timestamp) }}
+              </div>
             </div>
           </div>
           <div class="mt-3">
@@ -88,35 +98,50 @@
 
             <!-- Likes -->
             <div v-for="like in moment.likes" :key="like.userInfo.username">
-              <el-text type="primary">{{ like.userInfo.username }} - 点赞过</el-text>
+              <el-text type="primary">{{ like.userInfo.username }} - 点赞过
+              </el-text>
             </div>
             <!-- Comments -->
-            <div v-for="comment in moment.comments" :key="comment.userInfo.username" class="mb-4"
+            <div v-for="comment in moment.comments"
+                 :key="comment.userInfo.username" class="mb-4"
                  @click="selectComment(comment.id)">
               <div class="mt-2 rounded-md border p-4 bg-gray-200">
                 <div class="flex items-center justify-between mb-2">
                   <div class="flex items-center space-x-2">
-        <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
+        <span
+            class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
           <img
               :src="ipfsHost()+comment.userInfo.profile"
               alt="user profile"
               class="aspect-square h-full w-full"
           />
         </span>
-                    <div class="text-sm font-bold text-gray-700">{{ comment.userInfo.username }} - 评论</div>
+                    <div class="text-sm font-bold text-gray-700">
+                      {{ comment.userInfo.username }} - 评论
+                    </div>
                   </div>
-                  <div class="text-xs text-gray-500">{{ comment.userInfo.timestamp }}</div>
+                  <div class="text-xs text-gray-500">
+                    {{ comment.userInfo.timestamp }}
+                  </div>
                 </div>
-                <p class="mt-2 text-lg text-gray-700 mb-2">{{ comment.content }}</p>
+                <p class="mt-2 text-lg text-gray-700 mb-2">{{
+                    comment.content
+                  }}</p>
                 <div class="pl-4">
-                  <div v-for="nestedComment in comment.replies" :key="nestedComment.userInfo.username" class="mb-2">
+                  <div v-for="nestedComment in comment.replies"
+                       :key="nestedComment.userInfo.username" class="mb-2">
                     <div class="flex item justify-between">
-                      <span class="text-sm font-bold text-gray-700">{{ nestedComment.userInfo.username }} - 回复</span>
-                      <span class="text-lg text-gray-700">{{ nestedComment.content }}</span>
+                      <span class="text-sm font-bold text-gray-700">{{
+                          nestedComment.userInfo.username
+                        }} - 回复</span>
+                      <span class="text-lg text-gray-700">{{
+                          nestedComment.content
+                        }}</span>
                     </div>
                   </div>
                 </div>
-                <el-input v-if="selectedCommentId === comment.id" v-model="comment.input" placeholder="要回复吗"
+                <el-input v-if="selectedCommentId === comment.id"
+                          v-model="comment.input" placeholder="要回复吗"
                           @keyup.enter="submitNestedComment(moment.momentId,comment.input,moment.userInfo.userId,comment.id,moment.timestamp)"/>
               </div>
             </div>
@@ -133,7 +158,8 @@
                   width="24"
                   xmlns="http://www.w3.org/2000/svg"
               >
-                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                <path
+                    d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
               </svg>
               <svg
                   class="text-gray-500"
@@ -168,7 +194,8 @@
               </svg>
             </div>
             <div class="mt-3 flex justify-between text-gray-500">
-              <el-button @click="toLike(moment.momentId,moment.userInfo.userId,moment.timestamp)">
+              <el-button
+                  @click="toLike(moment.momentId,moment.userInfo.userId,moment.timestamp)">
                 <el-icon>
                   <Star/>
                 </el-icon>
@@ -248,7 +275,11 @@ export default {
           // 可以根据需要添加其他验证规则
         ],
         document: [
-          {required: true, message: '请输入朋友圈附加文档内容', trigger: 'blur'},
+          {
+            required: true,
+            message: '请输入朋友圈附加文档内容',
+            trigger: 'blur'
+          },
           // 可以根据需要添加其他验证规则
         ],
       },

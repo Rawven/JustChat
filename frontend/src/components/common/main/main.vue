@@ -3,7 +3,8 @@
     <JcAside></JcAside>
     <el-aside class="theAside w-64 border-r border-gray-200 overflow-y-auto">
       <el-row>
-        <img :src="ipfsHost()+userInfo.profile" alt="User Avatar" class="avatar">
+        <img :src="ipfsHost()+userInfo.profile" alt="User Avatar"
+             class="avatar">
       </el-row>
       <br>
       <el-header class="p-4 border-b border-gray-200">
@@ -33,17 +34,22 @@
                 <el-icon v-else color="#409EFC">
                   <ChatRound/>
                 </el-icon>
-                <el-col v-if="checkNull(room.lastMsgSender)" class="font-medium text-lg font-serif">
-                  {{ room.lastMsgSender + "：" + JSON.parse(room.lastMsg).content }}
+                <el-col v-if="checkNull(room.lastMsgSender)"
+                        class="font-medium text-lg font-serif">
+                  {{
+                    room.lastMsgSender + "：" + JSON.parse(room.lastMsg).content
+                  }}
                 </el-col>
-                <el-col v-else class="font-medium text-lg font-serif">暂无消息</el-col>
+                <el-col v-else class="font-medium text-lg font-serif">暂无消息
+                </el-col>
               </el-row>
             </el-col>
           </el-col>
         </div>
       </el-menu>
     </el-aside>
-    <chat-room v-if="nowRoomId >=1" :key="nowRoomId" :room="JSON.stringify(this.rooms[this.roomIndex.get(nowRoomId)])"
+    <chat-room v-if="nowRoomId >=1" :key="nowRoomId"
+               :room="JSON.stringify(this.rooms[this.roomIndex.get(nowRoomId)])"
                :user="this.userInfo.username"></chat-room>
   </el-container>
 </template>

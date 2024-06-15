@@ -14,7 +14,8 @@
             @click="checkOut(friend.friendId)"
         >
     <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
-      <img :src="ipfsHost()+friend.friendProfile" alt="User Avatar" class="avatar">
+      <img :src="ipfsHost()+friend.friendProfile" alt="User Avatar"
+           class="avatar">
     </span>
           <el-col>
             <el-col v-if="checkNull(friend.lastMsgSender)">{{
@@ -30,10 +31,14 @@
                 <el-icon v-else color="#409EFC">
                   <ChatRound/>
                 </el-icon>
-                <el-col v-if="checkNull(friend.lastMsgSender)" class="font-medium text-lg font-serif">
-                  {{ friend.lastMsgSender + "：" + JSON.parse(friend.lastMsg).content }}
+                <el-col v-if="checkNull(friend.lastMsgSender)"
+                        class="font-medium text-lg font-serif">
+                  {{
+                    friend.lastMsgSender + "：" + JSON.parse(friend.lastMsg).content
+                  }}
                 </el-col>
-                <el-col v-else class="font-medium text-lg font-serif">暂无消息</el-col>
+                <el-col v-else class="font-medium text-lg font-serif">暂无消息
+                </el-col>
               </el-row>
             </el-col>
           </el-col>

@@ -2,10 +2,8 @@ package www.raven.jc.controller;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,15 +41,19 @@ public class MessageController {
         return HttpResult.operateSuccess("获取最新离线信息成功", messageService.getLatestOffline());
     }
 
-    @PostMapping("/queryRoomMsgPages")
+    @GetMapping("/queryRoomMsgPages/{roomId}/{page}/{size}")
     public HttpResult<List<MessageVO>> getGroupMsgHistory(
-        @RequestBody @Validated PageGroupMsgModel model) {
+        @PathVariable("roomId") int roomId, @PathVariable("page") int page,
+        @PathVariable("size") int size) {
+        PageGroupMsgModel model = new PageGroupMsgModel().setRoomId(roomId).setPage(page).setSize(size);
         return HttpResult.operateSuccess("获取历史群聊信息成功", roomService.getGroupMsgPages(model));
     }
 
-    @PostMapping("/queryFriendMsgPages")
+    @GetMapping("/queryFriendMsgPages/{friendId}/{page}/{size}")
     public HttpResult<List<MessageVO>> getFriendMsgHistory(
-        @RequestBody @Validated PagesFriendMsgModel model) {
+        @PathVariable("friendId") int friendId, @PathVariable("page") int page,
+        @PathVariable("size") int size) {
+        PagesFriendMsgModel model = new PagesFriendMsgModel().setFriendId(friendId).setPage(page).setSize(size);
         return HttpResult.operateSuccess("获取历史私聊信息成功", friendService.getFriendMsgPages(model));
     }
 

@@ -1,19 +1,23 @@
 <template>
   <el-container class="cr-container">
-    <header class="flex items-center justify-between p-4 bg-white border-b border-gray-200 ">
+    <header
+        class="flex items-center justify-between p-4 bg-white border-b border-gray-200 ">
       <div class="flex items-center space-x-4">
         <div>
           <h2 class="text-lg font-semibold">{{ this.theRoom.roomName }}</h2>
         </div>
 
-        <el-button class="button" plain type="primary" @click="addMsg">消息漫游-分页加载-</el-button>
+        <el-button class="button" plain type="primary" @click="addMsg">
+          消息漫游-分页加载-
+        </el-button>
       </div>
     </header>
-    <main class="flex-1 p-4 space-y-4  main-content" >
+    <main class="flex-1 p-4 space-y-4  main-content">
       <div v-for="(message, index) in messages" :key="index">
         <div v-if="isMe(message)">
           <div class="flex flex-col items-end space-y-2">
-            <div class="rounded-lg border shadow-sm bg-green-50 text-green-700" data-v0-t="card">
+            <div class="rounded-lg border shadow-sm bg-green-50 text-green-700"
+                 data-v0-t="card">
               <div class="p-6">
                 <p class="font-medium text-lg font-serif">{{ message.text }}</p>
 
@@ -33,23 +37,31 @@
                 @confirm="addApplyFriend(message.user)"
             >
               <template #reference>
-                <img :src="ipfsHost()+message.profile" alt="User Avatar" class="avatar">
+                <img :src="ipfsHost()+message.profile" alt="User Avatar"
+                     class="avatar">
               </template>
             </el-popconfirm>
 
 
-            <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full mt-2">
+            <span
+                class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full mt-2">
           <span
               class="flex h-full w-full items-center justify-center rounded-full bg-muted font-medium text-lg font-serif">{{
               message.user
             }}</span>
         </span>
-            <div class="rounded-lg border shadow-sm bg-blue-50 text-blue-700" data-v0-t="card">
+            <div class="rounded-lg border shadow-sm bg-blue-50 text-blue-700"
+                 data-v0-t="card">
               <div class="p-6">
-                <p v-if="message.offline" class="text-xs text-gray-500"><el-text>{{ message.text }}</el-text> <el-icon  color="#409EFC">
-                  <ChatRound/>
-                </el-icon></p>
-                <p v-else class="font-medium text-lg font-serif">{{ message.text }}</p>
+                <p v-if="message.offline" class="text-xs text-gray-500">
+                  <el-text>{{ message.text }}</el-text>
+                  <el-icon color="#409EFC">
+                    <ChatRound/>
+                  </el-icon>
+                </p>
+                <p v-else class="font-medium text-lg font-serif">{{
+                    message.text
+                  }}</p>
               </div>
             </div>
           </div>
@@ -148,7 +160,7 @@ export default {
 
     this.socket.onmessage = (event) => {
       console.log('WebSocket message received:', event.data);
-      if(event.data === "ping"){
+      if (event.data === "ping") {
         this.socket.send("ping");
         return
       }
@@ -162,7 +174,7 @@ export default {
       } else if (data.type === "RECORD_MOMENT_FRIEND" || data.type === "RECORD_MOMENT") {
         this.momentNoticeIsNew = true;
         ElMessage.success('您有新的朋友圈消息');
-      } else if(data.type === "room"){
+      } else if (data.type === "room") {
         const msg = {
           time: Date.now(),
           text: data.text,
@@ -172,17 +184,18 @@ export default {
         this.messages.push(msg);
       }
       //发送msg_deliver_ack
-      let userInfo =JSON.parse(localStorage.getItem("userData"));
+      let userInfo = JSON.parse(localStorage.getItem("userData"));
       const msg = {
         time: Date.now(),
         belongId: this.theRoom.roomId,
         text: this.message,
         type: MSG_DELIVERED_ACK,
-        userInfo:{
+        userInfo: {
           userId: userInfo.userId,
           username: userInfo.username,
           profile: userInfo.profile
-        }};
+        }
+      };
       this.socket.send(JSON.stringify(msg));
     };
 
@@ -199,9 +212,7 @@ export default {
 
     getOffline() {
       let token = localStorage.getItem("token");
-      this.realAxios.post(`http://` + Host + `:7000/chat/message/getLatestRoomHistory`, {
-        roomId: this.theRoom.roomId,
-      }, {
+      this.realAxios.get(`http://` + Host + `:7000/chat/message/getLatestRoomHistory/${this.theRoom.roomId}`, {
         headers: {
           'token': token
         }
@@ -215,17 +226,18 @@ export default {
               offline: true
             })); // 使用map方法将每个MessageVO对象转换为msg对象
             //发送msg_deliver_ack
-            let userInfo =JSON.parse(localStorage.getItem("userData"));
+            let userInfo = JSON.parse(localStorage.getItem("userData"));
             const msg = {
               time: Date.now(),
               belongId: this.theRoom.roomId,
               text: this.message,
               type: MSG_DELIVERED_ACK,
-              userInfo:{
+              userInfo: {
                 userId: userInfo.userId,
                 username: userInfo.username,
                 profile: userInfo.profile
-              }};
+              }
+            };
             this.socket.send(JSON.stringify(msg));
           })
 
@@ -242,28 +254,25 @@ export default {
     },
     sendMessage() {
       if (this.message) {
-        let userInfo =JSON.parse(localStorage.getItem("userData"));
+        let userInfo = JSON.parse(localStorage.getItem("userData"));
         const msg = {
           time: Date.now(),
           belongId: this.theRoom.roomId,
           text: this.message,
           type: "room",
-          userInfo:{
+          userInfo: {
             userId: userInfo.userId,
             username: userInfo.username,
             profile: userInfo.profile
-          }};
+          }
+        };
         this.socket.send(JSON.stringify(msg));
         this.message = '';
       }
     }
     , addMsg() {
       let token = localStorage.getItem("token");
-      this.realAxios.post(`http://` + Host + `:7000/chat/message/queryRoomMsgPages`, {
-        roomId: this.theRoom.roomId,
-        page: this.page,
-        size: 15
-      }, {
+      this.realAxios.get(`http://` + Host + `:7000/chat/message/queryRoomMsgPages/${this.theRoom.roomId}/${this.page}/${15}`, {
         headers: {
           'token': token
         }

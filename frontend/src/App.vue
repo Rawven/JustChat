@@ -25,10 +25,7 @@ export default {
 
   },
   methods: {
-    generateId() {
-      return Math.random().toString(36).substr(2) + Date.now().toString(36);
-    },
-    // 关闭窗口之前执行
+// 关闭窗口之前执行
     beforeunloadHandler() {
       this.beforeUnload_time = new Date().getTime();
     },

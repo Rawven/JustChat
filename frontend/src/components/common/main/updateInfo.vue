@@ -8,11 +8,14 @@
         <el-form ref="form" :model="form" label-width="120px">
           <el-form-item label="用户名">
             <el-input v-model="form.username"></el-input>
-            <el-button plain type="primary" @click="updateUsername">更新用户名</el-button>
+            <el-button plain type="primary" @click="updateUsername">更新用户名
+            </el-button>
           </el-form-item>
           <el-form-item label="个性签名">
             <el-input v-model="form.signature"></el-input>
-            <el-button plain type="primary" @click="updateSignature">更新个性签名</el-button>
+            <el-button plain type="primary" @click="updateSignature">
+              更新个性签名
+            </el-button>
           </el-form-item>
           <el-form-item label="头像">
             <el-upload
@@ -26,7 +29,8 @@
                 </div>
               </template>
             </el-upload>
-            <el-button plain type="primary" @click="updateAvatar">更新头像</el-button>
+            <el-button plain type="primary" @click="updateAvatar">更新头像
+            </el-button>
           </el-form-item>
         </el-form>
       </el-card>

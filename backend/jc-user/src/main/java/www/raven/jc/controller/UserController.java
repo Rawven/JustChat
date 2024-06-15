@@ -1,19 +1,16 @@
 package www.raven.jc.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import www.raven.jc.dto.QueryUserInfoDTO;
 import www.raven.jc.dto.UserInfoDTO;
 import www.raven.jc.result.HttpResult;
 import www.raven.jc.service.UserService;
@@ -35,24 +32,12 @@ public class UserController {
     @Autowired
     private HttpServletRequest request;
 
-    /**
-     * check user exit
-     *
-     * @param username username
-     * @return {@link HttpResult}<{@link Boolean}>
-     */
-    @PostMapping("/checkUserExit")
-    HttpResult<Boolean> checkUserExit(
-        @RequestBody @NotBlank String username) {
-        return HttpResult.operateSuccess("查找成功", userService.checkUserExit(username));
+    @GetMapping("/defaultInfo")
+    public HttpResult<UserInfoDTO> defaultInfo() {
+        int userId = RequestUtil.getUserId(request);
+        return HttpResult.operateSuccess("查找成功", userService.querySingleInfo(userId));
     }
 
-    /**
-     * user logout
-     *
-     * @param userId user id
-     * @return {@link HttpResult}<{@link Void}>
-     */
     @PostMapping("/userLogout")
     HttpResult<Void> saveLogOutTime(@RequestBody @NotNull Integer userId) {
         userService.saveTime(userId);
@@ -83,32 +68,4 @@ public class UserController {
         return HttpResult.operateSuccess("重命名成功");
     }
 
-    @PostMapping("/defaultInfo")
-    public HttpResult<UserInfoDTO> defaultInfo() {
-        int userId = RequestUtil.getUserId(request);
-        return HttpResult.operateSuccess("查找成功", userService.querySingleInfo(userId));
-    }
-
-    @PostMapping("/getSingleInfo")
-    public HttpResult<UserInfoDTO> getSingleInfo(
-        @RequestBody @NotNull Integer userId) {
-        return HttpResult.operateSuccess("查找成功", userService.querySingleInfo(userId));
-    }
-
-    @PostMapping("/getAllInfo")
-    public HttpResult<List<UserInfoDTO>> getAllInfo() {
-        return HttpResult.operateSuccess("查找成功", userService.queryAllInfo());
-    }
-
-    @PostMapping("/getBatchInfo")
-    HttpResult<List<UserInfoDTO>> getBatchInfo(
-        @RequestBody List<Integer> userIds) {
-        return HttpResult.operateSuccess("查找成功", userService.queryBatchInfo(userIds));
-    }
-
-    @PostMapping("/getRelatedInfoList")
-    public HttpResult<List<UserInfoDTO>> getRelatedInfoList(
-        @RequestBody @Validated QueryUserInfoDTO userInfoDTO) {
-        return HttpResult.operateSuccess("查找成功", userService.queryLikedInfoList(userInfoDTO.getColumn(), userInfoDTO.getText()));
-    }
 }
