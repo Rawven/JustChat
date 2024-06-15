@@ -36,7 +36,7 @@ import www.raven.jc.util.JwtUtil;
 @Data
 public class WebsocketService {
     /**
-     * 用来存在线连接数
+     * 在线连接数map
      */
     public static final Map<Integer, Session> SESSION_POOL = new HashMap<>();
     /**
@@ -52,33 +52,22 @@ public class WebsocketService {
     public static CopyOnWriteArraySet<WebsocketService> webSockets = new CopyOnWriteArraySet<>();
 
     private static RedissonClient redissonClient;
-
     private static ImProperty imProperty;
-
     private static PrivateHandler privateHandler;
-
     private static RoomHandler roomHandler;
-
     private static ReadAckHandler readAckHandler;
     private static DeliveredAckHandler deliveredAckHandler;
 
     public BaseHandler baseHandler;
     /**
-     * user id
-     * 对应是哪个用户
+     * 该连接的用户id
      */
     protected Integer userId;
     /**
-     * 与某个客户端的连接会话，需要通过它来给客户端发送数据
+     * 与客户端的连接会话
      **/
     protected Session session;
 
-    /**
-     * send one message
-     *
-     * @param message message
-     * @param id      id
-     */
     public static void sendOneMessage(Integer id, String message) {
         Session session = SESSION_POOL.get(id);
         if (session != null && session.isOpen()) {
@@ -105,9 +94,6 @@ public class WebsocketService {
         }
     }
 
-    /**
-     * 链接成功调用的方法
-     */
     @OnOpen
     public void onOpen(Session session,
         @PathParam(value = "token") String token) {
@@ -129,10 +115,6 @@ public class WebsocketService {
         log.info("ws: 有新的连接,用户id为{},总数为:{}", this.userId, webSockets.size());
     }
 
-    /**
-     * on close
-     * 链接关闭调用的方法
-     */
     @OnClose
     public void onClose() {
         webSockets.remove(this);
@@ -140,12 +122,6 @@ public class WebsocketService {
         log.info("ws:用户id {} 连接断开，总数为:{}", this.userId, webSockets.size());
     }
 
-    /**
-     * on message
-     * 收到客户端消息后调用的方法
-     *
-     * @param message message
-     */
     @OnMessage
     public void onMessage(String message) {
         if (Objects.equals(message, HEARTBEAT)) {
@@ -177,12 +153,6 @@ public class WebsocketService {
         this.baseHandler.onMessage(messageDTO, this.session);
     }
 
-    /**
-     * on error 发送错误时的处理
-     *
-     * @param session session
-     * @param error   error
-     */
     @OnError
     public void onError(Session session, Throwable error) {
         SESSION_POOL.remove(this.userId);
@@ -190,12 +160,6 @@ public class WebsocketService {
         log.error("Stack trace: {}", (Object) error.getStackTrace());
     }
 
-    /**
-     * send all message
-     * 遍历方法
-     *
-     * @param message message
-     */
     public void sendAllMessage(String message) {
         log.info("--Websocket: 广播消息:{}", message);
         for (WebsocketService handler : webSockets) {

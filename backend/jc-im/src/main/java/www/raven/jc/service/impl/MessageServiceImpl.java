@@ -7,11 +7,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
+import org.redisson.api.RBatch;
 import org.redisson.api.RScoredSortedSet;
+import org.redisson.api.RScoredSortedSetAsync;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -67,26 +71,41 @@ public class MessageServiceImpl implements MessageService {
     private MessageReadAckDAO messageReadAckDAO;
 
     @Override
-    public void saveOfflineMessage(Message message, List<Integer> userIds,
+    public void saveOfflineMsgAndReadAck(Message message, List<Integer> userIds,
         Integer metaId) {
-        //对离线用户进行离线信息保存
         long timeStamp = message.getTimestamp().getTime();
-        userIds.forEach(
-            id -> {
-                //进行离线信息保存
-                RScoredSortedSet<Object> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + id.toString());
-                log.info("离线消息保存:{}", JsonUtil.objToJson(message));
-                scoredSortedSet.add(timeStamp, message);
-            }
-        );
-        //对所有群成员插入ReadAck回执
-        List<MessageReadAck> ackList = userIds.stream().map(id -> new MessageReadAck().setMessageId(message.getId())
-            .setSenderId(message.getSenderId())
-            .setReceiverId(id)
-            .setRoomId(metaId)
-            .setIfRead(false)).toList();
-        boolean b = messageReadAckDAO.saveBatch(ackList);
-        Assert.isTrue(b, "save ack fail");
+        // 进行用户的离线信息保存
+        CompletableFuture<Void> redisFuture = CompletableFuture.runAsync(() -> {
+            RBatch batch = redissonClient.createBatch();
+            userIds.parallelStream().forEach(id -> {
+                RScoredSortedSetAsync<Object> scoredSortedSet = batch.getScoredSortedSet(OfflineMessagesConstant.PREFIX + id.toString());
+                scoredSortedSet.addAsync(timeStamp, message);
+                // 日志记录改为条件判断
+                if (log.isInfoEnabled()) {
+                    log.info("离线消息保存:{}", JsonUtil.objToJson(message));
+                }
+            });
+            batch.execute();
+        });
+        // 进行消息回执的批量插入
+        CompletableFuture<Void> dbFuture = CompletableFuture.runAsync(() -> {
+            List<MessageReadAck> ackList = userIds.stream().map(id ->
+                    new MessageReadAck()
+                        .setMessageId(message.getId())
+                        .setSenderId(message.getSenderId())
+                        .setReceiverId(id)
+                        .setRoomId(metaId)
+                        .setIfRead(false))
+                .toList();
+            Assert.isTrue(messageReadAckDAO.saveBatch(ackList), "save ack fail");
+        });
+        // 等待两个异步操作完成
+        CompletableFuture<Void> combinedFuture = CompletableFuture.allOf(redisFuture, dbFuture);
+        try {
+            combinedFuture.get();  // 阻塞等待所有任务完成
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException("Failed to save offline message", e);
+        }
     }
 
     @Override

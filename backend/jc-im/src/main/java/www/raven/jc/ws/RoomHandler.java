@@ -56,9 +56,8 @@ public class RoomHandler implements BaseHandler {
             .setType(message.getType());
         List<Integer> userIds = userRoomDAO.getBaseMapper().selectList(new QueryWrapper<UserRoom>().eq("room_id", message.getBelongId())).stream()
             .map(UserRoom::getUserId).collect(Collectors.toList());
-        messageService.saveOfflineMessage(realMessage, userIds);
+        messageService.saveOfflineMsgAndReadAck(realMessage, userIds);
         broadcast(redissonClient, userIds, message, rocketMQTemplate);
-
         MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_SAVE_HISTORY_MSG,
             imProperty.getInTopic(), JsonUtil.objToJson(new SaveMsgEvent().setMessage(realMessage)
                 .setType(MessageConstant.ROOM)));

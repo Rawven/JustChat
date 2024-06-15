@@ -48,7 +48,7 @@ public class PrivateHandler implements BaseHandler {
             .setReceiverId(String.valueOf(friendId))
             .setType(message.getType());
         List<Integer> ids = List.of(friendId);
-        messageService.saveOfflineMessage(realMessage, ids);
+        messageService.saveOfflineMsgAndReadAck(realMessage, ids);
         broadcast(redissonClient, ids, message, rocketMQTemplate);
         MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_SAVE_HISTORY_MSG,
             imProperty.getInTopic(), JsonUtil.objToJson(new SaveMsgEvent().setMessage(realMessage)

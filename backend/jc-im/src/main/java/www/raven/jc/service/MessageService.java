@@ -28,8 +28,9 @@ public interface MessageService {
      * @param message message
      * @param userIds user ids
      */
-    default void saveOfflineMessage(Message message, List<Integer> userIds) {
-        saveOfflineMessage(message, userIds, null);
+    default void saveOfflineMsgAndReadAck(Message message,
+        List<Integer> userIds) {
+        saveOfflineMsgAndReadAck(message, userIds, null);
     }
 
     /**
@@ -39,7 +40,7 @@ public interface MessageService {
      * @param userIds user ids
      * @param metaId  meta id
      */
-    void saveOfflineMessage(Message message, List<Integer> userIds,
+    void saveOfflineMsgAndReadAck(Message message, List<Integer> userIds,
         Integer metaId);
 
     /**

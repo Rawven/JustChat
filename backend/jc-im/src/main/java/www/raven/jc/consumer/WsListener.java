@@ -5,7 +5,7 @@ import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 import www.raven.jc.constant.ImImMqConstant;
-import www.raven.jc.template.AbstractMQListener;
+import www.raven.jc.template.AbstractMqListener;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.ws.WebsocketService;
 import www.raven.jc.ws.WsMsg;
@@ -19,7 +19,7 @@ import www.raven.jc.ws.WsMsg;
 @Component
 @Slf4j
 @RocketMQMessageListener(consumerGroup = "${mq.ws_consumer_group}", topic = "${mq.ws_topic}", selectorExpression = ImImMqConstant.TAGS_SEND_MESSAGE)
-public class WsListener extends AbstractMQListener {
+public class WsListener extends AbstractMqListener {
 
     public WsListener(RedissonClient redissonClient) {
         super(redissonClient);

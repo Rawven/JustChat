@@ -31,7 +31,7 @@ import www.raven.jc.event.RoomApplyEvent;
 import www.raven.jc.event.SaveMsgEvent;
 import www.raven.jc.event.model.DeleteNoticeEvent;
 import www.raven.jc.result.RpcResult;
-import www.raven.jc.template.AbstractMQListener;
+import www.raven.jc.template.AbstractMqListener;
 import www.raven.jc.util.JsonUtil;
 import www.raven.jc.ws.WebsocketService;
 
@@ -44,7 +44,7 @@ import www.raven.jc.ws.WebsocketService;
 @Component
 @Slf4j
 @RocketMQMessageListener(consumerGroup = "${mq.in_consumer_group}", topic = "${mq.in_topic}")
-public class NoticeEventListener extends AbstractMQListener {
+public class NoticeEventListener extends AbstractMqListener {
     @Autowired
     private RedissonClient redissonClient;
     @Autowired
@@ -59,8 +59,6 @@ public class NoticeEventListener extends AbstractMQListener {
     private FriendChatDAO friendChatDAO;
 
     @Autowired
-    private
-
     public NoticeEventListener(RedissonClient redissonClient) {
         super(redissonClient);
     }
@@ -130,8 +128,6 @@ public class NoticeEventListener extends AbstractMQListener {
 
     /**
      * 通知用户有人想要入群
-     *
-     * @param msg msg
      */
     public void eventUserJoinRoomApply(String msg) {
         RoomApplyEvent payload = JsonUtil.jsonToObj(msg, RoomApplyEvent.class);
