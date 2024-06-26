@@ -1,6 +1,7 @@
 package www.raven.jc.consumer;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.spring.annotation.MessageModel;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
@@ -18,17 +19,18 @@ import www.raven.jc.ws.WsMsg;
  */
 @Component
 @Slf4j
-@RocketMQMessageListener(consumerGroup = "${mq.ws_consumer_group}", topic = "${mq.ws_topic}", selectorExpression = ImImMqConstant.TAGS_SEND_MESSAGE)
+//使用API方式定义可以实现不用硬编码ws_topic
+@RocketMQMessageListener(consumerGroup = "${mq.ws_consumer_group}", topic = "${mq.ws_topic}", messageModel = MessageModel.CLUSTERING, selectorExpression = ImImMqConstant.TAGS_SEND_MESSAGE)
 public class WsListener extends AbstractMqListener {
 
-    public WsListener(RedissonClient redissonClient) {
-        super(redissonClient);
-    }
+  public WsListener(RedissonClient redissonClient) {
+    super(redissonClient);
+  }
 
-    @Override
-    public void onMessage0(String message, String tags) {
-        WsMsg wsMsg = JsonUtil.jsonToObj(message, WsMsg.class);
-        WebsocketService.sendBatchMessage(wsMsg.getMessage(), wsMsg.getTo());
-    }
+  @Override
+  public void onMessage0(String message, String tags) {
+    WsMsg wsMsg = JsonUtil.jsonToObj(message, WsMsg.class);
+    WebsocketService.sendBatchMessage(wsMsg.getMessage(), wsMsg.getTo());
+  }
 
 }

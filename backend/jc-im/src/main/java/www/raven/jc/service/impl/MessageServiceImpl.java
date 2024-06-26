@@ -49,96 +49,99 @@ import www.raven.jc.util.RequestUtil;
 @Service
 @Slf4j
 public class MessageServiceImpl implements MessageService {
-    @Autowired
-    private MessageDAO messageDAO;
-    @Autowired
-    private UserRoomDAO userRoomDAO;
-    @Autowired
-    private RoomDAO roomDAO;
-    @Autowired
-    private FriendChatDAO friendChatDAO;
-    @Autowired
-    private UserRpcService userRpcService;
-    @Autowired
-    private RocketMQTemplate rocketMQTemplate;
-    @Autowired
-    private RedissonClient redissonClient;
-    @Autowired
-    private HttpServletRequest request;
-    @Autowired
-    private ImProperty imProperty;
-    @Autowired
-    private MessageReadAckDAO messageReadAckDAO;
 
-    @Override
-    public void saveOfflineMsgAndReadAck(Message message, List<Integer> userIds,
-        Integer metaId) {
-        long timeStamp = message.getTimestamp().getTime();
-        // 进行用户的离线信息保存
-        CompletableFuture<Void> redisFuture = CompletableFuture.runAsync(() -> {
-            RBatch batch = redissonClient.createBatch();
-            userIds.parallelStream().forEach(id -> {
-                RScoredSortedSetAsync<Object> scoredSortedSet = batch.getScoredSortedSet(OfflineMessagesConstant.PREFIX + id.toString());
-                scoredSortedSet.addAsync(timeStamp, message);
-                // 日志记录改为条件判断
-                if (log.isInfoEnabled()) {
-                    log.info("离线消息保存:{}", JsonUtil.objToJson(message));
-                }
-            });
-            batch.execute();
-        });
-        // 进行消息回执的批量插入
-        CompletableFuture<Void> dbFuture = CompletableFuture.runAsync(() -> {
-            List<MessageReadAck> ackList = userIds.stream().map(id ->
-                    new MessageReadAck()
-                        .setMessageId(message.getId())
-                        .setSenderId(message.getSenderId())
-                        .setReceiverId(id)
-                        .setRoomId(metaId)
-                        .setIfRead(false))
-                .toList();
-            Assert.isTrue(messageReadAckDAO.saveBatch(ackList), "save ack fail");
-        });
-        // 等待两个异步操作完成
-        CompletableFuture<Void> combinedFuture = CompletableFuture.allOf(redisFuture, dbFuture);
-        try {
-            combinedFuture.get();  // 阻塞等待所有任务完成
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException("Failed to save offline message", e);
-        }
-    }
+  @Autowired
+  private MessageDAO messageDAO;
+  @Autowired
+  private UserRoomDAO userRoomDAO;
+  @Autowired
+  private RoomDAO roomDAO;
+  @Autowired
+  private FriendChatDAO friendChatDAO;
+  @Autowired
+  private UserRpcService userRpcService;
+  @Autowired
+  private RocketMQTemplate rocketMQTemplate;
+  @Autowired
+  private RedissonClient redissonClient;
+  @Autowired
+  private HttpServletRequest request;
+  @Autowired
+  private ImProperty imProperty;
+  @Autowired
+  private MessageReadAckDAO messageReadAckDAO;
 
-    @Override
-    public List<MessageVO> getLatestOffline() {
-        int userId = RequestUtil.getUserId(request);
-        RScoredSortedSet<Message> scoredSortedSet = redissonClient.getScoredSortedSet(OfflineMessagesConstant.PREFIX + userId);
-        Collection<Message> messages = scoredSortedSet.readAll();
-        List<Integer> ids = messages.stream().map(Message::getSenderId).toList();
-        RpcResult<List<UserInfoDTO>> batchInfo = userRpcService.getBatchInfo(ids);
-        Map<Integer, UserInfoDTO> map = batchInfo.getData().stream().collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
-        List<MessageVO> messageVos = new ArrayList<>();
-        for (Message message : messages) {
-            UserInfoDTO user = map.get(message.getSenderId());
-            messageVos.add(new MessageVO(message, user));
-        }
-        return messageVos;
+  @Override
+  public void saveOfflineMsgAndReadAck(Message message, List<Integer> userIds,
+      Integer metaId) {
+    long timeStamp = message.getTimestamp().getTime();
+    // 进行用户的离线信息保存
+    CompletableFuture<Void> redisFuture = CompletableFuture.runAsync(() -> {
+      RBatch batch = redissonClient.createBatch();
+      userIds.parallelStream().forEach(id -> {
+        RScoredSortedSetAsync<Object> scoredSortedSet = batch.getScoredSortedSet(
+            OfflineMessagesConstant.PREFIX + id.toString());
+        scoredSortedSet.addAsync(timeStamp, message);
+      });
+      batch.execute();
+    });
+    // 进行消息回执的批量插入
+    CompletableFuture<Void> dbFuture = CompletableFuture.runAsync(() -> {
+      List<MessageReadAck> ackList = userIds.stream().map(id ->
+              new MessageReadAck()
+                  .setMessageId(message.getId())
+                  .setSenderId(message.getSenderId())
+                  .setReceiverId(id)
+                  .setRoomId(metaId)
+                  .setIfRead(false))
+          .toList();
+      Assert.isTrue(messageReadAckDAO.saveBatch(ackList), "save ack fail");
+    });
+    // 等待两个异步操作完成
+    CompletableFuture<Void> combinedFuture = CompletableFuture.allOf(redisFuture, dbFuture);
+    try {
+      combinedFuture.get();  // 阻塞等待所有任务完成
+    } catch (InterruptedException | ExecutionException e) {
+      throw new RuntimeException("Failed to save offline message", e);
     }
+  }
 
-    @Override
-    public List<MessageReadAck> getReadMessageAck() {
-        int userId = RequestUtil.getUserId(request);
-        List<MessageReadAck> readAckList = messageReadAckDAO.getBaseMapper().selectList(new QueryWrapper<MessageReadAck>().eq("sender_id", userId).eq("if_ack", true));
-        //删除已经确认的Ack
-        messageReadAckDAO.getBaseMapper().delete(new QueryWrapper<MessageReadAck>().eq("sender_id", userId).eq("if_ack", true));
-        return readAckList;
+  @Override
+  public List<MessageVO> getLatestOffline() {
+    int userId = RequestUtil.getUserId(request);
+    RScoredSortedSet<Message> scoredSortedSet = redissonClient.getScoredSortedSet(
+        OfflineMessagesConstant.PREFIX + userId);
+    Collection<Message> messages = scoredSortedSet.readAll();
+    List<Integer> ids = messages.stream().map(Message::getSenderId).toList();
+    RpcResult<List<UserInfoDTO>> batchInfo = userRpcService.getBatchInfo(ids);
+    Map<Integer, UserInfoDTO> map = batchInfo.getData().stream()
+        .collect(Collectors.toMap(UserInfoDTO::getUserId, Function.identity()));
+    List<MessageVO> messageVos = new ArrayList<>();
+    for (Message message : messages) {
+      UserInfoDTO user = map.get(message.getSenderId());
+      messageVos.add(new MessageVO(message, user));
     }
+    return messageVos;
+  }
 
-    @Override
-    public void sendNotice(Integer roomId, Integer userId) {
-        Room room = roomDAO.getBaseMapper().selectById(roomId);
-        Integer founderId = room.getFounderId();
-        //通知user模块 插入一条申请记录
-        MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_CHAT_ROOM_APPLY, imProperty.getInTopic(), JsonUtil.objToJson(new RoomApplyEvent(userId, founderId, roomId)));
-    }
+  @Override
+  public List<MessageReadAck> getReadMessageAck() {
+    int userId = RequestUtil.getUserId(request);
+    List<MessageReadAck> readAckList = messageReadAckDAO.getBaseMapper()
+        .selectList(new QueryWrapper<MessageReadAck>().eq("sender_id", userId).eq("if_ack", true));
+    //删除已经确认的Ack
+    messageReadAckDAO.getBaseMapper()
+        .delete(new QueryWrapper<MessageReadAck>().eq("sender_id", userId).eq("if_ack", true));
+    return readAckList;
+  }
+
+  @Override
+  public void sendNotice(Integer roomId, Integer userId) {
+    Room room = roomDAO.getBaseMapper().selectById(roomId);
+    Integer founderId = room.getFounderId();
+    //通知user模块 插入一条申请记录
+    MqUtil.sendMsg(rocketMQTemplate, ImImMqConstant.TAGS_CHAT_ROOM_APPLY, imProperty.getInTopic(),
+        JsonUtil.objToJson(new RoomApplyEvent(userId, founderId, roomId)));
+  }
 
 }

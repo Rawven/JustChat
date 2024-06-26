@@ -7,6 +7,7 @@ import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.redisson.api.RedissonClient;
 import www.raven.jc.constant.MqConstant;
+import www.raven.jc.util.JsonUtil;
 
 import static www.raven.jc.constant.MqConstant.HEAD;
 
@@ -50,6 +51,10 @@ public abstract class AbstractMqListener implements RocketMQListener<MessageExt>
         RedissonClient redissonClient) {
         Object id = msg.getKeys();
         redissonClient.getBucket(HEAD + id).set(id, MqConstant.EXPIRE_TIME, TimeUnit.MINUTES);
+    }
+
+    public <T> T parseMessage(String message, Class<T> clazz) {
+        return JsonUtil.jsonToObj(message, clazz);
     }
 
     /**
